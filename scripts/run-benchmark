@@ -1,0 +1,205 @@
+#!/usr/bin/env bash
+# Run one model benchmark in a dedicated, reviewable Git branch.
+set -uo pipefail
+
+usage() {
+  cat <<'EOF'
+Usage: scripts/run-benchmark --adapter codex|claude --model MODEL [options] [-- ADAPTER_ARGS...]
+
+Options:
+  --run-id ID          Unique, branch-safe run ID (default: UTC timestamp + adapter + model)
+  --timeout SECONDS    Hard timeout in seconds (default: 3600)
+  -h, --help           Show this help
+
+The runner requires SP_AUTH, a clean repository, an origin remote, and either
+timeout or gtimeout. It creates and pushes benchmark/RUN_ID, then returns to
+the branch that was checked out when it started.
+EOF
+}
+
+die() { printf 'error: %s\n' "$*" >&2; exit 2; }
+note() { printf '%s\n' "$*" >&2; }
+
+json_string() {
+  local value=${1-}
+  value=${value//\\/\\\\}
+  value=${value//\"/\\\"}
+  value=${value//$'\n'/\\n}
+  value=${value//$'\r'/\\r}
+  value=${value//$'\t'/\\t}
+  printf '"%s"' "$value"
+}
+
+sanitize_id() {
+  local value=$1
+  value=$(printf '%s' "$value" | tr '[:upper:]' '[:lower:]' | tr -cs 'a-z0-9._-' '-')
+  value=${value#-}
+  value=${value%-}
+  printf '%s' "$value"
+}
+
+extract_url() {
+  grep -Eo 'https://[^[:space:]"'"'"'<>]+' "$1" 2>/dev/null | grep -E 'vercel\.app|vercel\.sh' | tail -n 1 || true
+}
+
+redact_log() {
+  local raw_log=$1 redacted_log=$2 value variable
+  cp "$raw_log" "$redacted_log"
+  for variable in SP_AUTH STRIPE_SECRET_KEY STRIPE_PUBLISHABLE_KEY STRIPE_WEBHOOK_SECRET VERCEL_TOKEN; do
+    value=${!variable-}
+    if [[ -n $value ]]; then
+      REDACT_VALUE=$value perl -0pi -e 's/\Q$ENV{REDACT_VALUE}\E/[REDACTED]/g' "$redacted_log"
+    fi
+  done
+  perl -0pi -e 's/\b(?:sk|pk|rk)_(?:test|live)_[A-Za-z0-9_=-]+/[REDACTED_STRIPE_KEY]/g; s/\bwhsec_[A-Za-z0-9_=-]+/[REDACTED_STRIPE_WEBHOOK_SECRET]/g; s/\b(?:vercel|vcp)_[A-Za-z0-9_=-]+/[REDACTED_VERCEL_TOKEN]/gi' "$redacted_log"
+}
+
+assert_no_staged_secrets() {
+  local value variable
+  for variable in SP_AUTH STRIPE_SECRET_KEY STRIPE_PUBLISHABLE_KEY STRIPE_WEBHOOK_SECRET VERCEL_TOKEN; do
+    value=${!variable-}
+    if [[ -n $value ]] && git grep --cached -n -F -- "$value" -- "runs/$RUN_ID" >/dev/null 2>&1; then
+      die "a value from $variable is staged; refusing to commit"
+    fi
+  done
+  if git grep --cached -n -E -- '\b(sk|pk|rk)_(test|live)_[A-Za-z0-9_=-]+|\bwhsec_[A-Za-z0-9_=-]+' -- "runs/$RUN_ID" >/dev/null 2>&1; then
+    die "a Stripe secret pattern is staged; refusing to commit"
+  fi
+}
+
+ADAPTER=
+MODEL=
+RUN_ID=
+TIMEOUT_SECONDS=3600
+EXTRA_ARGS=()
+
+while (($#)); do
+  case $1 in
+    --adapter) ADAPTER=${2-}; shift 2 ;;
+    --model) MODEL=${2-}; shift 2 ;;
+    --run-id) RUN_ID=${2-}; shift 2 ;;
+    --timeout) TIMEOUT_SECONDS=${2-}; shift 2 ;;
+    --) shift; EXTRA_ARGS=("$@"); break ;;
+    -h|--help) usage; exit 0 ;;
+    *) die "unknown argument: $1" ;;
+  esac
+done
+
+[[ $ADAPTER == codex || $ADAPTER == claude ]] || die "--adapter must be codex or claude"
+[[ -n $MODEL ]] || die "--model is required"
+[[ $TIMEOUT_SECONDS =~ ^[1-9][0-9]*$ ]] || die "--timeout must be a positive integer"
+[[ -n ${SP_AUTH-} ]] || die "SP_AUTH must be set to a Scalable Press test key"
+
+REPO_ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || die "run this from inside the benchmark repository"
+cd "$REPO_ROOT"
+[[ -z $(git status --porcelain --untracked-files=all) ]] || die "repository is dirty; commit or stash changes before starting a run"
+BASE_BRANCH=$(git symbolic-ref --quiet --short HEAD) || die "a named branch must be checked out"
+BASE_COMMIT=$(git rev-parse HEAD)
+git remote get-url origin >/dev/null 2>&1 || die "origin remote is required"
+
+SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+ADAPTER_PATH="$SCRIPT_DIR/adapters/$ADAPTER"
+[[ -x $ADAPTER_PATH ]] || die "adapter is not executable: $ADAPTER_PATH"
+command -v "$ADAPTER" >/dev/null 2>&1 || die "$ADAPTER CLI is not installed or not on PATH"
+TIMEOUT_COMMAND=$(command -v timeout || command -v gtimeout || true)
+[[ -n $TIMEOUT_COMMAND ]] || die "install GNU coreutils (timeout/gtimeout) to enforce --timeout"
+
+if [[ -z $RUN_ID ]]; then
+  RUN_ID="$(date -u +%Y%m%dT%H%M%SZ)-$ADAPTER-$(sanitize_id "$MODEL")"
+else
+  RUN_ID=$(sanitize_id "$RUN_ID")
+fi
+[[ -n $RUN_ID && $RUN_ID != .* && $RUN_ID != *..* ]] || die "invalid --run-id"
+BRANCH="benchmark/$RUN_ID"
+RESULT_DIR="$REPO_ROOT/runs/$RUN_ID"
+WORKSPACE="$RESULT_DIR/workspace"
+RAW_LOG="$RESULT_DIR/agent.raw.log"
+REDACTED_LOG="$RESULT_DIR/agent.log"
+FINAL_OUTPUT="$RESULT_DIR/final.md"
+METADATA="$RESULT_DIR/metadata.json"
+
+[[ ! -e $RESULT_DIR ]] || die "run directory already exists: runs/$RUN_ID"
+git show-ref --verify --quiet "refs/heads/$BRANCH" && die "branch already exists: $BRANCH"
+git ls-remote --exit-code --heads origin "$BRANCH" >/dev/null 2>&1 && die "remote branch already exists: $BRANCH"
+
+restore_base_branch() {
+  if [[ ${SWITCHED_BRANCH-0} == 1 ]]; then
+    git switch "$BASE_BRANCH" >/dev/null 2>&1 || note "warning: could not restore $BASE_BRANCH; current branch is $BRANCH"
+  fi
+}
+
+SWITCHED_BRANCH=0
+git switch --create "$BRANCH" "$BASE_COMMIT" >/dev/null || die "could not create $BRANCH"
+SWITCHED_BRANCH=1
+mkdir -p "$WORKSPACE"
+
+STARTED_AT=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+START_EPOCH=$(date +%s)
+export BENCHMARK_REPO_ROOT="$REPO_ROOT"
+export BENCHMARK_RUN_ID="$RUN_ID"
+export BENCHMARK_WORKSPACE="$WORKSPACE"
+export BENCHMARK_PROMPT_FILE="$REPO_ROOT/prompt.md"
+export BENCHMARK_MODEL="$MODEL"
+export BENCHMARK_FINAL_OUTPUT="$FINAL_OUTPUT"
+
+set +e
+"$TIMEOUT_COMMAND" "$TIMEOUT_SECONDS" "$ADAPTER_PATH" "${EXTRA_ARGS[@]}" >"$RAW_LOG" 2>&1
+AGENT_EXIT=$?
+set -e
+
+FINISHED_AT=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+DURATION_SECONDS=$(( $(date +%s) - START_EPOCH ))
+RUN_STATUS=succeeded
+if (( AGENT_EXIT == 124 )); then
+  RUN_STATUS=timed_out
+elif (( AGENT_EXIT != 0 )); then
+  RUN_STATUS=failed
+fi
+if [[ ! -s $FINAL_OUTPUT ]]; then
+  printf 'No final completion message was produced. See agent.log for the redacted transcript.\n' >"$FINAL_OUTPUT"
+  [[ $RUN_STATUS == succeeded ]] && RUN_STATUS=failed
+fi
+
+redact_log "$RAW_LOG" "$REDACTED_LOG"
+DEPLOYMENT_URL=$(extract_url "$REDACTED_LOG")
+PROMPT_SHA=$(shasum -a 256 "$BENCHMARK_PROMPT_FILE" | awk '{print $1}')
+git add "$WORKSPACE"
+WORKSPACE_TREE=$(git write-tree)
+{
+  printf '{\n'
+  printf '  "run_id": '; json_string "$RUN_ID"; printf ',\n'
+  printf '  "status": '; json_string "$RUN_STATUS"; printf ',\n'
+  printf '  "adapter": '; json_string "$ADAPTER"; printf ',\n'
+  printf '  "model": '; json_string "$MODEL"; printf ',\n'
+  printf '  "branch": '; json_string "$BRANCH"; printf ',\n'
+  printf '  "base_commit": '; json_string "$BASE_COMMIT"; printf ',\n'
+  printf '  "prompt_sha256": '; json_string "$PROMPT_SHA"; printf ',\n'
+  printf '  "workspace_tree": '; json_string "$WORKSPACE_TREE"; printf ',\n'
+  printf '  "started_at": '; json_string "$STARTED_AT"; printf ',\n'
+  printf '  "finished_at": '; json_string "$FINISHED_AT"; printf ',\n'
+  printf '  "duration_seconds": %s,\n' "$DURATION_SECONDS"
+  printf '  "agent_exit_code": %s,\n' "$AGENT_EXIT"
+  printf '  "deployment_url": '; json_string "$DEPLOYMENT_URL"; printf '\n}\n'
+} >"$METADATA"
+
+git add "runs/$RUN_ID"
+git reset -q -- "$RAW_LOG"
+git diff --cached --check || { restore_base_branch; exit 1; }
+assert_no_staged_secrets
+COMMIT_MESSAGE="benchmark: $RUN_ID [$ADAPTER/$MODEL] $RUN_STATUS"
+if ! git commit -m "$COMMIT_MESSAGE" >/dev/null; then
+  note "commit failed; generated files remain staged on $BRANCH"
+  exit 1
+fi
+COMMIT_SHA=$(git rev-parse HEAD)
+
+if ! git push --set-upstream origin "$BRANCH" >/dev/null; then
+  note "push failed; local commit $COMMIT_SHA remains on $BRANCH"
+  note "recover with: git switch $BRANCH && git push --set-upstream origin $BRANCH"
+  restore_base_branch
+  exit 1
+fi
+restore_base_branch
+printf 'run=%s status=%s branch=%s commit=%s directory=%s\n' "$RUN_ID" "$RUN_STATUS" "$BRANCH" "$COMMIT_SHA" "$RESULT_DIR"
+[[ -n $DEPLOYMENT_URL ]] && printf 'deployment_url=%s\n' "$DEPLOYMENT_URL"
+[[ $RUN_STATUS == succeeded ]] || exit "$AGENT_EXIT"

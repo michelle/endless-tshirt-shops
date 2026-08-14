@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+: "${BENCHMARK_WORKSPACE:?}"
+: "${BENCHMARK_PROMPT_FILE:?}"
+: "${BENCHMARK_MODEL:?}"
+: "${BENCHMARK_FINAL_OUTPUT:?}"
+
+TMP_OUTPUT=$(mktemp "${TMPDIR:-/tmp}/benchmark-claude.XXXXXX")
+trap 'rm -f "$TMP_OUTPUT"' EXIT
+cd "$BENCHMARK_WORKSPACE"
+
+set +e
+claude --print \
+  --dangerously-skip-permissions \
+  --no-session-persistence \
+  --output-format json \
+  --model "$BENCHMARK_MODEL" \
+  "$@" \
+  "$(<"$BENCHMARK_PROMPT_FILE")" >"$TMP_OUTPUT"
+CLAUDE_EXIT=$?
+set -e
+cat "$TMP_OUTPUT"
+
+python3 - "$TMP_OUTPUT" "$BENCHMARK_FINAL_OUTPUT" <<'PY'
+import json
+import sys
+
+source, destination = sys.argv[1:]
+text = open(source, encoding="utf-8").read()
+try:
+    payload = json.loads(text)
+    result = payload.get("result")
+    if not isinstance(result, str):
+        raise ValueError("Claude JSON result was not a string")
+except Exception:
+    result = text
+with open(destination, "w", encoding="utf-8") as output:
+    output.write(result)
+    if result and not result.endswith("\n"):
+        output.write("\n")
+PY
+
+exit "$CLAUDE_EXIT"
+

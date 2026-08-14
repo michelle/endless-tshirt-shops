@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+: "${BENCHMARK_WORKSPACE:?}"
+: "${BENCHMARK_PROMPT_FILE:?}"
+: "${BENCHMARK_MODEL:?}"
+: "${BENCHMARK_FINAL_OUTPUT:?}"
+
+exec codex exec \
+  --dangerously-bypass-approvals-and-sandbox \
+  --skip-git-repo-check \
+  --ephemeral \
+  --color never \
+  --cd "$BENCHMARK_WORKSPACE" \
+  --model "$BENCHMARK_MODEL" \
+  --output-last-message "$BENCHMARK_FINAL_OUTPUT" \
+  "$@" \
+  "$(<"$BENCHMARK_PROMPT_FILE")"
+

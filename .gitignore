@@ -1,0 +1,9 @@
+# Local credentials and deployment linkage
+.env
+.env.*
+!.env.example
+.vercel/
+
+# Per-run code, final output, redacted log, and metadata are committed for review.
+# Raw execution transcripts may contain credentials and remain local only.
+runs/*/agent.raw.log
