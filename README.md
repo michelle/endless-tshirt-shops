@@ -37,7 +37,7 @@ you need an immutable model version for comparison.
 
 The runner creates `benchmark/<run-id>` from the current branch, invokes the selected CLI non-interactively in an initially empty workspace, commits with `benchmark: <run-id> [<adapter>/<model>] <status>`, pushes to `origin`, and returns to the original branch. It creates and pushes failed or timed-out runs too. A failed push leaves the local run branch and commit intact, then exits nonzero.
 
-Codex uses its non-interactive exec mode with automatic approvals. Claude uses print mode with bypassed permissions. Only run this on an externally controlled machine and with test credentials.
+Codex uses its non-interactive exec mode with automatic approvals. Claude uses print mode with bypassed permissions. Run this only in an isolated, externally sandboxed environment and with test-only credentials.
 
 ## Run contents
 

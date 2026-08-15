@@ -66,7 +66,9 @@ run() {
   )
 }
 
-assert run success
+SUCCESS_OUTPUT=$(run success)
+[[ $SUCCESS_OUTPUT == *'agent_summary='* ]] || fail 'agent summary location was not printed'
+[[ $SUCCESS_OUTPUT == *'final report'* ]] || fail 'agent summary contents were not printed'
 assert test "$(git -C "$REPO" branch --show-current)" = main
 assert git --git-dir="$REMOTE" show-ref --verify --quiet refs/heads/benchmark/success
 assert git --git-dir="$REMOTE" show benchmark/success:runs/success/workspace/app.txt
