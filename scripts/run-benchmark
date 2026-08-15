@@ -133,6 +133,10 @@ print_agent_summary() {
   cat "$FINAL_OUTPUT"
 }
 
+cleanup_local_run() {
+  rm -rf -- "$RESULT_DIR"
+}
+
 assert_only_run_output_changed() {
   local change unexpected=
   while IFS= read -r change; do
@@ -225,6 +229,7 @@ if ! git push --set-upstream origin "$BRANCH" >/dev/null; then
 fi
 print_agent_summary
 restore_base_branch
-printf 'run=%s status=%s branch=%s commit=%s directory=%s\n' "$RUN_ID" "$RUN_STATUS" "$BRANCH" "$COMMIT_SHA" "$RESULT_DIR"
+cleanup_local_run
+printf 'run=%s status=%s branch=%s commit=%s\n' "$RUN_ID" "$RUN_STATUS" "$BRANCH" "$COMMIT_SHA"
 [[ -n $DEPLOYMENT_URL ]] && printf 'deployment_url=%s\n' "$DEPLOYMENT_URL"
 [[ $RUN_STATUS == succeeded ]] || exit "$AGENT_EXIT"

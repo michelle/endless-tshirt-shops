@@ -45,6 +45,9 @@ printf '%s\n' \
   '[[ -n "${FAKE_CODEX_SLEEP:-}" ]] && sleep "$FAKE_CODEX_SLEEP"' \
   '[[ -n "${FAKE_ROOT_WRITE_PATH:-}" ]] && printf "outside workspace\n" >"$FAKE_ROOT_WRITE_PATH"' \
   'mkdir -p "$workspace"' \
+  'printf "node_modules\n" >"$workspace/.gitignore"' \
+  'mkdir -p "$workspace/node_modules"' \
+  'printf "generated dependency\n" >"$workspace/node_modules/example.js"' \
   'printf "generated app\n" >"$workspace/app.txt"' \
   'printf "SP_AUTH=%s sk_test_abcdefghijklmnop https://example.vercel.app\n" "$SP_AUTH"' \
   'printf "final report\n" >"$output"' \
@@ -74,6 +77,7 @@ assert test "$(git -C "$REPO" branch --show-current)" = main
 assert git --git-dir="$REMOTE" show-ref --verify --quiet refs/heads/benchmark/success
 assert git --git-dir="$REMOTE" show benchmark/success:runs/success/workspace/app.txt
 assert git --git-dir="$REMOTE" show benchmark/success:runs/success/final.md
+assert test ! -e "$REPO/runs/success"
 LOG=$(git --git-dir="$REMOTE" show benchmark/success:runs/success/agent.log)
 [[ $LOG == *'[REDACTED]'* ]] || fail 'injected secret was not redacted'
 [[ $LOG != *sp_test_secret* ]] || fail 'injected secret leaked into committed log'
