@@ -133,16 +133,29 @@ print_agent_summary() {
   cat "$FINAL_OUTPUT"
 }
 
+assert_only_run_output_changed() {
+  local change unexpected=
+  while IFS= read -r change; do
+    [[ -z $change || $change == "?? runs/$RUN_ID/"* ]] && continue
+    unexpected+="$change"$'\n'
+  done < <(git status --porcelain --untracked-files=all)
+  if [[ -n $unexpected ]]; then
+    note "agent modified files outside runs/$RUN_ID/: ${unexpected%$'\n'}"
+    return 1
+  fi
+}
+
 SWITCHED_BRANCH=0
 git switch --create "$BRANCH" "$BASE_COMMIT" >/dev/null || die "could not create $BRANCH"
 SWITCHED_BRANCH=1
 mkdir -p "$WORKSPACE"
+AGENT_WORKSPACE=$(mktemp -d "${TMPDIR:-/tmp}/benchmark-workspace.XXXXXX") || die "could not create isolated agent workspace"
+trap 'rm -rf -- "$AGENT_WORKSPACE"' EXIT
 
 STARTED_AT=$(date -u +%Y-%m-%dT%H:%M:%SZ)
 START_EPOCH=$(date +%s)
-export BENCHMARK_REPO_ROOT="$REPO_ROOT"
 export BENCHMARK_RUN_ID="$RUN_ID"
-export BENCHMARK_WORKSPACE="$WORKSPACE"
+export BENCHMARK_WORKSPACE="$AGENT_WORKSPACE"
 export BENCHMARK_PROMPT_FILE="$REPO_ROOT/prompt.md"
 export BENCHMARK_MODEL="$MODEL"
 export BENCHMARK_FINAL_OUTPUT="$FINAL_OUTPUT"
@@ -151,6 +164,12 @@ set +e
 "$TIMEOUT_COMMAND" "$TIMEOUT_SECONDS" "$ADAPTER_PATH" "${EXTRA_ARGS[@]}" >"$RAW_LOG" 2>&1
 AGENT_EXIT=$?
 set -e
+
+tar -C "$AGENT_WORKSPACE" -cf - . | tar -C "$WORKSPACE" -xf -
+if ! assert_only_run_output_changed; then
+  restore_base_branch
+  exit 1
+fi
 
 FINISHED_AT=$(date -u +%Y-%m-%dT%H:%M:%SZ)
 DURATION_SECONDS=$(( $(date +%s) - START_EPOCH ))

@@ -43,6 +43,7 @@ printf '%s\n' \
   '  esac' \
   'done' \
   '[[ -n "${FAKE_CODEX_SLEEP:-}" ]] && sleep "$FAKE_CODEX_SLEEP"' \
+  '[[ -n "${FAKE_ROOT_WRITE_PATH:-}" ]] && printf "outside workspace\n" >"$FAKE_ROOT_WRITE_PATH"' \
   'mkdir -p "$workspace"' \
   'printf "generated app\n" >"$workspace/app.txt"' \
   'printf "SP_AUTH=%s sk_test_abcdefghijklmnop https://example.vercel.app\n" "$SP_AUTH"' \
@@ -125,5 +126,19 @@ EXIT_CODE=$?
 set -e
 assert test "$EXIT_CODE" = 2
 assert test ! -e "$REPO/runs/dirty"
+rm "$REPO/unrelated.txt"
+
+set +e
+(
+  cd "$REPO"
+  PATH="$BIN:$PATH" SP_AUTH=sp_test_secret FAKE_ROOT_WRITE_PATH="$REPO/outside.txt" "$ROOT/scripts/run-benchmark" \
+    --adapter codex --model fake --timeout 5 --run-id outside-write
+)
+EXIT_CODE=$?
+set -e
+assert test "$EXIT_CODE" = 1
+assert test "$(git -C "$REPO" branch --show-current)" = main
+assert test -f "$REPO/outside.txt"
+rm "$REPO/outside.txt"
 
 printf 'PASS: benchmark runner\n'
