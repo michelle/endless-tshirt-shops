@@ -79,6 +79,9 @@ SUCCESS_OUTPUT=$(run success)
 assert test "$(git -C "$REPO" branch --show-current)" = main
 assert git --git-dir="$REMOTE" show-ref --verify --quiet refs/heads/benchmark-results
 assert git --git-dir="$REMOTE" show benchmark-results:runs/success/workspace/app.txt
+if git --git-dir="$REMOTE" cat-file -e benchmark-results:runs/success/workspace/node_modules/example.js 2>/dev/null; then
+  fail 'generated node_modules was committed'
+fi
 SUCCESS_VERCEL_PROJECT=$(git --git-dir="$REMOTE" show benchmark-results:runs/success/workspace/vercel-project.txt)
 assert test "$SUCCESS_VERCEL_PROJECT" = 'benchmark-success'
 assert git --git-dir="$REMOTE" show benchmark-results:runs/success/final.md
