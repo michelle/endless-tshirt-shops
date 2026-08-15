@@ -12,8 +12,8 @@ Options:
   -h, --help           Show this help
 
 The runner requires SP_AUTH, a clean repository, an origin remote, and either
-timeout or gtimeout. It creates and pushes benchmark/RUN_ID, then returns to
-the branch that was checked out when it started.
+timeout or gtimeout. It appends the completed run to benchmark-results, then
+returns to the branch that was checked out when it started.
 EOF
 }
 
@@ -122,7 +122,9 @@ else
   RUN_ID=$(sanitize_id "$RUN_ID")
 fi
 [[ -n $RUN_ID && $RUN_ID != .* && $RUN_ID != *..* ]] || die "invalid --run-id"
-BRANCH="benchmark/$RUN_ID"
+RESULTS_BRANCH=benchmark-results
+EXECUTION_BRANCH="benchmark-run/$RUN_ID"
+PUBLISH_BRANCH="benchmark-publish/$RUN_ID"
 VERCEL_PROJECT=$(vercel_project_name "$RUN_ID")
 RESULT_DIR="$REPO_ROOT/runs/$RUN_ID"
 WORKSPACE="$RESULT_DIR/workspace"
@@ -132,12 +134,19 @@ FINAL_OUTPUT="$RESULT_DIR/final.md"
 METADATA="$RESULT_DIR/metadata.json"
 
 [[ ! -e $RESULT_DIR ]] || die "run directory already exists: runs/$RUN_ID"
-git show-ref --verify --quiet "refs/heads/$BRANCH" && die "branch already exists: $BRANCH"
-git ls-remote --exit-code --heads origin "$BRANCH" >/dev/null 2>&1 && die "remote branch already exists: $BRANCH"
+git show-ref --verify --quiet "refs/heads/$EXECUTION_BRANCH" && die "temporary branch already exists: $EXECUTION_BRANCH"
+git show-ref --verify --quiet "refs/heads/$PUBLISH_BRANCH" && die "temporary branch already exists: $PUBLISH_BRANCH"
+git fetch -q origin "$RESULTS_BRANCH" >/dev/null 2>&1 || true
+if git show-ref --verify --quiet "refs/remotes/origin/$RESULTS_BRANCH"; then
+  RESULTS_BASE="origin/$RESULTS_BRANCH"
+  git cat-file -e "$RESULTS_BASE:runs/$RUN_ID" 2>/dev/null && die "run already exists on $RESULTS_BRANCH: runs/$RUN_ID"
+else
+  RESULTS_BASE=$BASE_COMMIT
+fi
 
 restore_base_branch() {
   if [[ ${SWITCHED_BRANCH-0} == 1 ]]; then
-    git switch "$BASE_BRANCH" >/dev/null 2>&1 || note "warning: could not restore $BASE_BRANCH; current branch is $BRANCH"
+    git switch "$BASE_BRANCH" >/dev/null 2>&1 || note "warning: could not restore $BASE_BRANCH"
   fi
 }
 
@@ -163,7 +172,7 @@ assert_only_run_output_changed() {
 }
 
 SWITCHED_BRANCH=0
-git switch --create "$BRANCH" "$BASE_COMMIT" >/dev/null || die "could not create $BRANCH"
+git switch --create "$EXECUTION_BRANCH" "$BASE_COMMIT" >/dev/null || die "could not create $EXECUTION_BRANCH"
 SWITCHED_BRANCH=1
 mkdir -p "$WORKSPACE"
 AGENT_WORKSPACE=$(mktemp -d "${TMPDIR:-/tmp}/benchmark-workspace.XXXXXX") || die "could not create isolated agent workspace"
@@ -213,7 +222,7 @@ WORKSPACE_TREE=$(git write-tree)
   printf '  "status": '; json_string "$RUN_STATUS"; printf ',\n'
   printf '  "adapter": '; json_string "$ADAPTER"; printf ',\n'
   printf '  "model": '; json_string "$MODEL"; printf ',\n'
-  printf '  "branch": '; json_string "$BRANCH"; printf ',\n'
+  printf '  "branch": '; json_string "$RESULTS_BRANCH"; printf ',\n'
   printf '  "vercel_project": '; json_string "$VERCEL_PROJECT"; printf ',\n'
   printf '  "base_commit": '; json_string "$BASE_COMMIT"; printf ',\n'
   printf '  "prompt_sha256": '; json_string "$PROMPT_SHA"; printf ',\n'
@@ -231,20 +240,39 @@ git diff --cached --check -- . ":(exclude)runs/$RUN_ID/agent.log" || { restore_b
 assert_no_staged_secrets
 COMMIT_MESSAGE="benchmark: $RUN_ID [$ADAPTER/$MODEL] $RUN_STATUS"
 if ! git commit -m "$COMMIT_MESSAGE" >/dev/null; then
-  note "commit failed; generated files remain staged on $BRANCH"
+  note "commit failed; generated files remain staged on $EXECUTION_BRANCH"
   exit 1
 fi
-COMMIT_SHA=$(git rev-parse HEAD)
+EXECUTION_COMMIT=$(git rev-parse HEAD)
 
-if ! git push --set-upstream origin "$BRANCH" >/dev/null; then
-  note "push failed; local commit $COMMIT_SHA remains on $BRANCH"
-  note "recover with: git switch $BRANCH && git push --set-upstream origin $BRANCH"
+git switch --detach "$RESULTS_BASE" >/dev/null || die "could not prepare $RESULTS_BRANCH"
+git switch --create "$PUBLISH_BRANCH" >/dev/null || die "could not create $PUBLISH_BRANCH"
+git checkout "$EXECUTION_COMMIT" -- "runs/$RUN_ID"
+git add "runs/$RUN_ID"
+git diff --cached --check -- . ":(exclude)runs/$RUN_ID/agent.log" || { restore_base_branch; exit 1; }
+assert_no_staged_secrets
+if ! git commit -m "$COMMIT_MESSAGE" >/dev/null; then
+  note "results commit failed; generated files remain staged on $PUBLISH_BRANCH"
   restore_base_branch
   exit 1
 fi
+RESULT_COMMIT=$(git rev-parse HEAD)
+
+if ! git push origin "HEAD:refs/heads/$RESULTS_BRANCH" >/dev/null; then
+  note "$RESULTS_BRANCH changed while this run was executing; rebasing the result once and retrying"
+  if git fetch -q origin "$RESULTS_BRANCH" && git rebase "origin/$RESULTS_BRANCH" >/dev/null && git push origin "HEAD:refs/heads/$RESULTS_BRANCH" >/dev/null; then
+    RESULT_COMMIT=$(git rev-parse HEAD)
+  else
+    note "push failed; local results commit $RESULT_COMMIT remains on $PUBLISH_BRANCH"
+    note "recover with: git switch $PUBLISH_BRANCH && git push origin HEAD:refs/heads/$RESULTS_BRANCH"
+    restore_base_branch
+    exit 1
+  fi
+fi
 print_agent_summary
 restore_base_branch
+git branch -D "$EXECUTION_BRANCH" "$PUBLISH_BRANCH" >/dev/null
 cleanup_local_run
-printf 'run=%s status=%s branch=%s commit=%s\n' "$RUN_ID" "$RUN_STATUS" "$BRANCH" "$COMMIT_SHA"
+printf 'run=%s status=%s branch=%s commit=%s\n' "$RUN_ID" "$RUN_STATUS" "$RESULTS_BRANCH" "$RESULT_COMMIT"
 [[ -n $DEPLOYMENT_URL ]] && printf 'deployment_url=%s\n' "$DEPLOYMENT_URL"
 [[ $RUN_STATUS == succeeded ]] || exit "$AGENT_EXIT"

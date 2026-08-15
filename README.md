@@ -1,6 +1,6 @@
 # endless-tshirt-shop benchmark
 
-Benchmark coding agents against [`prompt.md`](prompt.md). A run starts with an empty `runs/<run-id>/workspace/`, preserves the generated app and completion report, and pushes a review branch.
+Benchmark coding agents against [`prompt.md`](prompt.md). A run starts with an empty workspace, preserves the generated app and completion report under `runs/<run-id>/`, and appends it to the shared `benchmark-results` branch.
 
 ## Prerequisites
 
@@ -35,13 +35,13 @@ Claude Code accepts the stable aliases `sonnet`, `opus`, and `haiku`; its full
 model IDs also work (for example, `claude-sonnet-5`). Use a pinned full ID when
 you need an immutable model version for comparison.
 
-The runner creates `benchmark/<run-id>` from the current branch, invokes the selected CLI non-interactively in an initially empty workspace, commits with `benchmark: <run-id> [<adapter>/<model>] <status>`, pushes to `origin`, and returns to the original branch. It creates and pushes failed or timed-out runs too. Each run receives a unique Vercel project name, `benchmark-<run-id>`, through `$BENCHMARK_VERCEL_PROJECT`, so its deployment cannot replace another run's deployment. After a successful push, it removes the local run directory; review artifacts on the pushed run branch. A failed push leaves the local run branch and commit intact, then exits nonzero.
+The runner invokes the selected CLI non-interactively in an initially empty workspace, commits one immutable `runs/<run-id>/` result to `benchmark-results`, pushes it to `origin`, and returns to the original branch. It records failed or timed-out runs too. Each run receives a unique Vercel project name, `benchmark-<run-id>`, through `$BENCHMARK_VERCEL_PROJECT`, so its deployment cannot replace another run's deployment. Temporary execution branches remain local and are removed after a successful push. Review and compare all artifacts together on `benchmark-results`. A failed push leaves the local publication branch and commit intact, then exits nonzero.
 
 Codex uses its non-interactive exec mode with automatic approvals. Claude uses print mode with bypassed permissions. Run this only in an isolated, externally sandboxed environment and with test-only credentials.
 
 ## Run contents
 
-These files are committed on `benchmark/<run-id>`.
+These files are committed under `runs/<run-id>/` on `benchmark-results`.
 
 ```text
 runs/<run-id>/

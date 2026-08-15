@@ -76,19 +76,22 @@ SUCCESS_OUTPUT=$(run success)
 [[ $SUCCESS_OUTPUT == *'agent_summary='* ]] || fail 'agent summary location was not printed'
 [[ $SUCCESS_OUTPUT == *'final report'* ]] || fail 'agent summary contents were not printed'
 assert test "$(git -C "$REPO" branch --show-current)" = main
-assert git --git-dir="$REMOTE" show-ref --verify --quiet refs/heads/benchmark/success
-assert git --git-dir="$REMOTE" show benchmark/success:runs/success/workspace/app.txt
-SUCCESS_VERCEL_PROJECT=$(git --git-dir="$REMOTE" show benchmark/success:runs/success/workspace/vercel-project.txt)
+assert git --git-dir="$REMOTE" show-ref --verify --quiet refs/heads/benchmark-results
+assert git --git-dir="$REMOTE" show benchmark-results:runs/success/workspace/app.txt
+SUCCESS_VERCEL_PROJECT=$(git --git-dir="$REMOTE" show benchmark-results:runs/success/workspace/vercel-project.txt)
 assert test "$SUCCESS_VERCEL_PROJECT" = 'benchmark-success'
-assert git --git-dir="$REMOTE" show benchmark/success:runs/success/final.md
-SUCCESS_METADATA=$(git --git-dir="$REMOTE" show benchmark/success:runs/success/metadata.json)
+assert git --git-dir="$REMOTE" show benchmark-results:runs/success/final.md
+SUCCESS_METADATA=$(git --git-dir="$REMOTE" show benchmark-results:runs/success/metadata.json)
 [[ $SUCCESS_METADATA == *'"vercel_project": "benchmark-success"'* ]] || fail 'Vercel project was not recorded'
 assert test ! -e "$REPO/runs/success"
-LOG=$(git --git-dir="$REMOTE" show benchmark/success:runs/success/agent.log)
+if git -C "$REPO" show-ref --verify --quiet refs/heads/benchmark-run/success; then
+  fail 'temporary execution branch was retained after a successful push'
+fi
+LOG=$(git --git-dir="$REMOTE" show benchmark-results:runs/success/agent.log)
 [[ $LOG == *'[REDACTED]'* ]] || fail 'injected secret was not redacted'
 [[ $LOG != *sp_test_secret* ]] || fail 'injected secret leaked into committed log'
 [[ $LOG != *sk_test_* ]] || fail 'Stripe pattern leaked into committed log'
-if git --git-dir="$REMOTE" cat-file -e benchmark/success:runs/success/agent.raw.log 2>/dev/null; then
+if git --git-dir="$REMOTE" cat-file -e benchmark-results:runs/success/agent.raw.log 2>/dev/null; then
   fail 'raw log was committed'
 fi
 
@@ -97,8 +100,8 @@ fi
   PATH="$BIN:$PATH" SP_AUTH=sp_test_secret "$ROOT/scripts/run-benchmark" \
     --adapter claude --model fake --timeout 5 --run-id claude
 )
-assert git --git-dir="$REMOTE" show benchmark/claude:runs/claude/workspace/claude.txt
-CLAUDE_FINAL=$(git --git-dir="$REMOTE" show benchmark/claude:runs/claude/final.md)
+assert git --git-dir="$REMOTE" show benchmark-results:runs/claude/workspace/claude.txt
+CLAUDE_FINAL=$(git --git-dir="$REMOTE" show benchmark-results:runs/claude/final.md)
 assert test "$CLAUDE_FINAL" = 'claude final report'
 
 set +e
@@ -110,7 +113,7 @@ set +e
 EXIT_CODE=$?
 set -e
 assert test "$EXIT_CODE" = 124
-TIMEOUT_METADATA=$(git --git-dir="$REMOTE" show benchmark/timed-out:runs/timed-out/metadata.json)
+TIMEOUT_METADATA=$(git --git-dir="$REMOTE" show benchmark-results:runs/timed-out/metadata.json)
 [[ $TIMEOUT_METADATA == *'"status": "timed_out"'* ]] || fail 'timeout status was not recorded'
 
 set +e
@@ -122,8 +125,7 @@ set +e
 EXIT_CODE=$?
 set -e
 assert test "$EXIT_CODE" = 7
-assert git --git-dir="$REMOTE" show-ref --verify --quiet refs/heads/benchmark/failure
-assert git --git-dir="$REMOTE" show benchmark/failure:runs/failure/metadata.json
+assert git --git-dir="$REMOTE" show benchmark-results:runs/failure/metadata.json
 
 printf 'dirty\n' >"$REPO/unrelated.txt"
 set +e
