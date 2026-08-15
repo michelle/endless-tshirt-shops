@@ -6,7 +6,12 @@ https://github.com/michelle/dt-shirt
 
 Use the reference to understand the product’s behavior and visual intent.
 
-Use Stripe Projects, Stripe, and the Scalable Press API. The Scalable Press test key is available as $SP_AUTH. You should be able to get a Stripe test key yourself. Vercel CLI should be logged in.
+Vercel CLI should be logged in. Deploy to a new, run-specific Vercel project
+named `$BENCHMARK_VERCEL_PROJECT`; do not link to or deploy into an existing
+project. Pass that name explicitly when creating/deploying the project (for
+example, `vercel --yes --name "$BENCHMARK_VERCEL_PROJECT"`).
+
+Use Stripe Projects, Stripe, and the Scalable Press API. The Scalable Press test key is available as $SP_AUTH. You should be able to get a Stripe test key yourself.
 
 Deploy a reachable preview or sandbox environment. Use test, sandbox, or dry-run modes as appropriate while verifying
 the complete customer flow.

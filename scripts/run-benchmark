@@ -38,6 +38,18 @@ sanitize_id() {
   printf '%s' "$value"
 }
 
+vercel_project_name() {
+  # Vercel project names are capped at 100 characters. Keep a stable prefix
+  # and leave the run ID visible for easy identification in the dashboard. A
+  # hash suffix preserves uniqueness when an unusually long run ID is clipped.
+  local run_id=$1
+  if (( ${#run_id} <= 90 )); then
+    printf 'benchmark-%s' "$run_id"
+  else
+    printf 'benchmark-%.80s-%s' "$run_id" "$(printf '%s' "$run_id" | shasum -a 256 | cut -c1-8)"
+  fi
+}
+
 extract_url() {
   grep -Eo 'https://[^[:space:]"'"'"'<>]+' "$1" 2>/dev/null | grep -E 'vercel\.app|vercel\.sh' | tail -n 1 || true
 }
@@ -111,6 +123,7 @@ else
 fi
 [[ -n $RUN_ID && $RUN_ID != .* && $RUN_ID != *..* ]] || die "invalid --run-id"
 BRANCH="benchmark/$RUN_ID"
+VERCEL_PROJECT=$(vercel_project_name "$RUN_ID")
 RESULT_DIR="$REPO_ROOT/runs/$RUN_ID"
 WORKSPACE="$RESULT_DIR/workspace"
 RAW_LOG="$RESULT_DIR/agent.raw.log"
@@ -163,6 +176,7 @@ export BENCHMARK_WORKSPACE="$AGENT_WORKSPACE"
 export BENCHMARK_PROMPT_FILE="$REPO_ROOT/prompt.md"
 export BENCHMARK_MODEL="$MODEL"
 export BENCHMARK_FINAL_OUTPUT="$FINAL_OUTPUT"
+export BENCHMARK_VERCEL_PROJECT="$VERCEL_PROJECT"
 
 set +e
 "$TIMEOUT_COMMAND" "$TIMEOUT_SECONDS" "$ADAPTER_PATH" "${EXTRA_ARGS[@]}" >"$RAW_LOG" 2>&1
@@ -200,6 +214,7 @@ WORKSPACE_TREE=$(git write-tree)
   printf '  "adapter": '; json_string "$ADAPTER"; printf ',\n'
   printf '  "model": '; json_string "$MODEL"; printf ',\n'
   printf '  "branch": '; json_string "$BRANCH"; printf ',\n'
+  printf '  "vercel_project": '; json_string "$VERCEL_PROJECT"; printf ',\n'
   printf '  "base_commit": '; json_string "$BASE_COMMIT"; printf ',\n'
   printf '  "prompt_sha256": '; json_string "$PROMPT_SHA"; printf ',\n'
   printf '  "workspace_tree": '; json_string "$WORKSPACE_TREE"; printf ',\n'

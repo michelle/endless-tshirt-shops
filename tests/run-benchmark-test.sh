@@ -45,6 +45,7 @@ printf '%s\n' \
   '[[ -n "${FAKE_CODEX_SLEEP:-}" ]] && sleep "$FAKE_CODEX_SLEEP"' \
   '[[ -n "${FAKE_ROOT_WRITE_PATH:-}" ]] && printf "outside workspace\n" >"$FAKE_ROOT_WRITE_PATH"' \
   'mkdir -p "$workspace"' \
+  'printf "%s\n" "$BENCHMARK_VERCEL_PROJECT" >"$workspace/vercel-project.txt"' \
   'printf "node_modules\n" >"$workspace/.gitignore"' \
   'mkdir -p "$workspace/node_modules"' \
   'printf "generated dependency\n" >"$workspace/node_modules/example.js"' \
@@ -77,7 +78,11 @@ SUCCESS_OUTPUT=$(run success)
 assert test "$(git -C "$REPO" branch --show-current)" = main
 assert git --git-dir="$REMOTE" show-ref --verify --quiet refs/heads/benchmark/success
 assert git --git-dir="$REMOTE" show benchmark/success:runs/success/workspace/app.txt
+SUCCESS_VERCEL_PROJECT=$(git --git-dir="$REMOTE" show benchmark/success:runs/success/workspace/vercel-project.txt)
+assert test "$SUCCESS_VERCEL_PROJECT" = 'benchmark-success'
 assert git --git-dir="$REMOTE" show benchmark/success:runs/success/final.md
+SUCCESS_METADATA=$(git --git-dir="$REMOTE" show benchmark/success:runs/success/metadata.json)
+[[ $SUCCESS_METADATA == *'"vercel_project": "benchmark-success"'* ]] || fail 'Vercel project was not recorded'
 assert test ! -e "$REPO/runs/success"
 LOG=$(git --git-dir="$REMOTE" show benchmark/success:runs/success/agent.log)
 [[ $LOG == *'[REDACTED]'* ]] || fail 'injected secret was not redacted'

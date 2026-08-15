@@ -35,7 +35,7 @@ Claude Code accepts the stable aliases `sonnet`, `opus`, and `haiku`; its full
 model IDs also work (for example, `claude-sonnet-5`). Use a pinned full ID when
 you need an immutable model version for comparison.
 
-The runner creates `benchmark/<run-id>` from the current branch, invokes the selected CLI non-interactively in an initially empty workspace, commits with `benchmark: <run-id> [<adapter>/<model>] <status>`, pushes to `origin`, and returns to the original branch. It creates and pushes failed or timed-out runs too. After a successful push, it removes the local run directory; review artifacts on the pushed run branch. A failed push leaves the local run branch and commit intact, then exits nonzero.
+The runner creates `benchmark/<run-id>` from the current branch, invokes the selected CLI non-interactively in an initially empty workspace, commits with `benchmark: <run-id> [<adapter>/<model>] <status>`, pushes to `origin`, and returns to the original branch. It creates and pushes failed or timed-out runs too. Each run receives a unique Vercel project name, `benchmark-<run-id>`, through `$BENCHMARK_VERCEL_PROJECT`, so its deployment cannot replace another run's deployment. After a successful push, it removes the local run directory; review artifacts on the pushed run branch. A failed push leaves the local run branch and commit intact, then exits nonzero.
 
 Codex uses its non-interactive exec mode with automatic approvals. Claude uses print mode with bypassed permissions. Run this only in an isolated, externally sandboxed environment and with test-only credentials.
 
@@ -58,7 +58,7 @@ Run `tests/run-benchmark-test.sh` to verify the runner locally with fake CLIs an
 
 ## Adapter contract
 
-`scripts/adapters/codex` and `scripts/adapters/claude` receive `BENCHMARK_WORKSPACE`, `BENCHMARK_PROMPT_FILE`, `BENCHMARK_MODEL`, and `BENCHMARK_FINAL_OUTPUT`. New providers should implement the same contract, run without prompts, write only the final answer to `BENCHMARK_FINAL_OUTPUT`, and emit all other output to stdout/stderr.
+`scripts/adapters/codex` and `scripts/adapters/claude` receive `BENCHMARK_WORKSPACE`, `BENCHMARK_PROMPT_FILE`, `BENCHMARK_MODEL`, `BENCHMARK_FINAL_OUTPUT`, and `BENCHMARK_VERCEL_PROJECT`. New providers should implement the same contract, run without prompts, write only the final answer to `BENCHMARK_FINAL_OUTPUT`, and emit all other output to stdout/stderr.
 
 ## Fair comparison
 
