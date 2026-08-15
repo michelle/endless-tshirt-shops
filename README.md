@@ -20,15 +20,20 @@ Commit or stash all existing work first: the runner refuses a dirty repository s
 ```sh
 scripts/run-benchmark \
   --adapter codex \
-  --model YOUR_CODEX_MODEL \
+  --model gpt-5.6-sol \
   --timeout 3600
 
 scripts/run-benchmark \
   --adapter claude \
-  --model YOUR_CLAUDE_MODEL \
+  --model sonnet \
   --run-id 20260812-claude-sonnet-a \
   -- --max-budget-usd 20
 ```
+
+Example Codex models: `gpt-5.6-sol`, `gpt-5.6-terra`, and `gpt-5.6-luna`.
+Claude Code accepts the stable aliases `sonnet`, `opus`, and `haiku`; its full
+model IDs also work (for example, `claude-sonnet-5`). Use a pinned full ID when
+you need an immutable model version for comparison.
 
 The runner creates `benchmark/<run-id>` from the current branch, invokes the selected CLI non-interactively in an initially empty workspace, commits with `benchmark: <run-id> [<adapter>/<model>] <status>`, pushes to `origin`, and returns to the original branch. It creates and pushes failed or timed-out runs too. A failed push leaves the local run branch and commit intact, then exits nonzero.
 
