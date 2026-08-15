@@ -45,6 +45,7 @@ printf '%s\n' \
   '[[ -n "${FAKE_CODEX_SLEEP:-}" ]] && sleep "$FAKE_CODEX_SLEEP"' \
   '[[ -n "${FAKE_ROOT_WRITE_PATH:-}" ]] && printf "outside workspace\n" >"$FAKE_ROOT_WRITE_PATH"' \
   'mkdir -p "$workspace"' \
+  'git init -q "$workspace"' \
   'printf "%s\n" "$BENCHMARK_VERCEL_PROJECT" >"$workspace/vercel-project.txt"' \
   'printf "node_modules\n" >"$workspace/.gitignore"' \
   'mkdir -p "$workspace/node_modules"' \
