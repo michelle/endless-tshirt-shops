@@ -212,7 +212,7 @@ WORKSPACE_TREE=$(git write-tree)
 
 git add "runs/$RUN_ID"
 git reset -q -- "$RAW_LOG"
-git diff --cached --check || { restore_base_branch; exit 1; }
+git diff --cached --check -- . ":(exclude)runs/$RUN_ID/agent.log" || { restore_base_branch; exit 1; }
 assert_no_staged_secrets
 COMMIT_MESSAGE="benchmark: $RUN_ID [$ADAPTER/$MODEL] $RUN_STATUS"
 if ! git commit -m "$COMMIT_MESSAGE" >/dev/null; then

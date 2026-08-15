@@ -49,6 +49,7 @@ printf '%s\n' \
   'mkdir -p "$workspace/node_modules"' \
   'printf "generated dependency\n" >"$workspace/node_modules/example.js"' \
   'printf "generated app\n" >"$workspace/app.txt"' \
+  'printf "formatted CLI output  \n"' \
   'printf "SP_AUTH=%s sk_test_abcdefghijklmnop https://example.vercel.app\n" "$SP_AUTH"' \
   'printf "final report\n" >"$output"' \
   'exit "${FAKE_CODEX_EXIT:-0}"' >"$BIN/codex"
