@@ -1,0 +1,83 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url("https://fonts.googleapis.com/css2?family=Chivo:wght@400;500;700&display=swap");
+
+html,
+body {
+  min-height: 100%;
+}
+
+body {
+  -webkit-font-smoothing: antialiased;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+.field-label {
+  position: relative;
+  display: block;
+  width: 100%;
+}
+
+.field-label > span {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  font-weight: 400;
+  line-height: 28px;
+  color: #1a1a1a;
+  border-bottom: 1px solid #a4d5ff;
+  transition: border-bottom-color 200ms ease-in-out;
+  pointer-events: none;
+}
+
+.field-label > span > span {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: 0% 50%;
+  transition: transform 200ms ease-in-out;
+}
+
+.field-input {
+  background: transparent;
+  font-weight: 400;
+  border: 0;
+  border-bottom: 1px solid transparent;
+  color: #1a1a1a;
+  outline: none;
+  display: block;
+  width: 100%;
+  line-height: 28px;
+  padding-bottom: 3px;
+}
+
+.field-input:focus + span,
+.field-input:not(:placeholder-shown) + span {
+  color: #337ab7;
+}
+
+.field-input:focus + span > span,
+.field-input:not(:placeholder-shown) + span > span {
+  transform: scale(0.8) translateY(-22px);
+}
+
+.field-input:focus + span {
+  border-bottom-color: #337ab7;
+}
+
+.glyphicon-spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
