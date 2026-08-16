@@ -1,0 +1,477 @@
+/*
+ * Visual language carried over from the original datetime.store: Helvetica body
+ * copy, Bootstrap-3 blues (#337ab7 link blue, #a4d5ff pale fill), black slab
+ * buttons, and animated floating labels over hairline underlines.
+ */
+
+:root {
+  --ink: #111111;
+  --blue: #337ab7;
+  --blue-pale: #a4d5ff;
+  --blue-wash: #eaf4ff;
+  --muted: #8a8f98;
+  --hairline: #e6e9ed;
+  --danger: #eb1c26;
+  --font-body: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --font-display: var(--font-chivo), 'Helvetica Neue', Helvetica, sans-serif;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-body);
+  font-size: 16px;
+  color: var(--ink);
+  background: #fff;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ---------------------------------------------------------------- layout --- */
+
+.page {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 40px 24px 80px;
+}
+
+.masthead {
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--hairline);
+  margin-bottom: 40px;
+}
+
+.masthead h1 {
+  font-family: var(--font-display);
+  font-size: 40px;
+  font-weight: 300;
+  letter-spacing: -0.4px;
+  margin: 0;
+}
+
+.masthead p {
+  color: var(--blue);
+  font-size: 19px;
+  font-weight: 400;
+  margin: 6px 0 0;
+}
+
+.masthead .clock {
+  display: inline-block;
+  vertical-align: -2px;
+  margin-left: 4px;
+}
+
+.columns {
+  display: grid;
+  grid-template-columns: 7fr 5fr;
+  gap: 56px;
+  align-items: start;
+}
+
+@media (max-width: 820px) {
+  .page {
+    padding: 28px 20px 64px;
+  }
+  .masthead h1 {
+    font-size: 32px;
+  }
+  .masthead p {
+    font-size: 17px;
+  }
+  .columns {
+    grid-template-columns: 1fr;
+    gap: 36px;
+  }
+}
+
+/* ----------------------------------------------------------------- shirt --- */
+
+.shirt {
+  position: relative;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  /* Lets the printed timestamp size itself against the shirt, not the viewport. */
+  container-type: inline-size;
+}
+
+.shirt-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.shirt-svg path {
+  fill: #16181c;
+}
+
+/* The printed area, positioned over the chest of the garment. */
+.shirt-print {
+  position: absolute;
+  top: 26%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 47%;
+  text-align: center;
+  pointer-events: none;
+}
+
+.shirt-stamp {
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: #fff;
+  /* Scales with the shirt so the print keeps its proportion at every width. */
+  font-size: clamp(11px, 3.55cqw, 30px);
+  line-height: 1.1;
+  letter-spacing: 0.02em;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' 1;
+  white-space: nowrap;
+}
+
+.shirt-price {
+  /* Overlaps the hem at the lower left, so it reads as a price tag on the
+     listing rather than as part of the print. */
+  position: absolute;
+  bottom: 4%;
+  left: 2%;
+}
+
+.shirt-price .tag {
+  display: inline-block;
+  background: var(--blue);
+  color: #fff;
+  font-weight: 300;
+  font-size: 22px;
+  padding: 5px 12px;
+  border-radius: 3px;
+}
+
+.shirt-price .tag s {
+  opacity: 0.65;
+  margin-right: 6px;
+  font-size: 18px;
+}
+
+.shirt-caption {
+  text-align: center;
+  color: var(--muted);
+  font-size: 13px;
+  margin-top: 4px;
+  line-height: 1.5;
+}
+
+.shirt-caption strong {
+  color: var(--ink);
+  font-weight: 500;
+}
+
+/* ------------------------------------------------------------------ form --- */
+
+.form {
+  width: 100%;
+}
+
+.pickers {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+
+.picker {
+  position: relative;
+  display: grid;
+  gap: 2px;
+  width: 100%;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+}
+
+.picker input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.picker label {
+  background: var(--blue-pale);
+  color: var(--ink);
+  text-align: center;
+  padding: 9px 6px;
+  margin: 0;
+  cursor: pointer;
+  font-size: 15px;
+  transition:
+    background 150ms ease,
+    color 150ms ease,
+    opacity 150ms ease;
+  user-select: none;
+}
+
+.picker label:hover {
+  opacity: 0.82;
+}
+
+.picker input:checked + label {
+  background: var(--ink);
+  color: #fff;
+}
+
+.picker input:focus-visible + label {
+  outline: 2px solid var(--blue);
+  outline-offset: 2px;
+}
+
+/* Floating-label fields, straight from the original checkout. */
+.field-row {
+  position: relative;
+  display: block;
+  margin-top: 28px;
+  margin-bottom: 18px;
+  width: 100%;
+}
+
+.field {
+  background: transparent;
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 400;
+  border: 0;
+  color: var(--ink);
+  outline: none;
+  display: block;
+  width: 100%;
+  line-height: 28px;
+  padding: 0 0 3px;
+  transition: opacity 200ms ease-in-out;
+}
+
+.field::placeholder {
+  color: #ccc;
+}
+
+/* Placeholder text is hidden until the field is engaged, so the label reads as
+   the field's name at rest. */
+.field.is-empty:not(:focus) {
+  opacity: 0;
+}
+
+.field-label {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  font-weight: 400;
+  line-height: 28px;
+  color: var(--ink);
+  border-bottom: 1px solid var(--blue-pale);
+  transition: border-bottom-color 200ms ease-in-out;
+  pointer-events: none;
+}
+
+.field-label span {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: 0% 50%;
+  transition: transform 200ms ease-in-out;
+}
+
+.field:focus ~ .field-label,
+.field:not(.is-empty) ~ .field-label,
+.stripe-field.is-focused ~ .field-label,
+.stripe-field.is-filled ~ .field-label {
+  color: var(--blue);
+  border-bottom-color: var(--blue);
+}
+
+.field:focus ~ .field-label span,
+.field:not(.is-empty) ~ .field-label span,
+.stripe-field.is-focused ~ .field-label span,
+.stripe-field.is-filled ~ .field-label span {
+  transform: scale(0.8) translateY(-27px);
+}
+
+.field-row.is-invalid .field-label,
+.field-row.is-invalid .field-label span {
+  color: var(--danger);
+  border-bottom-color: var(--danger);
+}
+
+.field-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1.2fr;
+  gap: 16px;
+}
+
+@media (max-width: 420px) {
+  .field-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.stripe-field {
+  padding-top: 4px;
+  min-height: 28px;
+  transition: opacity 200ms ease-in-out;
+}
+
+/* Same trick as the text fields: the card inputs stay hidden until engaged so
+   the floating label can occupy the row without colliding with them. Clicking
+   the row still focuses the (invisible) iframe, which reveals it. */
+.stripe-field:not(.is-focused):not(.is-filled) {
+  opacity: 0;
+}
+
+.submit {
+  display: block;
+  background: var(--ink);
+  color: #fff;
+  border: 0;
+  margin-top: 18px;
+  font-family: inherit;
+  font-size: 19px;
+  font-weight: 400;
+  width: 100%;
+  height: 47px;
+  cursor: pointer;
+  transition:
+    background 200ms ease,
+    opacity 200ms ease;
+}
+
+.submit:hover:not(:disabled) {
+  opacity: 0.85;
+}
+
+.submit:focus-visible {
+  background: var(--blue);
+}
+
+.submit:disabled {
+  cursor: progress;
+  opacity: 0.7;
+}
+
+.submit .spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  margin-right: 8px;
+  vertical-align: -2px;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 800ms linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .submit .spinner {
+    animation-duration: 2s;
+  }
+  .field-label,
+  .field-label span,
+  .field {
+    transition: none;
+  }
+}
+
+.fineprint {
+  color: var(--muted);
+  font-size: 12.5px;
+  line-height: 1.6;
+  margin: 14px 0 0;
+}
+
+.alert {
+  background: #fdeaea;
+  border: 1px solid #f5c2c4;
+  color: #a3282e;
+  padding: 12px 14px;
+  font-size: 14px;
+  line-height: 1.5;
+  margin-bottom: 18px;
+}
+
+.alert ul {
+  margin: 6px 0 0;
+  padding-left: 18px;
+}
+
+.notice {
+  background: var(--blue-wash);
+  border: 1px solid #cde4fb;
+  color: #23527c;
+  padding: 10px 12px;
+  font-size: 12.5px;
+  line-height: 1.5;
+  margin-bottom: 20px;
+}
+
+/* --------------------------------------------------------------- success --- */
+
+.success {
+  padding-top: 8%;
+  text-align: center;
+}
+
+.success h2 {
+  font-size: 20px;
+  font-weight: 500;
+  margin: 0 0 12px;
+}
+
+.success p {
+  font-size: 16px;
+  line-height: 1.6;
+  margin: 0 0 12px;
+}
+
+.success .reference {
+  font-family: var(--font-display);
+  font-size: 22px;
+  letter-spacing: 0.5px;
+  display: inline-block;
+  background: var(--blue-wash);
+  color: #23527c;
+  padding: 8px 14px;
+  margin: 4px 0 16px;
+}
+
+.success .stamp {
+  font-family: var(--font-display);
+  font-weight: 700;
+}
+
+.footer {
+  margin-top: 64px;
+  padding-top: 20px;
+  border-top: 1px solid var(--hairline);
+  color: var(--muted);
+  font-size: 12.5px;
+  line-height: 1.7;
+}
+
+.footer a {
+  color: var(--blue);
+}
