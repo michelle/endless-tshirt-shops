@@ -192,7 +192,7 @@ set +e
 AGENT_EXIT=$?
 set -e
 
-tar -C "$AGENT_WORKSPACE" --exclude=.git --exclude=node_modules -cf - . | tar -C "$WORKSPACE" -xf -
+tar -C "$AGENT_WORKSPACE" --exclude=.git --exclude=node_modules --exclude=.next --exclude=reference -cf - . | tar -C "$WORKSPACE" -xf -
 if ! assert_only_run_output_changed; then
   restore_base_branch
   exit 1
