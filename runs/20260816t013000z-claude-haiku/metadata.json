@@ -1,0 +1,16 @@
+{
+  "run_id": "20260816t013000z-claude-haiku",
+  "status": "failed",
+  "adapter": "claude",
+  "model": "haiku",
+  "branch": "benchmark-results",
+  "vercel_project": "benchmark-20260816t013000z-claude-haiku",
+  "base_commit": "dffcb3ddef313f40c8652394778a838b32bea5c1",
+  "prompt_sha256": "4c1bef8b516318ba0f892c099106a5ddb176ddb9613ab928b5e33b2c255eab65",
+  "workspace_tree": "275927f59cb59dc1875b0882f0110ea0844d2e3c",
+  "started_at": "2026-08-16T01:35:49Z",
+  "finished_at": "2026-08-16T01:36:04Z",
+  "duration_seconds": 15,
+  "agent_exit_code": 1,
+  "deployment_url": ""
+}
