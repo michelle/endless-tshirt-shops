@@ -1,0 +1,547 @@
+/*
+ * datetime.store
+ * Palette and interaction model carried over from the original: black ink,
+ * #a4d5ff pill fills, #337ab7 focus blue, Helvetica Neue body, Chivo numerals.
+ */
+
+:root {
+  --ink: #111;
+  --ink-soft: #6b7280;
+  --blue: #337ab7;
+  --blue-pale: #a4d5ff;
+  --blue-wash: #eaf4ff;
+  --red: #eb1c26;
+  --rule: #e5e7eb;
+  --shirt: #16181d;
+  --max: 1080px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+* {
+  padding: 0;
+  margin: 0;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  color: var(--ink);
+  background: #fff;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  line-height: 1.5;
+}
+
+/* ---------------------------------------------------------------- layout */
+
+.page {
+  max-width: var(--max);
+  margin: 0 auto;
+  padding: 40px 24px 80px;
+}
+
+.masthead {
+  border-bottom: 1px solid var(--rule);
+  padding-bottom: 18px;
+  margin-bottom: 40px;
+}
+
+.masthead h1 {
+  font-size: 40px;
+  font-weight: 300;
+  letter-spacing: -0.4px;
+  line-height: 1.1;
+}
+
+.masthead p {
+  color: var(--blue);
+  font-size: 19px;
+  font-weight: 400;
+  margin-top: 6px;
+}
+
+.masthead p .clock {
+  font-variant-numeric: tabular-nums;
+  font-family: 'Chivo', 'Helvetica Neue', sans-serif;
+  color: var(--ink-soft);
+  font-size: 15px;
+  margin-left: 4px;
+  white-space: nowrap;
+}
+
+.columns {
+  display: grid;
+  grid-template-columns: 7fr 5fr;
+  gap: 56px;
+  align-items: start;
+}
+
+@media (max-width: 860px) {
+  .columns {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+  .page {
+    padding: 28px 18px 64px;
+  }
+  .masthead h1 {
+    font-size: 32px;
+  }
+}
+
+.sticky {
+  position: sticky;
+  top: 32px;
+}
+
+@media (max-width: 860px) {
+  .sticky {
+    position: static;
+  }
+}
+
+/* ----------------------------------------------------------------- shirt */
+
+.shirt {
+  position: relative;
+  width: 100%;
+}
+
+.shirt-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.shirt-body {
+  fill: var(--shirt);
+  transition: fill 200ms ease;
+}
+
+.shirt.is-frozen .shirt-body {
+  fill: #2a2d35;
+}
+
+/* The printed datetime, drawn in the SVG so it scales with the garment. */
+.shirt-print {
+  fill: #fff;
+  font-family: 'Chivo', 'Helvetica Neue', monospace;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  text-anchor: middle;
+  letter-spacing: 0.4px;
+  user-select: none;
+}
+
+.shirt-print-main {
+  font-size: 5.6px;
+}
+
+.shirt-print-sub {
+  font-size: 2.5px;
+  font-weight: 400;
+  fill: #fff;
+  letter-spacing: 1.2px;
+}
+
+.shirt-caption {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
+
+.price-tag {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+  background: var(--blue);
+  color: #fff;
+  padding: 5px 12px;
+  border-radius: 3px;
+  font-size: 19px;
+  font-weight: 500;
+}
+
+.price-tag s {
+  opacity: 0.65;
+  font-weight: 300;
+  font-size: 15px;
+}
+
+.shirt-note {
+  color: var(--ink-soft);
+  font-size: 14px;
+}
+
+.shirt-frozen-note {
+  color: var(--blue);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* ------------------------------------------------------------------ form */
+
+.form-section {
+  margin-bottom: 4px;
+}
+
+.form-section > h3 {
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 1.1px;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  margin-bottom: 10px;
+}
+
+.pills {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 22px;
+}
+
+.pills.styles {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.pills.sizes {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.pill input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.pill label {
+  display: block;
+  text-align: center;
+  background: var(--blue-pale);
+  color: var(--ink);
+  padding: 9px 8px;
+  font-size: 15px;
+  cursor: pointer;
+  border-radius: 3px;
+  transition: background 160ms ease, color 160ms ease, opacity 160ms ease;
+}
+
+.pill label:hover {
+  opacity: 0.82;
+}
+
+.pill input:checked + label {
+  background: var(--ink);
+  color: #fff;
+}
+
+.pill input:focus-visible + label {
+  outline: 2px solid var(--blue);
+  outline-offset: 2px;
+}
+
+/* Floating-label text fields, as in the original. */
+.field-wrap {
+  position: relative;
+  display: block;
+  margin-top: 26px;
+  margin-bottom: 16px;
+}
+
+.field {
+  background: transparent;
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 400;
+  border: 0;
+  color: var(--ink);
+  outline: none;
+  display: block;
+  width: 100%;
+  line-height: 28px;
+  padding: 0 0 3px;
+  transition: opacity 200ms ease-in-out;
+}
+
+.field::placeholder {
+  color: #ccc;
+}
+
+/* Hide the placeholder until the field is focused, so the label reads first. */
+.field.is-empty:not(:focus) {
+  opacity: 0;
+}
+
+.field-label {
+  position: absolute;
+  inset: 0;
+  font-weight: 400;
+  line-height: 28px;
+  color: var(--ink);
+  border-bottom: 1px solid var(--blue-pale);
+  transition: border-bottom-color 200ms ease-in-out, color 200ms ease-in-out;
+  pointer-events: none;
+}
+
+.field-label > span {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: 0 50%;
+  transition: transform 200ms ease-in-out;
+}
+
+.field:focus + .field-label,
+.field:not(.is-empty) + .field-label {
+  color: var(--blue);
+}
+
+.field:focus + .field-label > span,
+.field:not(.is-empty) + .field-label > span {
+  transform: scale(0.8) translateY(-27px);
+}
+
+.field:focus + .field-label {
+  border-bottom-color: var(--blue);
+}
+
+.field-wrap.is-invalid .field-label {
+  color: var(--red);
+  border-bottom-color: var(--red);
+}
+
+.field-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: 14px;
+}
+
+@media (max-width: 480px) {
+  .field-row {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+}
+
+/* Stripe Element sits in the same floating-label chrome as the inputs. */
+.field-wrap.card .stripe-mount {
+  line-height: 28px;
+  padding-bottom: 3px;
+}
+
+.field-wrap.card .field-label > span {
+  transform: scale(0.8) translateY(-27px);
+  color: var(--blue);
+}
+
+.field-wrap.card .field-label {
+  color: var(--blue);
+}
+
+.field-wrap.card.is-focused .field-label {
+  border-bottom-color: var(--blue);
+}
+
+/* --------------------------------------------------------------- actions */
+
+.buy {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: var(--ink);
+  color: #fff;
+  border: 0;
+  margin-top: 22px;
+  font-family: inherit;
+  font-size: 18px;
+  font-weight: 400;
+  width: 100%;
+  height: 50px;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: opacity 200ms ease, background 200ms ease;
+}
+
+.buy:hover:not(:disabled) {
+  opacity: 0.85;
+}
+
+.buy:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 2px;
+}
+
+.buy:disabled {
+  background: #4b5563;
+  cursor: progress;
+}
+
+.buy .spinner {
+  width: 15px;
+  height: 15px;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 700ms linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.fineprint {
+  color: var(--ink-soft);
+  font-size: 13px;
+  margin-top: 14px;
+  text-align: center;
+}
+
+/* -------------------------------------------------------------- messages */
+
+.alert {
+  border-radius: 3px;
+  padding: 11px 14px;
+  font-size: 14px;
+  margin-bottom: 18px;
+}
+
+.alert-error {
+  background: #fdeced;
+  color: #8f1219;
+  border: 1px solid #f7c6c9;
+}
+
+.alert-error ul {
+  margin: 6px 0 0 18px;
+}
+
+.alert-info {
+  background: var(--blue-wash);
+  color: #1e4b73;
+  border: 1px solid #c5e2ff;
+}
+
+.test-banner {
+  background: var(--blue-wash);
+  border: 1px solid #c5e2ff;
+  color: #1e4b73;
+  border-radius: 3px;
+  padding: 10px 14px;
+  font-size: 13px;
+  margin-bottom: 26px;
+}
+
+.test-banner code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  background: #fff;
+  padding: 1px 5px;
+  border-radius: 3px;
+  border: 1px solid #c5e2ff;
+}
+
+/* --------------------------------------------------------------- success */
+
+.success {
+  padding: 8px 0;
+}
+
+.success h2 {
+  font-size: 24px;
+  font-weight: 400;
+  margin-bottom: 12px;
+}
+
+.success p {
+  margin-bottom: 12px;
+  color: #374151;
+}
+
+.receipt {
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  margin: 20px 0;
+}
+
+.receipt div {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 10px 14px;
+  font-size: 14px;
+}
+
+.receipt div + div {
+  border-top: 1px solid var(--rule);
+}
+
+.receipt dt {
+  color: var(--ink-soft);
+}
+
+.receipt dd {
+  font-weight: 500;
+  text-align: right;
+  word-break: break-all;
+}
+
+.receipt .mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+.footer {
+  margin-top: 64px;
+  padding-top: 20px;
+  border-top: 1px solid var(--rule);
+  color: var(--ink-soft);
+  font-size: 13px;
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.footer a {
+  color: var(--blue);
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/*
+ * The print is server-rendered as placeholder zeros so the SVG reserves its
+ * layout; keep it hidden until the clock paints a real value on hydration.
+ */
+.shirt-print {
+  opacity: 0;
+  transition: opacity 180ms ease;
+}
+
+.shirt.is-live .shirt-print {
+  opacity: 1;
+}
+
+.shirt.is-live .shirt-print-sub {
+  opacity: 0.62;
+}
