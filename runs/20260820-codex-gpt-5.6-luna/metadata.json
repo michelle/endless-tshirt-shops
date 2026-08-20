@@ -1,0 +1,16 @@
+{
+  "run_id": "20260820-codex-gpt-5.6-luna",
+  "status": "succeeded",
+  "adapter": "codex",
+  "model": "gpt-5.6-luna",
+  "branch": "benchmark-results",
+  "vercel_project": "benchmark-20260820-codex-gpt-5.6-luna",
+  "base_commit": "dffcb3ddef313f40c8652394778a838b32bea5c1",
+  "prompt_sha256": "4c1bef8b516318ba0f892c099106a5ddb176ddb9613ab928b5e33b2c255eab65",
+  "workspace_tree": "6a13479c93fd84252984b453fd79ad9217e6410c",
+  "started_at": "2026-08-20T16:50:00Z",
+  "finished_at": "2026-08-20T16:53:56Z",
+  "duration_seconds": 236,
+  "agent_exit_code": 0,
+  "deployment_url": "https://benchmark-20260820-codex-gpt-56-luna-fj5eofofu.vercel.app"
+}
