@@ -21,12 +21,14 @@ Commit or stash all existing work first: the runner refuses a dirty repository s
 scripts/run-benchmark \
   --adapter codex \
   --model gpt-5.6-sol \
+  --reasoning-effort high \
   --timeout 3600
 
 scripts/run-benchmark \
   --adapter claude \
   --model sonnet \
   --run-id 20260812-claude-sonnet-a \
+  --reasoning-effort high \
   -- --max-budget-usd 20
 ```
 
@@ -48,7 +50,8 @@ runs/<run-id>/
   workspace/       generated application code
   final.md         agent's final completion report
   agent.log        redacted execution transcript
-  metadata.json    model, adapter, base/prompt hashes, status, timing, URL
+  metadata.json    model, adapter, reasoning effort, usage, base/prompt hashes, status, timing, URL
+  usage.json       provider-reported token usage, when the CLI exposes it
   agent.raw.log    untracked local source transcript
 ```
 
@@ -58,7 +61,7 @@ Run `tests/run-benchmark-test.sh` to verify the runner locally with fake CLIs an
 
 ## Adapter contract
 
-`scripts/adapters/codex` and `scripts/adapters/claude` receive `BENCHMARK_WORKSPACE`, `BENCHMARK_PROMPT_FILE`, `BENCHMARK_MODEL`, `BENCHMARK_FINAL_OUTPUT`, and `BENCHMARK_VERCEL_PROJECT`. New providers should implement the same contract, run without prompts, write only the final answer to `BENCHMARK_FINAL_OUTPUT`, and emit all other output to stdout/stderr.
+`scripts/adapters/codex` and `scripts/adapters/claude` receive `BENCHMARK_WORKSPACE`, `BENCHMARK_PROMPT_FILE`, `BENCHMARK_MODEL`, `BENCHMARK_FINAL_OUTPUT`, `BENCHMARK_VERCEL_PROJECT`, and optional `BENCHMARK_REASONING_EFFORT`. New providers should implement the same contract, run without prompts, write only the final answer to `BENCHMARK_FINAL_OUTPUT`, and emit all other output to stdout/stderr. Use `--reasoning-effort` to pin an effort level and record it in metadata; omit it to retain each provider's default.
 
 ## Fair comparison
 

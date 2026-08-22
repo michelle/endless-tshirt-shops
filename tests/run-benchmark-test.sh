@@ -52,6 +52,7 @@ printf '%s\n' \
   'printf "generated dependency\n" >"$workspace/node_modules/example.js"' \
   'printf "generated app\n" >"$workspace/app.txt"' \
   'printf "formatted CLI output  \n"' \
+  'printf "{\\"type\\":\\"turn.completed\\",\\"usage\\":{\\"input_tokens\\":11,\\"output_tokens\\":7,\\"total_tokens\\":18}}\\n"' \
   'printf "SP_AUTH=%s sk_test_abcdefghijklmnop https://example.vercel.app\n" "$SP_AUTH"' \
   'printf "final report\n" >"$output"' \
   'exit "${FAKE_CODEX_EXIT:-0}"' >"$BIN/codex"
@@ -62,7 +63,7 @@ printf '%s\n' \
   '#!/usr/bin/env bash' \
   'set -euo pipefail' \
   'printf "claude app\\n" > claude.txt' \
-  "printf '%s\\n' '{\"result\":\"claude final report\"}'" >"$BIN/claude"
+  "printf '%s\\n' '{\"result\":\"claude final report\",\"usage\":{\"input_tokens\":21,\"output_tokens\":13}}'" >"$BIN/claude"
 chmod +x "$BIN/claude"
 
 run() {
@@ -87,6 +88,7 @@ assert test "$SUCCESS_VERCEL_PROJECT" = 'benchmark-success'
 assert git --git-dir="$REMOTE" show benchmark-results:runs/success/final.md
 SUCCESS_METADATA=$(git --git-dir="$REMOTE" show benchmark-results:runs/success/metadata.json)
 [[ $SUCCESS_METADATA == *'"vercel_project": "benchmark-success"'* ]] || fail 'Vercel project was not recorded'
+[[ $SUCCESS_METADATA == *'"reasoning_effort": ""'* ]] || fail 'default reasoning effort was not recorded'
 assert test ! -e "$REPO/runs/success"
 if git -C "$REPO" show-ref --verify --quiet refs/heads/benchmark-run/success; then
   fail 'temporary execution branch was retained after a successful push'

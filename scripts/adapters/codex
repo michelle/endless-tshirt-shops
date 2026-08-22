@@ -5,15 +5,69 @@ set -euo pipefail
 : "${BENCHMARK_PROMPT_FILE:?}"
 : "${BENCHMARK_MODEL:?}"
 : "${BENCHMARK_FINAL_OUTPUT:?}"
+: "${BENCHMARK_USAGE_OUTPUT:?}"
 
-exec codex exec \
+ARGS=()
+if [[ -n ${BENCHMARK_REASONING_EFFORT-} ]]; then
+  ARGS+=(--config "model_reasoning_effort=\"$BENCHMARK_REASONING_EFFORT\"")
+fi
+
+TMP_OUTPUT=$(mktemp "${TMPDIR:-/tmp}/benchmark-codex.XXXXXX")
+trap 'rm -f "$TMP_OUTPUT"' EXIT
+
+set +e
+codex exec \
   --dangerously-bypass-approvals-and-sandbox \
   --skip-git-repo-check \
   --ephemeral \
   --color never \
+  --json \
   --cd "$BENCHMARK_WORKSPACE" \
   --model "$BENCHMARK_MODEL" \
   --output-last-message "$BENCHMARK_FINAL_OUTPUT" \
+  "${ARGS[@]}" \
   "$@" \
-  "$(<"$BENCHMARK_PROMPT_FILE")"
+  "$(<"$BENCHMARK_PROMPT_FILE")" >"$TMP_OUTPUT" 2>&1
+CODEX_EXIT=$?
+set -e
+cat "$TMP_OUTPUT"
 
+python3 - "$TMP_OUTPUT" "$BENCHMARK_USAGE_OUTPUT" <<'PY'
+import json
+import sys
+
+source, destination = sys.argv[1:]
+keys = ("input_tokens", "output_tokens", "total_tokens", "cached_input_tokens", "reasoning_tokens")
+best = None
+
+def visit(value):
+    global best
+    if isinstance(value, dict):
+        usage = value.get("usage") or value.get("token_usage")
+        if isinstance(usage, dict) and any(isinstance(usage.get(key), int) for key in keys):
+            best = usage
+        for child in value.values():
+            visit(child)
+    elif isinstance(value, list):
+        for child in value:
+            visit(child)
+
+for line in open(source, encoding="utf-8", errors="replace"):
+    try:
+        visit(json.loads(line))
+    except json.JSONDecodeError:
+        pass
+
+if best is None:
+    result = None
+else:
+    result = {key: best[key] for key in keys if isinstance(best.get(key), int)}
+    details = best.get("output_tokens_details")
+    if isinstance(details, dict) and isinstance(details.get("reasoning_tokens"), int):
+        result["reasoning_tokens"] = details["reasoning_tokens"]
+with open(destination, "w", encoding="utf-8") as output:
+    json.dump(result, output, sort_keys=True)
+    output.write("\n")
+PY
+
+exit "$CODEX_EXIT"

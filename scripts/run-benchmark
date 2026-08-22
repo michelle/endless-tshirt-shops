@@ -9,6 +9,8 @@ Usage: scripts/run-benchmark --adapter codex|claude --model MODEL [options] [-- 
 Options:
   --run-id ID          Unique, branch-safe run ID (default: UTC timestamp + adapter + model)
   --timeout SECONDS    Hard timeout in seconds (default: 3600)
+  --reasoning-effort LEVEL
+                      Optional provider reasoning level (low, medium, high, xhigh, or max)
   -h, --help           Show this help
 
 The runner requires SP_AUTH, a clean repository, an origin remote, and either
@@ -83,6 +85,7 @@ ADAPTER=
 MODEL=
 RUN_ID=
 TIMEOUT_SECONDS=3600
+REASONING_EFFORT=
 EXTRA_ARGS=()
 
 while (($#)); do
@@ -91,6 +94,7 @@ while (($#)); do
     --model) MODEL=${2-}; shift 2 ;;
     --run-id) RUN_ID=${2-}; shift 2 ;;
     --timeout) TIMEOUT_SECONDS=${2-}; shift 2 ;;
+    --reasoning-effort) REASONING_EFFORT=${2-}; shift 2 ;;
     --) shift; EXTRA_ARGS=("$@"); break ;;
     -h|--help) usage; exit 0 ;;
     *) die "unknown argument: $1" ;;
@@ -100,6 +104,7 @@ done
 [[ $ADAPTER == codex || $ADAPTER == claude ]] || die "--adapter must be codex or claude"
 [[ -n $MODEL ]] || die "--model is required"
 [[ $TIMEOUT_SECONDS =~ ^[1-9][0-9]*$ ]] || die "--timeout must be a positive integer"
+[[ -z $REASONING_EFFORT || $REASONING_EFFORT =~ ^(low|medium|high|xhigh|max)$ ]] || die "--reasoning-effort must be low, medium, high, xhigh, or max"
 [[ -n ${SP_AUTH-} ]] || die "SP_AUTH must be set to a Scalable Press test key"
 
 REPO_ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || die "run this from inside the benchmark repository"
@@ -132,6 +137,7 @@ RAW_LOG="$RESULT_DIR/agent.raw.log"
 REDACTED_LOG="$RESULT_DIR/agent.log"
 FINAL_OUTPUT="$RESULT_DIR/final.md"
 METADATA="$RESULT_DIR/metadata.json"
+USAGE_OUTPUT="$RESULT_DIR/usage.json"
 
 [[ ! -e $RESULT_DIR ]] || die "run directory already exists: runs/$RUN_ID"
 git show-ref --verify --quiet "refs/heads/$EXECUTION_BRANCH" && die "temporary branch already exists: $EXECUTION_BRANCH"
@@ -186,6 +192,8 @@ export BENCHMARK_PROMPT_FILE="$REPO_ROOT/prompt.md"
 export BENCHMARK_MODEL="$MODEL"
 export BENCHMARK_FINAL_OUTPUT="$FINAL_OUTPUT"
 export BENCHMARK_VERCEL_PROJECT="$VERCEL_PROJECT"
+export BENCHMARK_REASONING_EFFORT="$REASONING_EFFORT"
+export BENCHMARK_USAGE_OUTPUT="$USAGE_OUTPUT"
 
 set +e
 "$TIMEOUT_COMMAND" "$TIMEOUT_SECONDS" "$ADAPTER_PATH" "${EXTRA_ARGS[@]}" >"$RAW_LOG" 2>&1
@@ -213,6 +221,16 @@ fi
 
 redact_log "$RAW_LOG" "$REDACTED_LOG"
 DEPLOYMENT_URL=$(extract_url "$REDACTED_LOG")
+USAGE_JSON=null
+if [[ -s $USAGE_OUTPUT ]] && python3 - "$USAGE_OUTPUT" >/dev/null <<'PY'
+import json
+import sys
+value = json.load(open(sys.argv[1], encoding='utf-8'))
+assert value is None or isinstance(value, dict)
+PY
+then
+  USAGE_JSON=$(cat "$USAGE_OUTPUT")
+fi
 PROMPT_SHA=$(shasum -a 256 "$BENCHMARK_PROMPT_FILE" | awk '{print $1}')
 git add "$WORKSPACE"
 WORKSPACE_TREE=$(git write-tree)
@@ -222,6 +240,7 @@ WORKSPACE_TREE=$(git write-tree)
   printf '  "status": '; json_string "$RUN_STATUS"; printf ',\n'
   printf '  "adapter": '; json_string "$ADAPTER"; printf ',\n'
   printf '  "model": '; json_string "$MODEL"; printf ',\n'
+  printf '  "reasoning_effort": '; json_string "$REASONING_EFFORT"; printf ',\n'
   printf '  "branch": '; json_string "$RESULTS_BRANCH"; printf ',\n'
   printf '  "vercel_project": '; json_string "$VERCEL_PROJECT"; printf ',\n'
   printf '  "base_commit": '; json_string "$BASE_COMMIT"; printf ',\n'
@@ -231,6 +250,7 @@ WORKSPACE_TREE=$(git write-tree)
   printf '  "finished_at": '; json_string "$FINISHED_AT"; printf ',\n'
   printf '  "duration_seconds": %s,\n' "$DURATION_SECONDS"
   printf '  "agent_exit_code": %s,\n' "$AGENT_EXIT"
+  printf '  "usage": %s,\n' "$USAGE_JSON"
   printf '  "deployment_url": '; json_string "$DEPLOYMENT_URL"; printf '\n}\n'
 } >"$METADATA"
 

@@ -2,7 +2,7 @@ You are in an empty working directory. Build and deploy a production-quality reb
 autonomously and make reasonable product and technical decisions.
 
 Reference:
-https://github.com/michelle/dt-shirt
+https://github.com/michelle/datetime.store
 
 Use the reference to understand the product’s behavior and visual intent.
 
