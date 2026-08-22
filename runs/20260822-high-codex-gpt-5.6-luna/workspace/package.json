@@ -1,0 +1,17 @@
+{
+  "name": "datetime-store",
+  "version": "1.0.0",
+  "private": true,
+  "description": "A made-to-order shirt printed with the exact time of purchase.",
+  "scripts": {
+    "start": "node server.mjs",
+    "dev": "node server.mjs",
+    "check": "node --check site.js && node --check api/_lib.js && node --check api/create-checkout-session.js && node --check api/complete.js && node --check api/webhook.js"
+  },
+  "dependencies": {
+    "stripe": "^18.5.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

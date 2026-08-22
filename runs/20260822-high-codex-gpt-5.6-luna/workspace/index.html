@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#f5f3ef" />
+    <meta name="description" content="datetime.store makes a t-shirt with the current datetime." />
+    <meta property="og:title" content="datetime.store — wear the present" />
+    <meta property="og:description" content="A made-to-order tee printed with the exact moment you bought it." />
+    <title>datetime.store — wear the present</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='18' fill='%23171414'/%3E%3Cpath d='M27 25h46v50H27z' fill='none' stroke='%23fff' stroke-width='6'/%3E%3Cpath d='M38 39h24M38 51h24M38 63h13' stroke='%23ff5748' stroke-width='5'/%3E%3C/svg%3E" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#shop">Skip to shop</a>
+    <header class="site-header page-shell">
+      <a class="wordmark" href="/" aria-label="datetime.store home">
+        <span class="wordmark-mark" aria-hidden="true">dt</span>
+        <span>datetime.store</span>
+      </a>
+      <div class="header-note"><span class="live-dot"></span> made to order · ships worldwide</div>
+    </header>
+
+    <main>
+      <section class="hero page-shell" aria-labelledby="hero-title">
+        <div class="hero-copy">
+          <p class="eyebrow">edition 001 / the present</p>
+          <h1 id="hero-title">Wear the<br /><em>present.</em></h1>
+          <p class="hero-lede">A t-shirt printed with the exact datetime you order it. A tiny souvenir of right now.</p>
+          <a class="text-link" href="#shop">Choose your moment <span aria-hidden="true">↘</span></a>
+        </div>
+        <div class="hero-stamp" aria-label="Current time, updating live">
+          <span class="stamp-label">RIGHT NOW</span>
+          <strong id="hero-clock">--:--:--</strong>
+          <span id="hero-date">loading local time</span>
+        </div>
+      </section>
+
+      <section class="shop-grid page-shell" id="shop" aria-labelledby="product-title">
+        <div class="product-stage">
+          <div class="stage-label stage-label-top">the datetime tee <span>↓</span></div>
+          <div class="shirt-wrap">
+            <div class="shirt-shadow" aria-hidden="true"></div>
+            <svg class="shirt-svg" viewBox="0 0 100 125" role="img" aria-labelledby="shirt-label shirt-description">
+              <title id="shirt-label">Black datetime t-shirt preview</title>
+              <desc id="shirt-description">A black t-shirt with a live timestamp printed on the chest.</desc>
+              <path id="shirt-path" fill="#171414" d="M79.312,15.149c-1.629-1.631-16.117-6.146-16.117-6.146s-4.31,8.721-11.66,8.721s-11.66-8.721-11.66-8.721s-15.354,4.936-16.486,6.068c-1.13,1.13-13.712,16.992-13.712,16.992l10.081,8.37l6.614-5.518c0,0,14.411,23.971,1.384,58.875c0,0,43.546,10.767,47.434,0c-9.689-43.26,1.379-58.613,1.379-58.613l6.267,5.228l9.35-11.117C92.185,29.288,80.945,16.781,79.312,15.149z" />
+              <path class="shirt-seam" d="M27 26c4 17 4 37 2 60M73 26c-4 17-4 37-2 60" />
+              <path class="shirt-collar" d="M39 9c1 6 4 9 12 9s11-3 12-9" />
+              <foreignObject class="shirt-art" x="22" y="36" width="56" height="31">
+                <div xmlns="http://www.w3.org/1999/xhtml" class="shirt-art-inner">
+                  <span class="shirt-art-date" id="shirt-date">AUG 22, 2026</span>
+                  <span class="shirt-art-time" id="shirt-time">16:16:17</span>
+                  <span class="shirt-art-ms" id="shirt-ms">.042</span>
+                </div>
+              </foreignObject>
+            </svg>
+          </div>
+          <div class="stage-label stage-label-bottom"><span>↓</span> black / dtg print / 001</div>
+          <div class="stage-doodle doodle-left" aria-hidden="true">one moment<br />in time <span>↗</span></div>
+          <div class="stage-doodle doodle-right" aria-hidden="true">✳ made<br />for now</div>
+        </div>
+
+        <aside class="purchase-card" aria-labelledby="product-title">
+          <div class="purchase-heading">
+            <div>
+              <p class="eyebrow">the original</p>
+              <h2 id="product-title">Datetime tee</h2>
+            </div>
+            <p class="price">$22.50 <del>$30</del></p>
+          </div>
+          <p class="product-description">Your order's timestamp, printed in white ink on a heavyweight black tee. Every piece is made one at a time.</p>
+
+          <div class="option-group">
+            <div class="option-label"><span>Fit</span><span id="fit-value">Fitted</span></div>
+            <div class="segmented" role="group" aria-label="Choose a fit">
+              <button class="option-button is-selected" type="button" data-option="style" data-value="fitted" aria-pressed="true">Fitted</button>
+              <button class="option-button" type="button" data-option="style" data-value="unisex" aria-pressed="false">Unisex</button>
+            </div>
+          </div>
+
+          <div class="option-group">
+            <div class="option-label"><span>Size</span><a href="#sizing">size guide</a></div>
+            <div class="size-grid" role="group" aria-label="Choose a size">
+              <button class="size-button" type="button" data-option="size" data-value="S" aria-pressed="false">S</button>
+              <button class="size-button is-selected" type="button" data-option="size" data-value="M" aria-pressed="true">M</button>
+              <button class="size-button" type="button" data-option="size" data-value="L" aria-pressed="false">L</button>
+              <button class="size-button" type="button" data-option="size" data-value="XL" aria-pressed="false">XL</button>
+            </div>
+          </div>
+
+          <div class="purchase-summary">
+            <span>shirt / <span id="summary-fit">fitted</span> / <span id="summary-size">M</span></span>
+            <span>$22.50</span>
+          </div>
+          <button class="buy-button" id="buy-button" type="button">
+            <span id="buy-label">Make it mine</span><span class="button-arrow" aria-hidden="true">↗</span>
+          </button>
+          <p class="secure-note"><span class="lock" aria-hidden="true">⌁</span> Secure checkout by Stripe · free shipping</p>
+          <p class="checkout-error" id="checkout-error" role="alert" hidden></p>
+          <div class="success-panel" id="success-panel" hidden>
+            <span class="success-check">✓</span>
+            <h3>It’s in the works.</h3>
+            <p id="success-copy">Your timestamp has been saved. A confirmation is on its way.</p>
+            <button class="reset-button" id="reset-button" type="button">Back to the tee</button>
+          </div>
+        </aside>
+      </section>
+
+      <section class="details-strip page-shell" aria-label="Product details">
+        <div><span class="detail-number">01</span><strong>Printed on demand</strong><p>No stock, no waste. Your shirt is made after you order.</p></div>
+        <div><span class="detail-number">02</span><strong>Free shipping</strong><p>We’ll send your one-of-one tee anywhere in the world.</p></div>
+        <div><span class="detail-number">03</span><strong>Timestamped forever</strong><p>The design is generated at checkout, down to the millisecond.</p></div>
+      </section>
+
+      <section class="sizing page-shell" id="sizing" aria-labelledby="sizing-title">
+        <div><p class="eyebrow">good to know</p><h2 id="sizing-title">Find your<br /><em>right fit.</em></h2></div>
+        <div class="sizing-copy"><p>Fitted is a closer cut through the body. Unisex is relaxed and easy. Both are black, soft, and ready for your exact moment.</p><div class="measure-row"><span>FIT</span><span>CHEST</span><span>LENGTH</span></div><div class="measure-row"><b>Fitted</b><span>34–46 in</span><span>27–30 in</span></div><div class="measure-row"><b>Unisex</b><span>36–52 in</span><span>28–32 in</span></div></div>
+      </section>
+    </main>
+
+    <footer class="site-footer page-shell"><span>datetime.store / 2026</span><span>made for right now <span class="footer-heart">♥</span></span></footer>
+    <script src="/site.js" defer></script>
+  </body>
+</html>
