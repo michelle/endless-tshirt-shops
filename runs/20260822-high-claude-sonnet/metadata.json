@@ -1,0 +1,18 @@
+{
+  "run_id": "20260822-high-claude-sonnet",
+  "status": "succeeded",
+  "adapter": "claude",
+  "model": "sonnet",
+  "reasoning_effort": "high",
+  "branch": "benchmark-results",
+  "vercel_project": "benchmark-20260822-high-claude-sonnet",
+  "base_commit": "04a77bf40b54383a9f60d5336993a2ea862c8ec2",
+  "prompt_sha256": "e3e6c108d392421f7c99e80a54fec08d3f1b7fff20c23cb864870f0026275ec4",
+  "workspace_tree": "dd3a269e4a43954c72a551cc2fc0723e2cd7d102",
+  "started_at": "2026-08-22T23:24:08Z",
+  "finished_at": "2026-08-22T23:47:28Z",
+  "duration_seconds": 1400,
+  "agent_exit_code": 0,
+  "usage": {"cache_creation_input_tokens": 259425, "cache_read_input_tokens": 11533980, "input_tokens": 224, "output_tokens": 67713},
+  "deployment_url": "https://benchmark-20260822-high-claude-sonn.vercel.app/api/checkout"
+}
