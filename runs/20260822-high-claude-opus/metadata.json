@@ -1,0 +1,18 @@
+{
+  "run_id": "20260822-high-claude-opus",
+  "status": "succeeded",
+  "adapter": "claude",
+  "model": "opus",
+  "reasoning_effort": "high",
+  "branch": "benchmark-results",
+  "vercel_project": "benchmark-20260822-high-claude-opus",
+  "base_commit": "04a77bf40b54383a9f60d5336993a2ea862c8ec2",
+  "prompt_sha256": "e3e6c108d392421f7c99e80a54fec08d3f1b7fff20c23cb864870f0026275ec4",
+  "workspace_tree": "7a71be709ade48b3352dca78f36f084d425b519e",
+  "started_at": "2026-08-22T23:48:20Z",
+  "finished_at": "2026-08-23T00:27:48Z",
+  "duration_seconds": 2368,
+  "agent_exit_code": 0,
+  "usage": {"cache_creation_input_tokens": 236622, "cache_read_input_tokens": 9839026, "input_tokens": 212, "output_tokens": 95758},
+  "deployment_url": "https://benchmark-20260822-high-claude-opus.vercel.app"
+}
