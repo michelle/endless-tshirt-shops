@@ -1,0 +1,40 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap');
+
+:root { --ink:#111112; --paper:#f7f6f2; --blue:#9bd8ff; --electric:#3199df; --line:#d7d6d0; }
+* { box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body { margin:0; color:var(--ink); background:var(--paper); font-family:Manrope, Arial, sans-serif; }
+main { min-height:100vh; overflow:hidden; }
+.site-header { max-width:1240px; margin:auto; padding:28px 32px 16px; display:flex; justify-content:space-between; align-items:center; }
+.wordmark { color:var(--ink); text-decoration:none; letter-spacing:-1.3px; font-size:24px; font-weight:800; }
+.header-note,.eyebrow,.timestamp-note,.time-chip,footer,.fine-print { font-family:'DM Mono',monospace; }
+.header-note { color:#77756e; font-size:12px; text-transform:uppercase; letter-spacing:.08em; }
+.hero { max-width:1240px; margin:0 auto; min-height:510px; padding:54px 32px 40px; display:grid; grid-template-columns:1.05fr .95fr; gap:30px; align-items:center; }
+.eyebrow { margin:0 0 17px; color:#287db5; text-transform:uppercase; letter-spacing:.11em; font-size:11px; font-weight:500; }
+h1 { font-size:clamp(44px,6vw,78px); letter-spacing:-.07em; line-height:.98; margin:0; font-weight:800; max-width:740px; }
+.lede { max-width:515px; font-size:17px; line-height:1.65; margin:28px 0 22px; color:#494847; }
+.time-chip { display:inline-flex; align-items:center; gap:8px; color:#1e638e; font-size:12px; background:#e1f3ff; padding:10px 13px; border-radius:999px; }
+.pulse { width:7px; height:7px; background:#2395da; border-radius:100%; box-shadow:0 0 0 5px #bae5ff; animation:blink 1.5s infinite; }
+@keyframes blink { 50% { opacity:.35; } }
+.shirt-stage { position:relative; width:min(100%,530px); justify-self:end; }
+.shirt-svg { display:block; width:100%; overflow:visible; }
+.shirt-shape { fill:url(#fabric); stroke:#000; stroke-width:2; }
+.collar { fill:#303034; opacity:.85; }
+.timestamp { font-family:'DM Mono',monospace; font-size:24px; font-weight:500; fill:#fff; letter-spacing:.2px; }
+.timestamp-note { fill:#d9d9d9; font-size:6px; letter-spacing:1px; }
+.price-tag { position:absolute; left:13%; bottom:22%; background:var(--blue); color:#101010; padding:10px 13px; font-family:'DM Mono',monospace; font-size:15px; font-weight:500; transform:rotate(-2deg); }
+.price-tag span { text-decoration:line-through; opacity:.55; margin-right:4px; }
+.shop { border-top:1px solid var(--line); background:#fff; padding:82px max(32px,calc((100vw - 1176px)/2)); display:grid; grid-template-columns:1fr 520px; align-items:start; gap:100px; }
+h2 { margin:0 0 16px; font-size:39px; letter-spacing:-.055em; line-height:1; }
+.shop-copy>p:not(.eyebrow) { max-width:370px; line-height:1.65; color:#625f5b; }
+.facts { display:flex; flex-wrap:wrap; gap:8px; margin-top:28px; }
+.facts span { border:1px solid var(--line); border-radius:50px; padding:7px 10px; font-size:11px; color:#5f5d58; }
+.order-card { border:1px solid #151515; padding:30px; box-shadow:8px 8px 0 var(--blue); background:#fff; }
+fieldset { border:0; padding:0; margin:0 0 29px; } legend { font-size:13px; font-weight:700; margin-bottom:12px; }
+.choice-grid { display:grid; gap:9px; }.choice-grid.two { grid-template-columns:1fr 1fr; }.choice { border:1px solid #cfcdc8; min-height:82px; padding:14px; cursor:pointer; transition:.15s ease; }.choice input,.size-choice input { position:absolute; opacity:0; pointer-events:none; }.choice b { display:block; font-size:14px; }.choice small { display:block; margin-top:4px; font-size:11px; color:#716f6b; line-height:1.35; }.choice.selected,.size-choice.selected { border-color:var(--ink); background:var(--ink); color:#fff; }.choice.selected small { color:#d4d4d4; }
+.choice-grid.sizes { grid-template-columns:repeat(4,1fr); }.size-choice { text-align:center; border:1px solid #cfcdc8; cursor:pointer; padding:12px 4px; font-family:'DM Mono',monospace; font-size:13px; }
+.email-field { display:block; font-size:13px; font-weight:700; }.email-field input { margin-top:9px; display:block; width:100%; border:0; border-bottom:1px solid #aaa; border-radius:0; background:transparent; padding:10px 0; outline:none; font:400 15px Manrope,sans-serif; }.email-field input:focus { border-color:var(--electric); }
+button,.back-button { border:0; background:var(--ink); color:#fff; font:600 14px Manrope,sans-serif; margin-top:27px; width:100%; padding:17px 18px; display:flex; justify-content:space-between; cursor:pointer; text-decoration:none; transition:background .2s,transform .2s; } button:hover,.back-button:hover { background:#287db5; transform:translateY(-1px); } button:disabled { opacity:.7; cursor:wait; }.fine-print { margin:14px 0 0; font-size:10px; color:#77746d; line-height:1.5; }.form-error { color:#b42318; font-size:12px; margin:0; }
+footer { max-width:1240px; margin:auto; padding:28px 32px; color:#77746d; display:flex; justify-content:space-between; font-size:10px; }
+.success-page { max-width:1000px; margin:auto; padding:34px 32px; }.success-card { max-width:670px; margin:13vh auto 0; border:1px solid var(--ink); padding:54px; box-shadow:12px 12px 0 var(--blue); background:white; }.success-card h1 { font-size:52px; }.success-card>p:not(.eyebrow) { font-size:17px; line-height:1.6; color:#555; margin-top:24px; }.success-card .back-button { width:auto; display:inline-flex; gap:40px; }
+@media(max-width:760px) { .site-header{padding:22px 21px}.header-note{display:none}.hero{padding:48px 21px 25px;grid-template-columns:1fr;gap:15px}.shirt-stage{justify-self:center;width:100%;max-width:410px}.intro{order:0}.shop{padding:55px 21px;grid-template-columns:1fr;gap:45px}.order-card{padding:21px;box-shadow:6px 6px 0 var(--blue)}.choice-grid.sizes{grid-template-columns:repeat(5,1fr)}footer{padding:23px 21px;font-size:9px}.success-page{padding:23px 21px}.success-card{margin-top:12vh;padding:30px}.success-card h1{font-size:40px} }
