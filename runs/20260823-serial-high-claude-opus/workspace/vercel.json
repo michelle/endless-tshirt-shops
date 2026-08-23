@@ -1,0 +1,9 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "crons": [
+    {
+      "path": "/api/ops/fulfillment?retry=1",
+      "schedule": "0 7 * * *"
+    }
+  ]
+}

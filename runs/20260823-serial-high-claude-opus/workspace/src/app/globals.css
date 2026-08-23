@@ -1,0 +1,85 @@
+@import 'tailwindcss';
+
+/*
+ * The palette is lifted from the original store — Bootstrap 3's link blue
+ * (#337ab7) and its pale companion (#a4d5ff) — but set on paper white with a
+ * lot more air, so the black shirt is the loudest thing on the page.
+ */
+@theme {
+  --font-sans: 'Helvetica Neue', Helvetica, -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial,
+    sans-serif;
+  --font-chivo: var(--font-chivo-family), 'Chivo', sans-serif;
+
+  --color-ink: #0a0a0a;
+  --color-muted: #6b7280;
+  --color-hairline: #e6e8eb;
+  --color-accent: #337ab7;
+  --color-accent-soft: #a4d5ff;
+  --color-accent-wash: #f0f7ff;
+  --color-danger: #d0342c;
+  --color-paper: #ffffff;
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  ::selection {
+    background: var(--color-accent-soft);
+    color: var(--color-ink);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+}
+
+/* The digits on the shirt and in the ticker: fixed-width so nothing jitters. */
+.tnum {
+  font-family: var(--font-chivo);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' 1;
+  letter-spacing: 0.02em;
+}
+
+@keyframes dt-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.dt-spin {
+  animation: dt-spin 0.9s linear infinite;
+}
+
+@keyframes dt-rise {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.dt-rise {
+  animation: dt-rise 260ms ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dt-spin,
+  .dt-rise {
+    animation: none;
+  }
+}

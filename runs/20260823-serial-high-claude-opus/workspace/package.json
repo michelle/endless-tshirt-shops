@@ -1,0 +1,31 @@
+{
+  "name": "datetime-store",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit",
+    "verify:products": "node scripts/verify-products.mjs"
+  },
+  "dependencies": {
+    "@napi-rs/canvas": "^0.1.80",
+    "@stripe/react-stripe-js": "^3.9.2",
+    "@stripe/stripe-js": "^7.9.0",
+    "next": "^16.3.2",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "stripe": "^18.5.0",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.13",
+    "@types/node": "^22.15.3",
+    "@types/react": "^19.1.9",
+    "@types/react-dom": "^19.1.7",
+    "tailwindcss": "^4.1.13",
+    "typescript": "^5.8.3"
+  }
+}
