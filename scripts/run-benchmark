@@ -143,6 +143,8 @@ METADATA="$RESULT_DIR/metadata.json"
 USAGE_OUTPUT="$RESULT_DIR/usage.json"
 STRIPE_CONFIG_DIR="$REPO_ROOT/.benchmark-secrets/stripe"
 STRIPE_CONFIG="$STRIPE_CONFIG_DIR/$RUN_ID.toml"
+GLOBAL_STRIPE_CONFIG=${BENCHMARK_GLOBAL_STRIPE_CONFIG:-"${HOME:?}/.config/stripe/config.toml"}
+[[ $GLOBAL_STRIPE_CONFIG == /* ]] || die "global Stripe config path must be absolute"
 
 [[ ! -e $RESULT_DIR ]] || die "run directory already exists: runs/$RUN_ID"
 [[ ! -e $STRIPE_CONFIG ]] || die "Stripe config already exists for this run: .benchmark-secrets/stripe/$RUN_ID.toml"
@@ -183,12 +185,80 @@ assert_only_run_output_changed() {
   fi
 }
 
+config_has_test_key() {
+  [[ -f $1 ]] && grep -qE '^[[:space:]]*test_mode_api_key[[:space:]]*=' "$1"
+}
+
+capture_agent_global_stripe_config() {
+  [[ ${GLOBAL_STRIPE_GUARD_ACTIVE-0} == 1 && -f $GLOBAL_STRIPE_CONFIG ]] || return 0
+  local captured="$STRIPE_CONFIG_DIR/$RUN_ID.global.toml"
+  local wrapper_config="$STRIPE_CONFIG_DIR/$RUN_ID.wrapper.toml"
+
+  # A direct invocation of the real CLI may have written to the default global
+  # path. Prefer that file when it contains credentials and the wrapped config
+  # does not; otherwise preserve it separately for diagnosis and recovery.
+  if [[ ! -s $STRIPE_CONFIG ]] || { config_has_test_key "$GLOBAL_STRIPE_CONFIG" && ! config_has_test_key "$STRIPE_CONFIG"; }; then
+    [[ ! -e $wrapper_config ]] || { note "warning: cannot capture wrapper Stripe config: $wrapper_config exists"; return 1; }
+    mv -- "$STRIPE_CONFIG" "$wrapper_config"
+    mv -- "$GLOBAL_STRIPE_CONFIG" "$STRIPE_CONFIG"
+    note "captured Stripe config written outside the wrapper as .benchmark-secrets/stripe/$RUN_ID.toml"
+  else
+    [[ ! -e $captured ]] || { note "warning: cannot capture global Stripe config: $captured exists"; return 1; }
+    mv -- "$GLOBAL_STRIPE_CONFIG" "$captured"
+    note "captured additional Stripe config as .benchmark-secrets/stripe/$RUN_ID.global.toml"
+  fi
+}
+
+restore_global_stripe_config() {
+  [[ ${GLOBAL_STRIPE_GUARD_ACTIVE-0} == 1 ]] || return 0
+  capture_agent_global_stripe_config || note "warning: could not capture Stripe config created outside the wrapper"
+  if [[ ${GLOBAL_STRIPE_ORIGINAL_PRESENT-0} == 1 ]]; then
+    if [[ -e $GLOBAL_STRIPE_CONFIG ]]; then
+      note "warning: refusing to overwrite Stripe config while restoring; backup remains at $GLOBAL_STRIPE_BACKUP"
+      return 1
+    fi
+    mkdir -p "$(dirname "$GLOBAL_STRIPE_CONFIG")"
+    mv -- "$GLOBAL_STRIPE_BACKUP" "$GLOBAL_STRIPE_CONFIG" || {
+      note "warning: could not restore global Stripe config; backup remains at $GLOBAL_STRIPE_BACKUP"
+      return 1
+    }
+  fi
+  GLOBAL_STRIPE_GUARD_ACTIVE=0
+}
+
+cleanup_runtime() {
+  local status=$?
+  trap - EXIT
+  restore_global_stripe_config || true
+  [[ -z ${AGENT_WORKSPACE-} ]] || rm -rf -- "$AGENT_WORKSPACE"
+  [[ -z ${STRIPE_SHIM_DIR-} ]] || rm -rf -- "$STRIPE_SHIM_DIR"
+  if [[ -n ${GLOBAL_STRIPE_BACKUP_DIR-} && -d $GLOBAL_STRIPE_BACKUP_DIR && ! -e ${GLOBAL_STRIPE_BACKUP-} ]]; then
+    rm -rf -- "$GLOBAL_STRIPE_BACKUP_DIR"
+  fi
+  if [[ ${GLOBAL_STRIPE_LOCK_HELD-0} == 1 ]]; then
+    rmdir -- "$GLOBAL_STRIPE_LOCK_DIR" 2>/dev/null || note "warning: could not release Stripe config lock: $GLOBAL_STRIPE_LOCK_DIR"
+  fi
+  exit "$status"
+}
+
 SWITCHED_BRANCH=0
 git switch --create "$EXECUTION_BRANCH" "$BASE_COMMIT" >/dev/null || die "could not create $EXECUTION_BRANCH"
 SWITCHED_BRANCH=1
 mkdir -p "$WORKSPACE"
+AGENT_WORKSPACE=
+STRIPE_SHIM_DIR=
+GLOBAL_STRIPE_BACKUP_DIR=
+GLOBAL_STRIPE_BACKUP=
+GLOBAL_STRIPE_LOCK_DIR="${TMPDIR:-/tmp}/endless-tshirt-benchmark-stripe.lock"
+GLOBAL_STRIPE_LOCK_HELD=0
+GLOBAL_STRIPE_GUARD_ACTIVE=0
+GLOBAL_STRIPE_ORIGINAL_PRESENT=0
+trap cleanup_runtime EXIT
 AGENT_WORKSPACE=$(mktemp -d "${TMPDIR:-/tmp}/benchmark-workspace.XXXXXX") || die "could not create isolated agent workspace"
 STRIPE_SHIM_DIR=$(mktemp -d "${TMPDIR:-/tmp}/benchmark-stripe-shim.XXXXXX") || die "could not create Stripe CLI shim"
+GLOBAL_STRIPE_BACKUP_DIR=$(mktemp -d "${TMPDIR:-/tmp}/benchmark-stripe-global.XXXXXX") || die "could not create Stripe config backup directory"
+chmod 700 "$GLOBAL_STRIPE_BACKUP_DIR"
+GLOBAL_STRIPE_BACKUP="$GLOBAL_STRIPE_BACKUP_DIR/config.toml"
 mkdir -p "$STRIPE_CONFIG_DIR"
 chmod 700 "$REPO_ROOT/.benchmark-secrets" "$STRIPE_CONFIG_DIR"
 umask 077
@@ -199,7 +269,29 @@ cat >"$STRIPE_SHIM_DIR/stripe" <<EOF
 exec "${STRIPE_REAL}" --config "\${BENCHMARK_STRIPE_CONFIG}" "\$@"
 EOF
 chmod 700 "$STRIPE_SHIM_DIR/stripe"
-trap 'rm -rf -- "$AGENT_WORKSPACE" "$STRIPE_SHIM_DIR"' EXIT
+cat >"$STRIPE_SHIM_DIR/bash-env" <<EOF
+export PATH="${STRIPE_SHIM_DIR}:\$PATH"
+EOF
+chmod 600 "$STRIPE_SHIM_DIR/bash-env"
+
+if ! mkdir -- "$GLOBAL_STRIPE_LOCK_DIR" 2>/dev/null; then
+  die "another benchmark may be using the global Stripe config (lock: $GLOBAL_STRIPE_LOCK_DIR)"
+fi
+GLOBAL_STRIPE_LOCK_HELD=1
+GLOBAL_STRIPE_GUARD_ACTIVE=1
+if [[ -e $GLOBAL_STRIPE_CONFIG ]]; then
+  [[ -f $GLOBAL_STRIPE_CONFIG && ! -L $GLOBAL_STRIPE_CONFIG ]] || die "global Stripe config is not a regular file: $GLOBAL_STRIPE_CONFIG"
+  mv -- "$GLOBAL_STRIPE_CONFIG" "$GLOBAL_STRIPE_BACKUP" || die "could not quarantine global Stripe config"
+  GLOBAL_STRIPE_ORIGINAL_PRESENT=1
+fi
+
+export BASH_ENV="$STRIPE_SHIM_DIR/bash-env"
+LOGIN_SHELL_STRIPE=$(PATH="$STRIPE_SHIM_DIR:$PATH" /bin/bash -lc 'command -v stripe')
+[[ $LOGIN_SHELL_STRIPE == "$STRIPE_SHIM_DIR/stripe" ]] || die "Stripe wrapper did not survive a login shell (resolved: $LOGIN_SHELL_STRIPE)"
+
+# Credentials must come from the isolated CLI profile, never from the runner's
+# ambient environment.
+unset STRIPE_SECRET_KEY STRIPE_API_KEY STRIPE_PUBLISHABLE_KEY STRIPE_WEBHOOK_SECRET
 
 STARTED_AT=$(date -u +%Y-%m-%dT%H:%M:%SZ)
 START_EPOCH=$(date +%s)
@@ -218,6 +310,7 @@ set +e
 PATH="$STRIPE_SHIM_DIR:$PATH" "$TIMEOUT_COMMAND" "$TIMEOUT_SECONDS" "$ADAPTER_PATH" "${EXTRA_ARGS[@]}" >"$RAW_LOG" 2>&1
 AGENT_EXIT=$?
 set -e
+restore_global_stripe_config
 
 tar -C "$AGENT_WORKSPACE" --exclude=.git --exclude=node_modules --exclude=.next --exclude=reference -cf - . | tar -C "$WORKSPACE" -xf -
 if ! assert_only_run_output_changed; then

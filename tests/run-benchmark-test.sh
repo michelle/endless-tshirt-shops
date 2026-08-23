@@ -12,7 +12,10 @@ REPO="$TMP_ROOT/repo"
 REMOTE="$TMP_ROOT/remote.git"
 BIN="$TMP_ROOT/bin"
 BIN_WITHOUT_TIMEOUT="$TMP_ROOT/bin-without-timeout"
-mkdir -p "$REPO" "$BIN" "$BIN_WITHOUT_TIMEOUT"
+GLOBAL_STRIPE_CONFIG="$TMP_ROOT/global-stripe/config.toml"
+mkdir -p "$REPO" "$BIN" "$BIN_WITHOUT_TIMEOUT" "$(dirname "$GLOBAL_STRIPE_CONFIG")"
+printf 'original global Stripe config\n' >"$GLOBAL_STRIPE_CONFIG"
+export BENCHMARK_GLOBAL_STRIPE_CONFIG="$GLOBAL_STRIPE_CONFIG"
 git init -q -b main "$REPO"
 git -C "$REPO" config user.email benchmark-test@example.com
 git -C "$REPO" config user.name benchmark-test
@@ -50,6 +53,9 @@ printf '%s\n' \
   '    *) shift ;;' \
   '  esac' \
   'done' \
+  'case $(/bin/bash -lc "command -v stripe") in *benchmark-stripe-shim.*/stripe) ;; *) exit 9 ;; esac' \
+  '[[ -z "${STRIPE_SECRET_KEY-}${STRIPE_API_KEY-}${STRIPE_PUBLISHABLE_KEY-}${STRIPE_WEBHOOK_SECRET-}" ]]' \
+  'if [[ -n "${FAKE_GLOBAL_STRIPE_PATH:-}" ]]; then mkdir -p "$(dirname "$FAKE_GLOBAL_STRIPE_PATH")"; printf "test_mode_api_key = '\''sk_test_bypass_marker'\''\n" >"$FAKE_GLOBAL_STRIPE_PATH"; fi' \
   '[[ -n "${FAKE_CODEX_SLEEP:-}" ]] && sleep "$FAKE_CODEX_SLEEP"' \
   '[[ -n "${FAKE_ROOT_WRITE_PATH:-}" ]] && printf "outside workspace\n" >"$FAKE_ROOT_WRITE_PATH"' \
   'mkdir -p "$workspace"' \
@@ -104,6 +110,7 @@ SUCCESS_USAGE=$(git --git-dir="$REMOTE" show benchmark-results:runs/success/usag
 [[ $SUCCESS_USAGE == *'"new_input_tokens": 11'* ]] || fail 'Codex new input usage was not recorded'
 assert test ! -e "$REPO/runs/success"
 assert test -s "$REPO/.benchmark-secrets/stripe/success.toml"
+assert test "$(cat "$GLOBAL_STRIPE_CONFIG")" = 'original global Stripe config'
 assert git -C "$REPO" check-ignore -q .benchmark-secrets/stripe/success.toml
 if git --git-dir="$REMOTE" cat-file -e benchmark-results:.benchmark-secrets/stripe/success.toml 2>/dev/null; then
   fail 'Stripe config was published'
@@ -118,6 +125,15 @@ LOG=$(git --git-dir="$REMOTE" show benchmark-results:runs/success/agent.log)
 if git --git-dir="$REMOTE" cat-file -e benchmark-results:runs/success/agent.raw.log 2>/dev/null; then
   fail 'raw log was committed'
 fi
+
+(
+  cd "$REPO"
+  PATH="$BIN:$PATH" SP_AUTH=sp_test_secret STRIPE_SECRET_KEY=sk_test_ambient FAKE_GLOBAL_STRIPE_PATH="$GLOBAL_STRIPE_CONFIG" "$ROOT/scripts/run-benchmark" \
+    --adapter codex --model fake --timeout 5 --run-id global-bypass
+)
+assert test "$(cat "$GLOBAL_STRIPE_CONFIG")" = 'original global Stripe config'
+grep -q 'sk_test_bypass_marker' "$REPO/.benchmark-secrets/stripe/global-bypass.toml" || fail 'bypassed global Stripe config was not captured'
+assert test -e "$REPO/.benchmark-secrets/stripe/global-bypass.wrapper.toml"
 
 (
   cd "$REPO"
@@ -141,6 +157,7 @@ set -e
 assert test "$EXIT_CODE" = 124
 TIMEOUT_METADATA=$(git --git-dir="$REMOTE" show benchmark-results:runs/timed-out/metadata.json)
 [[ $TIMEOUT_METADATA == *'"status": "timed_out"'* ]] || fail 'timeout status was not recorded'
+assert test "$(cat "$GLOBAL_STRIPE_CONFIG")" = 'original global Stripe config'
 
 set +e
 (
@@ -152,6 +169,7 @@ EXIT_CODE=$?
 set -e
 assert test "$EXIT_CODE" = 7
 assert git --git-dir="$REMOTE" show benchmark-results:runs/failure/metadata.json
+assert test "$(cat "$GLOBAL_STRIPE_CONFIG")" = 'original global Stripe config'
 
 printf 'dirty\n' >"$REPO/unrelated.txt"
 set +e
