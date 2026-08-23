@@ -3,6 +3,7 @@
 .env.*
 !.env.example
 .vercel/
+.benchmark-secrets/
 
 # Per-run code, final output, redacted log, and metadata are committed for review.
 # Raw execution transcripts may contain credentials and remain local only.

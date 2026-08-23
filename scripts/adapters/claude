@@ -52,6 +52,13 @@ if not isinstance(usage, dict):
     usage = None
 else:
     usage = {key: value for key, value in usage.items() if isinstance(value, int)}
+    # Cache creation is first-time input; cache reads are reused input. Include
+    # the former in the normalized figure, so it has the same meaning as
+    # Codex's input_tokens minus cached_input_tokens.
+    input_tokens = usage.get("input_tokens")
+    cache_creation_input_tokens = usage.get("cache_creation_input_tokens", 0)
+    if isinstance(input_tokens, int) and isinstance(cache_creation_input_tokens, int):
+        usage["new_input_tokens"] = input_tokens + cache_creation_input_tokens
 with open(usage_destination, "w", encoding="utf-8") as output:
     json.dump(usage, output, sort_keys=True)
     output.write("\n")

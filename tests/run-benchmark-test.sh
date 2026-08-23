@@ -17,7 +17,7 @@ git init -q -b main "$REPO"
 git -C "$REPO" config user.email benchmark-test@example.com
 git -C "$REPO" config user.name benchmark-test
 printf 'test prompt\n' >"$REPO/prompt.md"
-printf 'runs/*/agent.raw.log\n' >"$REPO/.gitignore"
+printf 'runs/*/agent.raw.log\n.benchmark-secrets/\n' >"$REPO/.gitignore"
 git -C "$REPO" add prompt.md .gitignore
 git -C "$REPO" commit -qm baseline
 git init -q --bare "$REMOTE"
@@ -29,6 +29,14 @@ printf '%s\n' \
   'shift' \
   'exec "$@"' >"$BIN/timeout"
 chmod +x "$BIN/timeout"
+
+printf '%s\n' \
+  '#!/usr/bin/env bash' \
+  'set -euo pipefail' \
+  '[[ $1 == --config ]]' \
+  '[[ $2 == "$BENCHMARK_STRIPE_CONFIG" ]]' \
+  'printf "fake Stripe profile\\n" >>"$BENCHMARK_STRIPE_CONFIG"' >"$BIN/stripe"
+chmod +x "$BIN/stripe"
 
 printf '%s\n' \
   '#!/usr/bin/env bash' \
@@ -46,13 +54,14 @@ printf '%s\n' \
   '[[ -n "${FAKE_ROOT_WRITE_PATH:-}" ]] && printf "outside workspace\n" >"$FAKE_ROOT_WRITE_PATH"' \
   'mkdir -p "$workspace"' \
   'git init -q "$workspace"' \
+  'stripe sandbox create --non-interactive' \
   'printf "%s\n" "$BENCHMARK_VERCEL_PROJECT" >"$workspace/vercel-project.txt"' \
   'printf "node_modules\n" >"$workspace/.gitignore"' \
   'mkdir -p "$workspace/node_modules"' \
   'printf "generated dependency\n" >"$workspace/node_modules/example.js"' \
   'printf "generated app\n" >"$workspace/app.txt"' \
   'printf "formatted CLI output  \n"' \
-  'printf "{\\"type\\":\\"turn.completed\\",\\"usage\\":{\\"input_tokens\\":11,\\"output_tokens\\":7,\\"total_tokens\\":18}}\\n"' \
+  "printf '%s\\n' '{\"type\":\"turn.completed\",\"usage\":{\"input_tokens\":11,\"output_tokens\":7,\"total_tokens\":18}}'" \
   'printf "SP_AUTH=%s sk_test_abcdefghijklmnop https://example.vercel.app\n" "$SP_AUTH"' \
   'printf "final report\n" >"$output"' \
   'exit "${FAKE_CODEX_EXIT:-0}"' >"$BIN/codex"
@@ -89,7 +98,16 @@ assert git --git-dir="$REMOTE" show benchmark-results:runs/success/final.md
 SUCCESS_METADATA=$(git --git-dir="$REMOTE" show benchmark-results:runs/success/metadata.json)
 [[ $SUCCESS_METADATA == *'"vercel_project": "benchmark-success"'* ]] || fail 'Vercel project was not recorded'
 [[ $SUCCESS_METADATA == *'"reasoning_effort": ""'* ]] || fail 'default reasoning effort was not recorded'
+[[ $SUCCESS_METADATA == *'"stripe_config_ref": "success"'* ]] || fail 'Stripe config reference was not recorded'
+[[ $SUCCESS_METADATA == *'"stripe_config_path": ".benchmark-secrets/stripe/success.toml"'* ]] || fail 'Stripe config path was not recorded'
+SUCCESS_USAGE=$(git --git-dir="$REMOTE" show benchmark-results:runs/success/usage.json)
+[[ $SUCCESS_USAGE == *'"new_input_tokens": 11'* ]] || fail 'Codex new input usage was not recorded'
 assert test ! -e "$REPO/runs/success"
+assert test -s "$REPO/.benchmark-secrets/stripe/success.toml"
+assert git -C "$REPO" check-ignore -q .benchmark-secrets/stripe/success.toml
+if git --git-dir="$REMOTE" cat-file -e benchmark-results:.benchmark-secrets/stripe/success.toml 2>/dev/null; then
+  fail 'Stripe config was published'
+fi
 if git -C "$REPO" show-ref --verify --quiet refs/heads/benchmark-run/success; then
   fail 'temporary execution branch was retained after a successful push'
 fi
@@ -109,6 +127,8 @@ fi
 assert git --git-dir="$REMOTE" show benchmark-results:runs/claude/workspace/claude.txt
 CLAUDE_FINAL=$(git --git-dir="$REMOTE" show benchmark-results:runs/claude/final.md)
 assert test "$CLAUDE_FINAL" = 'claude final report'
+CLAUDE_USAGE=$(git --git-dir="$REMOTE" show benchmark-results:runs/claude/usage.json)
+[[ $CLAUDE_USAGE == *'"new_input_tokens": 21'* ]] || fail 'Claude new input usage was not recorded'
 
 set +e
 (

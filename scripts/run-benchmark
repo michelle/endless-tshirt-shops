@@ -13,9 +13,11 @@ Options:
                       Optional provider reasoning level (low, medium, high, xhigh, or max)
   -h, --help           Show this help
 
-The runner requires SP_AUTH, a clean repository, an origin remote, and either
-timeout or gtimeout. It appends the completed run to benchmark-results, then
-returns to the branch that was checked out when it started.
+The runner requires SP_AUTH, Stripe CLI, a clean repository, an origin remote,
+and either timeout or gtimeout. It appends the completed run to
+benchmark-results, then returns to the branch that was checked out when it
+started. Each run receives a separate local Stripe CLI config under
+.benchmark-secrets/stripe/; it is never committed.
 EOF
 }
 
@@ -118,6 +120,7 @@ SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 ADAPTER_PATH="$SCRIPT_DIR/adapters/$ADAPTER"
 [[ -x $ADAPTER_PATH ]] || die "adapter is not executable: $ADAPTER_PATH"
 command -v "$ADAPTER" >/dev/null 2>&1 || die "$ADAPTER CLI is not installed or not on PATH"
+STRIPE_REAL=$(command -v stripe) || die "Stripe CLI is not installed or not on PATH"
 TIMEOUT_COMMAND=$(command -v timeout || command -v gtimeout || true)
 [[ -n $TIMEOUT_COMMAND ]] || die "install GNU coreutils (timeout/gtimeout) to enforce --timeout"
 
@@ -138,8 +141,11 @@ REDACTED_LOG="$RESULT_DIR/agent.log"
 FINAL_OUTPUT="$RESULT_DIR/final.md"
 METADATA="$RESULT_DIR/metadata.json"
 USAGE_OUTPUT="$RESULT_DIR/usage.json"
+STRIPE_CONFIG_DIR="$REPO_ROOT/.benchmark-secrets/stripe"
+STRIPE_CONFIG="$STRIPE_CONFIG_DIR/$RUN_ID.toml"
 
 [[ ! -e $RESULT_DIR ]] || die "run directory already exists: runs/$RUN_ID"
+[[ ! -e $STRIPE_CONFIG ]] || die "Stripe config already exists for this run: .benchmark-secrets/stripe/$RUN_ID.toml"
 git show-ref --verify --quiet "refs/heads/$EXECUTION_BRANCH" && die "temporary branch already exists: $EXECUTION_BRANCH"
 git show-ref --verify --quiet "refs/heads/$PUBLISH_BRANCH" && die "temporary branch already exists: $PUBLISH_BRANCH"
 git fetch -q origin "$RESULTS_BRANCH" >/dev/null 2>&1 || true
@@ -182,7 +188,18 @@ git switch --create "$EXECUTION_BRANCH" "$BASE_COMMIT" >/dev/null || die "could 
 SWITCHED_BRANCH=1
 mkdir -p "$WORKSPACE"
 AGENT_WORKSPACE=$(mktemp -d "${TMPDIR:-/tmp}/benchmark-workspace.XXXXXX") || die "could not create isolated agent workspace"
-trap 'rm -rf -- "$AGENT_WORKSPACE"' EXIT
+STRIPE_SHIM_DIR=$(mktemp -d "${TMPDIR:-/tmp}/benchmark-stripe-shim.XXXXXX") || die "could not create Stripe CLI shim"
+mkdir -p "$STRIPE_CONFIG_DIR"
+chmod 700 "$REPO_ROOT/.benchmark-secrets" "$STRIPE_CONFIG_DIR"
+umask 077
+: >"$STRIPE_CONFIG"
+chmod 600 "$STRIPE_CONFIG"
+cat >"$STRIPE_SHIM_DIR/stripe" <<EOF
+#!/usr/bin/env bash
+exec "${STRIPE_REAL}" --config "\${BENCHMARK_STRIPE_CONFIG}" "\$@"
+EOF
+chmod 700 "$STRIPE_SHIM_DIR/stripe"
+trap 'rm -rf -- "$AGENT_WORKSPACE" "$STRIPE_SHIM_DIR"' EXIT
 
 STARTED_AT=$(date -u +%Y-%m-%dT%H:%M:%SZ)
 START_EPOCH=$(date +%s)
@@ -194,9 +211,11 @@ export BENCHMARK_FINAL_OUTPUT="$FINAL_OUTPUT"
 export BENCHMARK_VERCEL_PROJECT="$VERCEL_PROJECT"
 export BENCHMARK_REASONING_EFFORT="$REASONING_EFFORT"
 export BENCHMARK_USAGE_OUTPUT="$USAGE_OUTPUT"
+export BENCHMARK_STRIPE_CONFIG="$STRIPE_CONFIG"
+export BENCHMARK_STRIPE_CONFIG_REF=".benchmark-secrets/stripe/$RUN_ID.toml"
 
 set +e
-"$TIMEOUT_COMMAND" "$TIMEOUT_SECONDS" "$ADAPTER_PATH" "${EXTRA_ARGS[@]}" >"$RAW_LOG" 2>&1
+PATH="$STRIPE_SHIM_DIR:$PATH" "$TIMEOUT_COMMAND" "$TIMEOUT_SECONDS" "$ADAPTER_PATH" "${EXTRA_ARGS[@]}" >"$RAW_LOG" 2>&1
 AGENT_EXIT=$?
 set -e
 
@@ -243,6 +262,8 @@ WORKSPACE_TREE=$(git write-tree)
   printf '  "reasoning_effort": '; json_string "$REASONING_EFFORT"; printf ',\n'
   printf '  "branch": '; json_string "$RESULTS_BRANCH"; printf ',\n'
   printf '  "vercel_project": '; json_string "$VERCEL_PROJECT"; printf ',\n'
+  printf '  "stripe_config_ref": '; json_string "$RUN_ID"; printf ',\n'
+  printf '  "stripe_config_path": '; json_string ".benchmark-secrets/stripe/$RUN_ID.toml"; printf ',\n'
   printf '  "base_commit": '; json_string "$BASE_COMMIT"; printf ',\n'
   printf '  "prompt_sha256": '; json_string "$PROMPT_SHA"; printf ',\n'
   printf '  "workspace_tree": '; json_string "$WORKSPACE_TREE"; printf ',\n'
