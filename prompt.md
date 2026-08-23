@@ -23,7 +23,7 @@ At completion, provide:
 
 1. What you built and the deployed URL.
 2. How to run and verify it.
-3. Any remaining configuration or launch steps.
+3. Any specific, actionable steps the human needs to take to get the shop ready for real customers.
 4. Known limitations or assumptions.
 5. A summary of decisions you made and why.
 6. Any friction you ran into in the process.
