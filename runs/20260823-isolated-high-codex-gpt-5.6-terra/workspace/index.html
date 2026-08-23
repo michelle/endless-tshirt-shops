@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="A t-shirt printed with the exact moment you ordered it." />
+    <meta name="theme-color" content="#0a0a0a" />
+    <title>datetime.store — wear the moment</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <header class="site-header">
+        <a class="wordmark" href="/" aria-label="datetime.store home">datetime<span>.store</span></a>
+        <span class="header-note">EST. RIGHT NOW</span>
+      </header>
+
+      <section class="product-grid" aria-label="Datetime shirt">
+        <div class="product-stage">
+          <div class="ambient ambient-one"></div><div class="ambient ambient-two"></div>
+          <div class="shirt-wrap" id="shirtPreview" aria-label="Live preview of a black t-shirt with the current timestamp">
+            <svg class="shirt-svg" viewBox="0 0 620 700" aria-hidden="true">
+              <defs><linearGradient id="fabric" x1="0" x2="1"><stop stop-color="#111"/><stop offset=".5" stop-color="#272727"/><stop offset="1" stop-color="#0b0b0b"/></linearGradient></defs>
+              <path id="shirtPath" d="M181 106 273 66c9 34 26 49 37 49s28-15 37-49l92 40 118 100-74 108-55-38 31 355c-100 28-198 28-298 0l31-355-55 38-74-108 118-100Z" fill="url(#fabric)"/>
+              <path d="M273 66c8 35 23 58 37 58s29-23 37-58" fill="none" stroke="#4a4a4a" stroke-width="3"/>
+              <path d="M192 276c28 7 51 1 68-16M428 276c-28 7-51 1-68-16" fill="none" stroke="#3a3a3a" stroke-width="2"/>
+            </svg>
+            <div class="timestamp-print" id="timestamp" aria-live="polite">0000000000000</div>
+          </div>
+          <p class="preview-caption"><i></i> Live timestamp preview <span id="clockHuman"></span></p>
+        </div>
+
+        <section class="purchase-panel">
+          <p class="eyebrow">THE CURRENT DATETIME, FOREVER</p>
+          <h1>A shirt from<br />this exact moment.</h1>
+          <p class="intro">We print the Unix timestamp from the instant you check out. One moment. One shirt. No reruns.</p>
+          <div class="price-row"><span>$22.50</span><del>$30.00</del><em>FREE U.S. SHIPPING</em></div>
+
+          <form id="purchaseForm">
+            <fieldset>
+              <legend>Style</legend>
+              <div class="choice-grid two">
+                <label><input type="radio" name="style" value="fitted" checked><span><b>Fitted</b><small>Tailored cut</small></span></label>
+                <label><input type="radio" name="style" value="unisex"><span><b>Unisex</b><small>Classic cut</small></span></label>
+              </div>
+            </fieldset>
+            <fieldset>
+              <legend>Size</legend>
+              <div class="choice-grid four">
+                <label><input type="radio" name="size" value="S"><span>S</span></label>
+                <label><input type="radio" name="size" value="M" checked><span>M</span></label>
+                <label><input type="radio" name="size" value="L"><span>L</span></label>
+                <label><input type="radio" name="size" value="XL"><span>XL</span></label>
+              </div>
+            </fieldset>
+            <button id="checkoutButton" type="submit"><span>Secure checkout</span><span class="arrow">↗</span></button>
+            <p id="formMessage" class="form-message" role="status"></p>
+          </form>
+          <div class="reassurance"><span>✦ Printed to order</span><span>↗ Secure payment</span><span>⌁ Made in the USA</span></div>
+        </section>
+      </section>
+      <section class="details"><div><b>01</b><p>The number is the exact Unix time in milliseconds when you made it yours.</p></div><div><b>02</b><p>Soft black cotton, white DTG ink, and a timestamp that will never happen again.</p></div><div><b>03</b><p>Designed with intent. Printed after payment. Shipped free in the United States.</p></div></section>
+      <footer><span>© <span id="year"></span> DATETIME.STORE</span><span>EVERY MOMENT IS A LIMITED EDITION</span></footer>
+    </main>
+    <div class="success-modal" id="successModal" hidden><div><button class="close" id="closeSuccess" aria-label="Close">×</button><p class="eyebrow">ORDER RECEIVED</p><h2>That moment is yours.</h2><p id="successText">We’re preparing your timestamp for print.</p><a href="/">Get another shirt</a></div></div>
+    <script src="/app.js"></script>
+  </body>
+</html>
