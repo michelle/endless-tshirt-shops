@@ -1,0 +1,13 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "nextjs",
+  "functions": {
+    "app/api/artwork/route.tsx": {
+      "memory": 2048,
+      "maxDuration": 60
+    },
+    "app/api/order/route.ts": { "maxDuration": 30 },
+    "app/api/stripe-webhook/route.ts": { "maxDuration": 30 },
+    "app/api/health/route.ts": { "maxDuration": 30 }
+  }
+}

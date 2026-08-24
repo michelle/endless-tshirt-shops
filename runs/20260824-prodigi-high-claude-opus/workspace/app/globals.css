@@ -1,0 +1,588 @@
+/*
+ * Visual language carried over from the original datetime.store: white page,
+ * Bootstrap-3 blue (#337ab7) for accents, pale blue (#a4d5ff) for the segmented
+ * pickers, flat black buttons, floating labels that slide up out of the field,
+ * and Chivo for the one thing that matters — the number.
+ */
+
+:root {
+  --ink: #111213;
+  --ink-soft: #55595e;
+  --ink-faint: #9aa0a6;
+  --blue: #337ab7;
+  --blue-dark: #28638f;
+  --blue-pale: #a4d5ff;
+  --blue-wash: #eef6ff;
+  --red: #eb1c26;
+  --line: #e6e8eb;
+  --radius: 3px;
+  --font-ui: 'Helvetica Neue', Helvetica, -apple-system, BlinkMacSystemFont, Arial, sans-serif;
+  --font-stamp: 'Chivo', 'Helvetica Neue', Helvetica, sans-serif;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-ui);
+  font-size: 16px;
+  color: var(--ink);
+  background: #fff;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  color: var(--blue);
+}
+
+/* ---------- shell ---------- */
+
+.page {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 40px 24px 72px;
+}
+
+.masthead {
+  padding-bottom: 18px;
+  margin-bottom: 36px;
+  border-bottom: 1px solid var(--line);
+}
+
+.masthead h1 {
+  margin: 0;
+  font-size: 40px;
+  font-weight: 300;
+  letter-spacing: -0.6px;
+}
+
+.masthead h1 a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.masthead p {
+  margin: 6px 0 0;
+  color: var(--blue);
+  font-size: 19px;
+  font-weight: 400;
+}
+
+.masthead .clock {
+  display: inline-block;
+  vertical-align: -2px;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+  gap: 56px;
+  align-items: start;
+}
+
+@media (max-width: 800px) {
+  .page {
+    padding: 28px 18px 56px;
+  }
+  .masthead h1 {
+    font-size: 32px;
+  }
+  .masthead p {
+    font-size: 17px;
+  }
+  .layout {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 32px;
+  }
+}
+
+/* ---------- the shirt ---------- */
+
+.shirt {
+  position: relative;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  user-select: none;
+}
+
+.shirt-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.shirt-svg path {
+  fill: #131415;
+  transition: d 200ms ease;
+}
+
+.shirt-stamp {
+  position: absolute;
+  top: 21%;
+  left: 0;
+  width: 100%;
+  text-align: center;
+  font-family: var(--font-stamp);
+  font-weight: 700;
+  color: #fff;
+  /* 8 print-inches across a 15.6in print area, scaled to the on-screen shirt. */
+  font-size: 4.6cqw;
+  line-height: 1;
+  letter-spacing: 0.04em;
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+}
+
+.shirt-frame {
+  container-type: inline-size;
+  position: relative;
+}
+
+.shirt-stamp[data-frozen='true'] {
+  color: var(--blue-pale);
+}
+
+.shirt-price {
+  position: absolute;
+  top: 68%;
+  left: 8%;
+}
+
+.shirt-price .tag {
+  display: inline-block;
+  background: var(--blue);
+  color: #fff;
+  font-size: 20px;
+  font-weight: 300;
+  padding: 6px 12px;
+  border-radius: var(--radius);
+}
+
+.shirt-price .tag s {
+  opacity: 0.65;
+  margin-right: 6px;
+}
+
+.shirt-caption {
+  margin: 14px auto 0;
+  max-width: 600px;
+  color: var(--ink-faint);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.shirt-caption strong {
+  color: var(--ink-soft);
+  font-weight: 500;
+}
+
+/* ---------- segmented pickers ---------- */
+
+.picker {
+  display: grid;
+  gap: 2px;
+  margin-bottom: 10px;
+}
+
+.picker[data-cols='2'] {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.picker[data-cols='4'] {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.picker input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.picker label {
+  display: block;
+  text-align: center;
+  background: var(--blue-pale);
+  color: var(--ink);
+  padding: 9px 8px;
+  cursor: pointer;
+  font-size: 15px;
+  transition:
+    opacity 200ms ease-in-out,
+    background 150ms ease;
+}
+
+.picker label:hover {
+  opacity: 0.8;
+}
+
+.picker input:checked + label {
+  background: #131415;
+  color: #fff;
+}
+
+.picker input:focus-visible + label {
+  outline: 2px solid var(--blue);
+  outline-offset: 2px;
+}
+
+.picker-legend {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink-faint);
+  margin: 0 0 6px;
+}
+
+/* ---------- checkout ---------- */
+
+.checkout {
+  min-width: 0;
+}
+
+.express {
+  margin: 18px 0 4px;
+  min-height: 0;
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 22px 0 4px;
+  color: var(--ink-faint);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.divider::before,
+.divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--line);
+}
+
+/* Floating-label text fields, lifted from the original store. */
+.field-row {
+  position: relative;
+  display: block;
+  margin: 28px 0 18px;
+  width: 100%;
+}
+
+.field {
+  background: transparent;
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 400;
+  border: 0;
+  color: var(--ink);
+  outline: none;
+  display: block;
+  width: 100%;
+  line-height: 28px;
+  padding: 0 0 3px;
+  transition: opacity 200ms ease-in-out;
+}
+
+.field::placeholder {
+  color: #ccc;
+}
+
+.field.is-empty:not(:focus) {
+  opacity: 0;
+}
+
+.field-label {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  font-weight: 400;
+  line-height: 28px;
+  color: var(--ink);
+  border-bottom: 1px solid var(--blue-pale);
+  transition: border-bottom-color 200ms ease-in-out;
+  pointer-events: none;
+}
+
+.field-label span {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: 0% 50%;
+  transition: transform 200ms ease-in-out;
+}
+
+.field:focus ~ .field-label,
+.field:not(.is-empty) ~ .field-label {
+  color: var(--blue);
+}
+
+.field:focus ~ .field-label span,
+.field:not(.is-empty) ~ .field-label span {
+  transform: scale(0.8) translateY(-28px);
+}
+
+.field:focus ~ .field-label {
+  border-bottom-color: var(--blue);
+}
+
+.field-row[data-invalid='true'] .field-label {
+  color: var(--red);
+  border-bottom-color: var(--red);
+}
+
+.stripe-block {
+  margin: 22px 0 4px;
+}
+
+.stripe-block-title {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink-faint);
+  margin: 0 0 10px;
+}
+
+.buy {
+  display: block;
+  width: 100%;
+  background: #131415;
+  color: #fff;
+  border: 0;
+  font-family: inherit;
+  margin-top: 22px;
+  font-size: 19px;
+  font-weight: 400;
+  height: 50px;
+  cursor: pointer;
+  outline: none;
+  transition:
+    opacity 200ms ease-in-out,
+    background 150ms ease;
+}
+
+.buy:hover:not(:disabled) {
+  opacity: 0.85;
+}
+
+.buy:focus-visible {
+  background: var(--blue);
+}
+
+.buy:disabled {
+  cursor: progress;
+  background: var(--blue);
+}
+
+.spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  margin-right: 8px;
+  vertical-align: -2px;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 800ms linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.fineprint {
+  margin: 14px 0 0;
+  color: var(--ink-faint);
+  font-size: 12.5px;
+  line-height: 1.55;
+}
+
+.alert {
+  margin: 18px 0 0;
+  padding: 11px 13px;
+  border-radius: var(--radius);
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.alert[data-tone='error'] {
+  background: #fdecec;
+  color: #91161c;
+  border: 1px solid #f7c7c9;
+}
+
+.alert[data-tone='info'] {
+  background: var(--blue-wash);
+  color: var(--blue-dark);
+  border: 1px solid #cfe6fb;
+}
+
+.skeleton {
+  height: 44px;
+  border-radius: var(--radius);
+  background: linear-gradient(90deg, #f4f5f7 25%, #ecedf0 37%, #f4f5f7 63%);
+  background-size: 400% 100%;
+  animation: shimmer 1.4s ease infinite;
+}
+
+@keyframes shimmer {
+  from {
+    background-position: 100% 50%;
+  }
+  to {
+    background-position: 0 50%;
+  }
+}
+
+/* ---------- order confirmation ---------- */
+
+.order {
+  max-width: 620px;
+}
+
+.order h2 {
+  font-size: 26px;
+  font-weight: 500;
+  margin: 0 0 8px;
+}
+
+.order p {
+  line-height: 1.6;
+  color: var(--ink-soft);
+  margin: 0 0 14px;
+}
+
+.order-stamp {
+  font-family: var(--font-stamp);
+  font-weight: 700;
+  font-size: 34px;
+  letter-spacing: 0.03em;
+  font-variant-numeric: tabular-nums;
+  margin: 4px 0 2px;
+  color: var(--ink);
+  word-break: break-all;
+}
+
+/* The bought shirt, clock stopped. Narrower than the storefront's hero. */
+.order-shirt {
+  width: 100%;
+  max-width: 300px;
+  margin: 12px 0 4px;
+}
+
+/*
+ * On the storefront a frozen stamp turns pale blue to acknowledge "this
+ * millisecond is yours now". Here the shirt is a depiction of a real garment, so
+ * it goes back to the white ink that actually gets printed.
+ */
+.order-shirt .shirt-stamp[data-frozen='true'] {
+  color: #fff;
+}
+
+/*
+ * Both silhouettes end at y=98.6 of the shared 0 0 100 125 viewBox. The
+ * storefront hangs the price tag in that band; here it is just a hole, so trim
+ * it. Percentage margins resolve against the frame's width, and the SVG is
+ * exactly 1.25x as tall as it is wide, so 26% of width == the empty 26 units.
+ */
+.order-shirt .shirt-svg {
+  margin-bottom: -25%;
+}
+
+.link-quiet {
+  color: var(--ink-faint);
+  text-decoration: underline;
+  text-decoration-color: var(--line);
+  text-underline-offset: 2px;
+}
+
+.link-quiet:hover {
+  color: var(--blue);
+}
+
+.summary {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  margin: 22px 0;
+}
+
+.summary div {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 11px 14px;
+  font-size: 14.5px;
+  border-bottom: 1px solid var(--line);
+}
+
+.summary div:last-child {
+  border-bottom: 0;
+}
+
+.summary dt {
+  margin: 0;
+  color: var(--ink-faint);
+}
+
+.summary dd {
+  margin: 0;
+  text-align: right;
+  font-weight: 500;
+}
+
+.status-pill {
+  display: inline-block;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: var(--blue-wash);
+  color: var(--blue-dark);
+  border: 1px solid #cfe6fb;
+}
+
+.btn-secondary {
+  display: inline-block;
+  background: #131415;
+  color: #fff;
+  text-decoration: none;
+  padding: 12px 20px;
+  font-size: 16px;
+  transition: opacity 200ms ease;
+}
+
+.btn-secondary:hover {
+  opacity: 0.85;
+  color: #fff;
+}
+
+.footer {
+  margin-top: 64px;
+  padding-top: 18px;
+  border-top: 1px solid var(--line);
+  color: var(--ink-faint);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.footer a {
+  color: var(--ink-soft);
+}
