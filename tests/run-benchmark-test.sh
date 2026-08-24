@@ -68,7 +68,7 @@ printf '%s\n' \
   'printf "generated app\n" >"$workspace/app.txt"' \
   'printf "formatted CLI output  \n"' \
   "printf '%s\\n' '{\"type\":\"turn.completed\",\"usage\":{\"input_tokens\":11,\"output_tokens\":7,\"total_tokens\":18}}'" \
-  'printf "SP_AUTH=%s sk_test_abcdefghijklmnop https://example.vercel.app\n" "$SP_AUTH"' \
+  'printf "PRODIGI_API_KEY=%s sk_test_abcdefghijklmnop https://example.vercel.app\n" "$PRODIGI_API_KEY"' \
   'printf "final report\n" >"$output"' \
   'exit "${FAKE_CODEX_EXIT:-0}"' >"$BIN/codex"
 chmod +x "$BIN/codex"
@@ -84,7 +84,7 @@ chmod +x "$BIN/claude"
 run() {
   (
     cd "$REPO"
-    PATH="$BIN:$PATH" SP_AUTH=sp_test_secret "$ROOT/scripts/run-benchmark" \
+    PATH="$BIN:$PATH" PRODIGI_API_KEY=test_11111111-1111-1111-1111-111111111111 "$ROOT/scripts/run-benchmark" \
       --adapter codex --model fake --timeout 5 --run-id "$1"
   )
 }
@@ -120,7 +120,7 @@ if git -C "$REPO" show-ref --verify --quiet refs/heads/benchmark-run/success; th
 fi
 LOG=$(git --git-dir="$REMOTE" show benchmark-results:runs/success/agent.log)
 [[ $LOG == *'[REDACTED]'* ]] || fail 'injected secret was not redacted'
-[[ $LOG != *sp_test_secret* ]] || fail 'injected secret leaked into committed log'
+[[ $LOG != *test_11111111-1111-1111-1111-111111111111* ]] || fail 'injected secret leaked into committed log'
 [[ $LOG != *sk_test_* ]] || fail 'Stripe pattern leaked into committed log'
 if git --git-dir="$REMOTE" cat-file -e benchmark-results:runs/success/agent.raw.log 2>/dev/null; then
   fail 'raw log was committed'
@@ -128,7 +128,7 @@ fi
 
 (
   cd "$REPO"
-  PATH="$BIN:$PATH" SP_AUTH=sp_test_secret STRIPE_SECRET_KEY=sk_test_ambient FAKE_GLOBAL_STRIPE_PATH="$GLOBAL_STRIPE_CONFIG" "$ROOT/scripts/run-benchmark" \
+  PATH="$BIN:$PATH" PRODIGI_API_KEY=test_11111111-1111-1111-1111-111111111111 STRIPE_SECRET_KEY=sk_test_ambient FAKE_GLOBAL_STRIPE_PATH="$GLOBAL_STRIPE_CONFIG" "$ROOT/scripts/run-benchmark" \
     --adapter codex --model fake --timeout 5 --run-id global-bypass
 )
 assert test "$(cat "$GLOBAL_STRIPE_CONFIG")" = 'original global Stripe config'
@@ -137,7 +137,7 @@ assert test -e "$REPO/.benchmark-secrets/stripe/global-bypass.wrapper.toml"
 
 (
   cd "$REPO"
-  PATH="$BIN:$PATH" SP_AUTH=sp_test_secret "$ROOT/scripts/run-benchmark" \
+  PATH="$BIN:$PATH" PRODIGI_API_KEY=test_11111111-1111-1111-1111-111111111111 "$ROOT/scripts/run-benchmark" \
     --adapter claude --model fake --timeout 5 --run-id claude
 )
 assert git --git-dir="$REMOTE" show benchmark-results:runs/claude/workspace/claude.txt
@@ -149,7 +149,7 @@ CLAUDE_USAGE=$(git --git-dir="$REMOTE" show benchmark-results:runs/claude/usage.
 set +e
 (
   cd "$REPO"
-  PATH="$BIN_WITHOUT_TIMEOUT:$PATH" SP_AUTH=sp_test_secret FAKE_CODEX_SLEEP=2 "$ROOT/scripts/run-benchmark" \
+  PATH="$BIN_WITHOUT_TIMEOUT:$PATH" PRODIGI_API_KEY=test_11111111-1111-1111-1111-111111111111 FAKE_CODEX_SLEEP=2 "$ROOT/scripts/run-benchmark" \
     --adapter codex --model fake --timeout 1 --run-id timed-out
 )
 EXIT_CODE=$?
@@ -162,7 +162,7 @@ assert test "$(cat "$GLOBAL_STRIPE_CONFIG")" = 'original global Stripe config'
 set +e
 (
   cd "$REPO"
-  PATH="$BIN:$PATH" SP_AUTH=sp_test_secret FAKE_CODEX_EXIT=7 "$ROOT/scripts/run-benchmark" \
+  PATH="$BIN:$PATH" PRODIGI_API_KEY=test_11111111-1111-1111-1111-111111111111 FAKE_CODEX_EXIT=7 "$ROOT/scripts/run-benchmark" \
     --adapter codex --model fake --timeout 5 --run-id failure
 )
 EXIT_CODE=$?
@@ -175,7 +175,7 @@ printf 'dirty\n' >"$REPO/unrelated.txt"
 set +e
 (
   cd "$REPO"
-  PATH="$BIN:$PATH" SP_AUTH=sp_test_secret "$ROOT/scripts/run-benchmark" \
+  PATH="$BIN:$PATH" PRODIGI_API_KEY=test_11111111-1111-1111-1111-111111111111 "$ROOT/scripts/run-benchmark" \
     --adapter codex --model fake --timeout 5 --run-id dirty
 )
 EXIT_CODE=$?
@@ -187,7 +187,7 @@ rm "$REPO/unrelated.txt"
 set +e
 (
   cd "$REPO"
-  PATH="$BIN:$PATH" SP_AUTH=sp_test_secret FAKE_ROOT_WRITE_PATH="$REPO/outside.txt" "$ROOT/scripts/run-benchmark" \
+  PATH="$BIN:$PATH" PRODIGI_API_KEY=test_11111111-1111-1111-1111-111111111111 FAKE_ROOT_WRITE_PATH="$REPO/outside.txt" "$ROOT/scripts/run-benchmark" \
     --adapter codex --model fake --timeout 5 --run-id outside-write
 )
 EXIT_CODE=$?

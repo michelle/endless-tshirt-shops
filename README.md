@@ -8,10 +8,10 @@ Benchmark coding agents against [`prompt.md`](prompt.md). A run starts with an e
 # macOS
 brew install stripe/stripe-cli/stripe vercel-cli coreutils
 vercel login                         # the one interactive setup step
-export SP_AUTH='scalable-press-test-key'
+export PRODIGI_API_KEY='prodigi-test-key'
 ```
 
-`SP_AUTH` must be a test key. `timeout` (Linux) or `gtimeout` (macOS Coreutils), Git, and an `origin` remote are required. For CI, use masked `SP_AUTH`, `VERCEL_TOKEN`, `VERCEL_ORG_ID`, and `VERCEL_PROJECT_ID`; Vercel must be invoked with its token and `--yes`.
+`PRODIGI_API_KEY` should be a sandbox/test key. `timeout` (Linux) or `gtimeout` (macOS Coreutils), Git, and an `origin` remote are required. For CI, use masked `PRODIGI_API_KEY`, `VERCEL_TOKEN`, `VERCEL_ORG_ID`, and `VERCEL_PROJECT_ID`; Vercel must be invoked with its token and `--yes`.
 
 ## Run
 

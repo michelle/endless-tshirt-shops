@@ -13,7 +13,7 @@ Options:
                       Optional provider reasoning level (low, medium, high, xhigh, or max)
   -h, --help           Show this help
 
-The runner requires SP_AUTH, Stripe CLI, a clean repository, an origin remote,
+The runner requires PRODIGI_API_KEY, Stripe CLI, a clean repository, an origin remote,
 and either timeout or gtimeout. It appends the completed run to
 benchmark-results, then returns to the branch that was checked out when it
 started. Each run receives a separate local Stripe CLI config under
@@ -61,25 +61,25 @@ extract_url() {
 redact_log() {
   local raw_log=$1 redacted_log=$2 value variable
   cp "$raw_log" "$redacted_log"
-  for variable in SP_AUTH STRIPE_SECRET_KEY STRIPE_PUBLISHABLE_KEY STRIPE_WEBHOOK_SECRET VERCEL_TOKEN; do
+  for variable in PRODIGI_API_KEY STRIPE_SECRET_KEY STRIPE_PUBLISHABLE_KEY STRIPE_WEBHOOK_SECRET VERCEL_TOKEN; do
     value=${!variable-}
     if [[ -n $value ]]; then
       REDACT_VALUE=$value perl -0pi -e 's/\Q$ENV{REDACT_VALUE}\E/[REDACTED]/g' "$redacted_log"
     fi
   done
-  perl -0pi -e 's/\b(?:sk|pk|rk)_(?:test|live)_[A-Za-z0-9_=-]+/[REDACTED_STRIPE_KEY]/g; s/\bwhsec_[A-Za-z0-9_=-]+/[REDACTED_STRIPE_WEBHOOK_SECRET]/g; s/\b(?:vercel|vcp)_[A-Za-z0-9_=-]+/[REDACTED_VERCEL_TOKEN]/gi' "$redacted_log"
+  perl -0pi -e 's/\b(?:sk|pk|rk)_(?:test|live)_[A-Za-z0-9_=-]+/[REDACTED_STRIPE_KEY]/g; s/\bwhsec_[A-Za-z0-9_=-]+/[REDACTED_STRIPE_WEBHOOK_SECRET]/g; s/\b(?:test|live)_[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\b/[REDACTED_PRODIGI_KEY]/gi; s/\b(?:vercel|vcp)_[A-Za-z0-9_=-]+/[REDACTED_VERCEL_TOKEN]/gi' "$redacted_log"
 }
 
 assert_no_staged_secrets() {
   local value variable
-  for variable in SP_AUTH STRIPE_SECRET_KEY STRIPE_PUBLISHABLE_KEY STRIPE_WEBHOOK_SECRET VERCEL_TOKEN; do
+  for variable in PRODIGI_API_KEY STRIPE_SECRET_KEY STRIPE_PUBLISHABLE_KEY STRIPE_WEBHOOK_SECRET VERCEL_TOKEN; do
     value=${!variable-}
     if [[ -n $value ]] && git grep --cached -n -F -- "$value" -- "runs/$RUN_ID" >/dev/null 2>&1; then
       die "a value from $variable is staged; refusing to commit"
     fi
   done
-  if git grep --cached -n -E -- '\b(sk|pk|rk)_(test|live)_[A-Za-z0-9_=-]+|\bwhsec_[A-Za-z0-9_=-]+' -- "runs/$RUN_ID" >/dev/null 2>&1; then
-    die "a Stripe secret pattern is staged; refusing to commit"
+  if git grep --cached -n -E -- '\b(sk|pk|rk)_(test|live)_[A-Za-z0-9_=-]+|\bwhsec_[A-Za-z0-9_=-]+|\b(test|live)_[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\b' -- "runs/$RUN_ID" >/dev/null 2>&1; then
+    die "a provider secret pattern is staged; refusing to commit"
   fi
 }
 
@@ -107,7 +107,7 @@ done
 [[ -n $MODEL ]] || die "--model is required"
 [[ $TIMEOUT_SECONDS =~ ^[1-9][0-9]*$ ]] || die "--timeout must be a positive integer"
 [[ -z $REASONING_EFFORT || $REASONING_EFFORT =~ ^(low|medium|high|xhigh|max)$ ]] || die "--reasoning-effort must be low, medium, high, xhigh, or max"
-[[ -n ${SP_AUTH-} ]] || die "SP_AUTH must be set to a Scalable Press test key"
+[[ -n ${PRODIGI_API_KEY-} ]] || die "PRODIGI_API_KEY must be set to a Prodigi API key"
 
 REPO_ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || die "run this from inside the benchmark repository"
 cd "$REPO_ROOT"
