@@ -1,0 +1,20 @@
+{
+  "run_id": "20260824-prodigi-high-codex-gpt-5.6-sol",
+  "status": "succeeded",
+  "adapter": "codex",
+  "model": "gpt-5.6-sol",
+  "reasoning_effort": "high",
+  "branch": "benchmark-results",
+  "vercel_project": "benchmark-20260824-prodigi-high-codex-gpt-5.6-sol",
+  "stripe_config_ref": "20260824-prodigi-high-codex-gpt-5.6-sol",
+  "stripe_config_path": ".benchmark-secrets/stripe/20260824-prodigi-high-codex-gpt-5.6-sol.toml",
+  "base_commit": "5ce2cb1a8e1b461ee1b310ac910dfa78efb7ef1b",
+  "prompt_sha256": "4d3eb6c30ac497d510abb0f3bb8ec7b13ea255acd6d0b8fed28b9ec636cb1892",
+  "workspace_tree": "967be777c8e3132a9ec8349f6c60e30130e4ee60",
+  "started_at": "2026-08-24T06:01:57Z",
+  "finished_at": "2026-08-24T06:25:10Z",
+  "duration_seconds": 1393,
+  "agent_exit_code": 0,
+  "usage": {"cached_input_tokens": 11528086, "input_tokens": 11686395, "new_input_tokens": 158309, "output_tokens": 51000},
+  "deployment_url": "https://benchmark-20260824-prodigi-high-cod-six.vercel.app"
+}
