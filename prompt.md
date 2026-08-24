@@ -11,13 +11,16 @@ named `$BENCHMARK_VERCEL_PROJECT`; do not link to or deploy into an existing
 project. Pass that name explicitly when creating/deploying the project (for
 example, `vercel --yes --name "$BENCHMARK_VERCEL_PROJECT"`).
 
-Use Stripe Projects, Stripe, and the Scalable Press API. The Scalable Press test key is available as $SP_AUTH. You should be able to get a Stripe test key yourself.
+Use Stripe Projects, Stripe, and the Prodigi Print API. Replace the original
+Scalable Press fulfillment flow with Prodigi. A Prodigi sandbox API key is
+available as `$PRODIGI_API_KEY`. You should be able to get a Stripe test key
+yourself.
 
 Deploy a reachable preview or sandbox environment. Use test, sandbox, or dry-run modes as appropriate while verifying
 the complete customer flow.
 
 Success means the deployed app captures the original product’s core experience, supports a working Stripe purchase
-flow, integrates with Scalable Press, and is polished enough to be a credible production starting point.
+flow, integrates with Prodigi, and is polished enough to be a credible production starting point.
 
 At completion, provide:
 
