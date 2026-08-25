@@ -1,6 +1,6 @@
 # endless-tshirt-shop benchmark
 
-Benchmark coding agents against [`prompt.md`](prompt.md). A run starts with an empty workspace, preserves the generated app and completion report under `runs/<run-id>/`, and appends it to the shared `benchmark-results` branch.
+Informally benchmark coding agents against [`prompt.md`](prompt.md). A run starts with an empty workspace, preserves the generated app and completion report under `runs/<run-id>/`, and appends it to the shared `benchmark-results` branch.
 
 ## Prerequisites
 
@@ -70,6 +70,6 @@ Run `tests/run-benchmark-test.sh` to verify the runner locally with fake CLIs an
 
 `scripts/adapters/codex` and `scripts/adapters/claude` receive `BENCHMARK_WORKSPACE`, `BENCHMARK_PROMPT_FILE`, `BENCHMARK_MODEL`, `BENCHMARK_FINAL_OUTPUT`, `BENCHMARK_VERCEL_PROJECT`, `BENCHMARK_STRIPE_CONFIG`, and optional `BENCHMARK_REASONING_EFFORT`. New providers should implement the same contract, run without prompts, write only the final answer to `BENCHMARK_FINAL_OUTPUT`, and emit all other output to stdout/stderr. Use `--reasoning-effort` to pin an effort level and record it in metadata; omit it to retain each provider's default.
 
-## Fair comparison
+## Informal comparison
 
-Pin the prompt and reference revisions, environment, timeout, budget, credentials scope, and evaluator. Randomize order and run each model at least three times. Score deployed behavior and evidence—not self-reported success.
+For a more useful informal comparison, pin the prompt and reference revisions, environment, timeout, reasoning effort, and credentials scope. Check deployed behavior and evidence—not self-reported success.
