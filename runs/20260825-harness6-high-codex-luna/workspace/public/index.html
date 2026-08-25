@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f6f5f0">
+    <meta name="description" content="A t-shirt with the current datetime, made to order.">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23111416'/%3E%3Cpath d='M18 20h28v24H18z' fill='none' stroke='%23f6f5f0' stroke-width='3'/%3E%3Cpath d='M23 27h18M23 34h12' stroke='%23f6f5f0' stroke-width='3'/%3E%3C/svg%3E">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/styles.css">
+    <title>datetime.store — the current datetime, on a t-shirt</title>
+  </head>
+  <body>
+    <a class="skip-link" href="#shop">Skip to shop</a>
+    <header class="site-header shell">
+      <a class="wordmark" href="/" aria-label="datetime.store home">datetime<span>.</span>store</a>
+      <div class="header-note"><span class="live-dot"></span> made right now</div>
+    </header>
+
+    <main id="shop" class="shell">
+      <section class="intro" aria-labelledby="page-title">
+        <p class="eyebrow">A very small internet shop</p>
+        <h1 id="page-title">we sell a t-shirt with<br><em>the current datetime.</em></h1>
+        <p class="intro-copy">A precise little souvenir of this exact moment.<br class="desktop-only"> Printed on demand, shipped wherever you are.</p>
+      </section>
+
+      <section class="shop-grid" aria-label="Choose your datetime shirt">
+        <div class="preview-column">
+          <div class="preview-meta"><span>your shirt, live</span><span class="mono" id="preview-date">loading</span></div>
+          <div class="shirt-stage" id="shirt-stage">
+            <div class="stage-grain"></div>
+            <svg class="shirt-svg" viewBox="0 0 420 510" role="img" aria-label="Black t-shirt preview">
+              <defs>
+                <filter id="shirt-shadow" x="-20%" y="-20%" width="140%" height="150%"><feGaussianBlur in="SourceAlpha" stdDeviation="12"/><feOffset dy="16"/><feComponentTransfer><feFuncA type="linear" slope=".22"/></feComponentTransfer><feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+                <linearGradient id="shirt-fill" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#262a2b"/><stop offset=".48" stop-color="#15191a"/><stop offset="1" stop-color="#090b0c"/></linearGradient>
+                <linearGradient id="shirt-sheen" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff" stop-opacity=".09"/><stop offset=".5" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".18"/></linearGradient>
+              </defs>
+              <ellipse cx="210" cy="478" rx="132" ry="15" fill="#111" opacity=".18"/>
+              <g filter="url(#shirt-shadow)">
+                <path id="shirt-path" class="shirt-body fitted" d="M174 33c-15 3-42 13-63 26L43 126l36 42 33-26c8 31 13 80 9 127l-6 154c21 10 55 16 95 16s74-6 95-16l-6-154c-4-47 1-96 9-127l33 26 36-42-68-67c-21-13-48-23-63-26-11 21-26 31-38 31s-27-10-38-31Z" fill="url(#shirt-fill)" stroke="#090b0c" stroke-width="2"/>
+                <path class="shirt-sheen" d="M174 33c11 21 26 31 36 31s25-10 36-31c15 3 42 13 63 26l68 67-36 42-33-26c-8 31-13 80-9 127l6 154c-21 10-55 16-95 16s-74-6-95-16l6-154c4-47-1-96-9-127l-33 26-36-42 68-67c21-13 48-23 63-26Z" fill="url(#shirt-sheen)" opacity=".42"/>
+                <path d="M174 33c11 21 26 31 36 31s25-10 36-31" fill="none" stroke="#373b3b" stroke-width="3" opacity=".65"/>
+                <path d="M109 157c13 18 24 28 33 31M311 157c-13 18-24 28-33 31" fill="none" stroke="#303434" stroke-width="2" opacity=".7"/>
+              </g>
+              <text id="shirt-time" x="210" y="190" text-anchor="middle" class="shirt-time" aria-hidden="true">0000000000000</text>
+              <text x="210" y="445" text-anchor="middle" class="shirt-brand" aria-hidden="true">datetime.store</text>
+            </svg>
+            <div class="preview-caption"><span>black / front print</span><span class="mono">01 / 01</span></div>
+          </div>
+          <p class="preview-footnote"><span class="asterisk">*</span> The number updates until you check out. Your order captures the moment you click.</p>
+        </div>
+
+        <aside class="purchase-panel" aria-label="Product options and checkout">
+          <div class="product-heading"><div><p class="eyebrow">the datetime shirt</p><h2>current / classic</h2></div><div class="price"><s>$30</s> <strong>$22.50</strong></div></div>
+          <p class="product-description">A soft black tee, printed with the exact millisecond your order becomes real.</p>
+
+          <fieldset class="option-group"><legend>fit <span>choose one</span></legend><div class="option-grid two-up">
+            <label class="choice active"><input type="radio" name="style" value="fitted" checked><span>Fitted</span><small>closer cut</small></label>
+            <label class="choice"><input type="radio" name="style" value="unisex"><span>Unisex</span><small>easy fit</small></label>
+          </div></fieldset>
+
+          <fieldset class="option-group"><legend>size <a href="#size-guide" class="text-link">size guide</a></legend><div class="option-grid four-up">
+            <label class="choice"><input type="radio" name="size" value="S"><span>S</span></label>
+            <label class="choice active"><input type="radio" name="size" value="M" checked><span>M</span></label>
+            <label class="choice"><input type="radio" name="size" value="L"><span>L</span></label>
+            <label class="choice"><input type="radio" name="size" value="XL"><span>XL</span></label>
+          </div></fieldset>
+
+          <div class="shipping-line"><span>free shipping</span><span class="line"></span><span>made to order</span></div>
+          <button id="checkout-button" class="checkout-button" type="button"><span>Buy this moment</span><span class="button-arrow" aria-hidden="true">↗</span></button>
+          <p id="checkout-message" class="checkout-message" role="status" aria-live="polite"></p>
+          <p class="secure-note"><span class="lock" aria-hidden="true">⌑</span> Secure checkout by Stripe · no account needed</p>
+
+          <div class="details-row"><details id="size-guide"><summary>what arrives?</summary><p>One black Gildan Heavy Cotton tee with a white front print. S–XL, shipped free from our print partner.</p></details><details><summary>shipping & returns</summary><p>Made after you order and usually on its way in 3–7 business days. If your shirt arrives damaged, email us and we’ll make it right.</p></details></div>
+        </aside>
+      </section>
+
+      <section class="proof-strip" aria-label="Shop details"><div><span class="proof-number">01</span><strong>one exact moment</strong><span>captured at checkout</span></div><div><span class="proof-number">02</span><strong>one soft black tee</strong><span>printed on demand</span></div><div><span class="proof-number">03</span><strong>one small shop</strong><span>free shipping, always</span></div></section>
+      <footer class="site-footer"><span>datetime.store © 2026</span><span>made for people who notice the moment</span><a href="mailto:hello@datetime.store">say hello ↗</a></footer>
+    </main>
+    <script src="/app.js" defer></script>
+  </body>
+</html>

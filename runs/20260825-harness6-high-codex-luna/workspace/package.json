@@ -1,0 +1,19 @@
+{
+  "name": "datetime-store-rebuild",
+  "version": "1.0.0",
+  "private": true,
+  "description": "A tiny made-to-order shop for shirts printed with the current datetime.",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "vercel dev",
+    "build": "node -e \"console.log('Static Vercel build: no compilation required')\"",
+    "check": "node --check api/_lib.js && node --check api/create-checkout-session.js && node --check api/complete-order.js && node --check api/stripe-webhook.js && node --check api/artwork.js && node --check public/app.js",
+    "test": "npm run check"
+  },
+  "dependencies": {
+    "sharp": "^0.35.3",
+    "stripe": "^18.5.0"
+  }
+}
