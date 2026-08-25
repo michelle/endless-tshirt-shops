@@ -1,0 +1,32 @@
+@import "tailwindcss";
+
+:root {
+  --background: #050505;
+  --foreground: #f5f5f5;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-chivo);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-chivo), Arial, Helvetica, sans-serif;
+}
+
+@keyframes pulse-dot {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+
+.pulse-dot {
+  animation: pulse-dot 1.6s ease-in-out infinite;
+}
