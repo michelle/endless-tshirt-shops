@@ -1,0 +1,20 @@
+{
+  "run_id": "20260825-fresh6b-high-codex-terra",
+  "status": "succeeded",
+  "adapter": "codex",
+  "model": "gpt-5.6-terra",
+  "reasoning_effort": "high",
+  "branch": "benchmark-results",
+  "vercel_project": "benchmark-20260825-fresh6b-high-codex-terra",
+  "stripe_config_ref": "20260825-fresh6b-high-codex-terra",
+  "stripe_config_path": ".benchmark-secrets/stripe/20260825-fresh6b-high-codex-terra.toml",
+  "base_commit": "d78bcf272d77b4becb2da7bcfdb4f262a8130470",
+  "prompt_sha256": "4d3eb6c30ac497d510abb0f3bb8ec7b13ea255acd6d0b8fed28b9ec636cb1892",
+  "workspace_tree": "0542e1f49803877db07c5426d97a4e3e8487e693",
+  "started_at": "2026-08-25T22:14:52Z",
+  "finished_at": "2026-08-25T22:24:51Z",
+  "duration_seconds": 599,
+  "agent_exit_code": 0,
+  "usage": {"cached_input_tokens": 3689135, "input_tokens": 3808357, "new_input_tokens": 119222, "output_tokens": 24590},
+  "deployment_url": "https://benchmark-20260825-fresh6b-high-cod.vercel.app\\n\\nIt"
+}
