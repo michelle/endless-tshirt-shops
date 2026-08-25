@@ -67,7 +67,7 @@ redact_log() {
       REDACT_VALUE=$value perl -0pi -e 's/\Q$ENV{REDACT_VALUE}\E/[REDACTED]/g' "$redacted_log"
     fi
   done
-  perl -0pi -e 's/\b(?:sk|pk|rk)_(?:test|live)_[A-Za-z0-9_=-]+/[REDACTED_STRIPE_KEY]/g; s/\bwhsec_[A-Za-z0-9_=-]+/[REDACTED_STRIPE_WEBHOOK_SECRET]/g; s/\b(?:test|live)_[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\b/[REDACTED_PRODIGI_KEY]/gi; s/\b(?:vercel|vcp)_[A-Za-z0-9_=-]+/[REDACTED_VERCEL_TOKEN]/gi' "$redacted_log"
+  perl -0pi -e 's/\b(?:sk|pk|rkcs|rk)_(?:test|live)_[A-Za-z0-9_=-]+/[REDACTED_STRIPE_KEY]/g; s/\bwhsec_[A-Za-z0-9_=-]+/[REDACTED_STRIPE_WEBHOOK_SECRET]/g; s/\b(?:test|live)_[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\b/[REDACTED_PRODIGI_KEY]/gi; s/\b(?:vercel|vcp)_[A-Za-z0-9_=-]+/[REDACTED_VERCEL_TOKEN]/gi' "$redacted_log"
 }
 
 assert_no_staged_secrets() {
@@ -78,7 +78,7 @@ assert_no_staged_secrets() {
       die "a value from $variable is staged; refusing to commit"
     fi
   done
-  if git grep --cached -n -E -- '\b(sk|pk|rk)_(test|live)_[A-Za-z0-9_=-]+|\bwhsec_[A-Za-z0-9_=-]+|\b(test|live)_[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\b' -- "runs/$RUN_ID" >/dev/null 2>&1; then
+  if git grep --cached -n -E -- '\b(sk|pk|rkcs|rk)_(test|live)_[A-Za-z0-9_=-]+|\bwhsec_[A-Za-z0-9_=-]+|\b(test|live)_[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\b' -- "runs/$RUN_ID" >/dev/null 2>&1; then
     die "a provider secret pattern is staged; refusing to commit"
   fi
 }

@@ -68,7 +68,7 @@ printf '%s\n' \
   'printf "generated app\n" >"$workspace/app.txt"' \
   'printf "formatted CLI output  \n"' \
   "printf '%s\\n' '{\"type\":\"turn.completed\",\"usage\":{\"input_tokens\":11,\"output_tokens\":7,\"total_tokens\":18}}'" \
-  'printf "PRODIGI_API_KEY=%s sk_test_abcdefghijklmnop https://example.vercel.app\n" "$PRODIGI_API_KEY"' \
+  'printf "PRODIGI_API_KEY=%s sk_test_abcdefghijklmnop rkcs_test_abcdefghijklmnop https://example.vercel.app\n" "$PRODIGI_API_KEY"' \
   'printf "final report\n" >"$output"' \
   'exit "${FAKE_CODEX_EXIT:-0}"' >"$BIN/codex"
 chmod +x "$BIN/codex"
@@ -122,6 +122,7 @@ LOG=$(git --git-dir="$REMOTE" show benchmark-results:runs/success/agent.log)
 [[ $LOG == *'[REDACTED]'* ]] || fail 'injected secret was not redacted'
 [[ $LOG != *test_11111111-1111-1111-1111-111111111111* ]] || fail 'injected secret leaked into committed log'
 [[ $LOG != *sk_test_* ]] || fail 'Stripe pattern leaked into committed log'
+[[ $LOG != *rkcs_test_* ]] || fail 'restricted Stripe pattern leaked into committed log'
 if git --git-dir="$REMOTE" cat-file -e benchmark-results:runs/success/agent.raw.log 2>/dev/null; then
   fail 'raw log was committed'
 fi
