@@ -1,0 +1,20 @@
+{
+  "run_id": "20260825-harness6-high-claude-sonnet",
+  "status": "succeeded",
+  "adapter": "claude",
+  "model": "sonnet",
+  "reasoning_effort": "high",
+  "branch": "benchmark-results",
+  "vercel_project": "benchmark-20260825-harness6-high-claude-sonnet",
+  "stripe_config_ref": "20260825-harness6-high-claude-sonnet",
+  "stripe_config_path": ".benchmark-secrets/stripe/20260825-harness6-high-claude-sonnet.toml",
+  "base_commit": "b8ae3ed95ad55b6697641932e686aa36a2914eb9",
+  "prompt_sha256": "4d3eb6c30ac497d510abb0f3bb8ec7b13ea255acd6d0b8fed28b9ec636cb1892",
+  "workspace_tree": "47da2420d114b542a52d6337f30f650332c2cc87",
+  "started_at": "2026-08-25T01:14:38Z",
+  "finished_at": "2026-08-25T01:35:53Z",
+  "duration_seconds": 1275,
+  "agent_exit_code": 0,
+  "usage": {"cache_creation_input_tokens": 158162, "cache_read_input_tokens": 12988910, "input_tokens": 252, "new_input_tokens": 158414, "output_tokens": 65558},
+  "deployment_url": "https://benchmark-20260825-harness6-high-cl.vercel.app**"
+}
