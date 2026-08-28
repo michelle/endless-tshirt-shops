@@ -1,0 +1,42 @@
+.Shirt {
+  position: relative;
+  letter-spacing: 0.7px;
+  width: 100%;
+  max-width: 600px;
+}
+
+.Shirt-time {
+  font-family: 'Chivo', sans-serif;
+  position: absolute;
+  top: 20%;
+  color: #fff;
+  font-weight: 500;
+  width: 100%;
+  font-size: 22px;
+  line-height: 1em;
+  margin-left: 10px;
+}
+.Shirt-time-d,
+.Shirt-time-s,
+.Shirt-time-ms {
+  text-align: center;
+  margin: 0 auto;
+}
+.Shirt-time-s {
+  line-height: 1em;
+  font-size: 100%;
+}
+.Shirt-time-ms {
+  line-height: 1.2em;
+  font-size: 10px;
+}
+
+.Shirt-price {
+  position: absolute;
+  top: 70%;
+  left: 10%;
+}
+
+.Shirt-price .label {
+  font-weight: 300 !important;
+}

@@ -1,0 +1,162 @@
+* {
+  font-family: "Helvetica Neue", Helvetica;
+  font-size: 16px;
+  font-variant: normal;
+  padding: 0;
+  margin: 0;
+}
+
+body {
+  -webkit-font-smoothing: antialiased;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100%;
+}
+
+label {
+  position: relative;
+  color: black;
+  display: block;
+  margin-top: 28px;
+  margin-bottom: 18px;
+  width: 100%;
+}
+
+label > span {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  font-weight: 400;
+  line-height: 28px;
+  color: black;
+  border-bottom: 1px solid #a4d5ff;
+  transition: border-bottom-color 200ms ease-in-out;
+}
+
+label > span span {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: 0% 50%;
+  transition: transform 200ms ease-in-out;
+  cursor: text;
+}
+
+label .field:focus + span,
+label .field.is-focused + span,
+label .field:not(.is-empty) + span {
+  color: #337ab7;
+  pointer-events: none;
+}
+
+label .field:focus + span span,
+label .field.is-focused + span span,
+label .field:not(.is-empty) + span span {
+  transform: scale(0.8) translateY(-28px);
+  cursor: default;
+}
+
+label .field:focus + span,
+label .field.is-focused + span {
+  border-bottom-color: #337ab7;
+}
+label .field.is-invalid + span {
+  color: #eb1c26;
+  border-bottom-color: #eb1c26;
+}
+
+.field {
+  background: transparent;
+  font-weight: 400;
+  border: 0;
+  color: black;
+  outline: none;
+  cursor: text;
+  display: block;
+  width: 100%;
+  line-height: 28px;
+  padding-bottom: 3px;
+  transition: opacity 200ms ease-in-out;
+}
+
+.field::-webkit-input-placeholder { color: #ccc; }
+.field::-moz-placeholder { color: #ccc; }
+
+.field.is-empty:not(.is-focused),
+.field.is-empty:not(:focus) {
+  opacity: 0;
+}
+.field.is-empty:focus,
+.field.is-empty.is-focused {
+  opacity: 1;
+}
+
+button {
+  float: left;
+  display: block;
+  background: black;
+  color: white;
+  border: 0;
+  margin-top: 15px;
+  margin-bottom: 50px;
+  font-size: 19px;
+  font-weight: 400;
+  width: 100%;
+  height: 47px;
+  line-height: 45px;
+  outline: none;
+}
+
+button:focus {
+  background: #337ab7;
+}
+
+button:active {
+  background: #337ab7;
+}
+
+.styles .radio {
+  display: inline-block;
+  width: 50%;
+  line-height: 28px;
+}
+.sizes .radio {
+  display: inline-block;
+  width: 25%;
+  line-height: 28px;
+}
+
+.styles, .sizes {
+  width: 100%;
+}
+
+.radio {
+  text-align: center;
+}
+.radio input {
+  opacity: 0;
+}
+
+.radio input:checked + label {
+  background-color: black;
+  color: white;
+}
+
+.radio label {
+  background-color: #a4d5ff;
+  width: 100%;
+  display: inline-block;
+  padding: 8px 14px;;
+  margin: 0;
+}
+button, label {
+  transition: opacity 200ms ease-in-out;
+}
+button:hover, label:hover {
+  opacity: 0.8;
+}
