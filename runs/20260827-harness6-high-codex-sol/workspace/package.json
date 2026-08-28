@@ -1,0 +1,25 @@
+{
+  "name": "datetime-store-rebuild",
+  "version": "1.0.0",
+  "private": true,
+  "engines": { "node": "24.x" },
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "test": "node --test tests/*.test.mjs"
+  },
+  "dependencies": {
+    "next": "16.3.3",
+    "react": "19.2.6",
+    "react-dom": "19.2.6",
+    "stripe": "22.6.0",
+    "zod": "4.1.12"
+  },
+  "devDependencies": {
+    "@types/node": "22.19.19",
+    "@types/react": "19.2.14",
+    "@types/react-dom": "19.2.3",
+    "typescript": "5.9.3"
+  }
+}
