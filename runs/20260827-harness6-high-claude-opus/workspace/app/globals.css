@@ -1,0 +1,515 @@
+:root {
+  --ink: #0b0b0c;
+  --ink-2: #3f4650;
+  --ink-3: #878f9b;
+  --line: #e4e7ec;
+  --paper: #ffffff;
+  --paper-2: #f6f7f9;
+  /* The two blues the original shop used, kept on purpose. */
+  --accent: #337ab7;
+  --accent-soft: #a4d5ff;
+  --danger: #d3383f;
+  --radius: 10px;
+  --shell: 1120px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  padding: 0;
+  margin: 0;
+}
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-inter), 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  color: var(--accent);
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
+
+.shell {
+  max-width: var(--shell);
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* ---------- masthead ---------- */
+
+.masthead {
+  border-bottom: 1px solid var(--line);
+  padding: 34px 0 26px;
+}
+
+.masthead h1 {
+  font-size: 34px;
+  font-weight: 300;
+  letter-spacing: -0.4px;
+  margin: 0;
+}
+
+.masthead h1 b {
+  font-weight: 600;
+}
+
+.masthead p {
+  margin: 6px 0 0;
+  color: var(--accent);
+  font-size: 18px;
+  font-weight: 400;
+}
+
+.masthead .clock {
+  display: inline-block;
+  transform: translateY(2px);
+  margin-left: 4px;
+}
+
+/* ---------- layout ---------- */
+
+.store {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  gap: 56px;
+  /* The shirt is much taller than the controls; centring keeps the buy button
+     near the middle of the fold instead of stranded at the top. */
+  align-items: center;
+  padding: 48px 0 72px;
+}
+
+@media (max-width: 900px) {
+  .store {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 36px;
+    padding: 32px 0 56px;
+  }
+}
+
+/* ---------- shirt ---------- */
+
+.shirt {
+  position: relative;
+  width: 100%;
+  max-width: 560px;
+  margin: 0 auto;
+  user-select: none;
+}
+
+.shirt-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  filter: drop-shadow(0 24px 44px rgba(11, 11, 12, 0.18));
+}
+
+.shirt-svg path {
+  fill: #101012;
+  transition: d 200ms ease;
+}
+
+/* The print: absolutely positioned over the chest of the silhouette. */
+.shirt-print {
+  position: absolute;
+  top: 27%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 46%;
+  text-align: center;
+  pointer-events: none;
+}
+
+.shirt-print .digits {
+  font-family: var(--font-chivo), 'Chivo', monospace;
+  font-weight: 700;
+  color: #fff;
+  /* Scale with the shirt so the print never overflows the chest. */
+  font-size: clamp(13px, 3.9cqw, 34px);
+  letter-spacing: 0.06em;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.shirt-stage {
+  container-type: inline-size;
+  position: relative;
+}
+
+.shirt-print.is-frozen .digits {
+  animation: lock-in 520ms ease;
+}
+
+@keyframes lock-in {
+  0% {
+    text-shadow: 0 0 0 rgba(164, 213, 255, 0);
+  }
+  35% {
+    text-shadow: 0 0 18px rgba(164, 213, 255, 0.95);
+  }
+  100% {
+    text-shadow: 0 0 0 rgba(164, 213, 255, 0);
+  }
+}
+
+.shirt-price {
+  position: absolute;
+  left: 12%;
+  top: 70%;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+  background: var(--accent);
+  color: #fff;
+  border-radius: 999px;
+  padding: 7px 16px;
+  font-size: 19px;
+  font-weight: 500;
+  box-shadow: 0 8px 20px rgba(51, 122, 183, 0.32);
+}
+
+.shirt-price s {
+  opacity: 0.62;
+  font-weight: 400;
+  font-size: 16px;
+}
+
+.shirt-caption {
+  text-align: center;
+  color: var(--ink-3);
+  font-size: 13px;
+  margin-top: 18px;
+  min-height: 20px;
+}
+
+/* ---------- controls ---------- */
+
+.panel h2 {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin: 0 0 10px;
+}
+
+.panel + .panel {
+  margin-top: 26px;
+}
+
+.options {
+  display: grid;
+  gap: 8px;
+}
+
+.options.cols-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.options.cols-4 {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.option input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.option label {
+  display: block;
+  text-align: center;
+  padding: 11px 8px;
+  border-radius: var(--radius);
+  background: var(--accent-soft);
+  color: #16354f;
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    background 160ms ease,
+    color 160ms ease,
+    transform 160ms ease;
+}
+
+.option label:hover {
+  transform: translateY(-1px);
+}
+
+.option input:checked + label {
+  background: var(--ink);
+  color: #fff;
+}
+
+.option input:focus-visible + label {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.option-note {
+  margin: 10px 0 0;
+  font-size: 13px;
+  color: var(--ink-3);
+}
+
+/* ---------- buttons ---------- */
+
+.btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  border: 0;
+  border-radius: var(--radius);
+  background: var(--ink);
+  color: #fff;
+  font-size: 17px;
+  font-weight: 500;
+  font-family: inherit;
+  height: 52px;
+  cursor: pointer;
+  transition:
+    opacity 160ms ease,
+    transform 160ms ease;
+}
+
+.btn:hover:not(:disabled) {
+  opacity: 0.86;
+  transform: translateY(-1px);
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: progress;
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--ink-2);
+  border: 1px solid var(--line);
+  height: 44px;
+  font-size: 15px;
+}
+
+.btn-ghost:hover:not(:disabled) {
+  opacity: 1;
+  border-color: var(--ink-3);
+}
+
+.buy {
+  margin-top: 28px;
+}
+
+.buy-legal {
+  margin: 12px 0 0;
+  font-size: 12.5px;
+  color: var(--ink-3);
+  text-align: center;
+}
+
+/* ---------- checkout ---------- */
+
+.checkout-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.checkout-head h2 {
+  margin: 0;
+}
+
+.linkish {
+  background: none;
+  border: 0;
+  padding: 0;
+  color: var(--accent);
+  font-size: 13px;
+  font-family: inherit;
+  cursor: pointer;
+}
+.linkish:hover {
+  text-decoration: underline;
+}
+
+.frozen-note {
+  background: var(--paper-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  font-size: 13.5px;
+  color: var(--ink-2);
+  margin-bottom: 16px;
+}
+
+.frozen-note strong {
+  font-family: var(--font-chivo), 'Chivo', monospace;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.stripe-mount {
+  min-height: 300px;
+}
+
+/* ---------- states ---------- */
+
+.notice {
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  font-size: 14px;
+  margin-bottom: 16px;
+  border: 1px solid;
+}
+
+.notice-error {
+  border-color: #f0c5c7;
+  background: #fdf3f3;
+  color: var(--danger);
+}
+
+.notice-info {
+  border-color: var(--line);
+  background: var(--paper-2);
+  color: var(--ink-2);
+}
+
+.receipt {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 24px;
+}
+
+.receipt h2 {
+  font-size: 22px;
+  font-weight: 500;
+  margin: 0 0 6px;
+  letter-spacing: -0.2px;
+  color: var(--ink);
+  text-transform: none;
+}
+
+.receipt p {
+  margin: 0 0 14px;
+  color: var(--ink-2);
+  font-size: 15px;
+}
+
+.receipt dl {
+  margin: 18px 0;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 8px 18px;
+  font-size: 14px;
+}
+
+.receipt dt {
+  color: var(--ink-3);
+}
+
+.receipt dd {
+  margin: 0;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.receipt dd.mono {
+  font-family: var(--font-chivo), 'Chivo', monospace;
+  word-break: break-all;
+}
+
+.pill {
+  display: inline-block;
+  border-radius: 999px;
+  padding: 2px 10px;
+  font-size: 12px;
+  font-weight: 500;
+  background: var(--accent-soft);
+  color: #16354f;
+}
+
+.spinner {
+  width: 15px;
+  height: 15px;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 750ms linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ---------- footer ---------- */
+
+.footer {
+  border-top: 1px solid var(--line);
+  padding: 24px 0 48px;
+  color: var(--ink-3);
+  font-size: 13px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+  justify-content: space-between;
+}
+
+.badge-test {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px dashed var(--accent);
+  color: var(--accent);
+  border-radius: 999px;
+  padding: 2px 10px;
+  font-size: 12px;
+}
+
+.faq {
+  border-top: 1px solid var(--line);
+  padding: 34px 0 10px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 28px;
+}
+
+.faq h3 {
+  font-size: 13px;
+  margin: 0 0 6px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+
+.faq p {
+  margin: 0;
+  font-size: 13.5px;
+  color: var(--ink-2);
+  line-height: 1.6;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}
