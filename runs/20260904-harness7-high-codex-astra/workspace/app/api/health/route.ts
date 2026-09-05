@@ -1,0 +1,1 @@
+export async function GET(){return Response.json({status:'ok',mode:process.env.SHOP_MODE==='live'?'live':'sandbox',stripeConfigured:Boolean(process.env.STRIPE_SECRET_KEY),webhookConfigured:Boolean(process.env.STRIPE_WEBHOOK_SECRET),prodigiConfigured:Boolean(process.env.PRODIGI_API_KEY)},{headers:{'Cache-Control':'no-store'}})}

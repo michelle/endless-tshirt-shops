@@ -1,0 +1,14 @@
+node_modules/
+.next/
+.env*
+!.env.example
+.vercel/
+reference/
+.stripe/
+stripe-projects.json
+*.tsbuildinfo
+artifacts/
+.vercel
+docs/stripe-sandbox.json
+docs/verification.json
+.projects/

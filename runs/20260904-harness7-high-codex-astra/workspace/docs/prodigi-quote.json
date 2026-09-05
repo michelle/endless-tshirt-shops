@@ -1,0 +1,129 @@
+{
+  "outcome": "CreatedWithIssues",
+  "issues": [
+    {
+      "objectId": null,
+      "errorCode": "destinationCountryCode.UsSalesTaxWarning",
+      "description": "Please note: Quote does not include sales tax, which may apply"
+    }
+  ],
+  "quotes": [
+    {
+      "shipmentMethod": "Standard",
+      "costSummary": {
+        "items": {
+          "amount": "12.17",
+          "currency": "USD"
+        },
+        "shipping": {
+          "amount": "4.73",
+          "currency": "USD"
+        },
+        "branding": {
+          "amount": "0.00",
+          "currency": "USD"
+        },
+        "totalCost": {
+          "amount": "16.90",
+          "currency": "USD"
+        },
+        "totalTax": {
+          "amount": "0.00",
+          "currency": "USD"
+        }
+      },
+      "shipments": [
+        {
+          "carrier": {
+            "name": "royalmail",
+            "service": "Royal Mail DSA"
+          },
+          "fulfillmentLocation": {
+            "countryCode": "GB",
+            "labCode": "uk2"
+          },
+          "cost": {
+            "amount": "4.73",
+            "currency": "USD"
+          },
+          "items": [
+            "1"
+          ],
+          "brandingItems": [],
+          "tax": {
+            "amount": "0.00",
+            "currency": "USD"
+          }
+        }
+      ],
+      "items": [
+        {
+          "id": "1",
+          "sku": "GLOBAL-TEE-BC-3001",
+          "copies": 1,
+          "unitCost": {
+            "amount": "12.17",
+            "currency": "USD"
+          },
+          "attributes": {
+            "color": "black",
+            "size": "m"
+          },
+          "assets": [
+            {
+              "printArea": "front"
+            }
+          ],
+          "taxUnitCost": {
+            "amount": "0.00",
+            "currency": "USD"
+          },
+          "proCosts": {},
+          "additionalCosts": [
+            {
+              "appliedTo": "front",
+              "unitCost": {
+                "amount": "0.00",
+                "currency": "USD"
+              },
+              "taxUnitCost": {
+                "amount": "0.00",
+                "currency": "USD"
+              },
+              "baseCount": 0,
+              "chargeableCount": 1
+            },
+            {
+              "appliedTo": "FrameColour",
+              "unitCost": {
+                "amount": "0.00",
+                "currency": "USD"
+              },
+              "taxUnitCost": {
+                "amount": "0.00",
+                "currency": "USD"
+              },
+              "baseCount": 0,
+              "chargeableCount": 1
+            },
+            {
+              "appliedTo": "Size",
+              "unitCost": {
+                "amount": "0.00",
+                "currency": "USD"
+              },
+              "taxUnitCost": {
+                "amount": "0.00",
+                "currency": "USD"
+              },
+              "baseCount": 0,
+              "chargeableCount": 1
+            }
+          ]
+        }
+      ],
+      "branding": null
+    }
+  ],
+  "traceParent": "00-1e37f93f24ec1ac259e282beb52da711-f780fd5ce35134b0-00"
+}

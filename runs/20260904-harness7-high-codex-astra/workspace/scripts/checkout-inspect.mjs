@@ -1,0 +1,3 @@
+import {chromium} from '@playwright/test';import fs from 'node:fs';
+const browser=await chromium.launch({headless:true});const page=await browser.newPage({viewport:{width:1400,height:1100}});await page.goto(fs.readFileSync('artifacts/checkout-url.txt','utf8'));await page.locator('input').first().waitFor({timeout:45000});
+console.log((await page.locator('body').innerText()).slice(0,8000));console.log(await page.locator('input,select').evaluateAll(el=>el.map(x=>({tag:x.tagName,id:x.id,name:x.name,type:x.type,placeholder:x.placeholder}))));console.log('Frames',page.frames().map(f=>f.url()));await page.screenshot({path:'artifacts/stripe-checkout.png',fullPage:true});await browser.close();

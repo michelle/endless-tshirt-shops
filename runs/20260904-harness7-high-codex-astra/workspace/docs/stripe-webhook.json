@@ -1,0 +1,8 @@
+{
+  "id": "we_1UC8zCEGIg356IKV97CYEtYZ",
+  "url": "https://benchmark-20260904-harness7-high-co-amber.vercel.app/api/webhooks/stripe",
+  "enabled_events": [
+    "checkout.session.completed",
+    "checkout.session.async_payment_succeeded"
+  ]
+}

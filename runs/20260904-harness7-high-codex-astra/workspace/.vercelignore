@@ -1,0 +1,9 @@
+reference/
+artifacts/
+docs/
+tests/
+.env*
+.stripe/
+.git/
+.projects/
+scripts/
