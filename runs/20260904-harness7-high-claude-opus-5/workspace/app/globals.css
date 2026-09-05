@@ -1,0 +1,361 @@
+/*
+ * The original store's palette: white page, black garment, one cornflower
+ * accent (#a4d5ff) doing all the interactive work, Stripe blue for links.
+ */
+:root {
+  --ink: #0a0a0a;
+  --paper: #ffffff;
+  --accent: #a4d5ff;
+  --accent-strong: #337ab7;
+  --muted: #8a94a6;
+  --hairline: #e8edf3;
+  --danger: #d64545;
+  --font-sans: var(--font-chivo), 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  color: var(--accent-strong);
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
+
+.page {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 40px 24px 80px;
+}
+
+/* ---------------------------------------------------------------- header */
+
+.masthead {
+  border-bottom: 1px solid var(--hairline);
+  padding-bottom: 22px;
+  margin-bottom: 40px;
+}
+
+.masthead h1 {
+  font-size: clamp(34px, 6vw, 52px);
+  font-weight: 300;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+.masthead p {
+  margin: 6px 0 0;
+  color: var(--accent-strong);
+  font-size: 18px;
+  font-weight: 400;
+}
+
+.testbadge {
+  display: inline-block;
+  margin-top: 14px;
+  padding: 4px 10px;
+  border: 1px solid var(--accent);
+  border-radius: 999px;
+  background: #f2f8ff;
+  color: var(--accent-strong);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* ----------------------------------------------------------------- shell */
+
+.shop {
+  display: grid;
+  grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+  gap: 56px;
+  align-items: start;
+}
+
+@media (max-width: 860px) {
+  .shop {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 36px;
+  }
+}
+
+/* ----------------------------------------------------------------- shirt */
+
+.shirt-stage {
+  position: relative;
+  width: 100%;
+  max-width: 620px;
+  margin: 0 auto;
+}
+
+.shirt {
+  position: relative;
+  width: 100%;
+}
+
+.shirt svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.shirt-print {
+  position: absolute;
+  top: 21%;
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+}
+
+/* The timestamp itself. Tabular figures keep the digits from dancing as the
+   milliseconds roll over 60+ times a second. */
+.shirt-print span {
+  color: #ffffff;
+  font-weight: 700;
+  font-size: clamp(15px, 3.4vw, 30px);
+  letter-spacing: 0.04em;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' 1;
+}
+
+.shirt-price {
+  position: absolute;
+  top: 68%;
+  left: 12%;
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  background: var(--accent-strong);
+  color: #fff;
+  padding: 6px 14px;
+  border-radius: 4px;
+  font-size: 20px;
+  font-weight: 300;
+}
+
+.shirt-price s {
+  opacity: 0.65;
+  font-size: 16px;
+}
+
+.shirt-caption {
+  text-align: center;
+  color: var(--muted);
+  font-size: 13px;
+  margin-top: 14px;
+}
+
+/* --------------------------------------------------------------- choices */
+
+.choices {
+  padding-top: 6px;
+}
+
+.fieldset {
+  border: 0;
+  padding: 0;
+  margin: 0 0 26px;
+}
+
+.fieldset legend {
+  padding: 0;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+
+.options {
+  display: grid;
+  gap: 8px;
+}
+
+.options.two {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.options.four {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.options input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+}
+
+.options label {
+  display: block;
+  text-align: center;
+  padding: 11px 6px;
+  background: var(--accent);
+  color: var(--ink);
+  cursor: pointer;
+  border-radius: 3px;
+  user-select: none;
+  transition:
+    background 150ms ease,
+    color 150ms ease,
+    opacity 150ms ease;
+}
+
+.options label:hover {
+  opacity: 0.82;
+}
+
+.options input:checked + label {
+  background: var(--ink);
+  color: #fff;
+}
+
+/* Keyboard users need to see focus even though the input itself is hidden. */
+.options input:focus-visible + label {
+  outline: 2px solid var(--accent-strong);
+  outline-offset: 2px;
+}
+
+.blurb {
+  color: var(--muted);
+  font-size: 13px;
+  margin: 10px 0 0;
+}
+
+.buy {
+  display: block;
+  width: 100%;
+  border: 0;
+  border-radius: 3px;
+  background: var(--ink);
+  color: #fff;
+  font-family: inherit;
+  font-size: 19px;
+  font-weight: 400;
+  padding: 15px;
+  cursor: pointer;
+  transition: opacity 150ms ease;
+}
+
+.buy:hover:not(:disabled) {
+  opacity: 0.85;
+}
+
+.buy:disabled {
+  opacity: 0.5;
+  cursor: progress;
+}
+
+.error {
+  margin-top: 14px;
+  padding: 10px 12px;
+  border-left: 3px solid var(--danger);
+  background: #fdf3f3;
+  color: var(--danger);
+  font-size: 14px;
+}
+
+.notice {
+  margin-top: 14px;
+  padding: 10px 12px;
+  border-left: 3px solid var(--accent);
+  background: #f4f9ff;
+  font-size: 14px;
+}
+
+.finePrint {
+  margin-top: 22px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+/* --------------------------------------------------------------- success */
+
+.receipt h2 {
+  font-size: 28px;
+  font-weight: 400;
+  margin: 0 0 8px;
+}
+
+.receipt dl {
+  margin: 24px 0 0;
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  gap: 10px 24px;
+  font-size: 15px;
+}
+
+.receipt dt {
+  color: var(--muted);
+}
+
+.receipt dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.receipt code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 13px;
+  background: #f5f7fa;
+  padding: 2px 6px;
+  border-radius: 3px;
+}
+
+.footer {
+  margin-top: 64px;
+  padding-top: 20px;
+  border-top: 1px solid var(--hairline);
+  color: var(--muted);
+  font-size: 13px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+}
+
+.spinner {
+  display: inline-block;
+  width: 13px;
+  height: 13px;
+  border: 2px solid var(--accent);
+  border-top-color: var(--accent-strong);
+  border-radius: 50%;
+  animation: spin 700ms linear infinite;
+  vertical-align: -1px;
+  margin-right: 8px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spinner {
+    animation-duration: 2s;
+  }
+}
