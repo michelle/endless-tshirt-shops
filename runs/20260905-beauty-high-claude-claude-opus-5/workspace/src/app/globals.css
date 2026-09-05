@@ -1,0 +1,179 @@
+@import "tailwindcss";
+
+@theme {
+  --color-paper: #f7f3ea;
+  --color-paper-deep: #eee6d6;
+  --color-paper-edge: #ded3bd;
+  --color-ink: #16130f;
+  --color-ink-soft: #6b6153;
+  --color-ink-faint: #9c9284;
+  --color-flame: #ff4d2e;
+  --color-ultramarine: #2743ce;
+  --color-gold: #dfa73a;
+  --color-moss: #2f6b4f;
+
+  --font-display: var(--font-instrument), ui-serif, Georgia, serif;
+  --font-mono: var(--font-space-mono), ui-monospace, SFMono-Regular, monospace;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+
+  --ease-snap: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@layer base {
+  :root {
+    color-scheme: light;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-feature-settings: "cv05" 1, "ss01" 1;
+    overflow-x: hidden;
+  }
+
+  ::selection {
+    background: var(--color-flame);
+    color: var(--color-paper);
+  }
+
+  button {
+    cursor: pointer;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+@layer components {
+  /* Paper grain, laid over the whole page. Cheap, and it makes flat colour
+     look like something you could actually pick up. */
+  .grain::after {
+    content: "";
+    position: fixed;
+    inset: -50%;
+    pointer-events: none;
+    z-index: 60;
+    opacity: 0.32;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+    mix-blend-mode: multiply;
+  }
+
+  .rule-dots {
+    background-image: radial-gradient(currentColor 1px, transparent 1px);
+    background-size: 6px 6px;
+    background-repeat: repeat-x;
+    background-position: 0 center;
+  }
+
+  .card {
+    background: color-mix(in srgb, var(--color-paper) 84%, white);
+    border: 1px solid var(--color-paper-edge);
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.8) inset,
+      0 18px 40px -28px rgba(22, 19, 15, 0.5);
+  }
+
+  /* The torn/perforated top edge on the spec card. */
+  .perforated {
+    -webkit-mask-image: radial-gradient(circle 5px at 10px -1px, transparent 98%, black 100%);
+    mask-image: radial-gradient(circle 5px at 10px -1px, transparent 98%, black 100%);
+    -webkit-mask-size: 20px 100%;
+    mask-size: 20px 100%;
+    mask-repeat: repeat-x;
+  }
+
+  .chip {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    border: 1px solid var(--color-paper-edge);
+    background: color-mix(in srgb, var(--color-paper) 60%, white);
+    transition:
+      transform 0.18s var(--ease-snap),
+      background-color 0.18s,
+      border-color 0.18s,
+      color 0.18s;
+  }
+  .chip:hover:not(:disabled) {
+    transform: translateY(-1px);
+    border-color: var(--color-ink-faint);
+  }
+  .chip[data-on="true"] {
+    background: var(--color-ink);
+    color: var(--color-paper);
+    border-color: var(--color-ink);
+  }
+  .chip:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+
+  .stamp {
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+  }
+}
+
+@keyframes marquee {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+.marquee-track {
+  animation: marquee 42s linear infinite;
+  will-change: transform;
+}
+
+@keyframes blink {
+  0%,
+  49% {
+    opacity: 1;
+  }
+  50%,
+  100% {
+    opacity: 0.15;
+  }
+}
+.blink {
+  animation: blink 1.06s steps(1) infinite;
+}
+
+@keyframes sway {
+  0%,
+  100% {
+    transform: rotate(-0.5deg) translateY(0);
+  }
+  50% {
+    transform: rotate(0.5deg) translateY(-8px);
+  }
+}
+.sway {
+  animation: sway 9s ease-in-out infinite;
+}
+
+@keyframes bloom {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(3%, -4%, 0) scale(1.12);
+  }
+}
