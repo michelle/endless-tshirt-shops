@@ -1,0 +1,22 @@
+{
+  "run_id": "20260905-minimal-high-claude-claude-sonnet-5",
+  "suite_id": "20260905-minimal-high",
+  "status": "succeeded",
+  "adapter": "claude",
+  "model": "claude-sonnet-5",
+  "reasoning_effort": "high",
+  "branch": "benchmark-results",
+  "vercel_project": "benchmark-20260905-minimal-high-claude-claude-sonnet-5",
+  "stripe_config_ref": "20260905-minimal-high-claude-claude-sonnet-5",
+  "stripe_config_path": ".benchmark-secrets/stripe/20260905-minimal-high-claude-claude-sonnet-5.toml",
+  "base_commit": "cbac7b40b29076ab8bc099486c8333729df00b32",
+  "prompt_file": "prompt-minimal.md",
+  "prompt_sha256": "b211b5d8ded08d9e9f381b7f741f222ad5730eecb87868d4cc437ce10f8a4585",
+  "workspace_tree": "3c1feb41cf05571761aac09295c81da234dcfdf7",
+  "started_at": "2026-09-05T22:02:16Z",
+  "finished_at": "2026-09-05T22:19:28Z",
+  "duration_seconds": 1032,
+  "agent_exit_code": 0,
+  "usage": {"cache_creation_input_tokens": 134547, "cache_read_input_tokens": 8046527, "input_tokens": 204, "new_input_tokens": 134751, "output_tokens": 54833},
+  "deployment_url": "https://benchmark-20260905-minimal-high-cla-zeta.vercel.app**\\n\\nA"
+}
