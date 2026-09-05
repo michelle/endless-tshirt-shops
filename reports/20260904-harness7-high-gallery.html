@@ -1,0 +1,335 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>datetime.store benchmark — submitted artwork gallery</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        --ink: #f4f1e8;
+        --muted: #aaa79f;
+        --panel: #171719;
+        --line: #343438;
+        --good: #9fe0b0;
+        --warn: #ffd27d;
+        --bad: #ff8c86;
+      }
+
+      * { box-sizing: border-box; }
+
+      body {
+        margin: 0;
+        background: #0d0d0f;
+        color: var(--ink);
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      }
+
+      header {
+        max-width: 1480px;
+        margin: 0 auto;
+        padding: 56px 24px 30px;
+      }
+
+      .eyebrow {
+        color: #8f8bff;
+        font-size: 12px;
+        letter-spacing: .14em;
+        text-transform: uppercase;
+      }
+
+      h1 {
+        max-width: 920px;
+        margin: 14px 0 18px;
+        font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+        font-size: clamp(34px, 5vw, 72px);
+        line-height: .98;
+        letter-spacing: -.045em;
+      }
+
+      .intro {
+        max-width: 880px;
+        margin: 0;
+        color: var(--muted);
+        font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+        font-size: 16px;
+        line-height: 1.6;
+      }
+
+      main {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(min(100%, 390px), 1fr));
+        gap: 22px;
+        max-width: 1480px;
+        margin: 0 auto;
+        padding: 20px 24px 72px;
+      }
+
+      article {
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        background: var(--panel);
+      }
+
+      .canvas-wrap {
+        padding: 18px;
+        background: #111113;
+      }
+
+      .canvas {
+        position: relative;
+        width: 100%;
+        overflow: hidden;
+        border: 1px solid #29292d;
+        border-radius: 7px;
+        background: #09090a;
+        box-shadow: inset 0 0 70px rgba(255,255,255,.025), 0 18px 45px rgba(0,0,0,.3);
+      }
+
+      .canvas::after {
+        content: "full print canvas";
+        position: absolute;
+        right: 10px;
+        bottom: 8px;
+        color: rgba(255,255,255,.34);
+        font-size: 9px;
+        letter-spacing: .08em;
+        text-transform: uppercase;
+      }
+
+      .canvas img {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+      }
+
+      .copy { padding: 18px 20px 22px; }
+
+      .topline {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 16px;
+      }
+
+      h2 {
+        margin: 0;
+        font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+        font-size: 22px;
+        letter-spacing: -.025em;
+      }
+
+      .badge {
+        flex: none;
+        border: 1px solid currentColor;
+        border-radius: 999px;
+        padding: 4px 7px 3px;
+        font-size: 9px;
+        letter-spacing: .08em;
+        text-transform: uppercase;
+      }
+
+      .good { color: var(--good); }
+      .warn { color: var(--warn); }
+      .bad { color: var(--bad); }
+
+      dl {
+        display: grid;
+        grid-template-columns: max-content 1fr;
+        gap: 7px 14px;
+        margin: 16px 0 0;
+        font-size: 11px;
+        line-height: 1.45;
+      }
+
+      dt { color: #77747c; }
+      dd { min-width: 0; margin: 0; overflow-wrap: anywhere; }
+
+      .note {
+        margin: 16px 0 0;
+        color: var(--muted);
+        font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+        font-size: 13px;
+        line-height: 1.5;
+      }
+
+      a { color: inherit; }
+
+      footer {
+        max-width: 1480px;
+        margin: -38px auto 0;
+        padding: 0 24px 48px;
+        color: #77747c;
+        font-size: 11px;
+        line-height: 1.6;
+      }
+
+      @media (max-width: 520px) {
+        header { padding-top: 34px; }
+        main { padding-inline: 14px; }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="eyebrow">2026-09-04 · seven models · high reasoning</div>
+      <h1>The pixels actually sent to print.</h1>
+      <p class="intro">
+        Each image is the complete transparent print canvas, scaled uniformly and placed on black so white ink is visible.
+        Nothing is cropped or repositioned here: the whitespace, scale, and placement match the asset URL supplied to
+        Prodigi. Click a canvas to open its original generated asset.
+      </p>
+    </header>
+
+    <main>
+      <article>
+        <div class="canvas-wrap">
+          <a href="https://benchmark-20260904-harness7-high-cl-one.vercel.app/api/artwork/unisex-1788583053423.png">
+            <div class="canvas" style="aspect-ratio: 4680 / 5790">
+              <img loading="lazy" alt="Fable 5.1 print canvas" src="https://benchmark-20260904-harness7-high-cl-one.vercel.app/api/artwork/unisex-1788583053423.png" />
+            </div>
+          </a>
+        </div>
+        <div class="copy">
+          <div class="topline"><h2>Claude Fable 5.1</h2><span class="badge good">Prodigi verified</span></div>
+          <dl>
+            <dt>Order</dt><dd>ord_1170433 · payment-triggered</dd>
+            <dt>Canvas</dt><dd>4680 × 5790 RGBA</dd>
+            <dt>Ink bounds</dt><dd>x 693–3976 · y 867–1408</dd>
+            <dt>Ink pixels</dt><dd>451,730 · 1.6671%</dd>
+            <dt>Timestamp</dt><dd>1788583053423</dd>
+          </dl>
+        </div>
+      </article>
+
+      <article>
+        <div class="canvas-wrap">
+          <a href="https://benchmark-20260904-harness7-high-cl-livid.vercel.app/api/artwork/1788579892691.png">
+            <div class="canvas" style="aspect-ratio: 2800 / 3508">
+              <img loading="lazy" alt="Opus 5 print canvas" src="https://benchmark-20260904-harness7-high-cl-livid.vercel.app/api/artwork/1788579892691.png" />
+            </div>
+          </a>
+        </div>
+        <div class="copy">
+          <div class="topline"><h2>Claude Opus 5</h2><span class="badge good">Prodigi verified</span></div>
+          <dl>
+            <dt>Order</dt><dd>ord_1170404 · payment-triggered</dd>
+            <dt>Canvas</dt><dd>2800 × 3508 RGBA</dd>
+            <dt>Ink bounds</dt><dd>x 396–2406 · y 773–951</dd>
+            <dt>Ink pixels</dt><dd>176,092 · 1.7928%</dd>
+            <dt>Timestamp</dt><dd>1788579892691</dd>
+          </dl>
+        </div>
+      </article>
+
+      <article>
+        <div class="canvas-wrap">
+          <a href="https://benchmark-20260904-harness7-high-cl-fawn.vercel.app/api/artwork?ts=1788576342212&amp;style=fitted">
+            <div class="canvas" style="aspect-ratio: 1600 / 2000">
+              <img loading="lazy" alt="Sonnet 5 print canvas" src="https://benchmark-20260904-harness7-high-cl-fawn.vercel.app/api/artwork?ts=1788576342212&amp;style=fitted" />
+            </div>
+          </a>
+        </div>
+        <div class="copy">
+          <div class="topline"><h2>Claude Sonnet 5</h2><span class="badge good">Prodigi verified</span></div>
+          <dl>
+            <dt>Order</dt><dd>ord_1170399 · payment-triggered</dd>
+            <dt>Canvas</dt><dd>1600 × 2000 RGBA</dd>
+            <dt>Ink bounds</dt><dd>x 128–1471 · y 781–1218</dd>
+            <dt>Ink pixels</dt><dd>50,297 · 1.5718%</dd>
+            <dt>Timestamp</dt><dd>1788576342212</dd>
+          </dl>
+        </div>
+      </article>
+
+      <article>
+        <div class="canvas-wrap">
+          <a href="https://benchmark-20260904-harness7-high-co-amber.vercel.app/api/artwork/1788574243197.png">
+            <div class="canvas" style="aspect-ratio: 4677 / 5881">
+              <img loading="lazy" alt="Astra print canvas" src="https://benchmark-20260904-harness7-high-co-amber.vercel.app/api/artwork/1788574243197.png" />
+            </div>
+          </a>
+        </div>
+        <div class="copy">
+          <div class="topline"><h2>GPT-6 Astra</h2><span class="badge good">Prodigi verified</span></div>
+          <dl>
+            <dt>Order</dt><dd>ord_1170396 · payment-triggered</dd>
+            <dt>Canvas</dt><dd>4677 × 5881 RGBA</dd>
+            <dt>Ink bounds</dt><dd>x 1154–3517 · y 831–1053</dd>
+            <dt>Ink pixels</dt><dd>153,742 · 0.5590%</dd>
+            <dt>Timestamp</dt><dd>1788574243197</dd>
+          </dl>
+        </div>
+      </article>
+
+      <article>
+        <div class="canvas-wrap">
+          <a href="https://benchmark-20260904-harness7-high-co-sigma.vercel.app/api/artwork?timestamp=1778112345678">
+            <div class="canvas" style="aspect-ratio: 4677 / 5787">
+              <img loading="lazy" alt="Luna print canvas" src="https://benchmark-20260904-harness7-high-co-sigma.vercel.app/api/artwork?timestamp=1778112345678" />
+            </div>
+          </a>
+        </div>
+        <div class="copy">
+          <div class="topline"><h2>GPT-5.6 Luna</h2><span class="badge warn">Direct test only</span></div>
+          <dl>
+            <dt>Order</dt><dd>ord_1170401 · not payment-triggered</dd>
+            <dt>Canvas</dt><dd>4677 × 5787 RGBA</dd>
+            <dt>Ink bounds</dt><dd>x 546–4129 · y 1780–2143</dd>
+            <dt>Ink pixels</dt><dd>557,024 · 2.0580%</dd>
+            <dt>Timestamp</dt><dd>1778112345678</dd>
+          </dl>
+          <p class="note">Prodigi downloaded a readable asset, but this Stripe sandbox contains no completed payment.</p>
+        </div>
+      </article>
+
+      <article>
+        <div class="canvas-wrap">
+          <a href="https://benchmark-20260904-harness7-high-co-rouge.vercel.app/api/artwork/1788581161904">
+            <div class="canvas" style="aspect-ratio: 4680 / 5790">
+              <img loading="lazy" alt="Sol print canvas with microscopic artwork" src="https://benchmark-20260904-harness7-high-co-rouge.vercel.app/api/artwork/1788581161904" />
+            </div>
+          </a>
+        </div>
+        <div class="copy">
+          <div class="topline"><h2>GPT-5.6 Sol</h2><span class="badge bad">Print defect</span></div>
+          <dl>
+            <dt>Order</dt><dd>ord_1170430 · API smoke-test payment</dd>
+            <dt>Canvas</dt><dd>4680 × 5790 RGBA</dd>
+            <dt>Ink bounds</dt><dd>x 2242–2341 · y 2418–2430</dd>
+            <dt>Ink pixels</dt><dd>786 · 0.0029%</dd>
+            <dt>Timestamp</dt><dd>1788581161904</dd>
+          </dl>
+          <p class="note">Prodigi accepted the file, but the printable mark is only 100 × 13 pixels and appears as a tiny dash.</p>
+        </div>
+      </article>
+
+      <article>
+        <div class="canvas-wrap">
+          <a href="https://benchmark-20260904-harness7-high-co.vercel.app/api/artwork/1788571859184">
+            <div class="canvas" style="aspect-ratio: 4665 / 5844">
+              <img loading="lazy" alt="Terra generated SVG print candidate" src="https://benchmark-20260904-harness7-high-co.vercel.app/api/artwork/1788571859184" />
+            </div>
+          </a>
+        </div>
+        <div class="copy">
+          <div class="topline"><h2>GPT-5.6 Terra</h2><span class="badge bad">Not submitted</span></div>
+          <dl>
+            <dt>Order</dt><dd>No order contains this asset</dd>
+            <dt>Canvas</dt><dd>4665 × 5844 SVG</dd>
+            <dt>Position</dt><dd>text centered at x 2332.5 · baseline y 2922</dd>
+            <dt>Timestamp</dt><dd>1788571859184</dd>
+          </dl>
+          <p class="note">This is the app-generated candidate. Terra’s separate Prodigi test used an external sample image, which later failed to download.</p>
+        </div>
+      </article>
+    </main>
+
+    <footer>
+      Audit snapshot: 2026-09-05 UTC. “Prodigi verified” means the sandbox order references this exact URL,
+      reports no issues, and exposes a fetched thumbnail. A successful download alone is not treated as proof of a usable print.
+    </footer>
+  </body>
+</html>
