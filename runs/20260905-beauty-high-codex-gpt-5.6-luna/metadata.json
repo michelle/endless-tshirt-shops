@@ -1,0 +1,22 @@
+{
+  "run_id": "20260905-beauty-high-codex-gpt-5.6-luna",
+  "suite_id": "20260905-beauty-high",
+  "status": "succeeded",
+  "adapter": "codex",
+  "model": "gpt-5.6-luna",
+  "reasoning_effort": "high",
+  "branch": "benchmark-results",
+  "vercel_project": "benchmark-20260905-beauty-high-codex-gpt-5.6-luna",
+  "stripe_config_ref": "20260905-beauty-high-codex-gpt-5.6-luna",
+  "stripe_config_path": ".benchmark-secrets/stripe/20260905-beauty-high-codex-gpt-5.6-luna.toml",
+  "base_commit": "cbac7b40b29076ab8bc099486c8333729df00b32",
+  "prompt_file": "prompt-beauty.md",
+  "prompt_sha256": "af594c565b450979255e462eacd25bd9052bf9b3cc5124cc1c2873c1d3662aa9",
+  "workspace_tree": "17cc532822f157eb663e2c229771d7083eabbd8a",
+  "started_at": "2026-09-05T17:23:41Z",
+  "finished_at": "2026-09-05T17:34:26Z",
+  "duration_seconds": 645,
+  "agent_exit_code": 0,
+  "usage": {"cached_input_tokens": 4541440, "input_tokens": 4667164, "new_input_tokens": 125724, "output_tokens": 24746},
+  "deployment_url": "https://benchmark-20260905-beauty-high-code-one.vercel.app).\\n\\nBuilt:\\n\\n-"
+}
