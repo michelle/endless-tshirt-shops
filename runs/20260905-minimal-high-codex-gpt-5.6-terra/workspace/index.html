@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="A t-shirt bearing the exact current datetime." />
+    <title>datetime.store — a shirt for right now</title>
+    <link rel="preconnect" href="https://js.stripe.com" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Chivo:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/styles.css" />
+    <script src="https://js.stripe.com/v3/"></script>
+  </head>
+  <body>
+    <main class="shell">
+      <header class="masthead">
+        <a href="/" class="wordmark">datetime.store</a>
+        <p>we sell a t-shirt with the current datetime. <span aria-hidden="true">◷</span></p>
+      </header>
+      <section class="store" aria-label="datetime t-shirt">
+        <div class="product-column">
+          <div class="shirt-stage" aria-label="Black t-shirt preview">
+            <div class="shirt-time" id="previewTime">0000000000000</div>
+            <svg class="shirt" viewBox="0 0 100 125" role="img" aria-label="Black datetime t-shirt">
+              <path id="shirtPath" d="M79.312,15.149c-1.629-1.631-16.117-6.146-16.117-6.146s-4.31,8.721-11.66,8.721s-11.66-8.721-11.66-8.721s-15.354,4.936-16.486,6.068c-1.13,1.13-13.712,16.992-13.712,16.992l10.081,8.37l6.614-5.518c0,0,14.411,23.971,1.384,58.875c0,0,43.546,10.767,47.434,0c-9.689-43.26,1.379-58.613,1.379-58.613l6.267,5.228l9.35-11.117C92.185,29.288,80.945,16.781,79.312,15.149z" />
+            </svg>
+            <div class="price"><s>$30.00</s> $22.50</div>
+          </div>
+          <p class="product-note">Printed to order · Free standard shipping</p>
+        </div>
+        <section class="checkout" aria-live="polite">
+          <form id="checkoutForm">
+            <fieldset id="optionsFieldset">
+              <legend>Choose your shirt</legend>
+              <div class="option-group" role="radiogroup" aria-label="Style">
+                <label><input type="radio" name="style" value="fitted" checked /><span>Fitted</span><small>Bella + Canvas 6004</small></label>
+                <label><input type="radio" name="style" value="unisex" /><span>Unisex</span><small>Gildan SoftStyle</small></label>
+              </div>
+              <div class="size-row" role="radiogroup" aria-label="Size">
+                <span class="field-label">Size</span>
+                <div class="sizes">
+                  <label><input type="radio" name="size" value="S" /><span>S</span></label>
+                  <label><input type="radio" name="size" value="M" checked /><span>M</span></label>
+                  <label><input type="radio" name="size" value="L" /><span>L</span></label>
+                  <label><input type="radio" name="size" value="XL" /><span>XL</span></label>
+                  <label><input type="radio" name="size" value="2XL" /><span>2XL</span></label>
+                </div>
+              </div>
+            </fieldset>
+            <div class="divider"></div>
+            <fieldset id="addressFieldset">
+              <legend>Where should we send it?</legend>
+              <div class="fields two"><label>Full name<input name="name" autocomplete="name" required /></label><label>Email<input type="email" name="email" autocomplete="email" required /></label></div>
+              <label>Address<input name="line1" autocomplete="address-line1" required /></label>
+              <label>Apartment, suite, etc. <em>optional</em><input name="line2" autocomplete="address-line2" /></label>
+              <div class="fields three"><label>City<input name="city" autocomplete="address-level2" required /></label><label>State / region<input name="state" autocomplete="address-level1" /></label><label>ZIP / postal<input name="postalCode" autocomplete="postal-code" required /></label></div>
+              <label>Country<select name="countryCode" autocomplete="country" required><option value="US">United States</option><option value="CA">Canada</option><option value="GB">United Kingdom</option><option value="AU">Australia</option><option value="DE">Germany</option><option value="FR">France</option><option value="IE">Ireland</option><option value="NL">Netherlands</option><option value="NZ">New Zealand</option></select></label>
+            </fieldset>
+            <div class="divider"></div>
+            <fieldset id="paymentFieldset"><legend>Payment</legend><div id="card-element" class="card-element"></div><p class="payment-note">Secure payment powered by Stripe. Your timestamp is captured when payment begins.</p></fieldset>
+            <p id="formError" class="error" role="alert"></p>
+            <button class="buy" id="buyButton" type="submit"><span>Buy this shirt — $22.50</span><span class="arrow">→</span></button>
+            <p class="legal">By purchasing, you agree that this very specific moment is yours.</p>
+          </form>
+          <section id="success" class="success" hidden><div class="success-mark">✓</div><h2>Your pretty cool shirt is on its way.</h2><p id="successText">We’ve received your order.</p><button class="secondary" id="anotherButton">Get another shirt</button></section>
+        </section>
+      </section>
+      <footer>datetime.store · every shirt is a one-of-one moment</footer>
+    </main>
+    <script src="/app.js"></script>
+  </body>
+</html>

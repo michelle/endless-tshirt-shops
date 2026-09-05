@@ -1,0 +1,18 @@
+{
+  "name": "datetime-store-rebuild",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vercel dev",
+    "build": "node -e \"console.log('Static storefront ready')\"",
+    "test": "node --test test/*.test.js"
+  },
+  "dependencies": {
+    "sharp": "^0.34.2",
+    "stripe": "^18.5.0"
+  },
+  "engines": {
+    "node": "24.x"
+  }
+}
