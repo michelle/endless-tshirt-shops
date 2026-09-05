@@ -1,0 +1,36 @@
+{
+  "name": "datetime-store",
+  "version": "0.1.0",
+  "private": true,
+  "engines": {
+    "node": ">=20.9.0"
+  },
+  "scripts": {
+    "dev": "next dev --hostname 0.0.0.0",
+    "build": "next build",
+    "start": "next start --hostname 0.0.0.0",
+    "test": "tsx --test tests/*.test.ts",
+    "typecheck": "tsc --noEmit",
+    "format": "prettier --check app lib tests scripts next.config.ts"
+  },
+  "dependencies": {
+    "lucide-react": "1.41.0",
+    "next": "16.2.6",
+    "opentype.js": "2.0.0",
+    "react": "19.2.6",
+    "react-dom": "19.2.6",
+    "sharp": "0.34.5",
+    "stripe": "22.6.1",
+    "zod": "4.4.3"
+  },
+  "devDependencies": {
+    "@types/node": "22.19.19",
+    "@types/opentype.js": "1.3.10",
+    "@types/react": "19.2.14",
+    "@types/react-dom": "19.2.3",
+    "prettier": "3.9.6",
+    "tsx": "4.22.1",
+    "typescript": "5.9.3"
+  },
+  "type": "module"
+}

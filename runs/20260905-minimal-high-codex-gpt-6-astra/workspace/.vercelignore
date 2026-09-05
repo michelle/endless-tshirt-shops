@@ -1,0 +1,6 @@
+work
+outputs
+.git
+.env*
+README.md
+tests

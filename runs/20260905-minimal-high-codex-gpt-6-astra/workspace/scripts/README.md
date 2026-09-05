@@ -1,0 +1,1 @@
+The one-time service configuration script registers a Stripe webhook and sends local server configuration to the linked Vercel project's production environment. It was run for this deployment. Do not rerun it blindly: reuse the webhook ID in the ignored `work/webhook.json` and its already-configured signing secret when redeploying.
