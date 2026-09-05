@@ -1,0 +1,446 @@
+@font-face {
+  font-family: "Chivo";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/Chivo-400.ttf") format("truetype");
+}
+@font-face {
+  font-family: "Chivo";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("/fonts/Chivo-700.ttf") format("truetype");
+}
+
+:root {
+  --blue: #337ab7;
+  --blue-light: #a4d5ff;
+  --red: #eb1c26;
+  --ink: #000;
+  --muted: #777;
+  --font: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  font-family: var(--font);
+  font-size: 16px;
+  color: var(--ink);
+  background: #fff;
+}
+
+body {
+  min-height: 100vh;
+}
+
+a {
+  color: var(--blue);
+}
+
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 24px 20px 60px;
+}
+
+.page-header {
+  border-bottom: 1px solid #eee;
+  padding-bottom: 14px;
+  margin: 24px 0 30px;
+}
+.page-header h1 {
+  font-weight: 300;
+  font-size: 36px;
+  line-height: 1.1;
+  letter-spacing: -0.5px;
+}
+.page-header h1 a {
+  color: inherit;
+  text-decoration: none;
+}
+.page-header h2 {
+  color: var(--blue);
+  font-weight: 400;
+  font-size: 19px;
+  margin-top: 6px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.page-header h2 svg {
+  width: 18px;
+  height: 18px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 7fr 5fr;
+  gap: 40px;
+  align-items: start;
+}
+@media (max-width: 820px) {
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+}
+
+/* ---------- shirt ---------- */
+.Shirt {
+  position: relative;
+  width: 100%;
+  max-width: 600px;
+  user-select: none;
+}
+.Shirt svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.Shirt-body {
+  fill: #0b0b0b;
+}
+.Shirt-print {
+  font-family: "Chivo", "Helvetica Neue", monospace;
+  fill: #fff;
+}
+.Shirt-print-utc {
+  opacity: 0.9;
+}
+.Shirt-price {
+  position: absolute;
+  top: 70%;
+  left: 8%;
+}
+.Shirt-price .label {
+  display: inline-block;
+  background: var(--blue);
+  color: #fff;
+  font-size: 22px;
+  font-weight: 300;
+  padding: 4px 10px;
+  border-radius: 3px;
+  line-height: 1.2;
+}
+.Shirt-price .label s {
+  opacity: 0.75;
+  margin-right: 6px;
+}
+.Shirt-price small {
+  display: block;
+  color: var(--muted);
+  font-size: 13px;
+  margin-top: 6px;
+}
+.Shirt-caption {
+  margin-top: 8px;
+  color: var(--muted);
+  font-size: 13px;
+  max-width: 600px;
+}
+.Shirt-caption strong {
+  color: var(--ink);
+  font-weight: 500;
+}
+.Shirt.is-frozen .Shirt-print {
+  fill: #a4d5ff;
+}
+
+/* ---------- pickers ---------- */
+.pickers {
+  margin-bottom: 8px;
+}
+.picker {
+  display: flex;
+  width: 100%;
+  margin-bottom: 12px;
+}
+.picker-label {
+  font-size: 12px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 6px;
+}
+.radio {
+  flex: 1;
+  text-align: center;
+  line-height: 28px;
+}
+.radio input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+.radio label {
+  display: block;
+  width: 100%;
+  background: var(--blue-light);
+  color: var(--ink);
+  padding: 8px 6px;
+  cursor: pointer;
+  transition: opacity 200ms ease-in-out, background 150ms;
+  border-right: 1px solid rgba(255, 255, 255, 0.6);
+}
+.radio:last-child label {
+  border-right: 0;
+}
+.radio label:hover {
+  opacity: 0.8;
+}
+.radio input:checked + label {
+  background: var(--ink);
+  color: #fff;
+}
+.radio input:focus-visible + label {
+  outline: 2px solid var(--blue);
+  outline-offset: -2px;
+}
+.radio input:disabled + label {
+  cursor: default;
+  opacity: 0.6;
+}
+
+/* ---------- checkout ---------- */
+.Checkout {
+  position: relative;
+}
+.Checkout-express {
+  margin-top: 20px;
+  text-align: center;
+}
+.Checkout-express-switch {
+  display: inline-block;
+  margin-top: 10px;
+  font-size: 14px;
+  cursor: pointer;
+  background: none;
+  border: 0;
+  color: var(--blue);
+  text-decoration: underline;
+}
+.Checkout-loading {
+  margin-top: 24px;
+  color: var(--muted);
+  font-size: 14px;
+  text-align: center;
+}
+.Checkout-form {
+  margin-top: 16px;
+}
+.Checkout-section {
+  margin: 26px 0 10px;
+  font-size: 12px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.field-wrap {
+  position: relative;
+  display: block;
+  margin: 28px 0 18px;
+  width: 100%;
+}
+.field-wrap > span {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  line-height: 28px;
+  border-bottom: 1px solid var(--blue-light);
+  transition: border-bottom-color 200ms ease-in-out;
+  pointer-events: none;
+}
+.field-wrap > span span {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: 0% 50%;
+  transition: transform 200ms ease-in-out, color 200ms;
+  color: #000;
+}
+.field {
+  display: block;
+  width: 100%;
+  background: transparent;
+  border: 0;
+  outline: none;
+  font: inherit;
+  line-height: 28px;
+  padding-bottom: 3px;
+  color: var(--ink);
+  transition: opacity 200ms ease-in-out;
+}
+.field::placeholder {
+  color: #ccc;
+}
+.field.is-empty:not(:focus) {
+  opacity: 0;
+}
+.field:focus + span,
+.field:not(.is-empty) + span {
+  color: var(--blue);
+}
+.field:focus + span span,
+.field:not(.is-empty) + span span {
+  transform: scale(0.8) translateY(-28px);
+  color: var(--blue);
+}
+.field:focus + span {
+  border-bottom-color: var(--blue);
+}
+.field.is-invalid + span,
+.field.is-invalid + span span {
+  color: var(--red);
+  border-bottom-color: var(--red);
+}
+
+.btn {
+  display: block;
+  width: 100%;
+  height: 47px;
+  margin: 22px 0 10px;
+  background: var(--ink);
+  color: #fff;
+  border: 0;
+  font: inherit;
+  font-size: 19px;
+  cursor: pointer;
+  transition: opacity 200ms ease-in-out, background 150ms;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+.btn:hover {
+  opacity: 0.85;
+}
+.btn:focus-visible,
+.btn:active {
+  background: var(--blue);
+}
+.btn:disabled {
+  cursor: progress;
+  opacity: 0.7;
+}
+.btn svg {
+  width: 20px;
+  height: 20px;
+}
+.btn-secondary {
+  background: var(--blue);
+}
+.spinning {
+  animation: spin 1s infinite linear;
+}
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.errors {
+  list-style: none;
+  margin: 12px 0;
+}
+.errors li {
+  border: 1px solid #ebccd1;
+  background: #f2dede;
+  color: #a94442;
+  padding: 10px 14px;
+  font-size: 14px;
+  margin-bottom: 6px;
+}
+.fineprint {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
+  margin-top: 6px;
+}
+
+/* ---------- success ---------- */
+.Checkout-success {
+  text-align: center;
+  font-size: 16px;
+  padding-top: 12%;
+}
+.Checkout-success-title {
+  font-size: 22px;
+  font-weight: 500;
+  margin-bottom: 14px;
+}
+.Checkout-success p {
+  margin-bottom: 10px;
+  line-height: 1.5;
+}
+.Checkout-success code {
+  font-family: "Chivo", monospace;
+  font-size: 15px;
+  background: #f3f7fb;
+  padding: 2px 6px;
+}
+.Checkout-success .btn {
+  margin-top: 26px;
+}
+
+/* ---------- order page ---------- */
+.order-meta {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 8px 18px;
+  font-size: 15px;
+  margin: 12px 0 18px;
+}
+.order-meta dt {
+  color: var(--muted);
+}
+.order-meta dd code {
+  font-family: "Chivo", monospace;
+  font-size: 14px;
+}
+.badge {
+  display: inline-block;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 3px 7px;
+  background: #fff3cd;
+  color: #7a5b00;
+  border-radius: 3px;
+  vertical-align: middle;
+}
+.badge-ok {
+  background: #e6f4ea;
+  color: #1e6b34;
+}
+.badge-err {
+  background: #f2dede;
+  color: #a94442;
+}
+
+footer {
+  margin-top: 60px;
+  padding-top: 16px;
+  border-top: 1px solid #eee;
+  color: var(--muted);
+  font-size: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+}
+footer a {
+  color: var(--muted);
+}
