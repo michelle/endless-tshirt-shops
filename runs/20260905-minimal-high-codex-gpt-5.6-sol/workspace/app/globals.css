@@ -1,0 +1,61 @@
+@import "tailwindcss";
+
+:root { --ink: #121212; --blue: #1e68e5; --blue-soft: #dbeafe; --paper: #f7f5ef; --line: #dedbd1; }
+* { box-sizing: border-box; }
+html { background: var(--paper); }
+body { margin: 0; color: var(--ink); background: var(--paper); font-family: Arial, Helvetica, sans-serif; -webkit-font-smoothing: antialiased; }
+button, input { font: inherit; }
+a { text-underline-offset: 3px; }
+.site-shell { width: min(1180px, calc(100% - 40px)); margin: 0 auto; min-height: 100svh; padding-bottom: 48px; }
+.masthead { border-bottom: 1px solid var(--line); padding: 34px 0 24px; }
+.brand { color: var(--ink); font-size: clamp(32px, 5vw, 56px); line-height: 1; letter-spacing: -0.055em; font-weight: 800; text-decoration: none; }
+.masthead p { color: var(--blue); font-size: 17px; margin: 12px 0 0; }
+.notice { margin-top: 18px; padding: 13px 15px; border: 1px solid #d9b966; background: #fff6d8; font-size: 14px; }
+.product-grid { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(340px, .75fr); gap: clamp(32px, 6vw, 90px); align-items: center; padding: 54px 0 30px; }
+.preview-column { min-width: 0; }
+.shirt-stage { min-height: 600px; position: relative; display: grid; place-items: center; border: 1px solid var(--line); background: #eeece5; overflow: hidden; }
+.shirt-stage::before { content: ""; position: absolute; inset: 0; background: radial-gradient(circle at 50% 43%, rgba(255,255,255,.86), rgba(255,255,255,0) 54%); }
+.shirt { width: min(72%, 460px); aspect-ratio: .84; position: relative; z-index: 1; display: grid; place-items: start center; padding-top: 29%; background: #101010; clip-path: polygon(28% 5%, 39% 0, 43% 8%, 57% 8%, 61% 0, 72% 5%, 100% 21%, 86% 42%, 74% 35%, 77% 100%, 23% 100%, 26% 35%, 14% 42%, 0 21%); filter: drop-shadow(0 22px 18px rgba(0,0,0,.18)); }
+.shirt::after { content: ""; position: absolute; top: 0; left: 39%; width: 22%; height: 10%; background: #eeece5; border-radius: 0 0 55% 55%; }
+.shirt-fitted { width: min(65%, 410px); clip-path: polygon(29% 5%, 40% 0, 44% 8%, 56% 8%, 60% 0, 71% 5%, 96% 21%, 83% 42%, 73% 35%, 80% 100%, 20% 100%, 27% 35%, 17% 42%, 4% 21%); }
+.shirt-stamp { color: #fff; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: clamp(13px, 2.05vw, 24px); font-weight: 700; letter-spacing: .02em; }
+.price-tag { position: absolute; z-index: 2; left: 6%; bottom: 12%; padding: 10px 14px; color: #fff; background: var(--blue); font-size: 19px; font-weight: 700; transform: rotate(-2deg); }
+.price-tag s { opacity: .7; font-weight: 400; margin-right: 5px; }
+.caption { color: #716f68; margin: 13px 0 0; font-size: 13px; }
+.eyebrow { margin: 0 0 14px; color: var(--blue); font-size: 12px; font-weight: 800; letter-spacing: .16em; }
+.purchase-panel h1 { margin: 0; max-width: 430px; font-size: clamp(40px, 5vw, 66px); line-height: .96; letter-spacing: -.055em; }
+.intro { margin: 22px 0 34px; max-width: 400px; color: #66635c; font-size: 17px; line-height: 1.55; }
+fieldset { border: 0; margin: 0 0 24px; padding: 0; }
+legend { margin-bottom: 10px; font-size: 13px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
+.choice-grid { display: grid; border: 1px solid var(--ink); }
+.choice-grid.two { grid-template-columns: repeat(2, 1fr); }
+.choice-grid.four { grid-template-columns: repeat(4, 1fr); }
+.choice { min-height: 50px; display: flex; flex-direction: column; align-items: center; justify-content: center; border-right: 1px solid var(--ink); cursor: pointer; transition: .16s ease; }
+.choice:last-child { border-right: 0; }
+.choice input { position: absolute; opacity: 0; }
+.choice span { font-weight: 700; }
+.choice small { margin-top: 2px; opacity: .62; font-size: 10px; text-transform: uppercase; letter-spacing: .045em; }
+.choice.active { color: #fff; background: var(--ink); }
+.choice:hover { background: var(--blue-soft); color: var(--ink); }
+.buy-button { width: 100%; min-height: 58px; display: flex; justify-content: space-between; align-items: center; margin-top: 7px; padding: 0 20px; border: 0; color: #fff; background: var(--blue); cursor: pointer; font-weight: 800; transition: transform .16s ease, background .16s ease; }
+.buy-button:hover { background: #1559c8; transform: translateY(-1px); }
+.buy-button:disabled { cursor: wait; opacity: .68; transform: none; }
+.buy-button:focus-visible, .choice:focus-within { outline: 3px solid #8ab7ff; outline-offset: 3px; }
+.reassurance { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; margin-top: 14px; color: #77736b; font-size: 11px; text-transform: uppercase; letter-spacing: .04em; }
+.fine-print { margin: 16px 0 0; color: #88847b; font-size: 12px; line-height: 1.45; }
+.error-message { margin: 0 0 12px; padding: 11px 12px; color: #8f1f1f; border: 1px solid #e8baba; background: #fff1f1; font-size: 13px; }
+.confirmation-shell { min-height: 100svh; display: grid; place-items: center; padding: 24px; background: var(--blue); }
+.confirmation-card { width: min(100%, 670px); padding: clamp(32px, 7vw, 72px); background: var(--paper); box-shadow: 16px 16px 0 rgba(0,0,0,.15); }
+.confirmation-card h1 { margin: 0; font-size: clamp(44px, 8vw, 80px); line-height: .95; letter-spacing: -.06em; }
+.status-mark { width: 72px; height: 72px; display: grid; place-items: center; float: right; margin: -32px 0 18px 24px; color: var(--blue); border: 2px solid var(--blue); border-radius: 50%; font-size: 34px; animation: pulse 1.2s ease-in-out infinite; }
+.status-mark.complete { color: #fff; background: var(--blue); animation: none; }
+.confirmation-copy { margin: 25px 0 30px; color: #66635c; font-size: 18px; line-height: 1.55; }
+.order-details { margin: 0 0 30px; border-top: 1px solid var(--line); }
+.order-details div { display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 15px; padding: 13px 0; border-bottom: 1px solid var(--line); }
+.order-details dt { color: #77736b; font-size: 12px; text-transform: uppercase; letter-spacing: .05em; }
+.order-details dd { min-width: 0; margin: 0; overflow-wrap: anywhere; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 13px; }
+.text-link { color: var(--blue); font-weight: 800; }
+@keyframes pulse { 50% { opacity: .4; transform: rotate(12deg); } }
+@media (max-width: 760px) { .site-shell { width: min(100% - 24px, 620px); } .masthead { padding-top: 24px; } .product-grid { grid-template-columns: 1fr; padding-top: 28px; gap: 38px; } .shirt-stage { min-height: 440px; } .purchase-panel h1 { font-size: 48px; } }
+@media (max-width: 430px) { .shirt-stage { min-height: 370px; } .shirt { width: 83%; } .shirt-fitted { width: 75%; } .shirt-stamp { font-size: 12px; } .confirmation-card { padding: 30px 24px; } .status-mark { float: none; margin: 0 0 28px; } .order-details div { grid-template-columns: 1fr; gap: 5px; } }
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; transition: none !important; } }

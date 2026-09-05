@@ -1,0 +1,22 @@
+{
+  "run_id": "20260905-minimal-high-codex-gpt-5.6-sol",
+  "suite_id": "20260905-minimal-high",
+  "status": "succeeded",
+  "adapter": "codex",
+  "model": "gpt-5.6-sol",
+  "reasoning_effort": "high",
+  "branch": "benchmark-results",
+  "vercel_project": "benchmark-20260905-minimal-high-codex-gpt-5.6-sol",
+  "stripe_config_ref": "20260905-minimal-high-codex-gpt-5.6-sol",
+  "stripe_config_path": ".benchmark-secrets/stripe/20260905-minimal-high-codex-gpt-5.6-sol.toml",
+  "base_commit": "cbac7b40b29076ab8bc099486c8333729df00b32",
+  "prompt_file": "prompt-minimal.md",
+  "prompt_sha256": "b211b5d8ded08d9e9f381b7f741f222ad5730eecb87868d4cc437ce10f8a4585",
+  "workspace_tree": "6e0ab17c0a18d7b508d18605a6a9464f95c52b4e",
+  "started_at": "2026-09-05T19:57:01Z",
+  "finished_at": "2026-09-05T20:21:17Z",
+  "duration_seconds": 1456,
+  "agent_exit_code": 0,
+  "usage": {"cached_input_tokens": 15370240, "input_tokens": 15627536, "new_input_tokens": 257296, "output_tokens": 57203},
+  "deployment_url": "https://benchmark-20260905-minimal-high-cod-pi.vercel.app)**\\n\\nVercel"
+}
