@@ -1,0 +1,491 @@
+/*
+ * The original store was Bootstrap 3 with a blue accent, a black tee, and
+ * Stripe's floating-label form. This keeps that palette and that shape without
+ * the framework.
+ */
+
+:root {
+  --ink: #1a1a1a;
+  --blue: #337ab7;
+  --blue-pale: #a4d5ff;
+  --blue-dark: #2a6496;
+  --muted: #9b9b9b;
+  --danger: #eb1c26;
+  --shirt: #111111;
+  --ui: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--ui);
+  font-size: 16px;
+  color: var(--ink);
+  background: #fff;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  color: var(--blue);
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
+
+.Page {
+  max-width: 1020px;
+  margin: 0 auto;
+  padding: 32px 20px 64px;
+}
+
+/* ---------- header ---------- */
+
+.PageHeader {
+  padding-bottom: 9px;
+  margin: 8px 0 28px;
+  border-bottom: 1px solid #eee;
+}
+
+.PageHeader h1 {
+  font-size: 40px;
+  font-weight: 300;
+  line-height: 1.1;
+  margin: 0;
+  letter-spacing: -0.5px;
+}
+
+.PageHeader h2 {
+  color: var(--blue);
+  font-weight: 400;
+  font-size: 19px;
+  margin: 6px 0 0;
+}
+
+.PageHeader-clock {
+  font-size: 17px;
+}
+
+.PageFooter {
+  margin-top: 56px;
+  padding-top: 16px;
+  border-top: 1px solid #eee;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 24px;
+  justify-content: space-between;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+/* ---------- layout ---------- */
+
+.Store-shirt {
+  position: sticky;
+  top: 24px;
+}
+
+.Store {
+  display: grid;
+  grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+  gap: 40px;
+  align-items: start;
+}
+
+@media (max-width: 780px) {
+  .Store-shirt {
+    position: static;
+  }
+  .Store {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 24px;
+  }
+  .PageHeader h1 {
+    font-size: 32px;
+  }
+}
+
+/* ---------- the shirt ---------- */
+
+.Shirt {
+  position: relative;
+  width: 100%;
+  max-width: 520px;
+  margin: 0 auto;
+  user-select: none;
+}
+
+.Shirt-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  fill: var(--shirt);
+}
+
+/* The preview canvas is the print file, composited onto the garment. */
+.Shirt-print {
+  position: absolute;
+  left: 22%;
+  width: 56%;
+  top: 14%;
+  aspect-ratio: 3 / 4;
+  pointer-events: none;
+}
+
+.Shirt-print canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.Shirt-price {
+  position: absolute;
+  /* A price sticker slapped on the garment, as in the original. */
+  top: 58%;
+  left: 29%;
+}
+
+.Shirt-price .tag {
+  display: inline-block;
+  background: var(--blue);
+  color: #fff;
+  font-size: 22px;
+  font-weight: 300;
+  line-height: 1;
+  padding: 8px 12px;
+  border-radius: 4px;
+}
+
+.Shirt-price .tag s {
+  opacity: 0.65;
+  margin-right: 6px;
+}
+
+.Shirt-caption {
+  text-align: center;
+  max-width: 520px;
+  margin-left: auto;
+  margin-right: auto;
+  font-size: 13px;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+/* ---------- option pickers ---------- */
+
+.options {
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.options-row {
+  display: flex;
+  width: 100%;
+  gap: 0;
+}
+
+.options-row .radio {
+  flex: 1 1 0;
+  text-align: center;
+  min-width: 0;
+}
+
+.radio input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.radio label {
+  background-color: var(--blue-pale);
+  color: var(--ink);
+  width: 100%;
+  display: block;
+  padding: 8px 6px;
+  margin: 0;
+  cursor: pointer;
+  line-height: 28px;
+  transition:
+    background-color 150ms ease-in-out,
+    opacity 150ms ease-in-out;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.radio label:hover {
+  opacity: 0.82;
+}
+
+.radio input:checked + label {
+  background-color: #000;
+  color: #fff;
+}
+
+.radio input:focus-visible + label {
+  outline: 2px solid var(--blue-dark);
+  outline-offset: -2px;
+}
+
+/* ---------- checkout ---------- */
+
+.Checkout {
+  min-height: 260px;
+}
+
+.Checkout-express {
+  margin-top: 18px;
+  min-height: 1px;
+}
+
+.Checkout-or {
+  display: block;
+  width: 100%;
+  margin-top: 10px;
+  background: none;
+  border: 0;
+  color: var(--blue);
+  font-size: 14px;
+  cursor: pointer;
+  text-align: center;
+  padding: 6px;
+  font-family: inherit;
+}
+.Checkout-or:hover {
+  text-decoration: underline;
+}
+
+.Checkout-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--muted);
+  font-size: 13px;
+  margin: 20px 0 4px;
+}
+.Checkout-divider::before,
+.Checkout-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: #eee;
+}
+
+.Checkout-section-label {
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 22px 0 8px;
+}
+
+.Checkout-skeleton {
+  height: 220px;
+  border-radius: 6px;
+  background: linear-gradient(90deg, #f6f6f6, #eee, #f6f6f6);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* floating-label field, kept from the original */
+.field-label {
+  position: relative;
+  color: var(--ink);
+  display: block;
+  margin: 22px 0 14px;
+  width: 100%;
+}
+
+.field-label > span {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  font-weight: 400;
+  line-height: 28px;
+  color: var(--ink);
+  border-bottom: 1px solid var(--blue-pale);
+  transition: border-bottom-color 200ms ease-in-out;
+  pointer-events: none;
+}
+
+.field-label > span span {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: 0% 50%;
+  transition: transform 200ms ease-in-out;
+}
+
+.field {
+  background: transparent;
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 400;
+  border: 0;
+  color: var(--ink);
+  outline: none;
+  display: block;
+  width: 100%;
+  line-height: 28px;
+  padding: 0 0 3px;
+  transition: opacity 200ms ease-in-out;
+}
+
+.field::placeholder {
+  color: #ccc;
+}
+
+.field:focus + span,
+.field:not(.is-empty) + span {
+  color: var(--blue);
+}
+
+.field:focus + span span,
+.field:not(.is-empty) + span span {
+  transform: scale(0.8) translateY(-26px);
+}
+
+.field:focus + span {
+  border-bottom-color: var(--blue);
+}
+
+.field.is-invalid + span {
+  color: var(--danger);
+  border-bottom-color: var(--danger);
+}
+
+/* Hide the placeholder until the field is focused, like the original. */
+.field.is-empty:not(:focus)::placeholder {
+  color: transparent;
+}
+
+button.primary {
+  display: block;
+  background: #000;
+  color: #fff;
+  border: 0;
+  margin: 18px 0 8px;
+  font-size: 19px;
+  font-family: inherit;
+  font-weight: 400;
+  width: 100%;
+  height: 47px;
+  line-height: 47px;
+  outline: none;
+  cursor: pointer;
+  transition: opacity 200ms ease-in-out;
+}
+
+button.primary:hover:not(:disabled) {
+  opacity: 0.82;
+}
+button.primary:focus-visible {
+  background: var(--blue);
+}
+button.primary:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
+.spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  margin-right: 8px;
+  vertical-align: -2px;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.alert {
+  border: 1px solid #f0c2c4;
+  background: #fdf2f2;
+  color: #a4272d;
+  padding: 10px 12px;
+  font-size: 14px;
+  border-radius: 4px;
+  margin-top: 14px;
+}
+
+.note {
+  font-size: 13px;
+  color: var(--muted);
+  margin-top: 10px;
+  line-height: 1.5;
+}
+
+/* ---------- confirmation ---------- */
+
+.Checkout-success {
+  text-align: center;
+  padding-top: 12%;
+}
+
+.Checkout-success-title {
+  font-size: 20px;
+  font-weight: 500;
+  margin: 0 0 10px;
+}
+
+.Checkout-success p {
+  margin: 0 0 10px;
+  line-height: 1.55;
+}
+
+.Checkout-success dl {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 4px 14px;
+  text-align: left;
+  font-size: 14px;
+  margin: 18px auto;
+  max-width: 320px;
+}
+.Checkout-success dt {
+  color: var(--muted);
+}
+.Checkout-success dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.Checkout-success code {
+  font-family: 'SF Mono', ui-monospace, Menlo, monospace;
+  font-size: 13px;
+}
+
+.pending {
+  color: var(--muted);
+  font-size: 14px;
+}
