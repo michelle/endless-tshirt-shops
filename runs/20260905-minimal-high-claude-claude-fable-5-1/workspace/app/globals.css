@@ -1,0 +1,382 @@
+:root {
+  --blue: #337ab7;
+  --blue-light: #a4d5ff;
+  --blue-focus: #66afe9;
+  --red: #eb1c26;
+  --grey: #aaa;
+  --grey-light: #eee;
+  --black: #000;
+  --font-ui: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-ui);
+  font-size: 16px;
+  line-height: 1.4;
+  color: var(--black);
+  background: #fff;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: var(--blue);
+}
+
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 20px 60px;
+}
+
+/* Header ----------------------------------------------------------------- */
+.page-header {
+  padding: 40px 0 18px;
+  margin-bottom: 30px;
+  border-bottom: 1px solid var(--grey-light);
+}
+.page-header h1 {
+  font-size: 36px;
+  font-weight: 300;
+  margin: 0;
+  line-height: 1.1;
+}
+.page-header h2 {
+  color: var(--blue);
+  font-weight: 400;
+  font-size: 19px;
+  margin: 5px 0 0;
+  padding: 0;
+}
+.page-header .clock {
+  display: inline-block;
+  margin-left: 6px;
+  vertical-align: -2px;
+}
+
+/* Layout ----------------------------------------------------------------- */
+.store {
+  display: grid;
+  grid-template-columns: 7fr 5fr;
+  gap: 40px;
+  align-items: start;
+}
+@media (max-width: 760px) {
+  .store {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+}
+
+/* Shirt ------------------------------------------------------------------ */
+.Shirt {
+  position: relative;
+  width: 100%;
+  max-width: 600px;
+  user-select: none;
+}
+.Shirt-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.Shirt-time {
+  font-family: var(--font-chivo), "Chivo", sans-serif;
+  font-weight: 500;
+  fill: #fff;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+}
+.Shirt-price {
+  position: absolute;
+  top: 70%;
+  left: 8%;
+}
+.Shirt-price .label {
+  display: inline-block;
+  background: var(--blue);
+  color: #fff;
+  font-size: 24px;
+  font-weight: 300;
+  padding: 4px 10px;
+  border-radius: 4px;
+  line-height: 1.2;
+}
+.Shirt-price .label s {
+  opacity: 0.7;
+  margin-right: 6px;
+}
+.Shirt-caption {
+  color: var(--grey);
+  font-size: 13px;
+  margin: 8px 0 0;
+  max-width: 600px;
+}
+.Shirt-caption strong {
+  color: #555;
+  font-weight: 500;
+}
+.Shirt-caption code {
+  font-family: var(--font-chivo), monospace;
+  font-size: 13px;
+}
+
+/* Option pickers --------------------------------------------------------- */
+.options {
+  display: flex;
+  width: 100%;
+  margin-bottom: 6px;
+}
+.option {
+  flex: 1;
+  position: relative;
+  text-align: center;
+  line-height: 28px;
+}
+.option input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+.option label {
+  display: block;
+  width: 100%;
+  background: var(--blue-light);
+  padding: 8px 14px;
+  margin: 0;
+  cursor: pointer;
+  transition:
+    opacity 200ms ease-in-out,
+    background-color 120ms ease-in-out;
+}
+.option label:hover {
+  opacity: 0.8;
+}
+.option input:checked + label {
+  background: var(--black);
+  color: #fff;
+}
+.option input:focus-visible + label {
+  outline: 2px solid var(--blue);
+  outline-offset: -2px;
+}
+.option-hint {
+  color: var(--grey);
+  font-size: 13px;
+  margin: 2px 0 18px;
+  min-height: 18px;
+}
+
+/* Checkout --------------------------------------------------------------- */
+.Checkout {
+  width: 100%;
+}
+.Checkout-section {
+  margin-top: 22px;
+}
+.Checkout-section-title {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #666;
+  margin: 0 0 10px;
+}
+.Checkout-express {
+  margin-top: 20px;
+}
+.Checkout-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--grey);
+  font-size: 13px;
+  margin: 18px 0 4px;
+}
+.Checkout-divider::before,
+.Checkout-divider::after {
+  content: "";
+  flex: 1;
+  border-top: 1px solid var(--grey-light);
+}
+.Checkout-total {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 18px;
+  padding-top: 12px;
+  border-top: 1px solid var(--grey-light);
+  font-size: 15px;
+}
+.Checkout-total strong {
+  font-weight: 500;
+}
+.Checkout-total .muted {
+  color: var(--grey);
+}
+
+.btn {
+  display: block;
+  width: 100%;
+  background: var(--black);
+  color: #fff;
+  border: 0;
+  margin-top: 15px;
+  font-size: 19px;
+  font-weight: 400;
+  height: 47px;
+  line-height: 45px;
+  cursor: pointer;
+  transition: opacity 200ms ease-in-out;
+  font-family: var(--font-ui);
+}
+.btn:hover {
+  opacity: 0.8;
+}
+.btn:focus-visible,
+.btn:active {
+  background: var(--blue);
+  outline: none;
+}
+.btn[disabled] {
+  opacity: 0.6;
+  cursor: progress;
+}
+.btn-secondary {
+  background: #fff;
+  color: var(--black);
+  border: 1px solid var(--black);
+}
+.btn .spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  margin-right: 8px;
+  vertical-align: -2px;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.8s infinite linear;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.alert {
+  padding: 10px 14px;
+  margin: 14px 0 0;
+  font-size: 14px;
+  border: 1px solid;
+}
+.alert-danger {
+  color: #a94442;
+  background: #f2dede;
+  border-color: #ebccd1;
+}
+.alert-warning {
+  color: #8a6d3b;
+  background: #fcf8e3;
+  border-color: #faebcc;
+}
+.alert-info {
+  color: #31708f;
+  background: #d9edf7;
+  border-color: #bce8f1;
+}
+
+.fine-print {
+  color: var(--grey);
+  font-size: 12px;
+  margin-top: 12px;
+  line-height: 1.5;
+}
+
+/* Success ---------------------------------------------------------------- */
+.Checkout-success {
+  text-align: center;
+  font-size: 16px;
+  padding-top: 12%;
+}
+.Checkout-success-title {
+  font-size: 22px;
+  font-weight: 500;
+  margin: 0 0 12px;
+}
+.Checkout-success p {
+  margin: 8px 0;
+}
+.Checkout-success .stamp {
+  font-family: var(--font-chivo), monospace;
+  font-size: 20px;
+  background: var(--black);
+  color: #fff;
+  display: inline-block;
+  padding: 6px 14px;
+  margin: 10px 0;
+}
+.Checkout-success dl {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 4px 14px;
+  text-align: left;
+  font-size: 14px;
+  margin: 18px auto 0;
+  max-width: 360px;
+}
+.Checkout-success dt {
+  color: #666;
+}
+.Checkout-success dd {
+  margin: 0;
+  word-break: break-all;
+}
+
+/* Skeleton while Stripe.js loads ---------------------------------------- */
+.skeleton {
+  height: 44px;
+  background: linear-gradient(90deg, #f2f2f2 25%, #e6e6e6 37%, #f2f2f2 63%);
+  background-size: 400% 100%;
+  animation: shimmer 1.4s ease infinite;
+  margin-bottom: 10px;
+}
+@keyframes shimmer {
+  0% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0 50%;
+  }
+}
+
+/* Order page ------------------------------------------------------------- */
+.order-page {
+  max-width: 640px;
+  margin: 0 auto;
+}
+.order-page h1 {
+  font-weight: 300;
+  font-size: 30px;
+  margin: 40px 0 20px;
+}
+.order-page .Checkout-success {
+  padding-top: 0;
+  text-align: left;
+}
+.order-page .Checkout-success dl {
+  margin-left: 0;
+}
+footer {
+  margin-top: 60px;
+  color: var(--grey);
+  font-size: 12px;
+}
+footer a {
+  color: var(--grey);
+}
