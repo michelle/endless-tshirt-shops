@@ -1,0 +1,3 @@
+export default function Success() {
+  return <main style={{ minHeight: "100vh", display: "grid", placeItems: "center", padding: "2rem", textAlign: "center" }}><section><p style={{ fontFamily: "monospace", fontSize: 12, letterSpacing: ".12em" }}>ORDER RECEIVED</p><h1 style={{ fontFamily: "Georgia, serif", fontSize: "clamp(3rem, 10vw, 7rem)", margin: "1rem 0" }}>Your moment<br />is on its way.</h1><p>We’ll email your receipt now and shipping updates when your one-of-one shirt moves.</p><a href="/" style={{ color: "inherit", display: "inline-block", marginTop: 24 }}>Make another moment →</a></section></main>;
+}
