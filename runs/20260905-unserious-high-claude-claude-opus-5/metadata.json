@@ -1,0 +1,22 @@
+{
+  "run_id": "20260905-unserious-high-claude-claude-opus-5",
+  "suite_id": "20260905-unserious-high",
+  "status": "succeeded",
+  "adapter": "claude",
+  "model": "claude-opus-5",
+  "reasoning_effort": "high",
+  "branch": "benchmark-results",
+  "vercel_project": "benchmark-20260905-unserious-high-claude-claude-opus-5",
+  "stripe_config_ref": "20260905-unserious-high-claude-claude-opus-5",
+  "stripe_config_path": ".benchmark-secrets/stripe/20260905-unserious-high-claude-claude-opus-5.toml",
+  "base_commit": "47f0fee2d4632ed732b3df43ce90e4763fe117a6",
+  "prompt_file": "prompt-unserious.md",
+  "prompt_sha256": "5ea01768db6286008e7b9ae6298f5396bfb729894c714e240b90676a14a331eb",
+  "workspace_tree": "0a834a9618df4d6a3823e9b29b7826ff43535bda",
+  "started_at": "2026-09-06T05:15:18Z",
+  "finished_at": "2026-09-06T05:52:49Z",
+  "duration_seconds": 2251,
+  "agent_exit_code": 0,
+  "usage": {"cache_creation_input_tokens": 169335, "cache_read_input_tokens": 9642272, "input_tokens": 252, "new_input_tokens": 169587, "output_tokens": 106980},
+  "deployment_url": "https://benchmark-20260905-unserious-high-c-tan.vercel.app**\\n\\nVercel"
+}
