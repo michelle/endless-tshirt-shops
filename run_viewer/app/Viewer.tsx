@@ -2,13 +2,14 @@
 
 import Image from "./ArchiveImage";
 import { assetUrl } from "./asset-url";
-import { useEffect, useId, useMemo, useRef, useState, useSyncExternalStore } from "react";
+import { useCallback, useEffect, useId, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import ReactMarkdown, { type Components } from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { suites, type Storefront } from "./data";
 import { explainStatus } from "./status";
 import { rateRun } from "./ratings";
 import { summaryHeadings } from "./summary-headings";
+import { useDrawerSwipe } from "./use-drawer-swipe";
 
 function ignoreShortcut(event: KeyboardEvent) {
   const target = event.target;
@@ -161,10 +162,11 @@ export default function Viewer() {
   const selectedIndex = suite.runs.findIndex((run) => run.id === selectedRunId);
   const drawerOpen = Boolean(selectedRun);
 
-  function moveRun(direction: number) {
+  const moveRun = useCallback((direction: number) => {
     const nextRun = suite.runs[selectedIndex + direction];
     if (nextRun) navigateToRun(suite.id, nextRun.id);
-  }
+  }, [suite, selectedIndex]);
+  useDrawerSwipe(drawerContent, moveRun);
 
   useEffect(() => {
     function scrollPage(event: KeyboardEvent) {
@@ -297,12 +299,13 @@ export default function Viewer() {
 
               <div className="card-content">
               {storefront && (
-                <a
+                <button
+                  type="button"
                   className="storefront-thumbnail"
-                  href={run.deployment}
-                  target="_blank"
-                  rel="noreferrer"
-                  aria-label={`Open storefront by ${modelName(run.model)}`}
+                  aria-label={`View storefront screenshot for ${modelName(run.model)}`}
+                  aria-haspopup="dialog"
+                  aria-controls="run-drawer"
+                  onClick={() => navigateToRun(suite.id, run.id)}
                 >
                   <Image
                     src={storefront.screenshot}
@@ -312,7 +315,7 @@ export default function Viewer() {
                     sizes="(max-width: 680px) 100vw, (max-width: 900px) 25vw, 14vw"
                     unoptimized
                   />
-                </a>
+                </button>
               )}
 
               <div
@@ -390,7 +393,7 @@ export default function Viewer() {
                 </button>
               </div>
             </div>
-            <div className="drawer-content" ref={drawerContent} role="region" aria-label="Run details and final output (j/k to scroll)" aria-keyshortcuts="j k">
+            <div className="drawer-content" ref={drawerContent} role="region" aria-label="Run details and final output (swipe left/right for runs, j/k to scroll)" aria-keyshortcuts="j k">
               {selectedStorefront && (
                 <figure className="storefront-preview">
                   <a href={selectedRun.deployment} target="_blank" rel="noreferrer" aria-label="Open storefront from screenshot">

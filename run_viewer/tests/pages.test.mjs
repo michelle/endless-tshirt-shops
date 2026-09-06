@@ -70,13 +70,12 @@ test("static Pages viewer supports suite links, history, scoring, and all archiv
       assert.ok((await customerArt.getAttribute("src")).endsWith(suite.includes("minimal") ? "/paid-design.png" : "/design.jpg"), "Customer artwork must not be replaced with smoke-test placeholders or earlier local reproductions");
       assert.deepEqual(await customerArt.evaluate((image) => [image.naturalWidth, image.naturalHeight]), [4665, 5844]);
       for (const card of await page.locator(".design-card").all()) {
-        const thumbnail = card.locator("a.storefront-thumbnail");
-        assert.equal(await thumbnail.getAttribute("target"), "_blank");
-        const deployment = await thumbnail.getAttribute("href");
-        await card.locator(".run-details-button").click();
+        const thumbnail = card.locator("button.storefront-thumbnail");
+        assert.equal(await thumbnail.getAttribute("aria-haspopup"), "dialog");
+        await thumbnail.click();
         const dialog = page.getByRole("dialog");
         const storefrontLink = dialog.locator(".drawer-heading").getByRole("link", { name: "Storefront ↗", exact: true });
-        assert.equal(await storefrontLink.getAttribute("href"), deployment);
+        const deployment = await storefrontLink.getAttribute("href");
         const screenshotLink = dialog.getByRole("link", { name: "Open storefront from screenshot", exact: true });
         assert.equal(await screenshotLink.getAttribute("href"), deployment);
         assert.equal(await screenshotLink.getAttribute("target"), "_blank");

@@ -46,6 +46,9 @@ jobs:
       - run: npm run test:pages
         env:
           VIEWER_BASE_PATH: "${{ steps.pages.outputs.base_path }}/"
+      - run: npm run test:mobile
+        env:
+          VIEWER_BASE_PATH: "${{ steps.pages.outputs.base_path }}/"
       - uses: actions/upload-pages-artifact@v4
         with:
           path: run_viewer/out

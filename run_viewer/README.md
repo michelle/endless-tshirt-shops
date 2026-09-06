@@ -47,11 +47,17 @@ files, not recreated artwork. The manifest records their source, dimensions,
 capture time, and found/missing/unavailable status. A social card is separate
 from the customer's print artwork. New suite captures collect these automatically.
 
-Click Details to open the run drawer. Screenshots on cards and in the drawer
-open the live storefront in a new tab, as does the storefront link at the top.
+Click a card's screenshot or Details to open the run drawer. The large screenshot
+inside the drawer opens the live storefront in a new tab, as does the storefront link at the top.
 Use Left/Right or h/l
 to navigate within the selected suite; j/k scroll down/up and Escape closes it.
 With the drawer closed, j/k scroll the main page instead.
+On touchscreens, swipe left/right inside the drawer for the next/previous run.
+Only deliberate horizontal swipes navigate; vertical scrolling, pinch zoom,
+screen-edge gestures, text links, controls, and scrollable tables/code remain
+native. Screenshot taps still open the storefront; swiping one changes runs.
+Navigation stops at the first/last model. Touch controls have larger hit areas;
+desktop density and main-page vertical scrolling are unchanged.
 The arrow buttons show navigation shortcuts in their tooltips. Shortcuts ignore
 text inputs, editable content, composition, and modifier keys. Hover
 or focus a status (or tap its question mark) for plain-English definitions.
@@ -93,6 +99,10 @@ link address to share that section, including the selected suite.
 With the local viewer running, `npm run test:keyboard` checks keyboard navigation,
 focus at the first/last run, and drawer scrolling. Set `VIEWER_URL` if the server
 uses a different URL, and `CAPTURE_BROWSER=chrome` to test with installed Chrome.
+After `npm run build:pages`, `npm run test:mobile` checks phone layouts and
+browser-dispatched touch input, including swipe boundaries, vertical/table
+scrolling, multi-touch, cancellation, and screenshot taps. It also runs before
+automatic Pages deployments. Physical iOS/Android testing is still worthwhile.
 
 ## Capture a suite
 

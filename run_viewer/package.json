@@ -16,6 +16,7 @@
     "build:pages": "vite build --config vite.pages.config.ts && node scripts/prepare-pages.mjs",
     "preview:pages": "vite preview --config vite.pages.config.ts",
     "test:pages": "node --test tests/pages.test.mjs",
+    "test:mobile": "node --test tests/mobile.test.mjs",
     "start": "WRANGLER_LOG_PATH=.wrangler/wrangler.log vinext start",
     "test": "npm run build && node --test tests/viewer.test.mjs",
     "lint": "eslint . --ignore-pattern dist --ignore-pattern .next"

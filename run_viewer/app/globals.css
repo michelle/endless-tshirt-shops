@@ -423,3 +423,12 @@ code {
   select { width: 100%; min-width: 0; }
   .evidence { min-height: 0; }
 }
+
+@media (pointer: coarse) {
+  .drawer-close { min-width: 44px; min-height: 44px; justify-content: center; }
+  .drawer-permalink, .run-details-button, .run-status, select { min-height: 44px; }
+  .drawer-permalink, .run-status { min-width: 44px; }
+  .drawer-suite a, .card-links a, .suite-meta a { display: inline-flex; align-items: center; min-height: 44px; }
+  input[type="color"] { width: 44px; height: 44px; }
+  select { font-size: 16px; }
+}
