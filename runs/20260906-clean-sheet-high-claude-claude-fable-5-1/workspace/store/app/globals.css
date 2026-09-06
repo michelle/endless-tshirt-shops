@@ -1,0 +1,13 @@
+@import "tailwindcss";
+
+@theme inline {
+  --font-sans: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-mono), ui-monospace, Menlo, monospace;
+  --color-ink: #0b0c0e;
+  --color-paper: #f5f4f0;
+  --color-accent: #7cf29a;
+  --color-muted: #8b8f98;
+}
+
+html { color-scheme: dark; }
+body { @apply bg-ink text-paper font-sans antialiased; }
