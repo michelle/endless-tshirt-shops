@@ -11,7 +11,7 @@ vercel login                         # the one interactive setup step
 export PRODIGI_API_KEY='prodigi-test-key'
 ```
 
-`PRODIGI_API_KEY` should be a sandbox/test key. `timeout` (Linux) or `gtimeout` (macOS Coreutils), Git, and an `origin` remote are required. For CI, use masked `PRODIGI_API_KEY`, `VERCEL_TOKEN`, `VERCEL_ORG_ID`, and `VERCEL_PROJECT_ID`; Vercel must be invoked with its token and `--yes`.
+`PRODIGI_API_KEY` should be a sandbox/test key. Node.js 20.11+, Python 3, `timeout` (Linux) or `gtimeout` (macOS Coreutils), Git, and an `origin` remote are required. For CI, use masked `PRODIGI_API_KEY`, `VERCEL_TOKEN`, `VERCEL_ORG_ID`, and `VERCEL_PROJECT_ID`; Vercel must be invoked with its token and `--yes`.
 
 ## Run
 
@@ -53,13 +53,16 @@ These files are committed under `runs/<run-id>/` on `benchmark-results`.
 runs/<run-id>/
   workspace/       generated application code
   final.md         agent's final completion report
-  agent.log        redacted execution transcript
+  agent.log        public tool-evidence projection (not the raw transcript)
+  events.jsonl     versioned normalized tool/web events, excluding raw inputs/results
+  capture.json     capture coverage, missing-history warnings, schema version
   metadata.json    suite, prompt, model, effort, usage, base/tree hashes, status, timing, URL
   usage.json       provider-reported token usage, including normalized new-input tokens when available
-  agent.raw.log    untracked local source transcript
 ```
 
-The runner redacts injected secret values and common Stripe/Vercel key formats before committing `agent.log`; it scans staged output and refuses to commit if known secrets remain. Raw logs stay untracked. Review the pushed `benchmark/<run-id>` branch rather than trusting the agent's report alone.
+Both adapters retain incremental, permissions-protected raw events at `.benchmark-secrets/transcripts/<run-id>/transcript.jsonl`, including partial runs. These private files survive successful result cleanup and are never committed. They can contain credentials, customer data, source URLs and full tool outputs; do not publish them. There is no automatic retention expiry. The temporary `agent.raw.log` is also untracked and removed with successful run cleanup.
+
+Public tool events retain tool names, lifecycle status, topic classifications, documentation URL paths and hashed search queries, but not commands, raw query text or tool results. The staged-output secret scan remains a separate defense for generated source and final reports, not a general PII guarantee. Review artifacts before further publication. Older runs retain their original log formats; missing Claude tool history cannot be recovered from a final-result envelope.
 
 To inspect or claim a run's sandbox later, use its saved profile directly (substitute the run ID):
 
@@ -68,11 +71,35 @@ stripe --config .benchmark-secrets/stripe/<run-id>.toml payment_intents list --l
 stripe --config .benchmark-secrets/stripe/<run-id>.toml sandbox claim --non-interactive
 ```
 
-Run `tests/run-benchmark-test.sh` to verify the runner locally with fake CLIs and a temporary bare Git remote; it makes no network or model calls.
+## Inspect a completed suite
+
+For an unattended serial suite in a dedicated clean worktree:
+
+```sh
+node scripts/run-suite.mjs --suite 20260906-minimal-inspector-high \
+  --prompt prompt-minimal.md --effort high --timeout 7200
+```
+
+This runs all seven models in harness order, records private progress under `.benchmark-secrets/suites/<suite>/`, and invokes the live read-only inspector after all attempts. Published model failures do not stop later models; publication/cleanup failures pause the controller with artifacts preserved. It refuses duplicate launches for the same suite; inspect interrupted state before deciding how to resume. Run it under your normal persistent process supervisor for unattended operation. A sleeping/offline laptop can still interrupt network work. Completion means `awaiting-human-audit`, not an automatic passing score or viewer publication.
+
+```sh
+git fetch origin benchmark-results
+node scripts/run-inspector/inspect.mjs --suite 20260905-minimal-high --expected-runs 7
+```
+
+Offline by default. Produces a private versioned evidence report and reusable Markdown section, covering documentation use, frameworks, source review cues and run isolation. Add `--live` for read-only Stripe/Prodigi sandbox observations. See [inspector instructions](scripts/run-inspector/README.md) for artwork recovery, screenshot/favicon/social-preview staging, snapshot replay and safe summary updates. The inspector does not launch model runs, execute archived code, create orders/payments, assign ratings or publish viewer changes.
+
+Tests (fake CLIs, local Git fixtures, mocked APIs; no model calls):
+
+```sh
+python3 -m pip install -r scripts/run-inspector/requirements.txt
+node --test tests/run-inspector.test.mjs tests/adapter-capture.test.mjs tests/run-suite.test.mjs
+bash tests/run-benchmark-test.sh
+```
 
 ## Adapter contract
 
-`scripts/adapters/codex` and `scripts/adapters/claude` receive `BENCHMARK_WORKSPACE`, `BENCHMARK_PROMPT_FILE`, `BENCHMARK_MODEL`, `BENCHMARK_FINAL_OUTPUT`, `BENCHMARK_VERCEL_PROJECT`, `BENCHMARK_STRIPE_CONFIG`, and optional `BENCHMARK_REASONING_EFFORT`. New providers should implement the same contract, run without prompts, write only the final answer to `BENCHMARK_FINAL_OUTPUT`, and emit all other output to stdout/stderr. Use `--reasoning-effort` to pin an effort level and record it in metadata; omit it to retain each provider's default.
+`scripts/adapters/codex` and `scripts/adapters/claude` receive `BENCHMARK_WORKSPACE`, `BENCHMARK_PROMPT_FILE`, `BENCHMARK_MODEL`, `BENCHMARK_FINAL_OUTPUT`, `BENCHMARK_USAGE_OUTPUT`, `BENCHMARK_CAPTURE_DIR`, `BENCHMARK_VERCEL_PROJECT`, `BENCHMARK_STRIPE_CONFIG`, and optional `BENCHMARK_REASONING_EFFORT`. New providers should implement the same contract, run without prompts, write only the final answer to `BENCHMARK_FINAL_OUTPUT`, and emit other output to stdout/stderr. Keep incremental raw records private in the capture directory; extend the normalizer and its tests before supporting a new event format. Use `--reasoning-effort` to pin an effort level and record it in metadata; omit it to retain each provider's default. Codex uses `exec --json`; Claude uses `--output-format stream-json --verbose`. Do not override capture-format flags through extra CLI arguments.
 
 ## Informal comparison
 

@@ -1,0 +1,2 @@
+# Only artwork pixel inspection needs Pillow; other inspector features use Node built-ins.
+Pillow==11.3.0

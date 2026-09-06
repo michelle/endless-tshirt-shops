@@ -1,0 +1,12 @@
+import { readFileSync, writeFileSync, existsSync } from 'node:fs';
+import path from 'node:path';
+import { normalize } from './transcript.mjs';
+const [provider, capture, output] = process.argv.slice(2);
+const file = path.join(capture, 'transcript.jsonl');
+const result = normalize(existsSync(file) ? readFileSync(file, 'utf8') : '', provider);
+const json = value => JSON.stringify(value, null, 2) + '\n';
+writeFileSync(path.join(output, 'capture.json'), json(result.coverage));
+writeFileSync(path.join(output, 'events.jsonl'), result.events.map(e => JSON.stringify(e)).join('\n') + '\n');
+writeFileSync(path.join(output, 'agent.log'), 'Detailed transcript is private; arbitrary arguments/results omitted [REDACTED].\n' + result.events.map(e => JSON.stringify(e)).join('\n') + '\n');
+if (result.usage) writeFileSync(path.join(output, 'usage.json'), json(result.usage));
+if (provider === 'claude' && result.final !== null) writeFileSync(path.join(output, 'final.md'), result.final + (result.final.endsWith('\n') ? '' : '\n'));

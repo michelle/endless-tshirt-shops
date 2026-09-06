@@ -79,7 +79,8 @@ printf '%s\n' \
   '#!/usr/bin/env bash' \
   'set -euo pipefail' \
   'printf "claude app\\n" > claude.txt' \
-  "printf '%s\\n' '{\"result\":\"claude final report\",\"usage\":{\"input_tokens\":21,\"output_tokens\":13}}'" >"$BIN/claude"
+  "printf '%s\\n' '{\"type\":\"assistant\",\"message\":{\"content\":[{\"type\":\"tool_use\",\"id\":\"search1\",\"name\":\"WebSearch\",\"input\":{\"query\":\"stripe docs private@example.com\"}}]}}'" \
+  "printf '%s\\n' '{\"type\":\"result\",\"result\":\"claude final report\",\"usage\":{\"input_tokens\":21,\"output_tokens\":13}}'" >"$BIN/claude"
 chmod +x "$BIN/claude"
 
 run() {
@@ -117,6 +118,9 @@ SUCCESS_USAGE=$(git --git-dir="$REMOTE" show benchmark-results:runs/success/usag
 [[ $SUCCESS_USAGE == *'"new_input_tokens": 11'* ]] || fail 'Codex new input usage was not recorded'
 assert test ! -e "$REPO/runs/success"
 assert test -s "$REPO/.benchmark-secrets/stripe/success.toml"
+assert test -s "$REPO/.benchmark-secrets/transcripts/success/transcript.jsonl"
+assert git --git-dir="$REMOTE" cat-file -e benchmark-results:runs/success/capture.json
+assert git --git-dir="$REMOTE" cat-file -e benchmark-results:runs/success/events.jsonl
 assert test "$(cat "$GLOBAL_STRIPE_CONFIG")" = 'original global Stripe config'
 assert git -C "$REPO" check-ignore -q .benchmark-secrets/stripe/success.toml
 if git --git-dir="$REMOTE" cat-file -e benchmark-results:.benchmark-secrets/stripe/success.toml 2>/dev/null; then
@@ -153,6 +157,9 @@ CLAUDE_FINAL=$(git --git-dir="$REMOTE" show benchmark-results:runs/claude/final.
 assert test "$CLAUDE_FINAL" = 'claude final report'
 CLAUDE_USAGE=$(git --git-dir="$REMOTE" show benchmark-results:runs/claude/usage.json)
 [[ $CLAUDE_USAGE == *'"new_input_tokens": 21'* ]] || fail 'Claude new input usage was not recorded'
+CLAUDE_EVENTS=$(git --git-dir="$REMOTE" show benchmark-results:runs/claude/events.jsonl)
+[[ $CLAUDE_EVENTS == *'"operation":"search"'* ]] || fail 'Claude tool history was not captured'
+[[ $CLAUDE_EVENTS != *'private@example.com'* ]] || fail 'raw query leaked into public events'
 
 set +e
 (

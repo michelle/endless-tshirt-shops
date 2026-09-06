@@ -31,7 +31,40 @@ changes. The runner requires a clean worktree, so stash those changes before the
 first run and restore them after the last run. Give each run enough time to
 build, test, and deploy; do not impose a short outer timeout.
 
-After all seven attempts, independently inspect the committed artifacts, saved
+Alternatively, preserve local changes by using a dedicated clean worktree at
+the intended base commit. `node scripts/run-suite.mjs --suite <suite-id>
+--prompt <prompt-file> --effort high --timeout 7200` orchestrates the same
+seven serial runner calls and records durable private progress. It stops if
+publication or cleanup fails and invokes the inspector after all attempts.
+Use a persistent process supervisor when launching unattended; do not leave
+an unawaited in-tool promise as the only controller.
+
+After all seven attempts, use the durable inspector first; do not rewrite
+ad-hoc transcript parsers, pagination scripts or image-stat utilities for each
+suite:
+
+```sh
+git fetch origin benchmark-results
+node scripts/run-inspector/inspect.mjs --suite <suite-id> --expected-runs 7 --live
+```
+
+See `scripts/run-inspector/README.md` for private snapshot replay, explicit
+artwork selection, browser capture staging and summary refresh. Supply
+`--profiles` if the saved Stripe profiles belong to another worktree. Missing
+API permissions or tool history must remain unknown, not pass/zero. The
+inspector does not execute archived apps, create payments/orders, assign
+ratings or publish. Review its evidence and perform the remaining semantic
+audit; do not treat paid-object linkage as proof of the customer checkout path.
+
+New runs retain full raw tool streams privately under
+`.benchmark-secrets/transcripts/<run-id>/`; only filtered events and capture
+coverage are committed. Never publish raw transcripts or API snapshots. Old
+Claude final-result-only logs cannot answer documentation-use questions. Report
+searches, document requests, local reference reads and failed/incomplete calls
+separately for Stripe, Prodigi and frameworks. Do not infer training-data
+reliance or comprehension from absent/present lookups.
+
+Independently inspect the committed artifacts, saved
 Stripe profiles, Prodigi sandbox orders, and live deployments. Do not rely only
 on the agents' completion reports. Create a Markdown report covering:
 
@@ -72,6 +105,16 @@ run_viewer/public/suites/<suite-id>/summary.md
 run_viewer/public/suites/<suite-id>/runs/<run-id>/final.md
 run_viewer/public/suites/<suite-id>/runs/<run-id>/design.png
 ```
+
+Keep the human audit outside the inspector's generated markers. Use
+`--update-summary run_viewer/public/suites/<suite-id>/summary.md` to add or
+refresh automated evidence without replacing editorial findings or heading
+permalinks. Use `--artwork <private-plan.json>` for byte-preserving recovery and
+alpha/hash statistics; inspect its changeable-background `artwork/proof.html`.
+`--capture` can stage screenshots, favicons, social previews and final outputs
+privately before viewer import. Review every staged artifact and retain the
+existing short run IDs when updating an existing suite. Before committing or
+publishing, run the viewer's `npm run predeploy` asset/permalink checks.
 
 Use the image's real extension when it is not PNG. Copy `final.md` verbatim and
 copy the generated suite report to `summary.md`. The primary viewer image should

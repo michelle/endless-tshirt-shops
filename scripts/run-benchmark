@@ -60,18 +60,6 @@ extract_url() {
   grep -Eo 'https://[^[:space:]"'"'"'<>]+' "$1" 2>/dev/null | grep -E 'vercel\.app|vercel\.sh' | tail -n 1 || true
 }
 
-redact_log() {
-  local raw_log=$1 redacted_log=$2 value variable
-  cp "$raw_log" "$redacted_log"
-  for variable in PRODIGI_API_KEY STRIPE_SECRET_KEY STRIPE_PUBLISHABLE_KEY STRIPE_WEBHOOK_SECRET VERCEL_TOKEN; do
-    value=${!variable-}
-    if [[ -n $value ]]; then
-      REDACT_VALUE=$value perl -0pi -e 's/\Q$ENV{REDACT_VALUE}\E/[REDACTED]/g' "$redacted_log"
-    fi
-  done
-  perl -0pi -e 's/\b(?:sk|pk|rkcs|rk)_(?:test|live)_[A-Za-z0-9_=-]+/[REDACTED_STRIPE_KEY]/g; s/\bwhsec_[A-Za-z0-9_=-]+/[REDACTED_STRIPE_WEBHOOK_SECRET]/g; s/\b(?:test|live)_[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\b/[REDACTED_PRODIGI_KEY]/gi; s/\b(?:vercel|vcp)_[A-Za-z0-9_=-]+/[REDACTED_VERCEL_TOKEN]/gi' "$redacted_log"
-}
-
 assert_no_staged_secrets() {
   local value variable
   for variable in PRODIGI_API_KEY STRIPE_SECRET_KEY STRIPE_PUBLISHABLE_KEY STRIPE_WEBHOOK_SECRET VERCEL_TOKEN; do
@@ -136,6 +124,8 @@ git remote get-url origin >/dev/null 2>&1 || die "origin remote is required"
 SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 ADAPTER_PATH="$SCRIPT_DIR/adapters/$ADAPTER"
 [[ -x $ADAPTER_PATH ]] || die "adapter is not executable: $ADAPTER_PATH"
+command -v node >/dev/null 2>&1 || die "Node.js 20.11+ is required for transcript capture"
+node -e 'const [major, minor] = process.versions.node.split(".").map(Number); if (major < 20 || (major === 20 && minor < 11)) process.exit(1)' || die "Node.js 20.11+ is required"
 command -v "$ADAPTER" >/dev/null 2>&1 || die "$ADAPTER CLI is not installed or not on PATH"
 STRIPE_REAL=$(command -v stripe) || die "Stripe CLI is not installed or not on PATH"
 TIMEOUT_COMMAND=$(command -v timeout || command -v gtimeout || true)
@@ -164,11 +154,13 @@ METADATA="$RESULT_DIR/metadata.json"
 USAGE_OUTPUT="$RESULT_DIR/usage.json"
 STRIPE_CONFIG_DIR="$REPO_ROOT/.benchmark-secrets/stripe"
 STRIPE_CONFIG="$STRIPE_CONFIG_DIR/$RUN_ID.toml"
+CAPTURE_DIR="$REPO_ROOT/.benchmark-secrets/transcripts/$RUN_ID"
 GLOBAL_STRIPE_CONFIG=${BENCHMARK_GLOBAL_STRIPE_CONFIG:-"${HOME:?}/.config/stripe/config.toml"}
 [[ $GLOBAL_STRIPE_CONFIG == /* ]] || die "global Stripe config path must be absolute"
 
 [[ ! -e $RESULT_DIR ]] || die "run directory already exists: runs/$RUN_ID"
 [[ ! -e $STRIPE_CONFIG ]] || die "Stripe config already exists for this run: .benchmark-secrets/stripe/$RUN_ID.toml"
+[[ ! -e $CAPTURE_DIR ]] || die "private transcript already exists for this run"
 git show-ref --verify --quiet "refs/heads/$EXECUTION_BRANCH" && die "temporary branch already exists: $EXECUTION_BRANCH"
 git show-ref --verify --quiet "refs/heads/$PUBLISH_BRANCH" && die "temporary branch already exists: $PUBLISH_BRANCH"
 git fetch -q origin "$RESULTS_BRANCH" >/dev/null 2>&1 || true
@@ -326,12 +318,14 @@ export BENCHMARK_REASONING_EFFORT="$REASONING_EFFORT"
 export BENCHMARK_USAGE_OUTPUT="$USAGE_OUTPUT"
 export BENCHMARK_STRIPE_CONFIG="$STRIPE_CONFIG"
 export BENCHMARK_STRIPE_CONFIG_REF=".benchmark-secrets/stripe/$RUN_ID.toml"
+export BENCHMARK_CAPTURE_DIR="$CAPTURE_DIR"
 
 set +e
 PATH="$STRIPE_SHIM_DIR:$PATH" "$TIMEOUT_COMMAND" "$TIMEOUT_SECONDS" "$ADAPTER_PATH" "${EXTRA_ARGS[@]}" >"$RAW_LOG" 2>&1
 AGENT_EXIT=$?
 set -e
 restore_global_stripe_config
+node "$SCRIPT_DIR/run-inspector/finalize-capture.mjs" "$ADAPTER" "$CAPTURE_DIR" "$RESULT_DIR" || die "could not finalize transcript capture"
 
 tar -C "$AGENT_WORKSPACE" --exclude=.git --exclude=node_modules --exclude=.next --exclude=reference -cf - . | tar -C "$WORKSPACE" -xf -
 if ! assert_only_run_output_changed; then
@@ -348,12 +342,11 @@ elif (( AGENT_EXIT != 0 )); then
   RUN_STATUS=failed
 fi
 if [[ ! -s $FINAL_OUTPUT ]]; then
-  printf 'No final completion message was produced. See agent.log for the redacted transcript.\n' >"$FINAL_OUTPUT"
+  printf 'No final completion message was produced. See capture.json and events.jsonl for capture coverage and tool evidence.\n' >"$FINAL_OUTPUT"
   [[ $RUN_STATUS == succeeded ]] && RUN_STATUS=failed
 fi
 
-redact_log "$RAW_LOG" "$REDACTED_LOG"
-DEPLOYMENT_URL=$(extract_url "$REDACTED_LOG")
+DEPLOYMENT_URL=$(extract_url "$FINAL_OUTPUT")
 USAGE_JSON=null
 if [[ -s $USAGE_OUTPUT ]] && python3 - "$USAGE_OUTPUT" >/dev/null <<'PY'
 import json
@@ -373,6 +366,7 @@ WORKSPACE_TREE=$(git write-tree)
   printf '  "suite_id": '; json_string "$SUITE_ID"; printf ',\n'
   printf '  "status": '; json_string "$RUN_STATUS"; printf ',\n'
   printf '  "adapter": '; json_string "$ADAPTER"; printf ',\n'
+  printf '  "capture_version": 1,\n'
   printf '  "model": '; json_string "$MODEL"; printf ',\n'
   printf '  "reasoning_effort": '; json_string "$REASONING_EFFORT"; printf ',\n'
   printf '  "branch": '; json_string "$RESULTS_BRANCH"; printf ',\n'
@@ -432,4 +426,7 @@ git branch -D "$EXECUTION_BRANCH" "$PUBLISH_BRANCH" >/dev/null
 cleanup_local_run
 printf 'run=%s status=%s branch=%s commit=%s\n' "$RUN_ID" "$RUN_STATUS" "$RESULTS_BRANCH" "$RESULT_COMMIT"
 [[ -n $DEPLOYMENT_URL ]] && printf 'deployment_url=%s\n' "$DEPLOYMENT_URL"
-[[ $RUN_STATUS == succeeded ]] || exit "$AGENT_EXIT"
+if [[ $RUN_STATUS != succeeded ]]; then
+  (( AGENT_EXIT != 0 )) && exit "$AGENT_EXIT"
+  exit 1
+fi
