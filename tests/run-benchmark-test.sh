@@ -20,8 +20,9 @@ git init -q -b main "$REPO"
 git -C "$REPO" config user.email benchmark-test@example.com
 git -C "$REPO" config user.name benchmark-test
 printf 'test prompt\n' >"$REPO/prompt.md"
+printf 'beauty prompt\n' >"$REPO/prompt-beauty.md"
 printf 'runs/*/agent.raw.log\n.benchmark-secrets/\n' >"$REPO/.gitignore"
-git -C "$REPO" add prompt.md .gitignore
+git -C "$REPO" add prompt.md prompt-beauty.md .gitignore
 git -C "$REPO" commit -qm baseline
 git init -q --bare "$REMOTE"
 git -C "$REPO" remote add origin "$REMOTE"
@@ -82,14 +83,16 @@ printf '%s\n' \
 chmod +x "$BIN/claude"
 
 run() {
+  local run_id=$1
+  shift
   (
     cd "$REPO"
     PATH="$BIN:$PATH" PRODIGI_API_KEY=test_11111111-1111-1111-1111-111111111111 "$ROOT/scripts/run-benchmark" \
-      --adapter codex --model fake --timeout 5 --run-id "$1"
+      --adapter codex --model fake --timeout 5 --run-id "$run_id" "$@"
   )
 }
 
-SUCCESS_OUTPUT=$(run success)
+SUCCESS_OUTPUT=$(run success --suite-id beauty-suite --prompt-file prompt-beauty.md)
 [[ $SUCCESS_OUTPUT == *'agent_summary='* ]] || fail 'agent summary location was not printed'
 [[ $SUCCESS_OUTPUT == *'final report'* ]] || fail 'agent summary contents were not printed'
 assert test "$(git -C "$REPO" branch --show-current)" = main
@@ -104,6 +107,10 @@ assert git --git-dir="$REMOTE" show benchmark-results:runs/success/final.md
 SUCCESS_METADATA=$(git --git-dir="$REMOTE" show benchmark-results:runs/success/metadata.json)
 [[ $SUCCESS_METADATA == *'"vercel_project": "benchmark-success"'* ]] || fail 'Vercel project was not recorded'
 [[ $SUCCESS_METADATA == *'"reasoning_effort": ""'* ]] || fail 'default reasoning effort was not recorded'
+[[ $SUCCESS_METADATA == *'"suite_id": "beauty-suite"'* ]] || fail 'suite ID was not recorded'
+[[ $SUCCESS_METADATA == *'"prompt_file": "prompt-beauty.md"'* ]] || fail 'prompt filename was not recorded'
+EXPECTED_PROMPT_SHA=$(shasum -a 256 "$REPO/prompt-beauty.md" | awk '{print $1}')
+[[ $SUCCESS_METADATA == *'"prompt_sha256": "'"$EXPECTED_PROMPT_SHA"'"'* ]] || fail 'selected prompt hash was not recorded'
 [[ $SUCCESS_METADATA == *'"stripe_config_ref": "success"'* ]] || fail 'Stripe config reference was not recorded'
 [[ $SUCCESS_METADATA == *'"stripe_config_path": ".benchmark-secrets/stripe/success.toml"'* ]] || fail 'Stripe config path was not recorded'
 SUCCESS_USAGE=$(git --git-dir="$REMOTE" show benchmark-results:runs/success/usage.json)
@@ -184,6 +191,18 @@ set -e
 assert test "$EXIT_CODE" = 2
 assert test ! -e "$REPO/runs/dirty"
 rm "$REPO/unrelated.txt"
+
+printf 'outside prompt\n' >"$TMP_ROOT/outside.md"
+set +e
+(
+  cd "$REPO"
+  PATH="$BIN:$PATH" PRODIGI_API_KEY=test_11111111-1111-1111-1111-111111111111 "$ROOT/scripts/run-benchmark" \
+    --adapter codex --model fake --timeout 5 --run-id outside-prompt --prompt-file ../outside.md
+)
+EXIT_CODE=$?
+set -e
+assert test "$EXIT_CODE" = 2
+assert test ! -e "$REPO/runs/outside-prompt"
 
 set +e
 (

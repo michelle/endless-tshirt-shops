@@ -20,24 +20,28 @@ Commit or stash all existing work first: the runner refuses a dirty repository s
 ```sh
 scripts/run-benchmark \
   --adapter codex \
-  --model gpt-5.6-sol \
+  --model gpt-6-astra \
+  --suite-id 20260905-beauty-high \
+  --run-id 20260905-beauty-high-codex-astra \
+  --prompt-file prompt-beauty.md \
   --reasoning-effort high \
   --timeout 3600
 
 scripts/run-benchmark \
   --adapter claude \
-  --model sonnet \
-  --run-id 20260812-claude-sonnet-a \
+  --model claude-fable-5-1 \
+  --suite-id 20260905-beauty-high \
+  --run-id 20260905-beauty-high-claude-fable-5-1 \
+  --prompt-file prompt-beauty.md \
   --reasoning-effort high \
   -- --max-budget-usd 20
 ```
 
-Example Codex models: `gpt-5.6-sol`, `gpt-5.6-terra`, and `gpt-5.6-luna`.
-Claude Code accepts the stable aliases `sonnet`, `opus`, and `haiku`; its full
-model IDs also work (for example, `claude-sonnet-5`). Use a pinned full ID when
-you need an immutable model version for comparison.
+Current comparison models are `gpt-6-astra`, `gpt-5.6-sol`, `gpt-5.6-terra`,
+`gpt-5.6-luna`, `claude-fable-5-1`, `claude-opus-5`, and
+`claude-sonnet-5`. Use pinned full IDs for reproducible comparisons.
 
-The runner invokes the selected CLI non-interactively in an initially empty workspace, commits one immutable `runs/<run-id>/` result to `benchmark-results`, pushes it to `origin`, and returns to the original branch. It records failed or timed-out runs too. Each run receives a unique Vercel project name, `benchmark-<run-id>`, through `$BENCHMARK_VERCEL_PROJECT`, so its deployment cannot replace another run's deployment. It also gives every agent an isolated Stripe CLI config and transparently applies it to every `stripe` command, including commands launched through a login shell. While the agent runs, the normal global Stripe config is atomically quarantined and ambient Stripe credential variables are unset; the global config is restored afterward on success, failure, or timeout. A config written directly to the global path is captured under `.benchmark-secrets/stripe/` before restoration. The run config remains locally at `.benchmark-secrets/stripe/<run-id>.toml`, is permissions-protected and ignored by Git, and is not created or claimed by the runner—the agent does that itself. Temporary execution branches remain local and are removed after a successful push. Review and compare all artifacts together on `benchmark-results`. A failed push leaves the local publication branch and commit intact, then exits nonzero.
+The runner invokes the selected CLI non-interactively in an initially empty workspace, commits one immutable `runs/<run-id>/` result to `benchmark-results`, pushes it to `origin`, and returns to the original branch. It records failed or timed-out runs too. `--prompt-file` selects a regular prompt file inside the repository and defaults to `prompt.md`; the selected path and content hash are recorded in metadata. `--suite-id` records a shared identifier for grouping related attempts. Each run receives a unique Vercel project name, `benchmark-<run-id>`, through `$BENCHMARK_VERCEL_PROJECT`, so its deployment cannot replace another run's deployment. It also gives every agent an isolated Stripe CLI config and transparently applies it to every `stripe` command, including commands launched through a login shell. While the agent runs, the normal global Stripe config is atomically quarantined and ambient Stripe credential variables are unset; the global config is restored afterward on success, failure, or timeout. A config written directly to the global path is captured under `.benchmark-secrets/stripe/` before restoration. The run config remains locally at `.benchmark-secrets/stripe/<run-id>.toml`, is permissions-protected and ignored by Git, and is not created or claimed by the runner—the agent does that itself. Temporary execution branches remain local and are removed after a successful push. Review and compare all artifacts together on `benchmark-results`. A failed push leaves the local publication branch and commit intact, then exits nonzero.
 
 Codex uses its non-interactive exec mode with automatic approvals. Claude uses print mode with bypassed permissions. Run this only in an isolated, externally sandboxed environment and with test-only credentials.
 
@@ -50,7 +54,7 @@ runs/<run-id>/
   workspace/       generated application code
   final.md         agent's final completion report
   agent.log        redacted execution transcript
-  metadata.json    model, adapter, reasoning effort, usage, base/prompt hashes, status, timing, URL
+  metadata.json    suite, prompt, model, effort, usage, base/tree hashes, status, timing, URL
   usage.json       provider-reported token usage, including normalized new-input tokens when available
   agent.raw.log    untracked local source transcript
 ```

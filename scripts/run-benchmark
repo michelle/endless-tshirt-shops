@@ -8,6 +8,8 @@ Usage: scripts/run-benchmark --adapter codex|claude --model MODEL [options] [-- 
 
 Options:
   --run-id ID          Unique, branch-safe run ID (default: UTC timestamp + adapter + model)
+  --suite-id ID        Identifier shared by every run in one comparison suite
+  --prompt-file FILE   Repository-contained prompt file (default: prompt.md)
   --timeout SECONDS    Hard timeout in seconds (default: 3600)
   --reasoning-effort LEVEL
                       Optional provider reasoning level (low, medium, high, xhigh, or max)
@@ -86,6 +88,8 @@ assert_no_staged_secrets() {
 ADAPTER=
 MODEL=
 RUN_ID=
+SUITE_ID=
+PROMPT_FILE_ARG=prompt.md
 TIMEOUT_SECONDS=3600
 REASONING_EFFORT=
 EXTRA_ARGS=()
@@ -95,6 +99,8 @@ while (($#)); do
     --adapter) ADAPTER=${2-}; shift 2 ;;
     --model) MODEL=${2-}; shift 2 ;;
     --run-id) RUN_ID=${2-}; shift 2 ;;
+    --suite-id) SUITE_ID=${2-}; shift 2 ;;
+    --prompt-file) PROMPT_FILE_ARG=${2-}; shift 2 ;;
     --timeout) TIMEOUT_SECONDS=${2-}; shift 2 ;;
     --reasoning-effort) REASONING_EFFORT=${2-}; shift 2 ;;
     --) shift; EXTRA_ARGS=("$@"); break ;;
@@ -107,10 +113,21 @@ done
 [[ -n $MODEL ]] || die "--model is required"
 [[ $TIMEOUT_SECONDS =~ ^[1-9][0-9]*$ ]] || die "--timeout must be a positive integer"
 [[ -z $REASONING_EFFORT || $REASONING_EFFORT =~ ^(low|medium|high|xhigh|max)$ ]] || die "--reasoning-effort must be low, medium, high, xhigh, or max"
+[[ -n $PROMPT_FILE_ARG ]] || die "--prompt-file must not be empty"
 [[ -n ${PRODIGI_API_KEY-} ]] || die "PRODIGI_API_KEY must be set to a Prodigi API key"
 
 REPO_ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || die "run this from inside the benchmark repository"
 cd "$REPO_ROOT"
+if [[ $PROMPT_FILE_ARG == /* ]]; then
+  PROMPT_CANDIDATE=$PROMPT_FILE_ARG
+else
+  PROMPT_CANDIDATE="$REPO_ROOT/$PROMPT_FILE_ARG"
+fi
+[[ -f $PROMPT_CANDIDATE && ! -L $PROMPT_CANDIDATE ]] || die "prompt file is not a regular file: $PROMPT_FILE_ARG"
+PROMPT_DIR=$(cd -P "$(dirname "$PROMPT_CANDIDATE")" 2>/dev/null && pwd) || die "could not resolve prompt file: $PROMPT_FILE_ARG"
+PROMPT_FILE="$PROMPT_DIR/$(basename "$PROMPT_CANDIDATE")"
+[[ $PROMPT_FILE == "$REPO_ROOT/"* ]] || die "prompt file must be inside the repository: $PROMPT_FILE_ARG"
+PROMPT_REF=${PROMPT_FILE#"$REPO_ROOT/"}
 [[ -z $(git status --porcelain --untracked-files=all) ]] || die "repository is dirty; commit or stash changes before starting a run"
 BASE_BRANCH=$(git symbolic-ref --quiet --short HEAD) || die "a named branch must be checked out"
 BASE_COMMIT=$(git rev-parse HEAD)
@@ -130,6 +147,10 @@ else
   RUN_ID=$(sanitize_id "$RUN_ID")
 fi
 [[ -n $RUN_ID && $RUN_ID != .* && $RUN_ID != *..* ]] || die "invalid --run-id"
+if [[ -n $SUITE_ID ]]; then
+  SUITE_ID=$(sanitize_id "$SUITE_ID")
+  [[ -n $SUITE_ID && $SUITE_ID != .* && $SUITE_ID != *..* ]] || die "invalid --suite-id"
+fi
 RESULTS_BRANCH=benchmark-results
 EXECUTION_BRANCH="benchmark-run/$RUN_ID"
 PUBLISH_BRANCH="benchmark-publish/$RUN_ID"
@@ -297,7 +318,7 @@ STARTED_AT=$(date -u +%Y-%m-%dT%H:%M:%SZ)
 START_EPOCH=$(date +%s)
 export BENCHMARK_RUN_ID="$RUN_ID"
 export BENCHMARK_WORKSPACE="$AGENT_WORKSPACE"
-export BENCHMARK_PROMPT_FILE="$REPO_ROOT/prompt.md"
+export BENCHMARK_PROMPT_FILE="$PROMPT_FILE"
 export BENCHMARK_MODEL="$MODEL"
 export BENCHMARK_FINAL_OUTPUT="$FINAL_OUTPUT"
 export BENCHMARK_VERCEL_PROJECT="$VERCEL_PROJECT"
@@ -349,6 +370,7 @@ WORKSPACE_TREE=$(git write-tree)
 {
   printf '{\n'
   printf '  "run_id": '; json_string "$RUN_ID"; printf ',\n'
+  printf '  "suite_id": '; json_string "$SUITE_ID"; printf ',\n'
   printf '  "status": '; json_string "$RUN_STATUS"; printf ',\n'
   printf '  "adapter": '; json_string "$ADAPTER"; printf ',\n'
   printf '  "model": '; json_string "$MODEL"; printf ',\n'
@@ -358,6 +380,7 @@ WORKSPACE_TREE=$(git write-tree)
   printf '  "stripe_config_ref": '; json_string "$RUN_ID"; printf ',\n'
   printf '  "stripe_config_path": '; json_string ".benchmark-secrets/stripe/$RUN_ID.toml"; printf ',\n'
   printf '  "base_commit": '; json_string "$BASE_COMMIT"; printf ',\n'
+  printf '  "prompt_file": '; json_string "$PROMPT_REF"; printf ',\n'
   printf '  "prompt_sha256": '; json_string "$PROMPT_SHA"; printf ',\n'
   printf '  "workspace_tree": '; json_string "$WORKSPACE_TREE"; printf ',\n'
   printf '  "started_at": '; json_string "$STARTED_AT"; printf ',\n'

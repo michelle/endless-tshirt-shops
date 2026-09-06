@@ -4,26 +4,34 @@ Use this prompt from an outer harness to run an informal comparison. Inject all
 credentials through the environment; do not put keys in this file, commands,
 logs, or the final report.
 
-Run the benchmark in this repository against these models, in this exact order:
+Run the benchmark in this repository against these exact model IDs, in this
+exact order:
 
-1. Claude Sonnet
-2. Claude Opus
-3. Codex Terra
-4. Codex Sol
-5. Codex Luna
+1. `gpt-6-astra` through the Codex adapter
+2. `gpt-5.6-sol` through the Codex adapter
+3. `gpt-5.6-terra` through the Codex adapter
+4. `gpt-5.6-luna` through the Codex adapter
+5. `claude-fable-5-1` through the Claude adapter
+6. `claude-opus-5` through the Claude adapter
+7. `claude-sonnet-5` through the Claude adapter
 
 Run one model at a time. Wait for each run—including result publication and
 repository cleanup—to finish before starting the next. Do not parallelize model
-runs. Use the same explicitly selected reasoning level for all five; default to
+runs. Use the same explicitly selected reasoning level for all seven; default to
 high unless the caller specifies another level. Continue to the next model if a
 run fails, and record the failure accurately.
 
-Use the repository's `scripts/run-benchmark` runner and unique run IDs. Preserve
-pre-existing user changes. The runner requires a clean worktree, so stash those
-changes before the first run and restore them after the last run. Give each run
-enough time to build, test, and deploy; do not impose a short outer timeout.
+Use the repository's `scripts/run-benchmark` runner and unique run IDs. Select
+one suite ID for the comparison and pass it with `--suite-id` to every attempt.
+Prefix every run ID with that suite ID and suffix it with the adapter and model;
+give retries a further attempt suffix and report them separately. Pass the
+caller's selected task prompt to every run with `--prompt-file`; default to
+`prompt.md` only when no prompt was specified. Preserve pre-existing user
+changes. The runner requires a clean worktree, so stash those changes before the
+first run and restore them after the last run. Give each run enough time to
+build, test, and deploy; do not impose a short outer timeout.
 
-After all five attempts, independently inspect the committed artifacts, saved
+After all seven attempts, independently inspect the committed artifacts, saved
 Stripe profiles, Prodigi sandbox orders, and live deployments. Do not rely only
 on the agents' completion reports. Create a Markdown report covering:
 
@@ -55,5 +63,32 @@ on the agents' completion reports. Create a Markdown report covering:
   changes.
 - **Complexity:** runtime files and lines of code, tests/verification code, and
   operational and implementation complexity relevant to future maintenance.
+
+After the independent audit, prepare viewer artifacts under this predictable
+layout:
+
+```text
+run_viewer/public/suites/<suite-id>/summary.md
+run_viewer/public/suites/<suite-id>/runs/<run-id>/final.md
+run_viewer/public/suites/<suite-id>/runs/<run-id>/design.png
+```
+
+Use the image's real extension when it is not PNG. Copy `final.md` verbatim and
+copy the generated suite report to `summary.md`. For each design, prefer the
+exact original source file that Prodigi fetched for the representative order.
+If no intended design reached Prodigi, recover the exact hosted artwork stored
+in Stripe metadata; if that is unavailable, reproduce the deterministic artwork
+route only from committed code plus recorded timestamp and variant inputs.
+Label those fallbacks accurately—never imply that locally reproduced or
+synthetic fulfillment evidence is a paid end-to-end print.
+
+Preserve the complete original canvas, pixel dimensions, format, alpha channel,
+and artwork position. Do not crop, resize, flatten, recolor, or replace it with
+a thumbnail or social-preview asset. Derived dark-background proofs may be kept
+separately but are not the viewer design. Record dimensions, alpha mode,
+nontransparent bounds, recovery source, order ID when applicable, and whether
+the evidence is paid, synthetic, direct, or local in the viewer manifest. Do
+not store credentials, signed private URLs, webhook secrets, raw transcripts,
+customer PII, or payment client secrets in viewer data.
 
 Treat the results as directional case studies, not a formal ranking.
