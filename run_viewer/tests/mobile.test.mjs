@@ -42,6 +42,7 @@ test("mobile drawer swipes preserve native scrolling, links, zoom gestures, and 
         const box = await button.boundingBox();
         assert.ok(box.width >= 44 && box.height >= 44, `Touch target too small: ${await button.getAttribute("aria-label")}`);
       }
+      assert.ok(await dialog.locator(".drawer-evidence > .status-help > .run-status").evaluate((el) => Math.abs(parseFloat(getComputedStyle(el, "::before").top) - el.clientHeight / 2) < 1), "Status dot stays aligned in the taller touch target");
     }
     await page.setViewportSize({ width: 390, height: 844 });
     await swipe("left");

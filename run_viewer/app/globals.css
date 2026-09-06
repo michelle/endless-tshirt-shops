@@ -428,6 +428,7 @@ code {
   .drawer-close { min-width: 44px; min-height: 44px; justify-content: center; }
   .drawer-permalink, .run-details-button, .run-status, select { min-height: 44px; }
   .drawer-permalink, .run-status { min-width: 44px; }
+  .run-status::before { top: 50%; transform: translateY(-50%); }
   .drawer-suite a, .card-links a, .suite-meta a { display: inline-flex; align-items: center; min-height: 44px; }
   input[type="color"] { width: 44px; height: 44px; }
   select { font-size: 16px; }
