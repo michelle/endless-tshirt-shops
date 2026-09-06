@@ -309,7 +309,8 @@ code {
   padding: 24px 28px;
   border-bottom: 1px solid var(--border);
 }
-.drawer-suite { margin-bottom: 8px; font-size: 14px; }
+.drawer-suite { display: flex; flex-wrap: wrap; gap: 4px 14px; margin-bottom: 8px; font-size: 14px; }
+.drawer-suite a { color: inherit; white-space: nowrap; }
 .drawer-heading h2 { font-size: 26px; overflow-wrap: anywhere; }
 .drawer-close {
   display: flex;
@@ -325,7 +326,7 @@ code {
 }
 .drawer-close:hover { background: #f5f5f5; }
 .drawer-actions { display: flex; align-items: center; gap: 4px; flex: none; }
-.drawer-permalink { font-size: 12px; margin-right: 6px; color: inherit; }
+.drawer-permalink { font: 12px var(--sans); margin-right: 6px; padding: 7px 0; border: 0; background: none; color: inherit; text-decoration: underline; cursor: pointer; }
 .summary-heading { scroll-margin-top: 16px; }
 .markdown .heading-link { color: inherit; text-decoration: none; }
 .heading-link-mark { opacity: 0; color: var(--muted); }

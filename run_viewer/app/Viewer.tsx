@@ -89,6 +89,32 @@ function modelName(model: string) {
   return model.split(" · ").at(-1) ?? model;
 }
 
+function CopyPermalink({ suiteId, runId }: { suiteId: string; runId: string }) {
+  const [status, setStatus] = useState<"idle" | "copied" | "failed">("idle");
+  useEffect(() => {
+    if (status !== "copied") return;
+    const timer = window.setTimeout(() => setStatus("idle"), 2000);
+    return () => window.clearTimeout(timer);
+  }, [status]);
+  return (
+    <button
+      type="button"
+      className="drawer-permalink"
+      aria-label="Copy permalink"
+      aria-live="polite"
+      title={status === "failed" ? "Clipboard unavailable. Copy the address from your browser instead." : "Copy a direct link to this run"}
+      onClick={async () => {
+        try {
+          await navigator.clipboard.writeText(new URL(viewerLink(suiteId, runId), window.location.href).href);
+          setStatus("copied");
+        } catch { setStatus("failed"); }
+      }}
+    >
+      {status === "copied" ? "Copied!" : status === "failed" ? "Copy failed" : "Copy permalink"}
+    </button>
+  );
+}
+
 function Markdown({ source, summarySuite }: { source: string; summarySuite?: string }) {
   const components: Components = {
     a: ({ children, ...props }) => <a {...props} target="_blank" rel="noreferrer">{children}</a>,
@@ -271,13 +297,12 @@ export default function Viewer() {
 
               <div className="card-content">
               {storefront && (
-                <button
-                  type="button"
+                <a
                   className="storefront-thumbnail"
-                  aria-label={`View storefront screenshot for ${modelName(run.model)}`}
-                  aria-haspopup="dialog"
-                  aria-controls="run-drawer"
-                  onClick={() => navigateToRun(suite.id, run.id)}
+                  href={run.deployment}
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-label={`Open storefront by ${modelName(run.model)}`}
                 >
                   <Image
                     src={storefront.screenshot}
@@ -287,7 +312,7 @@ export default function Viewer() {
                     sizes="(max-width: 680px) 100vw, (max-width: 900px) 25vw, 14vw"
                     unoptimized
                   />
-                </button>
+                </a>
               )}
 
               <div
@@ -351,11 +376,11 @@ export default function Viewer() {
           <>
             <div className="drawer-heading">
               <div>
-                <p className="drawer-suite">{suite.label}</p>
+                <p className="drawer-suite">{suite.label} <a href={selectedRun.deployment} target="_blank" rel="noreferrer">Storefront ↗</a></p>
                 <h2 id="run-drawer-title">{modelName(selectedRun.model)}</h2>
               </div>
               <div className="drawer-actions">
-                <a className="drawer-permalink" href={viewerLink(suite.id, selectedRun.id)} aria-label="Link to this run" title="Link to this run (copy link address)">Link ↗</a>
+                <CopyPermalink key={`${suite.id}/${selectedRun.id}`} suiteId={suite.id} runId={selectedRun.id} />
                 <span className="run-position" aria-live="polite">{selectedIndex + 1}/{suite.runs.length}</span>
                 {/* Keep boundary buttons focusable so disabling navigation never ejects keyboard focus from the dialog. */}
                 <button type="button" className="drawer-close" aria-label="Previous run" aria-keyshortcuts="ArrowLeft h" title="Previous run (← or h)" aria-disabled={selectedIndex === 0} onClick={() => moveRun(-1)}>←</button>
@@ -368,7 +393,7 @@ export default function Viewer() {
             <div className="drawer-content" ref={drawerContent} role="region" aria-label="Run details and final output (j/k to scroll)" aria-keyshortcuts="j k">
               {selectedStorefront && (
                 <figure className="storefront-preview">
-                  <a href={assetUrl(selectedStorefront.screenshot)} target="_blank" rel="noreferrer" aria-label="Open full-size storefront screenshot">
+                  <a href={selectedRun.deployment} target="_blank" rel="noreferrer" aria-label="Open storefront from screenshot">
                     <Image
                       src={selectedStorefront.screenshot}
                       alt={`Above-the-fold storefront by ${modelName(selectedRun.model)}`}
@@ -399,7 +424,6 @@ export default function Viewer() {
                 <div className="card-links">
                   <a href={assetUrl(selectedRun.design)} download>Design ↓</a>
                   <a href={assetUrl(selectedRun.finalOutput)} download>final.md ↓</a>
-                  <a href={selectedRun.deployment} target="_blank" rel="noreferrer">Storefront ↗</a>
                 </div>
               </section>
               <section className="social-preview" aria-labelledby="social-preview-title">

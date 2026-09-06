@@ -47,7 +47,9 @@ files, not recreated artwork. The manifest records their source, dimensions,
 capture time, and found/missing/unavailable status. A social card is separate
 from the customer's print artwork. New suite captures collect these automatically.
 
-Click a screenshot or Details to open the run drawer. Use Left/Right or h/l
+Click Details to open the run drawer. Screenshots on cards and in the drawer
+open the live storefront in a new tab, as does the storefront link at the top.
+Use Left/Right or h/l
 to navigate within the selected suite; j/k scroll down/up and Escape closes it.
 With the drawer closed, j/k scroll the main page instead.
 The arrow buttons show navigation shortcuts in their tooltips. Shortcuts ignore
@@ -83,7 +85,8 @@ browser Back/Forward restores the selection. Missing or unknown IDs show the
 default suite. The query works on localhost and under the GitHub Pages subpath.
 Add `&run=sol` (or another short run ID) to open a particular drawer directly.
 Opening and navigating drawers updates the URL; refresh and Back/Forward preserve
-the selected run. The drawer's Link control can be copied via “Copy link address.”
+the selected run. The drawer's Copy permalink button copies the direct URL
+and briefly confirms success. If clipboard access fails, copy the browser address.
 Every summary heading is a link with a stable `#summary-…` fragment; copy its
 link address to share that section, including the selected suite.
 

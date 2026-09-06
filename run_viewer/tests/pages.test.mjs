@@ -70,8 +70,16 @@ test("static Pages viewer supports suite links, history, scoring, and all archiv
       assert.ok((await customerArt.getAttribute("src")).endsWith(suite.includes("minimal") ? "/paid-design.png" : "/design.jpg"), "Customer artwork must not be replaced with smoke-test placeholders or earlier local reproductions");
       assert.deepEqual(await customerArt.evaluate((image) => [image.naturalWidth, image.naturalHeight]), [4665, 5844]);
       for (const card of await page.locator(".design-card").all()) {
+        const thumbnail = card.locator("a.storefront-thumbnail");
+        assert.equal(await thumbnail.getAttribute("target"), "_blank");
+        const deployment = await thumbnail.getAttribute("href");
         await card.locator(".run-details-button").click();
         const dialog = page.getByRole("dialog");
+        const storefrontLink = dialog.locator(".drawer-heading").getByRole("link", { name: "Storefront ↗", exact: true });
+        assert.equal(await storefrontLink.getAttribute("href"), deployment);
+        const screenshotLink = dialog.getByRole("link", { name: "Open storefront from screenshot", exact: true });
+        assert.equal(await screenshotLink.getAttribute("href"), deployment);
+        assert.equal(await screenshotLink.getAttribute("target"), "_blank");
         assert.equal(await dialog.locator(".rating-checks dt").count(), 3);
         assert.ok(new URL(page.url()).searchParams.get("run"));
         const social = dialog.locator(".social-preview img");
@@ -110,9 +118,19 @@ test("static Pages viewer supports suite links, history, scoring, and all archiv
     await dialog.waitFor();
     assert.equal(await dialog.locator("#run-drawer-title").innerText(), "claude-opus-5");
     assert.ok(await dialog.locator(".social-preview img").count());
-    assert.equal(await dialog.getByRole("link", { name: "Link to this run", exact: true }).getAttribute("href"), "?suite=20260905-beauty-high&run=opus");
+    await page.context().grantPermissions(["clipboard-read", "clipboard-write"]);
+    const copy = dialog.getByRole("button", { name: "Copy permalink", exact: true });
+    await copy.click();
+    await page.waitForFunction(() => document.querySelector(".drawer-permalink")?.textContent === "Copied!");
+    assert.equal(await page.evaluate(() => navigator.clipboard.readText()), new URL("?suite=20260905-beauty-high&run=opus", base).href);
     await dialog.getByRole("button", { name: "Next run", exact: true }).click();
     assert.equal(new URL(page.url()).searchParams.get("run"), "sonnet");
+    assert.equal(await copy.innerText(), "Copy permalink");
+    await page.evaluate(() => { Object.defineProperty(navigator.clipboard, "writeText", { configurable: true, value: () => Promise.reject(new Error("Clipboard denied")) }); });
+    await copy.click();
+    await page.waitForFunction(() => document.querySelector(".drawer-permalink")?.textContent === "Copy failed");
+    assert.match(await copy.getAttribute("title"), /Copy the address/);
+    await page.evaluate(() => { delete navigator.clipboard.writeText; });
     await page.goBack();
     assert.equal(await dialog.locator("#run-drawer-title").innerText(), "claude-opus-5");
     await page.reload({ waitUntil: "networkidle" });
