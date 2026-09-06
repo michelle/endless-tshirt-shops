@@ -46,6 +46,62 @@ const models = {
 
 export const suites: Suite[] = [
   {
+    id: "20260905-unserious-high",
+    label: "2026-09-05 · Unserious prompt",
+    summary: "/suites/20260905-unserious-high/summary.md",
+    runs: [
+      {
+        id: "astra", model: models.astra, commit: "f30ffc82", status: "Paid fixture · hosted checkout unverified",
+        deployment: "https://benchmark-20260905-unserious-high-codex-gpt-6-astra.vercel.app",
+        finalOutput: "/suites/20260905-unserious-high/runs/20260905-unserious-high-codex-gpt-6-astra/final.md", design: "/suites/20260905-unserious-high/runs/20260905-unserious-high-codex-gpt-6-astra/design.png",
+        width: 4677, height: 5881, alpha: "RGBA transparency",
+        evidence: "Exact source fetched for ord_1170586; MD5 matches Prodigi. Timestamp 1788666438003; 130,769 nontransparent pixels; bounds (1299,788)–(3370,984). Black/M Gildan 5000, front, fillPrintArea. The integration test cloned an app Session, bypassed hosted shipping collection and seeded PaymentIntent shipping before paying. This verifies paid backend fulfillment, not the original customer checkout path.",
+      },
+      {
+        id: "sol", model: models.sol, commit: "4b2dcada", status: "Hosted unpaid · ineffective print scale",
+        deployment: "https://benchmark-20260905-unserious-high-c-tau.vercel.app",
+        finalOutput: "/suites/20260905-unserious-high/runs/20260905-unserious-high-codex-gpt-5.6-sol/final.md", design: "/suites/20260905-unserious-high/runs/20260905-unserious-high-codex-gpt-5.6-sol/design.png",
+        width: 4665, height: 5844, alpha: "Indexed PNG with transparency",
+        evidence: "Live customer artwork route using timestamp 1788624000000 from an unpaid unisex/L Session; 2,728 nontransparent pixels; bounds (2034,1827)–(2640,2079). Deployed glyphs are nearly invisible; code also adds EXACTLY ONE (1) MOMENT. Separate black/M smoke order ord_1170588 fetched identical bytes (MD5 verified), but bypassed app fulfillment. Expected app mapping: Gildan 64000/64000L, front, fitPrintArea. No paid app order.",
+      },
+      {
+        id: "terra", model: models.terra, commit: "77c7617a", status: "Hosted unpaid · extra print text",
+        deployment: "https://benchmark-20260905-unserious-high-c-three.vercel.app",
+        finalOutput: "/suites/20260905-unserious-high/runs/20260905-unserious-high-codex-gpt-5.6-terra/final.md", design: "/suites/20260905-unserious-high/runs/20260905-unserious-high-codex-gpt-5.6-terra/design.png",
+        width: 4688, height: 5881, alpha: "RGBA transparency",
+        evidence: "Live artwork route using 2026-09-06T04:00:00.000Z from the unpaid classic/M Session. 126,111 nontransparent pixels; bounds (1226,2660)–(3471,3221). Includes two slogans beyond the timestamp. Separate black/M smoke order ord_1170592 fetched identical bytes (MD5 verified), not an app payment. Both classic and roomy select TEE-AS-5001, front, fitPrintArea.",
+      },
+      {
+        id: "luna", model: models.luna, commit: "da62384d", status: "Hosted unpaid · opaque print",
+        deployment: "https://benchmark-20260905-unserious-high-c-nu.vercel.app",
+        finalOutput: "/suites/20260905-unserious-high/runs/20260905-unserious-high-codex-gpt-5.6-luna/final.md", design: "/suites/20260905-unserious-high/runs/20260905-unserious-high-codex-gpt-5.6-luna/design.png",
+        width: 4200, height: 5370, alpha: "RGBA, but every pixel opaque",
+        evidence: "Live artwork route using unpaid fitted/M Session metadata, timestamp 1788650000123. All 22,554,000 pixels opaque; bounds cover the entire canvas. Tiny deployed glyphs plus branding on white. Separate smoke order ord_1170594 used unisex/L artwork, archived as submitted.png; its hash matches Prodigi but it is not this customer's variant. Both app fits select white TEE-AS-5001, front, fillPrintArea. No payment-to-order proof; legacy shipping extraction remains a compatibility concern.",
+      },
+      {
+        id: "fable", model: models.fable, commit: "caa56d0c", status: "Paid E2E · completed print",
+        deployment: "https://benchmark-20260905-unserious-high-c-gamma.vercel.app",
+        finalOutput: "/suites/20260905-unserious-high/runs/20260905-unserious-high-claude-claude-fable-5-1/final.md", design: "/suites/20260905-unserious-high/runs/20260905-unserious-high-claude-claude-fable-5-1/design.png",
+        width: 4677, height: 5881, alpha: "RGBA transparency",
+        evidence: "Exact paid fitted/M source from ord_1170596; MD5 matches Prodigi. Timestamp 1788671655583; 197,939 nontransparent pixels; bounds (1105,945)–(3571,1157). Black Bella + Canvas 6004, front, fitPrintArea. Earlier localhost-source order ord_1170595 failed asset download; this later deployed source completed. Paid integration confirmed; browser-payment steps were not independently replayed.",
+      },
+      {
+        id: "opus", model: models.opus, commit: "1490ef86", status: "Paid E2E · wrong garment fit",
+        deployment: "https://benchmark-20260905-unserious-high-c-tan.vercel.app",
+        finalOutput: "/suites/20260905-unserious-high/runs/20260905-unserious-high-claude-claude-opus-5/final.md", design: "/suites/20260905-unserious-high/runs/20260905-unserious-high-claude-claude-opus-5/design.png",
+        width: 3300, height: 4228, alpha: "Grayscale PNG with alpha",
+        evidence: "Exact paid source from ord_1170598; MD5 matches Prodigi. Timestamp 1788673722760; 127,358 nontransparent pixels; bounds (800,698)–(2595,909). Customer selected fitted/navy blue/L, but fulfillment ignores fit and submits unisex Gildan 64000, front, fillPrintArea. The raw timestamp is printable; the garment mapping fails independently. Physical placement remains unverified.",
+      },
+      {
+        id: "sonnet", model: models.sonnet, commit: "2b5d759f", status: "Paid E2E · opaque print",
+        deployment: "https://benchmark-20260905-unserious-high-c-silk.vercel.app",
+        finalOutput: "/suites/20260905-unserious-high/runs/20260905-unserious-high-claude-claude-sonnet-5/final.md", design: "/suites/20260905-unserious-high/runs/20260905-unserious-high-claude-claude-sonnet-5/design.png",
+        width: 1200, height: 1500, alpha: "RGBA, but every pixel opaque",
+        evidence: "Exact paid white/L source from ord_1170600; MD5 matches Prodigi. Timestamp 1788675352704; all 1,800,000 pixels opaque; full-canvas bounds. Unisex Gildan 64000, front, fillPrintArea. A second paid black/M order also completed. The print includes an opaque background and ms since epoch subtitle. Missing paid-state guard and no durable failure recovery remain launch blockers.",
+      },
+    ],
+  },
+  {
     id: "20260905-minimal-high",
     label: "2026-09-05 · Minimal prompt",
     summary: "/suites/20260905-minimal-high/summary.md",

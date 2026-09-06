@@ -23,6 +23,7 @@ test("server-renders the benchmark viewer", async () => {
   assert.match(html, /<title>Benchmark run viewer<\/title>/i);
   assert.match(html, /Minimal prompt/);
   assert.match(html, /Beauty prompt/);
+  assert.match(html, /Unserious prompt/);
   assert.match(html, /Harness 6/);
   assert.match(html, /Codex · gpt-6-astra/);
   assert.match(html, /Design background/);
@@ -31,8 +32,8 @@ test("server-renders the benchmark viewer", async () => {
   assert.equal((html.match(/Full print canvas generated/g) ?? []).length, 7);
 });
 
-test("packages all 14 full-canvas designs, final outputs, and all summaries", async () => {
-  const suiteNames = ["20260905-minimal-high", "20260905-beauty-high"];
+test("packages all 21 full-canvas designs, final outputs, and all summaries", async () => {
+  const suiteNames = ["20260905-minimal-high", "20260905-beauty-high", "20260905-unserious-high"];
 
   for (const suite of suiteNames) {
     const [designs, finals, summary] = await Promise.all([
@@ -51,9 +52,9 @@ test("packages all 14 full-canvas designs, final outputs, and all summaries", as
 
   const source = await readFile(new URL("../app/data.ts", import.meta.url), "utf8");
   const viewer = await readFile(new URL("../app/Viewer.tsx", import.meta.url), "utf8");
-  assert.ok((source.match(/finalOutput: "\/suites/g) ?? []).length >= 14);
-  assert.ok((source.match(/design: "\/suites/g) ?? []).length >= 14);
-  assert.ok((source.match(/deployment: "https:\/\//g) ?? []).length >= 14);
+  assert.ok((source.match(/finalOutput: "\/suites/g) ?? []).length >= 21);
+  assert.ok((source.match(/design: "\/suites/g) ?? []).length >= 21);
+  assert.ok((source.match(/deployment: "https:\/\//g) ?? []).length >= 21);
   assert.match(viewer, /ReactMarkdown/);
   assert.match(viewer, /remarkGfm/);
 
@@ -65,10 +66,12 @@ test("packages all 14 full-canvas designs, final outputs, and all summaries", as
     "20260827-harness6-high",
     "20260905-beauty-high",
     "20260905-minimal-high",
+    "20260905-unserious-high",
   ]) assert.ok(allSuites.includes(suite), `Missing archived suite ${suite}`);
 });
 
 for (const [suiteId, missingIcons] of [
+  ["20260905-unserious-high", ["terra", "luna"]],
   ["20260905-beauty-high", ["terra", "luna"]],
   ["20260905-minimal-high", ["astra", "sol", "terra", "luna", "fable"]],
 ]) {

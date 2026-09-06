@@ -1,10 +1,10 @@
 # Benchmark run viewer
 
-A deliberately simple viewer for the `20260905-beauty-high` and
-`20260905-minimal-high` benchmark suites.
+A deliberately simple viewer for the beauty, minimal, and unserious benchmark
+suites. The newest imported suite is the default.
 
-It shows every recovered design for the selected suite at once, includes all 14
-agent final responses, and renders all six generated suite summaries as rich
+It shows every recovered design for the selected suite at once, includes all 21
+agent final responses, and renders all seven generated suite summaries as rich
 Markdown. The shared artwork background color can be changed to inspect
 transparency without altering image placement.
 
@@ -31,7 +31,7 @@ clearly labeled not delivered: the shipping-address bug prevented fulfillment.
 Manual follow-up findings appear in the suite report without rewriting the
 original benchmark's payment history.
 
-The beauty and minimal suites also include `storefront.png` and, where published,
+The beauty, minimal, and unserious suites also include `storefront.png` and, where published,
 `favicon.*` beside each run's artwork. These are fresh 1440 × 900 desktop
 viewport captures of the deployed homepages, not screenshots from the original
 benchmark. `public/suites/<suite-id>/storefronts.json` records the
@@ -106,7 +106,9 @@ automatic Pages deployments. Physical iOS/Android testing is still worthwhile.
 
 ## Capture a suite
 
-Register the suite and its runs in `app/data.ts`, including public `deployment`
+Write the suite's `summary.md`, final outputs, and recovered artwork before
+registering it so an open local viewer cannot fetch a missing summary. Then
+register the suite and its runs in `app/data.ts`, including public `deployment`
 URLs and `finalOutput` paths under `public/suites/<suite-id>/runs/<run-id>/`.
 Then, from `run_viewer`, run:
 
@@ -148,7 +150,7 @@ npm run preview:pages -- --port 4174
 
 Open `http://localhost:4174/endless-tshirt-shops/`. `VIEWER_BASE_PATH` overrides
 the default `/endless-tshirt-shops/` prefix (use `/` for a custom domain).
-`npm run test:pages` checks redaction, exact image bytes, both suites, Markdown,
+`npm run test:pages` checks redaction, exact image bytes, all three suites, Markdown,
 downloads, and browser asset loading against the built static site.
 Use `CAPTURE_BROWSER=chrome` if testing with installed Chrome.
 

@@ -4,6 +4,7 @@ import { assessments, rateRun } from "../app/ratings.ts";
 
 test("every reviewed run has three explicit checks, reasons, and the strict color", () => {
   const expected = {
+    "20260905-unserious-high": [2, 0, 0, 0, 3, 2, 2],
     "20260905-beauty-high": [3, 0, 0, 0, 3, 2, 0],
     "20260905-minimal-high": [3, 2, 2, 0, 3, 3, 2],
   };

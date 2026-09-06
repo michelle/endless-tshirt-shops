@@ -1,0 +1,168 @@
+{
+  "astra": {
+    "screenshot": "/suites/20260905-unserious-high/runs/20260905-unserious-high-codex-gpt-6-astra/storefront.png",
+    "favicon": {
+      "path": "/suites/20260905-unserious-high/runs/20260905-unserious-high-codex-gpt-6-astra/favicon.svg",
+      "source": "https://benchmark-20260905-unserious-high-codex-gpt-6-astra.vercel.app/icon.svg?icon.10cy3wqvbv_dy.svg",
+      "mime": "image/svg+xml"
+    },
+    "faviconStatus": "found",
+    "socialPreview": null,
+    "socialPreviewStatus": "missing",
+    "url": "https://benchmark-20260905-unserious-high-codex-gpt-6-astra.vercel.app/",
+    "title": "datetime.store — Wear right now. Forever.",
+    "width": 1440,
+    "height": 900,
+    "capturedAt": "2026-09-06T15:10:17.842Z",
+    "httpStatus": 200,
+    "errors": [],
+    "browser": "152.0.7977.82",
+    "deviceScaleFactor": 1,
+    "colorScheme": "light",
+    "timezone": "America/Los_Angeles"
+  },
+  "sol": {
+    "screenshot": "/suites/20260905-unserious-high/runs/20260905-unserious-high-codex-gpt-5.6-sol/storefront.png",
+    "favicon": {
+      "path": "/suites/20260905-unserious-high/runs/20260905-unserious-high-codex-gpt-5.6-sol/favicon.svg",
+      "source": "https://benchmark-20260905-unserious-high-c-tau.vercel.app/favicon.svg",
+      "mime": "image/svg+xml"
+    },
+    "faviconStatus": "found",
+    "socialPreview": null,
+    "socialPreviewStatus": "missing",
+    "url": "https://benchmark-20260905-unserious-high-c-tau.vercel.app/",
+    "title": "datetime.store — own a millisecond",
+    "width": 1440,
+    "height": 900,
+    "capturedAt": "2026-09-06T15:10:18.640Z",
+    "httpStatus": 200,
+    "errors": [],
+    "browser": "152.0.7977.82",
+    "deviceScaleFactor": 1,
+    "colorScheme": "light",
+    "timezone": "America/Los_Angeles"
+  },
+  "terra": {
+    "screenshot": "/suites/20260905-unserious-high/runs/20260905-unserious-high-codex-gpt-5.6-terra/storefront.png",
+    "favicon": null,
+    "faviconStatus": "missing",
+    "socialPreview": null,
+    "socialPreviewStatus": "missing",
+    "url": "https://benchmark-20260905-unserious-high-c-three.vercel.app/",
+    "title": "datetime.store — a shirt from right now",
+    "width": 1440,
+    "height": 900,
+    "capturedAt": "2026-09-06T15:10:19.362Z",
+    "httpStatus": 200,
+    "errors": [
+      "Minified React error #418; visit https://react.dev/errors/418?args[]=text&args[]= for the full message or use the non-minified dev environment for full errors and additional helpful warnings."
+    ],
+    "browser": "152.0.7977.82",
+    "deviceScaleFactor": 1,
+    "colorScheme": "light",
+    "timezone": "America/Los_Angeles"
+  },
+  "luna": {
+    "screenshot": "/suites/20260905-unserious-high/runs/20260905-unserious-high-codex-gpt-5.6-luna/storefront.png",
+    "favicon": null,
+    "faviconStatus": "missing",
+    "socialPreview": null,
+    "socialPreviewStatus": "missing",
+    "url": "https://benchmark-20260905-unserious-high-c-nu.vercel.app/",
+    "title": "datetime.store — the shirt that knows what time it is",
+    "width": 1440,
+    "height": 900,
+    "capturedAt": "2026-09-06T15:10:20.100Z",
+    "httpStatus": 200,
+    "errors": [
+      "Minified React error #418; visit https://react.dev/errors/418?args[]=text&args[]= for the full message or use the non-minified dev environment for full errors and additional helpful warnings."
+    ],
+    "browser": "152.0.7977.82",
+    "deviceScaleFactor": 1,
+    "colorScheme": "light",
+    "timezone": "America/Los_Angeles"
+  },
+  "fable": {
+    "screenshot": "/suites/20260905-unserious-high/runs/20260905-unserious-high-claude-claude-fable-5-1/storefront.png",
+    "favicon": {
+      "path": "/suites/20260905-unserious-high/runs/20260905-unserious-high-claude-claude-fable-5-1/favicon.ico",
+      "source": "https://benchmark-20260905-unserious-high-c-gamma.vercel.app/favicon.ico?favicon.3fpu2ql9ns1a0.ico",
+      "mime": "image/x-icon"
+    },
+    "faviconStatus": "found",
+    "socialPreview": {
+      "path": "/suites/20260905-unserious-high/runs/20260905-unserious-high-claude-claude-fable-5-1/social-preview.png",
+      "source": "https://benchmark-20260905-unserious-high-c-gamma.vercel.app/opengraph-image?214488b7cb13a5c6",
+      "mime": "image/png",
+      "tag": "og:image",
+      "width": 1200,
+      "height": 630,
+      "capturedAt": "2026-09-06T15:10:21.670Z"
+    },
+    "socialPreviewStatus": "found",
+    "url": "https://benchmark-20260905-unserious-high-c-gamma.vercel.app/",
+    "title": "1788707421667 · datetime.store",
+    "width": 1440,
+    "height": 900,
+    "capturedAt": "2026-09-06T15:10:21.921Z",
+    "httpStatus": 200,
+    "errors": [],
+    "browser": "152.0.7977.82",
+    "deviceScaleFactor": 1,
+    "colorScheme": "light",
+    "timezone": "America/Los_Angeles"
+  },
+  "opus": {
+    "screenshot": "/suites/20260905-unserious-high/runs/20260905-unserious-high-claude-claude-opus-5/storefront.png",
+    "favicon": {
+      "path": "/suites/20260905-unserious-high/runs/20260905-unserious-high-claude-claude-opus-5/favicon.svg",
+      "source": "https://benchmark-20260905-unserious-high-c-tan.vercel.app/icon.svg",
+      "mime": "image/svg+xml"
+    },
+    "faviconStatus": "found",
+    "socialPreview": null,
+    "socialPreviewStatus": "missing",
+    "url": "https://benchmark-20260905-unserious-high-c-tan.vercel.app/",
+    "title": "datetime.store — we sell a t-shirt with the current datetime",
+    "width": 1440,
+    "height": 900,
+    "capturedAt": "2026-09-06T15:10:23.501Z",
+    "httpStatus": 200,
+    "errors": [],
+    "browser": "152.0.7977.82",
+    "deviceScaleFactor": 1,
+    "colorScheme": "light",
+    "timezone": "America/Los_Angeles"
+  },
+  "sonnet": {
+    "screenshot": "/suites/20260905-unserious-high/runs/20260905-unserious-high-claude-claude-sonnet-5/storefront.png",
+    "favicon": {
+      "path": "/suites/20260905-unserious-high/runs/20260905-unserious-high-claude-claude-sonnet-5/favicon.png",
+      "source": "https://benchmark-20260905-unserious-high-c-silk.vercel.app/icon?d7a45ad2d2b88e8f",
+      "mime": "image/png"
+    },
+    "faviconStatus": "found",
+    "socialPreview": {
+      "path": "/suites/20260905-unserious-high/runs/20260905-unserious-high-claude-claude-sonnet-5/social-preview.png",
+      "source": "https://benchmark-20260905-unserious-high-c-silk.vercel.app/api/artwork/now.png?fg=%23f5f3ee&bg=%230a0a0a",
+      "mime": "image/png",
+      "tag": "og:image",
+      "width": 1200,
+      "height": 1500,
+      "capturedAt": "2026-09-06T15:10:26.906Z"
+    },
+    "socialPreviewStatus": "found",
+    "url": "https://benchmark-20260905-unserious-high-c-silk.vercel.app/",
+    "title": "datetime.store — a t-shirt with the current datetime on it",
+    "width": 1440,
+    "height": 900,
+    "capturedAt": "2026-09-06T15:10:27.006Z",
+    "httpStatus": 200,
+    "errors": [],
+    "browser": "152.0.7977.82",
+    "deviceScaleFactor": 1,
+    "colorScheme": "light",
+    "timezone": "America/Los_Angeles"
+  }
+}

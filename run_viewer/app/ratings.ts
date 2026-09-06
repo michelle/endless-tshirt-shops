@@ -14,6 +14,43 @@ const unverified = (reason: string): Check => ({ result: "unverified", reason })
 // Audit judgments from each suite's summary.md plus inspection of archived art.
 // These are benchmark checks, not a live health check or launch certification.
 export const assessments: Record<string, Record<string, Assessment>> = {
+  "20260905-unserious-high": {
+    astra: {
+      artwork: pass("The exact 4677×5881 print is a legible raw timestamp on transparency, with 130,769 nontransparent pixels."),
+      checkout: unverified("The successful payment used a cloned fixture Session with hosted shipping collection removed and PaymentIntent shipping seeded. Paid backend fulfillment worked, but the original customer checkout was not verified."),
+      prodigi: pass("The deployed fulfillment handler sent the fixture's intended black/M artwork to ord_1170586. Source MD5 matches Prodigi; this integration check is distinct from hosted checkout."),
+    },
+    sol: {
+      artwork: fail("The deployed customer artwork has only 2,728 nontransparent pixels in tiny glyphs on a 4665×5844 canvas; the code also adds a slogan."),
+      checkout: unverified("Three open unpaid Checkout Sessions, no PaymentIntents or payment events. A direct smoke order does not establish end-to-end checkout."),
+      prodigi: unverified("Order ord_1170588 fetched the same artwork bytes through a standalone API test, not the application's paid fulfillment path."),
+    },
+    terra: {
+      artwork: fail("The transparent image includes THE INSTANT WAS and AND THEN IT WASN'T, beyond the timestamp."),
+      checkout: unverified("One unpaid Checkout Session and no PaymentIntents. Customer payment-to-fulfillment was not verified."),
+      prodigi: fail("Both classic and roomy choices submit the same TEE-AS-5001 garment; only standalone smoke order ord_1170592 was confirmed."),
+    },
+    luna: {
+      artwork: fail("Every pixel of the 4200×5370 canvas is opaque white apart from tiny rendered marks; the source also includes branding and a slogan."),
+      checkout: unverified("Nine unpaid Sessions, no PaymentIntents or payment events. Legacy shipping extraction is a code concern, not a newly observed paid failure in this suite."),
+      prodigi: fail("Both fit choices submit the same white unisex TEE-AS-5001. Only standalone smoke order ord_1170594 was confirmed; paid application delivery was not."),
+    },
+    fable: {
+      artwork: pass("The exact 4677×5881 print contains only a legible raw timestamp on transparency; 197,939 nontransparent pixels."),
+      checkout: pass("A genuine succeeded deployed PaymentIntent is linked to the app's fitted/M fulfillment and completed order. Browser payment steps were not independently replayed."),
+      prodigi: pass("Paid fitted/M order ord_1170596 uses the intended Bella + Canvas 6004 and deployed artwork; its source MD5 matches Prodigi. An earlier localhost-source order failed separately."),
+    },
+    opus: {
+      artwork: pass("The 3300×4228 transparent print contains only a legible raw timestamp; 127,358 nontransparent pixels. Physical print placement remains unverified."),
+      checkout: pass("A genuine paid $22.50 Checkout Session triggered the deployed fulfillment path and ord_1170598."),
+      prodigi: fail("The paid customer selected fitted, but the code ignores fit and order ord_1170598 contains unisex Gildan 64000. Payment and asset delivery do not excuse the wrong garment mapping."),
+    },
+    sonnet: {
+      artwork: fail("The actual 1200×1500 print is fully opaque and adds ms since epoch below the timestamp; it is not timestamp-only transparent artwork."),
+      checkout: pass("Two genuine paid $22.50 Checkout Sessions triggered orders for black/M and white/L variants."),
+      prodigi: pass("Paid customer orders ord_1170599 and ord_1170600 use the selected unisex garment/color/size and intended artwork. The latter's source MD5 matches Prodigi. Paid-state guarding still needs hardening."),
+    },
+  },
   "20260905-beauty-high": {
     astra: {
       artwork: pass("The archived 4665×5844 transparent print contains only the raw epoch at a readable scale."),

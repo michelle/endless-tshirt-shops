@@ -1,4 +1,10 @@
 export const statusDefinitions: Record<string, string> = {
+  "Paid fixture": "A real Stripe test payment completed on a Session cloned by the integration script, with the normal shipping form bypassed and shipping seeded on the PaymentIntent. This is backend integration evidence, not a verified customer checkout.",
+  "hosted checkout unverified": "The normal customer-facing checkout flow was not independently demonstrated. An altered integration fixture is not a substitute for that test.",
+  "Hosted unpaid": "The deployed application created a real Stripe Checkout Session, but no payment completed. This artwork was recovered using that Session's recorded inputs, not recreated from a guess.",
+  "extra print text": "The print includes slogans or subtitles beyond the timestamp, so it fails this suite's timestamp-only artwork requirement.",
+  "opaque print": "The PNG has an alpha channel but every pixel is opaque. Changing the viewer background cannot show through the image's own background; this fails the transparent-artwork requirement.",
+  "wrong garment fit": "The customer's fit selection was recorded, but fulfillment ignores it and orders the same unisex garment for every fit. The print may arrive on a different cut than the customer chose.",
   "Payment received": "Stripe confirms a completed test payment. This alone does not prove that fulfillment worked.",
   "fulfillment failed": "The paid customer's print order did not reach Prodigi. In this run, the webhook reads an obsolete shipping-address field and throws before submitting the order.",
   "Session artwork": "This image was fetched from the artwork URL recorded on the customer's Checkout Session. It is hosted customer-path artwork, but no matching Prodigi submission was confirmed.",

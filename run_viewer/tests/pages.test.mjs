@@ -35,8 +35,8 @@ test("static artifact contains every approved archive file, exact raster bytes, 
     if (/\/design\./.test(path)) designs++;
     if (/\/storefront\.png$/.test(path)) screenshots++;
   }
-  assert.ok(designs >= 14);
-  assert.ok(screenshots >= 14);
+  assert.ok(designs >= 21);
+  assert.ok(screenshots >= 21);
 });
 
 test("static Pages viewer supports suite links, history, scoring, and all archive assets", async () => {
@@ -55,7 +55,7 @@ test("static Pages viewer supports suite links, history, scoring, and all archiv
     const select = page.getByRole("combobox");
     assert.equal(await select.inputValue(), "20260905-beauty-high");
 
-    for (const [suite, expected] of [["20260905-beauty-high", [2, 1, 4]], ["20260905-minimal-high", [3, 3, 1]]]) {
+    for (const [suite, expected] of [["20260905-unserious-high", [1, 3, 3]], ["20260905-beauty-high", [2, 1, 4]], ["20260905-minimal-high", [3, 3, 1]]]) {
       await select.selectOption(suite);
       await page.waitForLoadState("networkidle");
       await page.waitForFunction(() => document.querySelectorAll(".storefront-thumbnail img").length === 7 &&
@@ -67,8 +67,9 @@ test("static Pages viewer supports suite links, history, scoring, and all archiv
       const captures = await page.locator(".storefront-thumbnail img").evaluateAll((images) => images.map((image) => image.getBoundingClientRect().top));
       assert.ok(Math.max(...captures) - Math.min(...captures) < 1, "Screenshots stay vertically aligned");
       const customerArt = page.locator(".design-card").filter({ has: page.locator(".model-title").filter({ hasText: suite.includes("minimal") ? "gpt-5.6-sol" : "claude-sonnet-5" }) }).locator(".art-canvas img");
-      assert.ok((await customerArt.getAttribute("src")).endsWith(suite.includes("minimal") ? "/paid-design.png" : "/design.jpg"), "Customer artwork must not be replaced with smoke-test placeholders or earlier local reproductions");
-      assert.deepEqual(await customerArt.evaluate((image) => [image.naturalWidth, image.naturalHeight]), [4665, 5844]);
+      const unserious = suite.includes("unserious");
+      assert.ok((await customerArt.getAttribute("src")).endsWith(unserious ? "/design.png" : suite.includes("minimal") ? "/paid-design.png" : "/design.jpg"), "Customer artwork must not be replaced with smoke-test placeholders or earlier local reproductions");
+      assert.deepEqual(await customerArt.evaluate((image) => [image.naturalWidth, image.naturalHeight]), unserious ? [1200, 1500] : [4665, 5844]);
       for (const card of await page.locator(".design-card").all()) {
         const thumbnail = card.locator("button.storefront-thumbnail");
         assert.equal(await thumbnail.getAttribute("aria-haspopup"), "dialog");
@@ -110,7 +111,7 @@ test("static Pages viewer supports suite links, history, scoring, and all archiv
     assert.equal(await page.locator(".design-card").count(), 0);
     assert.ok((await page.locator(".summary-section").innerText()).length > 100);
     await page.goto(`${base}?suite=unknown`, { waitUntil: "networkidle" });
-    assert.equal(await select.inputValue(), "20260905-minimal-high");
+    assert.equal(await select.inputValue(), "20260905-unserious-high");
 
     await page.goto(`${base}?suite=20260905-beauty-high&run=opus`, { waitUntil: "networkidle" });
     const dialog = page.getByRole("dialog");
