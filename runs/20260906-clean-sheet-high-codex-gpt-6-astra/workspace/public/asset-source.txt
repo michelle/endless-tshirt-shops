@@ -1,0 +1,11 @@
+Asset: black-shirt-render.png
+1200x1200 official Prodigi legacy mockup of blank Gildan 64000 black shirt.
+Background: #f4f3ef. Visually verified front view, blank shirt, no watermark.
+Product source: https://www.prodigi.com/products/mens-clothing/t-shirts/classic/gildan-64000/
+Official linked mockup app: https://mockups.prodigi.com/mockups/gildan-64000/
+Direct image URL: https://image.kite.ly/render/?product_id=tshirt_uk&format=png&debug=false&size=1200x1200&background=f4f3ef&fill_mode=contain&scene_resize_type=cover&variant=black
+Template metadata: https://image.kite.ly/product/tshirt_uk/
+The product print zone in the 1200x1200 source is approximately x=365..835, y=285..875. For a chest graphic choose a smaller centered area within that zone.
+Reuse statement: https://support.prodigi.com/hc/en-us/articles/13155448132508-Do-you-have-a-product-mockup-service
+Prodigi says the legacy generator enables instant product previews to download and display in your online store, and lists photography assets as free resources.
+https://www.prodigi.com/downloads/ labels its collection Free-to-use assets and marketing materials.

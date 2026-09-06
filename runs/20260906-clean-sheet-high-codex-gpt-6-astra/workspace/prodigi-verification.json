@@ -1,0 +1,17 @@
+{
+  "orderId": "ord_1170683",
+  "firstOutcome": "Created",
+  "retryOutcome": "AlreadyExists",
+  "status": {
+    "stage": "InProgress",
+    "issues": [],
+    "details": {
+      "downloadAssets": "NotStarted",
+      "printReadyAssetsPrepared": "NotStarted",
+      "allocateProductionLocation": "NotStarted",
+      "inProduction": "NotStarted",
+      "shipping": "NotStarted"
+    }
+  },
+  "createdAt": "2026-09-06T15:21:12.267Z"
+}

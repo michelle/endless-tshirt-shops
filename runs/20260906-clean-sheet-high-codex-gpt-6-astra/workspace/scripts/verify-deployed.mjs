@@ -1,0 +1,16 @@
+import Stripe from 'stripe';
+import assert from 'node:assert/strict';
+import {writeFile} from 'node:fs/promises';
+const base=process.env.STORE_URL, stripe=new Stripe(process.env.STRIPE_SECRET_KEY);
+const report={base,checks:[],createdAt:new Date().toISOString()};
+async function check(name,fn){await fn();report.checks.push(name);console.log('PASS',name);}
+await check('Public storefront, policies and versioned print files load',async()=>{for(const path of ['/','/policies','/artwork/orbit-v1.png','/artwork/phase-v2.png','/artwork/pluto-v1.png']){const r=await fetch(base+path);assert.equal(r.status,200,path);}});
+await check('Invalid order token rejected',async()=>{assert.equal((await fetch(base+'/api/orders?session_id=invalid')).status,400);});
+await check('Unsigned webhook rejected',async()=>{assert.equal((await fetch(base+'/api/webhooks/stripe',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'})).status,400);});
+await check('Cross-origin checkout rejected',async()=>{assert.equal((await fetch(base+'/api/checkout',{method:'POST',headers:{Origin:'https://example.com','Content-Type':'application/json'},body:JSON.stringify({items:[{id:'orbit',size:'m',quantity:1}]})})).status,403);});
+await check('Catalog and price tampering rejected',async()=>{assert.equal((await fetch(base+'/api/checkout',{method:'POST',headers:{Origin:base,'Content-Type':'application/json'},body:JSON.stringify({items:[{id:'orbit',size:'m',quantity:1,price:1}]})})).status,400);});
+let session;
+await check('Real Stripe Checkout session created with correct line items and shipping',async()=>{const r=await fetch(base+'/api/checkout',{method:'POST',headers:{Origin:base,'Content-Type':'application/json'},body:JSON.stringify({items:[{id:'orbit',size:'m',quantity:1},{id:'phase',size:'s',quantity:2}]})});const d=await r.json();assert.equal(r.status,200,JSON.stringify(d));assert.ok(d.url.startsWith('https://checkout.stripe.com/'));const sessions=await stripe.checkout.sessions.list({limit:10});session=sessions.data.find(s=>s.url===d.url);assert.ok(session);assert.equal(session.amount_total,10200);assert.equal(session.livemode,false);assert.equal(session.metadata.store,'night-shift-v1');assert.equal(session.metadata.artworkRevision,'v2');report.checkoutSessionId=session.id;await writeFile('/tmp/nightshift-checkout-url.txt',d.url);});
+await check('Forged paid event cannot fulfill an unpaid Stripe session',async()=>{const body=JSON.stringify({id:'evt_nightshift_unpaid_guard',object:'event',type:'checkout.session.completed',data:{object:{id:session.id,payment_status:'paid'}}});const sig=stripe.webhooks.generateTestHeaderString({payload:body,secret:process.env.STRIPE_WEBHOOK_SECRET});const r=await fetch(base+'/api/webhooks/stripe',{method:'POST',headers:{'Content-Type':'application/json','stripe-signature':sig},body});assert.equal(r.status,500);assert.equal((await stripe.checkout.sessions.retrieve(session.id)).metadata.prodigiOrderId,undefined);});
+await check('Order status reflects unpaid checkout',async()=>{const r=await fetch(base+'/api/orders?session_id='+session.id);const d=await r.json();assert.equal(d.payment,'unpaid');assert.equal(d.orderId,undefined);});
+await writeFile('verification.json',JSON.stringify(report,null,2));

@@ -1,0 +1,7 @@
+.env*
+PRIVATE_HANDOFF.md
+verification.json
+prodigi-verification.json
+node_modules
+.next
+.git

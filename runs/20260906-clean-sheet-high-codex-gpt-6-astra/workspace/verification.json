@@ -1,0 +1,34 @@
+{
+  "base": "https://benchmark-20260906-clean-sheet-high-codex-gpt-6-astra.vercel.app",
+  "checks": [
+    "Public storefront, policies and versioned print files load",
+    "Invalid order token rejected",
+    "Unsigned webhook rejected",
+    "Cross-origin checkout rejected",
+    "Catalog and price tampering rejected",
+    "Real Stripe Checkout session created with correct line items and shipping",
+    "Forged paid event cannot fulfill an unpaid Stripe session",
+    "Order status reflects unpaid checkout",
+    "Actual test payment → automatic Stripe webhook → Prodigi sandbox fulfillment",
+    "Duplicate paid webhook handled without creating another order",
+    "Customer paid status and privacy verified"
+  ],
+  "createdAt": "2026-09-06T15:28:20.300Z",
+  "checkoutSessionId": "cs_test_b17i6uVnP4YOvVvoD3pojMHmkTYA7Hq5t7Fj9EsyBlqDXZQDWvn2q4GHfT",
+  "fulfillment": {
+    "orderId": "ord_1170685",
+    "payment": "paid",
+    "stage": "InProgress",
+    "issues": [],
+    "assetStates": [
+      [
+        "Complete"
+      ],
+      [
+        "Complete"
+      ]
+    ],
+    "replayVerified": true,
+    "verifiedAt": "2026-09-06T15:28:47.189Z"
+  }
+}
