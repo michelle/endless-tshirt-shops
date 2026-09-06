@@ -55,6 +55,13 @@ test("static Pages viewer supports suite links, history, scoring, and all archiv
     const select = page.getByRole("combobox");
     assert.equal(await select.inputValue(), "20260905-beauty-high");
 
+    for (const id of ["20260823-serial-high", "20260825-fresh6-high", "20260825-harness6-high", "20260827-harness6-high"]) {
+      assert.match(await select.locator(`option[value="${id}"]`).innerText(), / \(legacy\)$/);
+    }
+    for (const id of ["20260905-beauty-high", "20260905-minimal-high", "20260905-unserious-high"]) {
+      assert.doesNotMatch(await select.locator(`option[value="${id}"]`).innerText(), /\(legacy\)/);
+    }
+
     for (const [suite, expected] of [["20260905-unserious-high", [1, 3, 3]], ["20260905-beauty-high", [2, 1, 4]], ["20260905-minimal-high", [3, 3, 1]]]) {
       await select.selectOption(suite);
       await page.waitForLoadState("networkidle");

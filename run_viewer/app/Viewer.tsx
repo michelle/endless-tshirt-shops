@@ -276,7 +276,7 @@ export default function Viewer() {
             navigateToRun(event.target.value);
           }}>
             {suites.map((candidate) => (
-              <option key={candidate.id} value={candidate.id}>{candidate.label}</option>
+              <option key={candidate.id} value={candidate.id}>{candidate.label}{candidate.runs.length === 0 ? " (legacy)" : ""}</option>
             ))}
           </select>
         </label>
