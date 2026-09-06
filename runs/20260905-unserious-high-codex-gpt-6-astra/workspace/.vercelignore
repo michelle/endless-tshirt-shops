@@ -1,0 +1,7 @@
+.env*
+SANDBOX_CLAIM.txt
+tests/
+scripts/
+test-results/
+README.md
+.next/
