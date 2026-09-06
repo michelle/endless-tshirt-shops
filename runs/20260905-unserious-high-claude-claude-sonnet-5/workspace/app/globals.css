@@ -1,0 +1,21 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  background-color: #f5f3ee;
+}
+
+body {
+  color: #0a0a0a;
+  background-color: #f5f3ee;
+}
+
+::selection {
+  background-color: #ff5a1f;
+  color: #f5f3ee;
+}
+
+details summary::-webkit-details-marker {
+  display: none;
+}
