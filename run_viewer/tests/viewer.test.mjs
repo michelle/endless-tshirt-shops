@@ -51,19 +51,45 @@ test("packages all 14 full-canvas designs, final outputs, and all summaries", as
 
   const source = await readFile(new URL("../app/data.ts", import.meta.url), "utf8");
   const viewer = await readFile(new URL("../app/Viewer.tsx", import.meta.url), "utf8");
-  assert.equal((source.match(/finalOutput: "\/suites/g) ?? []).length, 14);
-  assert.equal((source.match(/design: "\/suites/g) ?? []).length, 14);
-  assert.equal((source.match(/deployment: "https:\/\//g) ?? []).length, 14);
+  assert.ok((source.match(/finalOutput: "\/suites/g) ?? []).length >= 14);
+  assert.ok((source.match(/design: "\/suites/g) ?? []).length >= 14);
+  assert.ok((source.match(/deployment: "https:\/\//g) ?? []).length >= 14);
   assert.match(viewer, /ReactMarkdown/);
   assert.match(viewer, /remarkGfm/);
 
   const allSuites = await readdir(new URL("../public/suites/", import.meta.url));
-  assert.deepEqual(allSuites.sort(), [
+  for (const suite of [
     "20260823-serial-high",
     "20260825-fresh6-high",
     "20260825-harness6-high",
     "20260827-harness6-high",
     "20260905-beauty-high",
     "20260905-minimal-high",
-  ]);
+  ]) assert.ok(allSuites.includes(suite), `Missing archived suite ${suite}`);
 });
+
+for (const [suiteId, missingIcons] of [
+  ["20260905-beauty-high", ["terra", "luna"]],
+  ["20260905-minimal-high", ["astra", "sol", "terra", "luna", "fable"]],
+]) {
+test(`archives seven ${suiteId} viewport screenshots and their actual favicon sources`, async () => {
+  const captures = JSON.parse(await readFile(new URL(`../public/suites/${suiteId}/storefronts.json`, import.meta.url), "utf8"));
+  assert.deepEqual(Object.keys(captures).sort(), ["astra", "fable", "luna", "opus", "sol", "sonnet", "terra"]);
+  for (const [model, capture] of Object.entries(captures)) {
+    assert.equal(capture.httpStatus, 200);
+    assert.ok(Number.isFinite(Date.parse(capture.capturedAt)));
+    const screenshot = await readFile(new URL(`../public${capture.screenshot}`, import.meta.url));
+    assert.equal(screenshot.subarray(1, 4).toString(), "PNG");
+    assert.equal(screenshot.readUInt32BE(16), 1440);
+    assert.equal(screenshot.readUInt32BE(20), 900);
+    assert.equal(capture.width, 1440);
+    assert.equal(capture.height, 900);
+    if (missingIcons.includes(model)) {
+      assert.equal(capture.favicon, null);
+    } else {
+      assert.ok(capture.favicon.source);
+      assert.ok((await readFile(new URL(`../public${capture.favicon.path}`, import.meta.url))).length > 0);
+    }
+  }
+});
+}

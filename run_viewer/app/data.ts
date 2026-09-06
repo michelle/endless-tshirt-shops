@@ -1,3 +1,16 @@
+export type Storefront = {
+  screenshot: string;
+  favicon: { path: string; source: string; mime: string } | null;
+  faviconStatus?: "found" | "missing" | "unavailable";
+  url: string;
+  title: string;
+  width: number;
+  height: number;
+  capturedAt: string;
+  httpStatus: number | null;
+  errors: string[];
+};
+
 export type Run = {
   id: string;
   model: string;

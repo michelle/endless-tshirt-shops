@@ -1,0 +1,104 @@
+{
+  "astra": {
+    "screenshot": "/suites/20260905-beauty-high/runs/20260905-beauty-high-codex-gpt-6-astra/storefront.png",
+    "favicon": {
+      "path": "/suites/20260905-beauty-high/runs/20260905-beauty-high-codex-gpt-6-astra/favicon.png",
+      "source": "https://benchmark-20260905-beauty-high-codex-gpt-6-astra.vercel.app/icon.png?icon.0gr6_8ry22-d2.png",
+      "mime": "image/png"
+    },
+    "url": "https://benchmark-20260905-beauty-high-codex-gpt-6-astra.vercel.app/",
+    "title": "datetime.store — Time flies. Wear it.",
+    "width": 1440,
+    "height": 900,
+    "capturedAt": "2026-09-06T00:36:18.944Z",
+    "httpStatus": 200,
+    "errors": []
+  },
+  "terra": {
+    "screenshot": "/suites/20260905-beauty-high/runs/20260905-beauty-high-codex-gpt-5.6-terra/storefront.png",
+    "favicon": null,
+    "url": "https://benchmark-20260905-beauty-high-code-woad.vercel.app/",
+    "title": "datetime.store — wear a moment",
+    "width": 1440,
+    "height": 900,
+    "capturedAt": "2026-09-06T00:36:18.945Z",
+    "httpStatus": 200,
+    "errors": [
+      "Minified React error #425; visit https://react.dev/errors/425 for the full message or use the non-minified dev environment for full errors and additional helpful warnings.",
+      "Minified React error #425; visit https://react.dev/errors/425 for the full message or use the non-minified dev environment for full errors and additional helpful warnings.",
+      "Minified React error #425; visit https://react.dev/errors/425 for the full message or use the non-minified dev environment for full errors and additional helpful warnings.",
+      "Minified React error #425; visit https://react.dev/errors/425 for the full message or use the non-minified dev environment for full errors and additional helpful warnings.",
+      "Minified React error #418; visit https://react.dev/errors/418 for the full message or use the non-minified dev environment for full errors and additional helpful warnings.",
+      "Minified React error #423; visit https://react.dev/errors/423 for the full message or use the non-minified dev environment for full errors and additional helpful warnings."
+    ]
+  },
+  "sol": {
+    "screenshot": "/suites/20260905-beauty-high/runs/20260905-beauty-high-codex-gpt-5.6-sol/storefront.png",
+    "favicon": {
+      "path": "/suites/20260905-beauty-high/runs/20260905-beauty-high-codex-gpt-5.6-sol/favicon.png",
+      "source": "https://benchmark-20260905-beauty-high-code-ten.vercel.app/icon?44af914002d66e57",
+      "mime": "image/png"
+    },
+    "url": "https://benchmark-20260905-beauty-high-code-ten.vercel.app/",
+    "title": "datetime.store — Wear this exact moment",
+    "width": 1440,
+    "height": 900,
+    "capturedAt": "2026-09-06T00:36:29.453Z",
+    "httpStatus": 200,
+    "errors": []
+  },
+  "luna": {
+    "screenshot": "/suites/20260905-beauty-high/runs/20260905-beauty-high-codex-gpt-5.6-luna/storefront.png",
+    "favicon": null,
+    "url": "https://benchmark-20260905-beauty-high-code-one.vercel.app/",
+    "title": "datetime.store — wear the moment",
+    "width": 1440,
+    "height": 900,
+    "capturedAt": "2026-09-06T00:36:31.725Z",
+    "httpStatus": 200,
+    "errors": [
+      "Minified React error #418; visit https://react.dev/errors/418?args[]=text&args[]= for the full message or use the non-minified dev environment for full errors and additional helpful warnings."
+    ]
+  },
+  "opus": {
+    "screenshot": "/suites/20260905-beauty-high/runs/20260905-beauty-high-claude-claude-opus-5/storefront.png",
+    "favicon": {"path":"/suites/20260905-beauty-high/runs/20260905-beauty-high-claude-claude-opus-5/favicon.svg","source":"data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20rx%3D%227%22%20fill%3D%22%2316130f%22%2F%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2217%22%20r%3D%229%22%20fill%3D%22none%22%20stroke%3D%22%23f7f3ea%22%20stroke-width%3D%222%22%2F%3E%3Cpath%20d%3D%22M16%2012v5.4l3.4%202%22%20stroke%3D%22%23ff4d2e%22%20stroke-width%3D%222.2%22%20fill%3D%22none%22%20stroke-linecap%3D%22round%22%2F%3E%3Cpath%20d%3D%22M12.5%206h7%22%20stroke%3D%22%23f7f3ea%22%20stroke-width%3D%222.4%22%20stroke-linecap%3D%22round%22%2F%3E%3C%2Fsvg%3E","mime":"image/svg+xml"},
+    "url": "https://benchmark-20260905-beauty-high-clau-gold.vercel.app/",
+    "title": "datetime.store — we sell a t-shirt with the current datetime",
+    "width": 1440,
+    "height": 900,
+    "capturedAt": "2026-09-06T00:36:31.746Z",
+    "httpStatus": 200,
+    "errors": []
+  },
+  "fable": {
+    "screenshot": "/suites/20260905-beauty-high/runs/20260905-beauty-high-claude-claude-fable-5-1/storefront.png",
+    "favicon": {
+      "path": "/suites/20260905-beauty-high/runs/20260905-beauty-high-claude-claude-fable-5-1/favicon.svg",
+      "source": "https://benchmark-20260905-beauty-high-clau.vercel.app/icon.svg",
+      "mime": "image/svg+xml"
+    },
+    "url": "https://benchmark-20260905-beauty-high-clau.vercel.app/",
+    "title": "datetime.store — we sell a t-shirt with the current datetime",
+    "width": 1440,
+    "height": 900,
+    "capturedAt": "2026-09-06T00:36:32.188Z",
+    "httpStatus": 200,
+    "errors": []
+  },
+  "sonnet": {
+    "screenshot": "/suites/20260905-beauty-high/runs/20260905-beauty-high-claude-claude-sonnet-5/storefront.png",
+    "favicon": {
+      "path": "/suites/20260905-beauty-high/runs/20260905-beauty-high-claude-claude-sonnet-5/favicon.png",
+      "source": "https://benchmark-20260905-beauty-high-clau-two.vercel.app/icon?4a9fd017c639d9e8",
+      "mime": "image/png"
+    },
+    "url": "https://benchmark-20260905-beauty-high-clau-two.vercel.app/",
+    "title": "datetime.store — wear this exact moment",
+    "width": 1440,
+    "height": 900,
+    "capturedAt": "2026-09-06T00:36:33.226Z",
+    "httpStatus": 200,
+    "errors": []
+  }
+}

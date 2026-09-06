@@ -91,4 +91,25 @@ the evidence is paid, synthetic, direct, or local in the viewer manifest. Do
 not store credentials, signed private URLs, webhook secrets, raw transcripts,
 customer PII, or payment client secrets in viewer data.
 
+Register the suite and run deployment URLs in `run_viewer/app/data.ts`. After
+the deployments settle, capture their initial browser viewports and favicons:
+
+```bash
+cd run_viewer
+npm ci
+npx playwright install chromium
+npm run capture -- --suite <suite-id>
+```
+
+This archives `storefront.png` and available `favicon.*` files beside each run's
+artwork and writes `public/suites/<suite-id>/storefronts.json`. The viewer loads
+that manifest automatically for any registered suite. Use the same 1440 × 900
+viewport for comparisons. Keep the capture timestamp, URL, HTTP status, and
+missing/unavailable favicon evidence; these are fresh captures of deployments,
+not historical screenshots from the benchmark. Never submit checkout forms
+while capturing. Existing captures are skipped; use `--run <run-id>` for a
+targeted retry and `--overwrite` only for an intentional refresh. Check
+`capture-errors.json` and report missing captures instead of substituting
+another run's screenshot. See `run_viewer/README.md` for browser setup options.
+
 Treat the results as directional case studies, not a formal ranking.
