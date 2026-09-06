@@ -4,6 +4,7 @@ import { assessments, rateRun } from "../app/ratings.ts";
 
 test("every reviewed run has three explicit checks, reasons, and the strict color", () => {
   const expected = {
+    "20260906-clean-sheet-high": [3, 1, 1, 1, 3, 2, 1],
     "20260905-unserious-high": [2, 0, 0, 0, 3, 2, 2],
     "20260905-beauty-high": [3, 0, 0, 0, 3, 2, 0],
     "20260905-minimal-high": [3, 2, 2, 0, 3, 3, 2],
@@ -18,6 +19,14 @@ test("every reviewed run has three explicit checks, reasons, and the strict colo
       assert.equal(rating.checks.length, 3);
       for (const check of rating.checks) assert.ok(check.reason.length > 20);
     });
+  }
+});
+
+test("clean-sheet uses its own theme criterion without weakening timestamp-only suites", () => {
+  assert.equal(rateRun("20260906-clean-sheet-high", "sonnet").checks[0].label, "Printable theme design");
+  for (const suite of ["20260905-minimal-high", "20260905-beauty-high", "20260905-unserious-high"]) {
+    assert.equal(rateRun(suite, "sonnet").checks[0].label, "Timestamp-only print");
+    assert.equal(rateRun(suite, "sonnet").checks[0].result, "fail");
   }
 });
 

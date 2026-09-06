@@ -14,6 +14,43 @@ const unverified = (reason: string): Check => ({ result: "unverified", reason })
 // Audit judgments from each suite's summary.md plus inspection of archived art.
 // These are benchmark checks, not a live health check or launch certification.
 export const assessments: Record<string, Record<string, Assessment>> = {
+  "20260906-clean-sheet-high": {
+    astra: {
+      artwork: pass("Legible high-resolution astronomy artwork on transparency; exact paid orbit and phase-v2 source hashes match Prodigi."),
+      checkout: pass("Two original app-created $102.00 Sessions were paid through API-driven confirmation with shipping collection intact and fulfilled; not cloned fixtures."),
+      prodigi: pass("Paid orbit/M and phase/S quantities map to black Gildan 64000; both orders fetched the intended assets. Physical samples remain unverified."),
+    },
+    sol: {
+      artwork: pass("The actual 6000×7200 customer-path 418 print is readable transparent artwork intended for an orange shirt."),
+      checkout: unverified("Three unpaid Sessions, no PaymentIntents or payment events; the customer payment-to-order path was not demonstrated."),
+      prodigi: unverified("Committed fulfillment code exists, but no matched app order or asset delivery was confirmed."),
+    },
+    terra: {
+      artwork: pass("The 2490×3510 outdoor design is a coherent opaque panel. This prompt allows themed graphics; sample the panel on each garment color before launch."),
+      checkout: unverified("Both app Sessions stayed unpaid; there is no customer payment-to-fulfillment proof."),
+      prodigi: unverified("Catalog colors are valid, but no paid app order verifies the TEE-AA-1301 mapping and public asset delivery."),
+    },
+    luna: {
+      artwork: pass("The 2172×724 transparent fixed-edition timestamp is legible pixel typography. This prompt does not require purchase-time capture; lower raster resolution needs physical-scale validation."),
+      checkout: unverified("Three unpaid Sessions and no payments. The legacy-shaped synthetic event does not verify real current checkout events."),
+      prodigi: fail("The app offers navy blue absent from the exact TEE-GIL-64000 catalog, reads legacy shipping_details, and lacks a paid-state guard. Only synthetic black/M delivery was confirmed."),
+    },
+    fable: {
+      artwork: pass("The paid 4665×5844 transparent HTTP response design is legible, rendered with bundled fonts, and hash-matched to Prodigi."),
+      checkout: pass("A genuine paid $34.99 app Session is linked to the selected navy blue/XL order and payment receipt."),
+      prodigi: pass("Order ord_1170711 is Complete with the intended Gildan 64000 variant and source. Body idempotency and receipt reuse are present; wider catalog regression testing remains."),
+    },
+    opus: {
+      artwork: pass("The exact paid 3000×3758 indexed PNG is a coherent, transparent Rule 184 cellular-automaton design; its hash matches Prodigi."),
+      checkout: pass("Two genuine app Sessions were paid and produced matching custom/multi-item orders. Browser gestures and latest webhook delivery were not independently replayed."),
+      prodigi: fail("One paid cart produced duplicate orders. Final code sends Idempotency-Key as a header instead of the documented JSON idempotencyKey; non-atomic prelookup does not close the race."),
+    },
+    sonnet: {
+      artwork: pass("The actual 4665×5844 HTTP 418 panel is legible and intentionally colored. Opaque themed panels are allowed by clean-sheet, unlike timestamp-only prompts."),
+      checkout: unverified("App 404/M and 418/L Sessions remain unpaid. The sole $30 paid fixture has no product metadata and does not demonstrate customer fulfillment."),
+      prodigi: unverified("Order ord_1170723 was a separate 500/M direct API smoke test, not the app's paid ordering path. Missing paid/idempotency guards still require fixes."),
+    },
+  },
   "20260905-unserious-high": {
     astra: {
       artwork: pass("The exact 4677×5881 print is a legible raw timestamp on transparency, with 130,769 nontransparent pixels."),
@@ -131,6 +168,10 @@ export function rateRun(suiteId: string, runId: string) {
   const assessment = assessments[suiteId]?.[runId];
   const checks = criteria.map((criterion) => ({
     ...criterion,
+    ...(suiteId === "20260906-clean-sheet-high" && criterion.id === "artwork" ? {
+      label: "Printable theme design",
+      definition: "A coherent theme design legible at shirt scale with suitable raster detail. This prompt allows graphics and intentional colored panels; opacity is disclosed, not automatically failed. Physical samples remain unverified.",
+    } : {}),
     ...(assessment?.[criterion.id] ?? unverified("No independent audit evidence recorded for this check.")),
   }));
   const passed = checks.filter((check) => check.result === "pass").length;

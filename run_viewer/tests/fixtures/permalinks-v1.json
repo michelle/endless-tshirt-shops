@@ -3,6 +3,59 @@
   "note": "Append new published destinations. Do not remove old IDs to make a regression pass; preserve compatibility or add aliases.",
   "suites": [
     {
+      "id": "20260906-clean-sheet-high",
+      "runs": [
+        {
+          "id": "astra",
+          "model": "Codex · gpt-6-astra"
+        },
+        {
+          "id": "sol",
+          "model": "Codex · gpt-5.6-sol"
+        },
+        {
+          "id": "terra",
+          "model": "Codex · gpt-5.6-terra"
+        },
+        {
+          "id": "luna",
+          "model": "Codex · gpt-5.6-luna"
+        },
+        {
+          "id": "fable",
+          "model": "Claude · claude-fable-5-1"
+        },
+        {
+          "id": "opus",
+          "model": "Claude · claude-opus-5"
+        },
+        {
+          "id": "sonnet",
+          "model": "Claude · claude-sonnet-5"
+        }
+      ],
+      "headings": [
+        "summary-seven-model-clean-sheet-benchmark-2026-09-06",
+        "summary-scoring-for-this-prompt",
+        "summary-overview",
+        "summary-framework-and-major-technology-choices",
+        "summary-stripe-integration-and-payment-evidence",
+        "summary-astra-original-app-checkout-not-a-replacement-fixture",
+        "summary-fable-and-opus-payment-and-fulfillment-confirmed-browser-gestures-not-replayed",
+        "summary-sonnet-a-paid-test-is-not-a-paid-customer-order-test",
+        "summary-application-flow-and-failure-recovery",
+        "summary-opus-duplicate-protection-remains-a-launch-blocker",
+        "summary-design-correctness-and-print-proof",
+        "summary-garment-and-print-area-mapping",
+        "summary-testing-and-observed-storefront-issues",
+        "summary-isolation-and-reproducibility",
+        "summary-token-usage",
+        "summary-complexity",
+        "summary-production-quality-pieces-and-launch-blockers",
+        "summary-human-handoff"
+      ]
+    },
+    {
       "id": "20260905-unserious-high",
       "runs": [
         {

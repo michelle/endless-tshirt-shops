@@ -24,6 +24,7 @@ test("server-renders the benchmark viewer", async () => {
   assert.match(html, /Minimal prompt/);
   assert.match(html, /Beauty prompt/);
   assert.match(html, /Unserious prompt/);
+  assert.match(html, /Clean-sheet prompt/);
   assert.match(html, /Harness 6/);
   assert.match(html, /Codex · gpt-6-astra/);
   assert.match(html, /Design background/);
@@ -32,8 +33,8 @@ test("server-renders the benchmark viewer", async () => {
   assert.equal((html.match(/Full print canvas generated/g) ?? []).length, 7);
 });
 
-test("packages all 21 full-canvas designs, final outputs, and all summaries", async () => {
-  const suiteNames = ["20260905-minimal-high", "20260905-beauty-high", "20260905-unserious-high"];
+test("packages all 28 full-canvas designs, final outputs, and all summaries", async () => {
+  const suiteNames = ["20260906-clean-sheet-high", "20260905-minimal-high", "20260905-beauty-high", "20260905-unserious-high"];
 
   for (const suite of suiteNames) {
     const [designs, finals, summary] = await Promise.all([
@@ -71,6 +72,7 @@ test("packages all 21 full-canvas designs, final outputs, and all summaries", as
 });
 
 for (const [suiteId, missingIcons] of [
+  ["20260906-clean-sheet-high", ["astra", "luna", "opus"]],
   ["20260905-unserious-high", ["terra", "luna"]],
   ["20260905-beauty-high", ["terra", "luna"]],
   ["20260905-minimal-high", ["astra", "sol", "terra", "luna", "fable"]],

@@ -46,6 +46,62 @@ const models = {
 
 export const suites: Suite[] = [
   {
+    id: "20260906-clean-sheet-high",
+    label: "2026-09-06 · Clean-sheet prompt",
+    summary: "/suites/20260906-clean-sheet-high/summary.md",
+    runs: [
+      {
+        id: "astra", model: models.astra, commit: "d67a9f00", status: "Paid E2E · asset fetched",
+        deployment: "https://benchmark-20260906-clean-sheet-high-codex-gpt-6-astra.vercel.app",
+        finalOutput: "/suites/20260906-clean-sheet-high/runs/20260906-clean-sheet-high-codex-gpt-6-astra/final.md", design: "/suites/20260906-clean-sheet-high/runs/20260906-clean-sheet-high-codex-gpt-6-astra/design.png",
+        width: 4677, height: 5881, alpha: "RGBA transparency",
+        evidence: "Exact paid orbit/M source from ord_1170685; MD5 matches Prodigi. 956,727 nontransparent pixels; bounds (906,407)–(3771,5129). Black Gildan 64000, front, fitPrintArea. The same paid cart includes phase/S ×2; its v2 source was also hash-verified. API-driven confirmation used the original app Session with shipping, not a cloned fixture. Physical samples remain unverified.",
+      },
+      {
+        id: "sol", model: models.sol, commit: "14d4ed07", status: "Hosted unpaid · theme design",
+        deployment: "https://benchmark-20260906-clean-sheet-high-lovat.vercel.app",
+        finalOutput: "/suites/20260906-clean-sheet-high/runs/20260906-clean-sheet-high-codex-gpt-5.6-sol/final.md", design: "/suites/20260906-clean-sheet-high/runs/20260906-clean-sheet-high-codex-gpt-5.6-sol/design.png",
+        width: 6000, height: 7200, alpha: "RGBA transparency · dark ink for orange shirt",
+        evidence: "Exact hosted /prints/418-teapot.png selected by the unpaid orange/XL Session. 2,151,132 nontransparent pixels; bounds (493,2340)–(5504,4321). Expected app mapping: Gildan 5000, front, fitPrintArea. Dark lettering is intended for the orange garment; choose a light/orange viewer background to inspect it. No paid app order or confirmed Prodigi delivery.",
+      },
+      {
+        id: "terra", model: models.terra, commit: "41ad2a8c", status: "Hosted unpaid · opaque panel",
+        deployment: "https://benchmark-20260906-clean-sheet-high-two.vercel.app",
+        finalOutput: "/suites/20260906-clean-sheet-high/runs/20260906-clean-sheet-high-codex-gpt-5.6-terra/final.md", design: "/suites/20260906-clean-sheet-high/runs/20260906-clean-sheet-high-codex-gpt-5.6-terra/design.png",
+        width: 2490, height: 3510, alpha: "RGBA, but every pixel opaque",
+        evidence: "Actual /trail-marker-print.png for the unpaid charcoal/M Session. All 8,739,900 pixels opaque; full-canvas bounds. This is an intentional dark topographic panel, allowed by the clean-sheet theme prompt. Expected mapping: TEE-AA-1301, front, fitPrintArea. Catalog confirms charcoal/forest/cream; app payment and delivery remain unverified.",
+      },
+      {
+        id: "luna", model: models.luna, commit: "90e9f6e4", status: "Hosted unpaid · fulfillment concerns",
+        deployment: "https://benchmark-20260906-clean-sheet-high-teal.vercel.app",
+        finalOutput: "/suites/20260906-clean-sheet-high/runs/20260906-clean-sheet-high-codex-gpt-5.6-luna/final.md", design: "/suites/20260906-clean-sheet-high/runs/20260906-clean-sheet-high-codex-gpt-5.6-luna/design.png",
+        width: 2172, height: 724, alpha: "RGBA transparency · fixed-edition artwork",
+        evidence: "Actual static customer-path PNG for the unpaid black/M Session; fixed edition 2026-09-06 23:41, not purchase time. 165,665 nontransparent pixels; bounds (33,104)–(2011,463). Bytes match synthetic order ord_1170700, which is not paid checkout proof. TEE-GIL-64000, front, fitPrintArea; navy blue is offered but absent from this exact SKU's catalog. Handler reads legacy shipping_details. Lower print resolution and physical size require sample validation.",
+      },
+      {
+        id: "fable", model: models.fable, commit: "c7173019", status: "Paid E2E · completed print",
+        deployment: "https://benchmark-20260906-clean-sheet-high-fawn.vercel.app",
+        finalOutput: "/suites/20260906-clean-sheet-high/runs/20260906-clean-sheet-high-claude-claude-fable-5-1/final.md", design: "/suites/20260906-clean-sheet-high/runs/20260906-clean-sheet-high-claude-claude-fable-5-1/design.png",
+        width: 4665, height: 5844, alpha: "RGBA transparency · white ink for navy shirt",
+        evidence: "Exact 418 response design from paid navy blue/XL order ord_1170711; MD5 matches Prodigi. 499,502 nontransparent pixels; bounds (320,1029)–(4334,2966). Gildan 64000, front, fillPrintArea. Stripe receipt and merchant reference agree; Prodigi reports Complete. White-on-white thumbnail is inconclusive without the original viewed against a dark background. Browser card-entry gestures were not independently replayed.",
+      },
+      {
+        id: "opus", model: models.opus, commit: "6b779482", status: "Paid E2E · duplicate-order risk",
+        deployment: "https://benchmark-20260906-clean-sheet-high-rosy.vercel.app",
+        finalOutput: "/suites/20260906-clean-sheet-high/runs/20260906-clean-sheet-high-claude-claude-opus-5/final.md", design: "/suites/20260906-clean-sheet-high/runs/20260906-clean-sheet-high-claude-claude-opus-5/design.png",
+        width: 3000, height: 3758, alpha: "Indexed PNG with transparency",
+        evidence: "Exact paid Rule 184 / seed 7C2B10 / ember / 121-cell design from ord_1170722; MD5 matches Prodigi. 2,720,444 nontransparent pixels; bounds (169,225)–(2831,3103). Black/XL Gildan 64000, front, fillPrintArea. Earlier one-payment cart created duplicate orders 1170716/1170717. Final code still uses an idempotency header instead of Prodigi's documented JSON field; prelookup is not atomic. Latest completion event still has a pending webhook.",
+      },
+      {
+        id: "sonnet", model: models.sonnet, commit: "bffe31cf", status: "App checkout unpaid · opaque panel",
+        deployment: "https://benchmark-20260906-clean-sheet-high-coral.vercel.app",
+        finalOutput: "/suites/20260906-clean-sheet-high/runs/20260906-clean-sheet-high-claude-claude-sonnet-5/final.md", design: "/suites/20260906-clean-sheet-high/runs/20260906-clean-sheet-high-claude-claude-sonnet-5/design.png",
+        width: 4665, height: 5844, alpha: "RGBA · colored panel, no fully transparent pixels",
+        evidence: "Exact static 418 design selected by the unpaid black/L app Session. All 27,262,260 pixels have nonzero alpha; full-canvas bounds. Gildan 64000, front, fillPrintArea. The separate 500/M direct smoke order ord_1170723 is archived as submitted.png and hash-verified. A paid $30 fixture lacked slug/size metadata, so it did not exercise customer fulfillment. Intentional themed panels are allowed for this prompt; payment and delivery remain unverified.",
+      },
+    ],
+  },
+  {
     id: "20260905-unserious-high",
     label: "2026-09-05 · Unserious prompt",
     summary: "/suites/20260905-unserious-high/summary.md",

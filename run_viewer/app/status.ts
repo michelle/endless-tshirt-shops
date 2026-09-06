@@ -1,4 +1,10 @@
 export const statusDefinitions: Record<string, string> = {
+  "asset fetched": "Prodigi downloaded the original artwork successfully. This is not confirmation of physical manufacture or print quality.",
+  "theme design": "Clean-sheet permits any appealing shirt theme, not only a timestamp. The artwork check is assessed against that prompt.",
+  "opaque panel": "The artwork includes an intentional colored background panel. Changing the viewer background will not show through that panel.",
+  "fulfillment concerns": "Source or catalog inspection found fulfillment risks; see the separate checks and evidence for the specific mapping and payment issues.",
+  "duplicate-order risk": "A payment produced duplicate orders during the run, and the final implementation still has a non-atomic deduplication path.",
+  "App checkout unpaid": "Actual product Checkout Sessions remain unpaid. A separate paid fixture exists but lacks the metadata required for customer-order fulfillment.",
   "Paid fixture": "A real Stripe test payment completed on a Session cloned by the integration script, with the normal shipping form bypassed and shipping seeded on the PaymentIntent. This is backend integration evidence, not a verified customer checkout.",
   "hosted checkout unverified": "The normal customer-facing checkout flow was not independently demonstrated. An altered integration fixture is not a substitute for that test.",
   "Hosted unpaid": "The deployed application created a real Stripe Checkout Session, but no payment completed. This artwork was recovered using that Session's recorded inputs, not recreated from a guess.",
