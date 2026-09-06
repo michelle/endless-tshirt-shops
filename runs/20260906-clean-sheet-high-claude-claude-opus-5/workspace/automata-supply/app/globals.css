@@ -1,0 +1,304 @@
+:root {
+  --bg: #08080a;
+  --bg-raised: #101014;
+  --bg-input: #16161b;
+  --line: #24242c;
+  --line-bright: #35353f;
+  --fg: #eceae4;
+  --fg-dim: #9a988f;
+  --fg-faint: #6b6960;
+  --accent: #7ef9ff;
+  --accent-dim: #2b6f76;
+  --warn: #ffb347;
+  --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  --sans: "Helvetica Neue", Helvetica, Arial, system-ui, sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  /* A faint cell grid: the house pattern, at 1% opacity. */
+  background-image:
+    linear-gradient(to right, rgba(255,255,255,0.022) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255,255,255,0.022) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+a { color: inherit; text-decoration: none; }
+
+.mono { font-family: var(--mono); }
+
+.wrap { max-width: 1180px; margin: 0 auto; padding: 0 24px; }
+
+/* ---------- header ---------- */
+
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  border-bottom: 1px solid var(--line);
+  background: rgba(8, 8, 10, 0.86);
+  backdrop-filter: blur(12px);
+}
+.site-header .wrap {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  height: 62px;
+}
+.brand { display: flex; align-items: center; gap: 10px; }
+.brand-mark {
+  width: 26px; height: 26px;
+  image-rendering: pixelated;
+  display: block;
+}
+.brand-name {
+  font-family: var(--mono);
+  font-size: 14px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+.nav { display: flex; gap: 22px; margin-left: auto; align-items: center; }
+.nav a {
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--fg-dim);
+  transition: color 0.15s;
+}
+.nav a:hover { color: var(--fg); }
+.nav a.cart-link { color: var(--fg); }
+.cart-count {
+  display: inline-block;
+  min-width: 17px;
+  padding: 1px 5px;
+  margin-left: 6px;
+  border-radius: 9px;
+  background: var(--accent);
+  color: #05161a;
+  font-size: 10px;
+  text-align: center;
+  font-weight: 700;
+}
+
+/* ---------- hero ---------- */
+
+.hero { padding: 88px 0 56px; border-bottom: 1px solid var(--line); }
+.hero-grid { display: grid; grid-template-columns: 1.15fr 0.85fr; gap: 56px; align-items: center; }
+.eyebrow {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin: 0 0 20px;
+}
+h1.hero-title {
+  font-size: clamp(38px, 5.6vw, 66px);
+  line-height: 1.02;
+  letter-spacing: -0.03em;
+  margin: 0 0 22px;
+  font-weight: 700;
+}
+.hero-lede { font-size: 17px; line-height: 1.65; color: var(--fg-dim); max-width: 46ch; margin: 0 0 30px; }
+.hero-lede strong { color: var(--fg); font-weight: 500; }
+
+/* ---------- buttons ---------- */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 13px 22px;
+  border: 1px solid var(--line-bright);
+  background: transparent;
+  color: var(--fg);
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+.btn:hover:not(:disabled) { border-color: var(--fg-dim); background: var(--bg-raised); }
+.btn-primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #05161a;
+  font-weight: 700;
+}
+.btn-primary:hover:not(:disabled) { background: #a6fbff; border-color: #a6fbff; color: #05161a; }
+.btn:disabled { opacity: 0.45; cursor: not-allowed; }
+.btn-block { width: 100%; }
+.btn-sm { padding: 8px 13px; font-size: 11px; }
+
+/* ---------- mockup ---------- */
+
+.mockup { position: relative; width: 100%; aspect-ratio: 400 / 460; }
+.mockup svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+/* The Gildan 64000 front print area is 15.6 x 19.3in — effectively the whole
+   shirt front — so the artwork box is sized and placed to match it. */
+.mockup-print {
+  position: absolute;
+  left: 27%;
+  top: 12%;
+  width: 46%;
+  height: 50.1%;
+  object-fit: contain;
+  object-position: top center;
+  image-rendering: pixelated;
+}
+
+/* ---------- catalog grid ---------- */
+
+.section { padding: 64px 0; }
+.section-head { display: flex; align-items: baseline; gap: 16px; margin-bottom: 34px; }
+h2.section-title { font-size: 13px; font-family: var(--mono); letter-spacing: 0.2em; text-transform: uppercase; margin: 0; font-weight: 600; }
+.section-note { font-size: 13px; color: var(--fg-faint); font-family: var(--mono); }
+
+.grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 22px; }
+.card {
+  border: 1px solid var(--line);
+  background: var(--bg-raised);
+  padding: 16px 16px 18px;
+  transition: border-color 0.18s, transform 0.18s;
+  display: block;
+}
+.card:hover { border-color: var(--line-bright); transform: translateY(-2px); }
+.card-media { background: #0b0b0e; border: 1px solid var(--line); margin-bottom: 14px; }
+.card-rule { font-family: var(--mono); font-size: 13px; letter-spacing: 0.08em; margin: 0 0 4px; font-weight: 600; }
+.card-tag { font-size: 12.5px; color: var(--fg-dim); margin: 0 0 10px; line-height: 1.45; }
+.card-price { font-family: var(--mono); font-size: 12px; color: var(--fg-faint); }
+
+/* ---------- product page ---------- */
+
+.product { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; padding: 48px 0 80px; align-items: start; }
+.product-stage { border: 1px solid var(--line); background: var(--bg-raised); padding: 26px; position: sticky; top: 86px; }
+h1.product-title { font-size: 40px; letter-spacing: -0.025em; margin: 0 0 6px; }
+.product-tag { color: var(--accent); font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; margin: 0 0 22px; }
+.product-note { font-size: 15px; line-height: 1.7; color: var(--fg-dim); margin: 0 0 26px; }
+.price-line { font-family: var(--mono); font-size: 22px; margin: 0 0 26px; }
+
+.field { margin-bottom: 22px; }
+.field-label {
+  display: flex; justify-content: space-between; align-items: baseline;
+  font-family: var(--mono); font-size: 11px; letter-spacing: 0.16em;
+  text-transform: uppercase; color: var(--fg-faint); margin-bottom: 9px;
+}
+.field-label b { color: var(--fg); font-weight: 500; letter-spacing: 0.06em; text-transform: none; }
+
+.swatches { display: flex; flex-wrap: wrap; gap: 8px; }
+.swatch {
+  width: 32px; height: 32px; border-radius: 50%;
+  border: 1px solid var(--line-bright);
+  cursor: pointer; padding: 0;
+  outline-offset: 3px;
+}
+.swatch[aria-pressed="true"] { outline: 2px solid var(--accent); }
+
+.chips { display: flex; flex-wrap: wrap; gap: 7px; }
+.chip {
+  padding: 9px 14px;
+  border: 1px solid var(--line-bright);
+  background: transparent;
+  color: var(--fg-dim);
+  font-family: var(--mono); font-size: 12px;
+  cursor: pointer;
+  transition: all 0.14s;
+}
+.chip:hover { color: var(--fg); border-color: var(--fg-faint); }
+.chip[aria-pressed="true"] { background: var(--fg); color: var(--bg); border-color: var(--fg); font-weight: 600; }
+.chip:disabled { opacity: 0.3; cursor: not-allowed; }
+
+.spec {
+  border-top: 1px solid var(--line);
+  margin-top: 30px; padding-top: 20px;
+  font-family: var(--mono); font-size: 12px; color: var(--fg-faint);
+  line-height: 1.9;
+}
+.spec div { display: flex; justify-content: space-between; gap: 16px; }
+.spec span:last-child { color: var(--fg-dim); text-align: right; }
+
+/* ---------- designer ---------- */
+
+.designer { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; padding: 40px 0 80px; align-items: start; }
+input[type="range"] { width: 100%; accent-color: var(--accent); }
+.text-input {
+  width: 100%;
+  padding: 11px 13px;
+  background: var(--bg-input);
+  border: 1px solid var(--line-bright);
+  color: var(--fg);
+  font-family: var(--mono);
+  font-size: 14px;
+  letter-spacing: 0.1em;
+}
+.text-input:focus { outline: none; border-color: var(--accent-dim); }
+.row { display: flex; gap: 10px; }
+
+/* ---------- cart ---------- */
+
+.cart-row {
+  display: grid;
+  grid-template-columns: 92px 1fr auto;
+  gap: 20px;
+  padding: 20px 0;
+  border-bottom: 1px solid var(--line);
+  align-items: center;
+}
+.cart-thumb { background: #0b0b0e; border: 1px solid var(--line); }
+.cart-meta { font-family: var(--mono); font-size: 12px; color: var(--fg-faint); line-height: 1.7; }
+.cart-name { font-size: 16px; color: var(--fg); font-family: var(--sans); margin-bottom: 4px; }
+.cart-total { display: flex; justify-content: space-between; font-family: var(--mono); font-size: 15px; padding: 22px 0; }
+.muted { color: var(--fg-dim); }
+
+/* ---------- order / status ---------- */
+
+.panel { border: 1px solid var(--line); background: var(--bg-raised); padding: 30px; }
+.status-pill {
+  display: inline-block; padding: 4px 11px; border: 1px solid var(--accent-dim);
+  color: var(--accent); font-family: var(--mono); font-size: 11px;
+  letter-spacing: 0.14em; text-transform: uppercase;
+}
+.status-pill.pending { border-color: var(--warn); color: var(--warn); }
+.status-pill.error { border-color: #c0504d; color: #ef8f8c; }
+
+/* ---------- footer ---------- */
+
+.site-footer {
+  border-top: 1px solid var(--line);
+  margin-top: 40px; padding: 40px 0;
+  font-family: var(--mono); font-size: 11.5px; color: var(--fg-faint);
+  letter-spacing: 0.06em;
+}
+.site-footer .wrap { display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
+
+.notice {
+  border: 1px solid var(--accent-dim);
+  background: rgba(126, 249, 255, 0.05);
+  padding: 12px 16px;
+  font-family: var(--mono); font-size: 12px; color: var(--accent);
+  line-height: 1.6;
+}
+
+@media (max-width: 900px) {
+  .hero-grid, .product, .designer { grid-template-columns: 1fr; gap: 36px; }
+  .grid { grid-template-columns: repeat(2, 1fr); }
+  .product-stage { position: static; }
+}
+@media (max-width: 560px) {
+  .grid { grid-template-columns: 1fr; }
+  .nav { gap: 14px; }
+}
