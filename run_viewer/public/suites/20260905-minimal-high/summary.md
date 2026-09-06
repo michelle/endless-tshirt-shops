@@ -1,5 +1,60 @@
 # Seven-model minimal-prompt benchmark — 2026-09-05
 
+## Post-run manual validation and correction — 2026-09-06 UTC
+
+A user subsequently completed Minimal Sol's customer checkout. Stripe confirmed
+a $22.50 succeeded test payment, and Session metadata linked it to Prodigi order
+`ord_1170585` (fitted/M, black, `GLOBAL-TEE-GIL-64000L`, front, `fitPrintArea`).
+Prodigi marked the `/api/artwork` asset Complete. The fetched original PNG's MD5
+matches Prodigi's recorded asset hash.
+
+That deployed image is **not** the readable local reconstruction previously
+shown: it is 4665×5844 RGBA with only 994 nontransparent pixels, in bounds
+`(2208,1867)–(2462,1879)` — a 254×12 strip of tiny box-like glyphs. Its recorded
+timestamp is `1788665167946`. The viewer now shows this exact paid-order image.
+The code relies on an unbundled system font; a deployed font-rendering problem
+is suspected, but its precise cause has not been isolated.
+
+**Current viewer rating: yellow, 2/3.** Customer checkout and Prodigi delivery
+pass; printable timestamp artwork fails. This is later user-supplied validation,
+not a payment completed by the benchmark agent. Original run-time counts below
+remain historical evidence unless explicitly noted otherwise.
+
+**Audit correction:** the earlier conclusion that Sol's deployed webhook secret
+was missing was unsupported. Its handler returns the same “Webhook is not
+configured” error for either a missing signature or a missing secret. An unsigned
+probe cannot distinguish those cases. The successful manual order also does not
+isolate webhook delivery from the app's success-page recovery path.
+
+The earlier social-image order `ord_1170542` was a separate command-line smoke
+test that bypassed the application. The committed customer fulfillment code
+constructs a signed `/api/artwork` URL, not `/og.png`.
+
+### Luna and Sonnet: later user checkouts
+
+**Luna — red, 0/3.** Stripe confirmed a paid classic/M checkout, but no Prodigi
+order matched the handler's `datetime-<session-id>` merchant reference at the
+follow-up inspection. The completion event still had one pending webhook.
+The event has `collected_information.shipping_details`, not the legacy
+`shipping_details` field used by Luna's handler, which throws before submitting
+an order. The paid Session's hosted artwork (not a confirmed Prodigi source) is
+2400×2900 RGBA with 2,438 nontransparent pixels in tiny box-like glyph lines;
+bounds `(966,1307)–(1439,1749)`. Its timestamp is
+`2026-09-06T03:34:31.369Z`. Payment collection succeeded, but the end-to-end
+checkout-to-fulfillment criterion still fails, as do integration and artwork.
+
+**Sonnet — yellow, 2/3.** A paid unisex/M checkout produced Prodigi order
+`ord_1170583` (`GLOBAL-TEE-GIL-64000`, black/M, front, `fitPrintArea`). The
+2400×3000 RGBA source was fetched and MD5-matched to Prodigi's record. It has
+59,737 nontransparent pixels, bounds `(660,919)–(1732,1268)`, and timestamp
+`1788664053470`. The print is readable and transparent, but its date subtitle
+and `DATETIME.STORE` branding fail the timestamp-only requirement. Checkout and
+Prodigi delivery now pass based on this later user test.
+
+The viewer now uses these two fresh customer-path images instead of the earlier
+synthetic-test examples. Neither manual checkout is credited to the original
+benchmark agent. Original run-time tables below remain historical observations.
+
 This suite used `prompt-minimal.md`, suite ID `20260905-minimal-high`, base
 commit `cbac7b4`, prompt SHA-256 `b211b5d8…`, and `high` reasoning for every
 model. The seven models ran strictly one at a time in the requested order. Each
@@ -68,7 +123,7 @@ targets Prodigi's sandbox API.
 | Model | Observed Stripe objects | Customer creation | Result |
 | --- | --- | --- | --- |
 | Astra | 5 Checkout Sessions: 3 paid/complete and 2 expired; 3 succeeded PIs/charges; 0 Customers | Omitted | Two paid purchases printed; the third was refunded before fulfillment as an explicit safety test. |
-| Sol | 2 unpaid/open Sessions; 0 PIs, charges or Customers | `always` | No paid proof. Its registered production webhook cannot run because deployed configuration is missing. |
+| Sol | At original audit: 2 unpaid/open Sessions; 0 PIs, charges or Customers | `always` | No agent-run paid proof. A later user checkout succeeded; see the post-run validation above. The unsigned probe did not establish missing configuration. |
 | Terra | 5 PaymentIntents: 2 succeeded, 3 require payment method; 2 paid charges; 0 Customers | Omitted | Two genuine payments and prints, but the art is effectively invisible. |
 | Luna | 2 unpaid Sessions; 0 PIs, charges or Customers | `always` | No paid proof. Both fits map to one unisex SKU and garment configuration. |
 | Fable | 8 PaymentIntents: 3 succeeded, 5 require payment method; 3 paid charges; 0 Customers | Omitted | One localhost-art failure and two completed paid prints. Shipping PII is stored in PI metadata. |
@@ -84,23 +139,23 @@ seven saved Stripe profiles identify seven distinct sandbox accounts, are mode
 | Model | Registered endpoint and events | Independent unsigned POST |
 | --- | --- | ---: |
 | Astra | One enabled `/api/stripe/webhook`; Checkout completed and async succeeded | 400 |
-| Sol | One enabled `/api/webhooks/stripe`; both Checkout completion events | **400 — webhook not configured** |
+| Sol | One enabled `/api/webhooks/stripe`; both Checkout completion events | 400 — shared error for missing signature or secret; configuration not determined |
 | Terra | One enabled `/api/stripe-webhook`; PaymentIntent succeeded | 400 |
 | Luna | One enabled `/api/stripe-webhook`; Checkout completed | 400 |
 | Fable | One enabled `/api/webhooks/stripe`; PaymentIntent succeeded and failed | 400 |
 | Opus | One enabled `/api/webhooks/stripe`; PaymentIntent succeeded and failed | 400 |
 | Sonnet | One enabled `/api/webhook`; Checkout completed | 400 |
 
-The signature-related responses reject unsigned traffic. Sol's response is a
-deployment-configuration failure, so legitimate events are currently unusable
-too.
+The signature-related responses reject unsigned traffic. Sol's ambiguous error
+message cannot establish missing deployment configuration; its code returns it
+for a missing signature as well. The original inference has been corrected.
 
 ## Application flow and recovery behavior
 
 | Model | Exact runtime call order | Failure and recovery behavior |
 | --- | --- | --- |
 | Astra | Freeze `Date.now()` → optional Prodigi quote → hosted Checkout → paid webhook re-fetches and validates Session → refund guard → `POST /orders` → store Prodigi id/status/error → status and cron reconciliation | Session ID drives deterministic idempotency. Errors become retry state and non-2xx webhook responses. The refund-before-print test worked; two variants printed. |
-| Sol | Freeze timestamp → hosted Checkout → webhook/status route re-fetches Session and verifies paid → `POST /Orders` → persist order id on Session | Session ID is the idempotency key and status polling can retry. No genuine payment occurred and deployed webhook configuration is missing. Its direct smoke order submitted `/og.png`, not the artwork route. |
+| Sol | Freeze timestamp → hosted Checkout → webhook/status route re-fetches Session and verifies paid → `POST /Orders` → persist order id on Session | Session ID is the idempotency key and status polling can retry. No payment occurred during the agent run; a later user payment delivered the correct artwork route. The separate command-line smoke order submitted `/og.png`, bypassing this code. |
 | Terra | Capture timestamp at submit → create/confirm direct PI in Elements → browser fulfillment and PI-succeeded webhook each re-fetch paid PI → `POST /v4.0/Orders` | PI ID is the idempotency key, but order outcome is not persisted or exposed. The webhook catches broad failures and returns 400. Two paid orders exist. |
 | Luna | Freeze timestamp when checkout modal opens → hosted Checkout → paid webhook → `POST /Orders` | Session is the idempotency key and errors return 500, but legacy shipping extraction and no durable result/recovery remain. The direct synthetic order bypassed Stripe. |
 | Fable | Freeze timestamp → create/confirm PI with Elements → webhook or browser finalizer re-fetches succeeded PI → `POST /orders` → record result/error | PI ID is the idempotency key. Errors generally return 500; permanent validation failures are acknowledged. One paid localhost asset failed and two real hosted assets completed. |
@@ -130,7 +185,7 @@ observed print positioning is preserved.
 | Model | Fresh verification | Remaining gaps |
 | --- | --- | --- |
 | Astra | Production build passed; all 12 committed tests passed; live 200; paid/refund/print evidence independently confirmed | Physical sample, tax and asynchronous outage recovery remain untested. `npm audit` reports 1 low and 4 high vulnerabilities. |
-| Sol | Production build passed; live 200; local art reproduced | No committed tests, no paid flow, broken deployed webhook configuration and wrong smoke-order image. |
+| Sol | Production build passed; live 200; local art reproduced; later user payment and Prodigi asset independently confirmed | No committed tests. The deployed print renderer produces a tiny glyph strip despite the readable local reconstruction. Webhook versus status-route recovery was not isolated. |
 | Terra | Production build passed; live 200; two payments/orders confirmed | `npm test` is advertised but no matching `test/*.test.js` exists, so it fails. Artwork is effectively invisible; no durable result. `npm audit` reports 1 high vulnerability. |
 | Luna | Production build passed; live 200; corrected direct order inspected | No committed tests or paid flow; fit/SKU mismatch; art is extremely small. |
 | Fable | Production build passed; all 5 committed tests passed; live 200; paid prints confirmed | Shipping PII in metadata and ambiguous browser-finalize authentication deserve remediation. `npm audit` reports 1 moderate and 1 high vulnerability. |
@@ -187,8 +242,9 @@ and a custom domain before public launch.
 
 - **Astra:** resolve dependency findings, confirm the refund guard under real
   delayed events, and physically validate both garment cuts and placement.
-- **Sol:** configure the deployed webhook, ensure fulfillment always uses the
-  print-art route, add tests, and prove a real paid flow.
+- **Sol:** fix and test deployed font rendering using the actual served print
+  asset, add regression tests, and independently exercise webhook delivery and
+  status-route recovery. A later user test has now proved paid app fulfillment.
 - **Terra:** fix artwork scale/opacity, persist fulfillment state and expose a
   recovery/status path; make webhook error classes deliberate.
 - **Luna:** map fitted/unisex to real distinct garments, enlarge and simplify

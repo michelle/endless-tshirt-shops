@@ -74,17 +74,27 @@ run_viewer/public/suites/<suite-id>/runs/<run-id>/design.png
 ```
 
 Use the image's real extension when it is not PNG. Copy `final.md` verbatim and
-copy the generated suite report to `summary.md`. For each design, prefer the
-exact original source file that Prodigi fetched for the representative order.
-If no intended design reached Prodigi, recover the exact hosted artwork stored
-in Stripe metadata; if that is unavailable, reproduce the deterministic artwork
-route only from committed code plus recorded timestamp and variant inputs.
-Label those fallbacks accurately—never imply that locally reproduced or
-synthetic fulfillment evidence is a paid end-to-end print.
+copy the generated suite report to `summary.md`. The primary viewer image should
+represent the customer ordering path. Prefer the exact source Prodigi fetched
+for a genuine paid app order, even if that customer-path asset is wrong. Without
+a paid order, recover artwork recorded in a real customer Checkout Session;
+otherwise reproduce the deterministic app route only from committed code and
+recorded timestamp/variant inputs. Label hosted-unpaid and local reproductions
+explicitly; neither proves payment or fulfillment.
+
+Inspect the committed runtime and test transcript before attributing an asset
+to the application. A separate command-line smoke order or synthetic webhook
+may use arbitrary test inputs, such as /og.png or an icon, that the customer
+flow never supplies. Archive these separately as `submitted.<extension>` and
+describe them as test evidence, not the customer's design. Artwork quality may
+pass independently of unverified delivery; do not infer a working integration
+or a wrong-customer-asset bug from a standalone smoke test.
 
 Preserve the complete original canvas, pixel dimensions, format, alpha channel,
-and artwork position. Do not crop, resize, flatten, recolor, or replace it with
-a thumbnail or social-preview asset. Derived dark-background proofs may be kept
+and artwork position. Do not crop, resize, flatten, recolor, or substitute a
+thumbnail. Show a social-preview asset as the main image only when evidence
+establishes that the customer flow submits it, not merely a standalone smoke
+test. Derived dark-background proofs may be kept
 separately but are not the viewer design. Record dimensions, alpha mode,
 nontransparent bounds, recovery source, order ID when applicable, and whether
 the evidence is paid, synthetic, direct, or local in the viewer manifest. Do
@@ -92,7 +102,7 @@ not store credentials, signed private URLs, webhook secrets, raw transcripts,
 customer PII, or payment client secrets in viewer data.
 
 Register the suite and run deployment URLs in `run_viewer/app/data.ts`. After
-the deployments settle, capture their initial browser viewports and favicons:
+the deployments settle, capture their initial browser viewports, favicons, and social previews:
 
 ```bash
 cd run_viewer
@@ -101,7 +111,7 @@ npx playwright install chromium
 npm run capture -- --suite <suite-id>
 ```
 
-This archives `storefront.png` and available `favicon.*` files beside each run's
+This archives `storefront.png`, available `favicon.*`, and published `social-preview.*` files beside each run's
 artwork and writes `public/suites/<suite-id>/storefronts.json`. The viewer loads
 that manifest automatically for any registered suite. Use the same 1440 × 900
 viewport for comparisons. Keep the capture timestamp, URL, HTTP status, and
@@ -111,5 +121,13 @@ while capturing. Existing captures are skipped; use `--run <run-id>` for a
 targeted retry and `--overwrite` only for an intentional refresh. Check
 `capture-errors.json` and report missing captures instead of substituting
 another run's screenshot. See `run_viewer/README.md` for browser setup options.
+
+Social previews are fetched unchanged from homepage `og:image` metadata, with
+`twitter:image` as a fallback. Record the source, dimensions, capture time, and
+found/missing/unavailable state in the manifest. Never recreate a missing social
+card or treat it as customer print artwork. Older manifests are automatically
+backfilled without recapturing screenshots; use `--social-only --overwrite` for
+an intentional social-only refresh. Run drawers link via `?suite=<suite-id>&run=<short-run-id>`;
+summary headings expose stable `#summary-…` links.
 
 Treat the results as directional case studies, not a formal ranking.

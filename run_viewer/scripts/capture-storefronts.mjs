@@ -27,8 +27,8 @@ export function artifactDirectory(root, suite, run) {
   return { publicDir, diskDir: path.join(root, "public", publicDir) };
 }
 
-export function faviconImage(bytes, declaredType = "") {
-  if (bytes.length > 2 * 1024 * 1024) return null;
+export function faviconImage(bytes, declaredType = "", maxBytes = 2 * 1024 * 1024) {
+  if (bytes.length > maxBytes) return null;
   if (bytes.subarray(0, 8).equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]))) return { extension: "png", mime: "image/png" };
   if (bytes.subarray(0, 4).equals(Buffer.from([0, 0, 1, 0]))) return { extension: "ico", mime: "image/x-icon" };
   if (/^GIF8[79]a/.test(bytes.subarray(0, 6).toString())) return { extension: "gif", mime: "image/gif" };
@@ -70,7 +70,35 @@ export async function captureFavicon(page, context, directory) {
   return { favicon: null, faviconStatus: unavailable ? "unavailable" : "missing" };
 }
 
-async function captureRun(browser, root, suite, run) {
+export async function captureSocialPreview(page, context, directory) {
+  const candidates = await page.locator('meta[property="og:image"], meta[property="og:image:url"], meta[name="twitter:image"], meta[property="twitter:image"]').evaluateAll((tags) => tags.map((tag) => ({ tag: tag.getAttribute("property") || tag.getAttribute("name"), source: tag.getAttribute("content") })).filter((entry) => entry.source));
+  candidates.sort((a, b) => Number(b.tag.startsWith("og:")) - Number(a.tag.startsWith("og:")));
+  for (const candidate of candidates) {
+    try {
+      const source = new URL(candidate.source, page.url()).href;
+      if (!["https:", "http:"].includes(new URL(source).protocol)) continue;
+      const response = await context.request.get(source, { timeout: 20000 });
+      if (!response.ok()) continue;
+      const bytes = await response.body();
+      const format = faviconImage(bytes, (response.headers()["content-type"] ?? "").split(";")[0], 20 * 1024 * 1024);
+      if (!format) continue;
+      const dimensions = await page.evaluate(async ({ base64, mime }) => {
+        const image = new Image();
+        image.src = `data:${mime};base64,${base64}`;
+        await image.decode();
+        return { width: image.naturalWidth, height: image.naturalHeight };
+      }, { base64: bytes.toString("base64"), mime: format.mime });
+      if (!dimensions.width || !dimensions.height) continue;
+      const name = `social-preview.${format.extension}`;
+      await writeFile(path.join(directory.diskDir, `${name}.pending`), bytes);
+      await rename(path.join(directory.diskDir, `${name}.pending`), path.join(directory.diskDir, name));
+      return { socialPreview: { path: `${directory.publicDir}/${name}`, source, mime: format.mime, tag: candidate.tag, ...dimensions, capturedAt: new Date().toISOString() }, socialPreviewStatus: "found" };
+    } catch { /* Try the next published image; never reconstruct a substitute. */ }
+  }
+  return { socialPreview: null, socialPreviewStatus: candidates.length ? "unavailable" : "missing" };
+}
+
+async function captureRun(browser, root, suite, run, socialOnly = false) {
   const directory = artifactDirectory(root, suite, run);
   const url = new URL(run.deployment);
   if (!["https:", "http:"].includes(url.protocol) || url.username || url.password) throw new Error(`Invalid public deployment URL for ${run.id}`);
@@ -81,6 +109,9 @@ async function captureRun(browser, root, suite, run) {
   page.on("pageerror", (error) => errors.push(error.message));
   try {
     const response = await page.goto(url.href, { waitUntil: "load", timeout: 45000 });
+    if (socialOnly && !response?.ok()) throw new Error(`Social preview page: HTTP ${response?.status() ?? "unknown"}`);
+    const social = await captureSocialPreview(page, context, directory);
+    if (socialOnly) return social;
     await page.evaluate(async () => {
       await Promise.race([
         Promise.all([document.fonts.ready, ...[...document.images].map((image) => image.decode().catch(() => {}))]),
@@ -92,11 +123,11 @@ async function captureRun(browser, root, suite, run) {
     const screenshot = `${directory.publicDir}/storefront.png`;
     await page.screenshot({ path: path.join(directory.diskDir, "storefront.pending.png"), fullPage: false, animations: "disabled", timeout: 15000 });
     await rename(path.join(directory.diskDir, "storefront.pending.png"), path.join(directory.diskDir, "storefront.png"));
-    return { screenshot, ...icon, url: page.url(), title: await page.title(), ...viewport, capturedAt: new Date().toISOString(), httpStatus: response?.status() ?? null, errors, browser: browser.version(), deviceScaleFactor: 1, colorScheme: "light", timezone: "America/Los_Angeles" };
+    return { screenshot, ...icon, ...social, url: page.url(), title: await page.title(), ...viewport, capturedAt: new Date().toISOString(), httpStatus: response?.status() ?? null, errors, browser: browser.version(), deviceScaleFactor: 1, colorScheme: "light", timezone: "America/Los_Angeles" };
   } finally { await context.close(); }
 }
 
-export async function captureSuite({ suite, root = projectRoot, browser, runId, overwrite = false, log = console.log }) {
+export async function captureSuite({ suite, root = projectRoot, browser, runId, overwrite = false, socialOnly = false, log = console.log }) {
   const runs = runId ? suite.runs.filter((run) => run.id === runId) : suite.runs;
   if (!runs.length) throw new Error(runId ? `No run ${runId} in ${suite.id}` : `No runs registered for ${suite.id}`);
   const directories = runs.map((run) => artifactDirectory(root, suite, run).publicDir);
@@ -110,19 +141,26 @@ export async function captureSuite({ suite, root = projectRoot, browser, runId, 
   let failureCount = 0;
   for (const run of runs) {
     const directory = artifactDirectory(root, suite, run);
+    let keepScreenshot = socialOnly && Boolean(captures[run.id]?.screenshot);
     if (!overwrite && captures[run.id]?.screenshot) {
       try {
         await access(path.join(directory.diskDir, "storefront.png"));
         if (captures[run.id].favicon) await access(path.join(root, "public", captures[run.id].favicon.path));
+        keepScreenshot = true;
+        if (!["found", "missing"].includes(captures[run.id].socialPreviewStatus)) throw new Error("Social preview needs capture");
+        if (captures[run.id].socialPreview) await access(path.join(root, "public", captures[run.id].socialPreview.path));
         log(`${run.id}: kept existing capture`);
         continue;
       } catch { /* Recover missing archived files. */ }
     }
     try {
-      captures[run.id] = await captureRun(browser, root, suite, run);
+      const capture = await captureRun(browser, root, suite, run, keepScreenshot);
+      // Failed refreshes must not discard a previously archived social image.
+      if (capture.socialPreviewStatus === "unavailable" && captures[run.id]?.socialPreview) throw new Error("Social preview refresh failed; preserved archived image");
+      captures[run.id] = keepScreenshot ? { ...captures[run.id], ...capture } : capture;
       delete failures[run.id];
       await saveJson(manifestFile, captures);
-      log(`${run.id}: HTTP ${captures[run.id].httpStatus}, favicon ${captures[run.id].faviconStatus}`);
+      log(`${run.id}: HTTP ${captures[run.id].httpStatus}, favicon ${captures[run.id].faviconStatus}, social preview ${captures[run.id].socialPreviewStatus}`);
     } catch (error) {
       failures[run.id] = { attemptedAt: new Date().toISOString(), url: run.deployment, error: error.message };
       failureCount++;
@@ -135,12 +173,13 @@ export async function captureSuite({ suite, root = projectRoot, browser, runId, 
 
 async function main() {
   const args = process.argv.slice(2);
-  const help = "npm run capture -- --suite <suite-id> [--run <run-id>] [--overwrite] [--browser chrome|chromium]";
+  const help = "npm run capture -- --suite <suite-id> [--run <run-id>] [--overwrite] [--social-only] [--browser chrome|chromium]";
   if (args.includes("--help")) { console.log(help); return; }
   const options = {};
   for (let i = 0; i < args.length; i++) {
     const key = args[i];
     if (key === "--overwrite") options.overwrite = true;
+    else if (key === "--social-only") options.socialOnly = true;
     else if (["--suite", "--run", "--browser"].includes(key) && args[i + 1] && !args[i + 1].startsWith("--")) options[key.slice(2)] = args[++i];
     else throw new Error(`Unknown or incomplete option: ${key}\n${help}`);
   }
@@ -151,7 +190,7 @@ async function main() {
   if (!suite) throw new Error(`Unknown suite: ${options.suite}`);
   const browser = await chromium.launch({ headless: true, ...(options.browser === "chrome" ? { channel: "chrome" } : {}) });
   try {
-    const result = await captureSuite({ suite, browser, runId: options.run, overwrite: options.overwrite });
+    const result = await captureSuite({ suite, browser, runId: options.run, overwrite: options.overwrite, socialOnly: options.socialOnly });
     if (result.failureCount) process.exitCode = 1;
   } finally { await browser.close(); }
 }

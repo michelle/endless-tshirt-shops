@@ -1,0 +1,66 @@
+name: Deploy benchmark viewer to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "run_viewer/**"
+      - ".github/workflows/run-viewer-pages.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: github-pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: read
+    defaults:
+      run:
+        working-directory: run_viewer
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: run_viewer/package-lock.json
+      - name: Configure Pages
+        id: pages
+        uses: actions/configure-pages@v5
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run test:ratings
+      - run: npm run test:links
+      - name: Build redacted static viewer
+        run: npm run build:pages
+        env:
+          VIEWER_BASE_PATH: "${{ steps.pages.outputs.base_path }}/"
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:pages
+        env:
+          VIEWER_BASE_PATH: "${{ steps.pages.outputs.base_path }}/"
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: run_viewer/out
+
+  deploy:
+    needs: build
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v4

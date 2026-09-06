@@ -2,6 +2,8 @@ export type Storefront = {
   screenshot: string;
   favicon: { path: string; source: string; mime: string } | null;
   faviconStatus?: "found" | "missing" | "unavailable";
+  socialPreview?: { path: string; source: string; mime: string; tag: string; width: number; height: number; capturedAt: string } | null;
+  socialPreviewStatus?: "found" | "missing" | "unavailable";
   url: string;
   title: string;
   width: number;
@@ -56,11 +58,11 @@ export const suites: Suite[] = [
         evidence: "Exact full canvas from paid fitted/S Prodigi order ord_1170539. Nontransparent bounds: (1160,600)–(3517,812).",
       },
       {
-        id: "sol", model: models.sol, commit: "6fb583b", status: "No paid E2E · locally reproduced design",
+        id: "sol", model: models.sol, commit: "6fb583b", status: "Paid E2E · manually verified · ineffective print scale",
         deployment: "https://benchmark-20260905-minimal-high-cod-pi.vercel.app",
-        finalOutput: "/suites/20260905-minimal-high/runs/20260905-minimal-high-codex-gpt-5.6-sol/final.md", design: "/suites/20260905-minimal-high/runs/20260905-minimal-high-codex-gpt-5.6-sol/design.png",
-        width: 4665, height: 5844, alpha: "RGBA transparency",
-        evidence: "Exact route output reproduced from the latest unpaid Session. The actual smoke order used the opaque social image, not this design. Bounds: (629,1560)–(4050,1889).",
+        finalOutput: "/suites/20260905-minimal-high/runs/20260905-minimal-high-codex-gpt-5.6-sol/final.md", design: "/suites/20260905-minimal-high/runs/20260905-minimal-high-codex-gpt-5.6-sol/paid-design.png",
+        width: 4665, height: 5844, alpha: "RGBA transparency · actual paid-order asset",
+        evidence: "Post-run manual validation (2026-09-06 UTC): exact /api/artwork PNG from paid fitted/M order ord_1170585, timestamp 1788665167946. File MD5 matches Prodigi's recorded asset hash. Only 994 nontransparent pixels in a 254×12 strip; bounds: (2208,1867)–(2462,1879). Production renders tiny box-like glyphs, unlike the earlier local reconstruction. Payment and asset delivery worked; printable artwork did not. The prior unsigned webhook probe did not establish missing configuration.",
       },
       {
         id: "terra", model: models.terra, commit: "69f25c1", status: "Paid E2E · ineffective print scale",
@@ -70,11 +72,11 @@ export const suites: Suite[] = [
         evidence: "Exact full canvas from paid fitted/M Prodigi order ord_1170543. Only a faint 167×13px strip is nontransparent; bounds: (1194,1496)–(1361,1509).",
       },
       {
-        id: "luna", model: models.luna, commit: "8ad2f54", status: "Synthetic fulfillment · no paid E2E",
+        id: "luna", model: models.luna, commit: "8ad2f54", status: "Payment received · fulfillment failed · Session artwork",
         deployment: "https://benchmark-20260905-minimal-high-cod-nu.vercel.app",
-        finalOutput: "/suites/20260905-minimal-high/runs/20260905-minimal-high-codex-gpt-5.6-luna/final.md", design: "/suites/20260905-minimal-high/runs/20260905-minimal-high-codex-gpt-5.6-luna/design.png",
-        width: 2400, height: 2900, alpha: "RGBA transparency",
-        evidence: "Exact full canvas from direct synthetic Prodigi order ord_1170548. Three very small lines; bounds: (1006,1307)–(1399,1749).",
+        finalOutput: "/suites/20260905-minimal-high/runs/20260905-minimal-high-codex-gpt-5.6-luna/final.md", design: "/suites/20260905-minimal-high/runs/20260905-minimal-high-codex-gpt-5.6-luna/session-design.png",
+        width: 2400, height: 2900, alpha: "RGBA transparency · paid Session artwork, not delivered",
+        evidence: "Post-run user test (2026-09-06 UTC): Stripe payment completed, but no matching Prodigi order was found and one webhook delivery remained pending. The handler reads legacy session.shipping_details, absent from this event; shipping is under collected_information.shipping_details. Image fetched from the paid Session's artwork URL, timestamp 2026-09-06T03:34:31.369Z; 2,438 nontransparent pixels in tiny box-like glyph lines. Bounds: (966,1307)–(1439,1749). This is not a confirmed Prodigi asset.",
       },
       {
         id: "fable", model: models.fable, commit: "4314244", status: "Paid E2E · completed print",
@@ -91,11 +93,11 @@ export const suites: Suite[] = [
         evidence: "Exact full canvas from paid unisex/L Prodigi order ord_1170558. Nontransparent bounds: (625,900)–(2985,1113).",
       },
       {
-        id: "sonnet", model: models.sonnet, commit: "c467d40", status: "Synthetic fulfillment · no paid E2E",
+        id: "sonnet", model: models.sonnet, commit: "c467d40", status: "Paid E2E · manually verified · extra branding",
         deployment: "https://benchmark-20260905-minimal-high-cla-zeta.vercel.app",
-        finalOutput: "/suites/20260905-minimal-high/runs/20260905-minimal-high-claude-claude-sonnet-5/final.md", design: "/suites/20260905-minimal-high/runs/20260905-minimal-high-claude-claude-sonnet-5/design.png",
-        width: 2400, height: 3000, alpha: "RGBA transparency",
-        evidence: "Exact full canvas from signed synthetic Prodigi order ord_1170560. Nontransparent bounds: (686,919)–(1709,1268).",
+        finalOutput: "/suites/20260905-minimal-high/runs/20260905-minimal-high-claude-claude-sonnet-5/final.md", design: "/suites/20260905-minimal-high/runs/20260905-minimal-high-claude-claude-sonnet-5/paid-design.png",
+        width: 2400, height: 3000, alpha: "RGBA transparency · actual paid-order asset",
+        evidence: "Post-run user test (2026-09-06 UTC): exact source from paid unisex/M Prodigi order ord_1170583. File MD5 matches Prodigi's recorded asset hash. Timestamp 1788664053470; 59,737 nontransparent pixels; bounds: (660,919)–(1732,1268). Legible transparent artwork reached Prodigi, but the date subtitle and DATETIME.STORE branding fail the timestamp-only requirement.",
       },
     ],
   },
@@ -150,8 +152,8 @@ export const suites: Suite[] = [
         id: "sonnet", model: models.sonnet, commit: "966dc10", status: "Session design · no paid E2E",
         deployment: "https://benchmark-20260905-beauty-high-clau-two.vercel.app",
         finalOutput: "/suites/20260905-beauty-high/runs/20260905-beauty-high-claude-claude-sonnet-5/final.md", design: "/suites/20260905-beauty-high/runs/20260905-beauty-high-claude-claude-sonnet-5/design.jpg",
-        width: 4665, height: 5844, alpha: "JPEG · fully opaque",
-        evidence: "Full-resolution design stored on a real unpaid Session. Synthetic Prodigi tests used the 64×64 app icon instead. JPEG has no transparency.",
+        width: 4665, height: 5844, alpha: "JPEG · fully opaque · unpaid Session design",
+        evidence: "Customer-path artwork: full-resolution design stored on a real unpaid Checkout Session. It never reached Prodigi through a verified paid flow. Synthetic webhook tests supplied the 64×64 app icon instead; those test inputs do not establish what an actual customer order would print. JPEG has no transparency.",
       },
     ],
   },

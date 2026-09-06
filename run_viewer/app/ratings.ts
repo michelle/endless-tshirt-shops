@@ -1,0 +1,105 @@
+export type Check = { result: "pass" | "fail" | "unverified"; reason: string };
+export type Assessment = Record<"artwork" | "checkout" | "prodigi", Check>;
+
+export const criteria = [
+  { id: "artwork", label: "Timestamp-only print", definition: "Only the timestamp, legible at shirt scale, with sufficient resolution and transparency. Branding, slogans, illustrations, and decorative graphics do not pass." },
+  { id: "checkout", label: "End-to-end checkout", definition: "A genuine customer payment completed in Stripe test mode and triggered the application's fulfillment path. Unpaid sessions, demo checkout, and synthetic events do not pass." },
+  { id: "prodigi", label: "Prodigi integration", definition: "The application's fulfillment path sent the intended artwork and garment mapping to Prodigi, which fetched the asset successfully. A standalone API request or the wrong image does not prove this. Artwork quality is scored separately." },
+] as const;
+
+const pass = (reason: string): Check => ({ result: "pass", reason });
+const fail = (reason: string): Check => ({ result: "fail", reason });
+const unverified = (reason: string): Check => ({ result: "unverified", reason });
+
+// Audit judgments from each suite's summary.md plus inspection of archived art.
+// These are benchmark checks, not a live health check or launch certification.
+export const assessments: Record<string, Record<string, Assessment>> = {
+  "20260905-beauty-high": {
+    astra: {
+      artwork: pass("The archived 4665×5844 transparent print contains only the raw epoch at a readable scale."),
+      checkout: pass("One genuine paid Stripe test checkout triggered fulfillment; declined payments were also tested."),
+      prodigi: pass("The paid app flow sent the intended design to order ord_1170501; source and thumbnail were confirmed."),
+    },
+    sol: {
+      artwork: fail("The archived smoke-order design includes decorative lines and dots rather than only the timestamp."),
+      checkout: fail("Both Checkout Sessions stayed unpaid, and the deployed webhook was missing configuration."),
+      prodigi: unverified("Order ord_1170506 was a standalone smoke request. It does not verify the app's fulfillment path."),
+    },
+    terra: {
+      artwork: fail("The print includes slogans, a rule, and a decorative dot in addition to the timestamp."),
+      checkout: unverified("Two unpaid Sessions; no completed customer payment-to-fulfillment flow."),
+      prodigi: unverified("The final app design was only reproduced locally and never reached Prodigi."),
+    },
+    luna: {
+      artwork: fail("The print is an opaque black rectangle with tiny formatted text, not a usable transparent timestamp print."),
+      checkout: fail("The deployment was explicitly demo-only, with no usable Stripe account or configured webhook."),
+      prodigi: unverified("The direct smoke order bypassed the app's customer fulfillment path."),
+    },
+    fable: {
+      artwork: pass("The archived 2340×2895 transparent print contains only a legible raw epoch."),
+      checkout: pass("A genuine embedded Stripe test checkout completed payment and fulfillment."),
+      prodigi: pass("The paid fitted/L flow sent the intended artwork to ord_1170515; source and thumbnail were confirmed."),
+    },
+    opus: {
+      artwork: fail("The actual production asset is only 320×396 pixels, far below the intended print resolution."),
+      checkout: pass("Two genuine Stripe test payments completed and triggered fulfillment."),
+      prodigi: pass("Paid app flows created orders ord_1170523 and ord_1170525 with the generated assets. Their resolution failure is scored under artwork."),
+    },
+    sonnet: {
+      artwork: fail("The customer-path design stored on the unpaid Session includes sun/cloud illustrations and an opaque JPEG background, not timestamp-only transparent art."),
+      checkout: unverified("All three Sessions stayed unpaid; only synthetic signed payment events were exercised."),
+      prodigi: unverified("Synthetic webhook tests delivered the 64×64 app icon, not the customer-path artwork. Delivery of the actual Session design was never verified."),
+    },
+  },
+  "20260905-minimal-high": {
+    astra: {
+      artwork: pass("The archived 4677×5881 transparent print contains only a legible raw epoch."),
+      checkout: pass("Three genuine Stripe test payments; one was refunded before print and the other two fulfilled."),
+      prodigi: pass("Two paid variant orders sent the intended artwork; source and thumbnail evidence were confirmed."),
+    },
+    sol: {
+      artwork: fail("The actual paid-order asset contains only 994 nontransparent pixels in a 254×12 strip of tiny box-like glyphs. The local reconstruction hid this deployed rendering failure."),
+      checkout: pass("Post-run user test on 2026-09-06 UTC completed a $22.50 Stripe payment and app fulfillment. This is new manual evidence, not a test the benchmark agent performed."),
+      prodigi: pass("Paid fitted/M order ord_1170585 fetched the intended /api/artwork asset successfully; the downloaded file's MD5 matches Prodigi's record. Print quality fails separately. Independent webhook delivery versus success-page recovery was not isolated."),
+    },
+    terra: {
+      artwork: fail("The submitted timestamp is a nearly invisible 167×13-pixel strip on a 2490×3510 canvas."),
+      checkout: pass("Two genuine Stripe test payments completed and triggered orders."),
+      prodigi: pass("Paid app flows delivered their generated assets to ord_1170543 and ord_1170546. The print-scale failure is scored under artwork."),
+    },
+    luna: {
+      artwork: fail("The paid Session's hosted image renders three lines of tiny box-like glyphs, only 2,438 nontransparent pixels on a 2400×2900 canvas."),
+      checkout: fail("Post-run user payment succeeded, but end-to-end payment-to-fulfillment failed: no corresponding Prodigi order and a pending webhook delivery. Receiving money alone does not pass this check."),
+      prodigi: fail("The handler reads session.shipping_details, absent from the actual paid event, and throws before sending an order. Shipping is in collected_information.shipping_details. Both fit choices also map to the same unisex SKU."),
+    },
+    fable: {
+      artwork: pass("The archived 3120×3860 transparent print contains only a legible raw epoch."),
+      checkout: pass("Genuine Stripe test payments completed for two successfully fulfilled hosted variants."),
+      prodigi: pass("Two paid hosted designs reached Prodigi after an earlier localhost-source failure."),
+    },
+    opus: {
+      artwork: pass("The archived 3600×4800 transparent print contains only a legible raw epoch."),
+      checkout: pass("Genuine Stripe test payments completed and triggered fulfillment."),
+      prodigi: pass("Paid orders delivered intended assets. Initial duplicates prompted a lease/prelookup fix; regression and outage testing remain launch gaps."),
+    },
+    sonnet: {
+      artwork: fail("The print adds DATETIME.STORE branding and a second date line; it is not only the timestamp."),
+      checkout: pass("A post-run user checkout on 2026-09-06 UTC completed a genuine Stripe test payment and produced Prodigi order ord_1170583. This was not performed by the benchmark agent."),
+      prodigi: pass("The paid unisex/M flow delivered its intended /api/artwork PNG to ord_1170583; the fetched source MD5 matches Prodigi's record. Payment guarding and recovery still need hardening."),
+    },
+  },
+};
+
+export function rateRun(suiteId: string, runId: string) {
+  const assessment = assessments[suiteId]?.[runId];
+  const checks = criteria.map((criterion) => ({
+    ...criterion,
+    ...(assessment?.[criterion.id] ?? unverified("No independent audit evidence recorded for this check.")),
+  }));
+  const passed = checks.filter((check) => check.result === "pass").length;
+  return {
+    checks, passed,
+    tone: passed === 3 ? "complete" : passed === 2 ? "partial" : "failed",
+    label: passed === 3 ? "Pass" : passed === 2 ? "Partial" : "Fail",
+  };
+}

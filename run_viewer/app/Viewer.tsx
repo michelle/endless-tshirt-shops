@@ -1,21 +1,61 @@
 "use client";
 
-import Image from "next/image";
-import { useEffect, useId, useMemo, useRef, useState } from "react";
-import ReactMarkdown from "react-markdown";
+import Image from "./ArchiveImage";
+import { assetUrl } from "./asset-url";
+import { useEffect, useId, useMemo, useRef, useState, useSyncExternalStore } from "react";
+import ReactMarkdown, { type Components } from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { suites, type Storefront } from "./data";
 import { explainStatus } from "./status";
+import { rateRun } from "./ratings";
+import { summaryHeadings } from "./summary-headings";
 
-function RunStatus({ status }: { status: string }) {
+function ignoreShortcut(event: KeyboardEvent) {
+  const target = event.target;
+  return event.defaultPrevented || event.isComposing || event.altKey || event.ctrlKey || event.metaKey || event.shiftKey ||
+    (target instanceof HTMLElement && (target.isContentEditable || Boolean(target.closest('input, textarea, select, [role="textbox"]'))));
+}
+
+function subscribeToNavigation(onChange: () => void) {
+  window.addEventListener("popstate", onChange);
+  window.addEventListener("hashchange", onChange);
+  return () => {
+    window.removeEventListener("popstate", onChange);
+    window.removeEventListener("hashchange", onChange);
+  };
+}
+
+function navigationFromUrl() {
+  return window.location.search + window.location.hash;
+}
+
+function viewerLink(suiteId: string, runId?: string, hash = "") {
+  const query = new URLSearchParams({ suite: suiteId });
+  if (runId) query.set("run", runId);
+  return `?${query}${hash ? `#${hash}` : ""}`;
+}
+
+function navigateToRun(suiteId: string, runId?: string) {
+  const url = new URL(window.location.href);
+  url.searchParams.set("suite", suiteId);
+  if (runId) url.searchParams.set("run", runId);
+  else url.searchParams.delete("run");
+  url.hash = "";
+  if (url.href === window.location.href) return;
+  window.history.pushState(null, "", url);
+  window.dispatchEvent(new PopStateEvent("popstate"));
+}
+
+function RunStatus({ status, suiteId, runId }: { status: string; suiteId: string; runId: string }) {
   const tooltipId = useId();
   const [open, setOpen] = useState(false);
+  const rating = rateRun(suiteId, runId);
   return (
     <div className="status-help" onMouseLeave={() => setOpen(false)}>
       <button
         type="button"
         className="run-status"
-        data-tone={status.startsWith("Paid E2E") ? "complete" : "partial"}
+        data-tone={rating.tone}
         aria-describedby={tooltipId}
         aria-expanded={open}
         onClick={() => setOpen(true)}
@@ -30,9 +70,13 @@ function RunStatus({ status }: { status: string }) {
           }
         }}
       >
-        {status} <span className="status-help-mark" aria-hidden="true">?</span>
+        {rating.label} · {rating.passed}/3 <span className="status-help-mark" aria-hidden="true">?</span>
       </button>
       <div id={tooltipId} role="tooltip" className="status-tooltip" hidden={!open} onMouseLeave={() => setOpen(false)}>
+        {rating.checks.map((check) => (
+          <p key={check.id}><strong>{check.result === "pass" ? "✓" : check.result === "fail" ? "✕" : "?"} {check.label}: {check.result}</strong> — {check.reason}</p>
+        ))}
+        <p>Green = 3/3; yellow = 2/3; red = 0–1/3. Unverified checks do not pass. Sandbox evidence, not physical print or launch certification.</p>
         {explainStatus(status).map(({ label, definition }) => (
           <p key={label}><strong>{label}</strong> — {definition}</p>
         ))}
@@ -45,13 +89,24 @@ function modelName(model: string) {
   return model.split(" · ").at(-1) ?? model;
 }
 
-function Markdown({ source }: { source: string }) {
+function Markdown({ source, summarySuite }: { source: string; summarySuite?: string }) {
+  const components: Components = {
+    a: ({ children, ...props }) => <a {...props} target="_blank" rel="noreferrer">{children}</a>,
+  };
+  if (summarySuite) {
+    for (const tag of ["h1", "h2", "h3", "h4", "h5", "h6"] as const) {
+      const Heading = tag;
+      components[tag] = ({ children, id }) => (
+        <Heading id={id} className="summary-heading">
+          <a className="heading-link" href={viewerLink(summarySuite, undefined, id)}>{children}<span aria-hidden="true" className="heading-link-mark"> #</span></a>
+        </Heading>
+      );
+    }
+  }
   return (
     <ReactMarkdown
-      remarkPlugins={[remarkGfm]}
-      components={{
-        a: ({ children, ...props }) => <a {...props} target="_blank" rel="noreferrer">{children}</a>,
-      }}
+      remarkPlugins={summarySuite ? [remarkGfm, summaryHeadings] : [remarkGfm]}
+      components={components}
     >
       {source}
     </ReactMarkdown>
@@ -59,11 +114,14 @@ function Markdown({ source }: { source: string }) {
 }
 
 export default function Viewer() {
-  const [suiteId, setSuiteId] = useState(suites[0].id);
+  const navigation = useSyncExternalStore(subscribeToNavigation, navigationFromUrl, () => "");
+  const [search, hash = ""] = navigation.split("#");
+  const params = new URLSearchParams(search);
+  const suiteId = params.get("suite") ?? suites[0].id;
   const [background, setBackground] = useState("#30363d");
   const [documents, setDocuments] = useState<Record<string, string>>({});
   const [captures, setCaptures] = useState<Record<string, Record<string, Storefront>>>({});
-  const [selectedRunId, setSelectedRunId] = useState<string | null>(null);
+  const selectedRunId = params.get("run");
   const drawer = useRef<HTMLDialogElement>(null);
   const drawerContent = useRef<HTMLDivElement>(null);
 
@@ -79,8 +137,18 @@ export default function Viewer() {
 
   function moveRun(direction: number) {
     const nextRun = suite.runs[selectedIndex + direction];
-    if (nextRun) setSelectedRunId(nextRun.id);
+    if (nextRun) navigateToRun(suite.id, nextRun.id);
   }
+
+  useEffect(() => {
+    function scrollPage(event: KeyboardEvent) {
+      if (drawer.current?.open || ignoreShortcut(event) || !["j", "k"].includes(event.key)) return;
+      event.preventDefault();
+      window.scrollBy({ top: event.key === "j" ? 80 : -80, behavior: "instant" });
+    }
+    window.addEventListener("keydown", scrollPage);
+    return () => window.removeEventListener("keydown", scrollPage);
+  }, []);
 
   useEffect(() => {
     const dialog = drawer.current;
@@ -98,13 +166,22 @@ export default function Viewer() {
 
   useEffect(() => {
     drawerContent.current?.scrollTo({ top: 0 });
-  }, [selectedRunId]);
+  }, [selectedRunId, suiteId]);
+
+  const summarySource = documents[suite.summary];
+  useEffect(() => {
+    if (!hash || drawerOpen || !summarySource) return;
+    let id: string;
+    try { id = decodeURIComponent(hash); } catch { return; }
+    const frame = requestAnimationFrame(() => document.getElementById(id)?.scrollIntoView());
+    return () => cancelAnimationFrame(frame);
+  }, [hash, drawerOpen, summarySource, suiteId]);
 
   useEffect(() => {
     if (suite.runs.length === 0) return;
     const controller = new AbortController();
     const manifest = `/suites/${suite.id}/storefronts.json`;
-    fetch(manifest, { signal: controller.signal, cache: "no-store" })
+    fetch(assetUrl(manifest), { signal: controller.signal, cache: "no-store" })
       .then(async (response) => {
         if (response.status === 404) return {};
         if (!response.ok) throw new Error(`Capture manifest: HTTP ${response.status}`);
@@ -125,7 +202,7 @@ export default function Viewer() {
     if (missing.length > 0) {
       Promise.all(missing.map(async (documentPath) => {
         try {
-          const response = await fetch(documentPath);
+          const response = await fetch(assetUrl(documentPath));
           if (!response.ok) throw new Error(`${response.status} ${response.statusText}`);
           return [documentPath, await response.text()] as const;
         } catch (error) {
@@ -143,15 +220,14 @@ export default function Viewer() {
   }, [documents, suite]);
 
   return (
-    <main>
+    <main aria-keyshortcuts="j k">
       <h1 className="viewer-title">Benchmark runs</h1>
 
       <section className="controls" aria-label="Viewer controls">
         <label>
           <span className="sr-only">Suite</span>
           <select value={suite.id} onChange={(event) => {
-            setSelectedRunId(null);
-            setSuiteId(event.target.value);
+            navigateToRun(event.target.value);
           }}>
             {suites.map((candidate) => (
               <option key={candidate.id} value={candidate.id}>{candidate.label}</option>
@@ -170,8 +246,8 @@ export default function Viewer() {
           </span>
         </label>
         <div className="suite-meta">
-          <a href="#suite-summary">Summary</a>
-          <a href={suite.summary} download aria-label="Download suite summary as Markdown">.md ↓</a>
+          <a href={viewerLink(suite.id, undefined, "suite-summary")}>Summary</a>
+          <a href={assetUrl(suite.summary)} download aria-label="Download suite summary as Markdown">.md ↓</a>
         </div>
       </section>
 
@@ -190,7 +266,7 @@ export default function Viewer() {
                   ))}
                   <span>{modelName(run.model)}</span>
                 </h3>
-                <RunStatus status={run.status} />
+                <RunStatus status={run.status} suiteId={suite.id} runId={run.id} />
               </div>
 
               <div className="card-content">
@@ -201,7 +277,7 @@ export default function Viewer() {
                   aria-label={`View storefront screenshot for ${modelName(run.model)}`}
                   aria-haspopup="dialog"
                   aria-controls="run-drawer"
-                  onClick={() => setSelectedRunId(run.id)}
+                  onClick={() => navigateToRun(suite.id, run.id)}
                 >
                   <Image
                     src={storefront.screenshot}
@@ -233,7 +309,7 @@ export default function Viewer() {
                 aria-label={`View details and final output for ${run.model}`}
                 aria-haspopup="dialog"
                 aria-controls="run-drawer"
-                onClick={() => setSelectedRunId(run.id)}
+                onClick={() => navigateToRun(suite.id, run.id)}
               >
                 Details <span aria-hidden="true">↗</span>
               </button>
@@ -250,7 +326,7 @@ export default function Viewer() {
 
       <section className="summary-section" id="suite-summary" aria-label="Suite summary">
         <div className="markdown">
-          <Markdown source={documents[suite.summary] ?? "Loading…"} />
+          <Markdown source={documents[suite.summary] ?? "Loading…"} summarySuite={suite.id} />
         </div>
       </section>
 
@@ -259,13 +335,15 @@ export default function Viewer() {
         id="run-drawer"
         className="run-drawer"
         aria-labelledby="run-drawer-title"
-        onClose={() => setSelectedRunId(null)}
+        onCancel={(event) => { event.preventDefault(); navigateToRun(suite.id); }}
         onKeyDown={(event) => {
-          const target = event.target as HTMLElement;
-          if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey || target.closest("input, textarea, select, [contenteditable=true]")) return;
-          if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
+          if (ignoreShortcut(event.nativeEvent)) return;
+          if (["ArrowLeft", "ArrowRight", "h", "l"].includes(event.key)) {
             event.preventDefault();
-            moveRun(event.key === "ArrowLeft" ? -1 : 1);
+            moveRun(event.key === "ArrowLeft" || event.key === "h" ? -1 : 1);
+          } else if (event.key === "j" || event.key === "k") {
+            event.preventDefault();
+            drawerContent.current?.scrollBy({ top: event.key === "j" ? 80 : -80, behavior: "instant" });
           }
         }}
       >
@@ -277,18 +355,20 @@ export default function Viewer() {
                 <h2 id="run-drawer-title">{modelName(selectedRun.model)}</h2>
               </div>
               <div className="drawer-actions">
+                <a className="drawer-permalink" href={viewerLink(suite.id, selectedRun.id)} aria-label="Link to this run" title="Link to this run (copy link address)">Link ↗</a>
                 <span className="run-position" aria-live="polite">{selectedIndex + 1}/{suite.runs.length}</span>
-                <button type="button" className="drawer-close" aria-label="Previous run" title="Previous run (←)" disabled={selectedIndex === 0} onClick={() => moveRun(-1)}>←</button>
-                <button type="button" className="drawer-close" aria-label="Next run" title="Next run (→)" disabled={selectedIndex === suite.runs.length - 1} onClick={() => moveRun(1)}>→</button>
-                <button type="button" className="drawer-close" aria-label="Close run details" onClick={() => drawer.current?.close()}>
+                {/* Keep boundary buttons focusable so disabling navigation never ejects keyboard focus from the dialog. */}
+                <button type="button" className="drawer-close" aria-label="Previous run" aria-keyshortcuts="ArrowLeft h" title="Previous run (← or h)" aria-disabled={selectedIndex === 0} onClick={() => moveRun(-1)}>←</button>
+                <button type="button" className="drawer-close" aria-label="Next run" aria-keyshortcuts="ArrowRight l" title="Next run (→ or l)" aria-disabled={selectedIndex === suite.runs.length - 1} onClick={() => moveRun(1)}>→</button>
+                <button type="button" className="drawer-close" aria-label="Close run details" aria-keyshortcuts="Escape" title="Close (Esc)" onClick={() => navigateToRun(suite.id)}>
                   <span aria-hidden="true">×</span>
                 </button>
               </div>
             </div>
-            <div className="drawer-content" ref={drawerContent}>
+            <div className="drawer-content" ref={drawerContent} role="region" aria-label="Run details and final output (j/k to scroll)" aria-keyshortcuts="j k">
               {selectedStorefront && (
                 <figure className="storefront-preview">
-                  <a href={selectedStorefront.screenshot} target="_blank" rel="noreferrer" aria-label="Open full-size storefront screenshot">
+                  <a href={assetUrl(selectedStorefront.screenshot)} target="_blank" rel="noreferrer" aria-label="Open full-size storefront screenshot">
                     <Image
                       src={selectedStorefront.screenshot}
                       alt={`Above-the-fold storefront by ${modelName(selectedRun.model)}`}
@@ -305,14 +385,35 @@ export default function Viewer() {
                 </figure>
               )}
               <section className="drawer-evidence" aria-label="Run details">
-                <RunStatus key={selectedRun.id} status={selectedRun.status} />
+                <RunStatus key={selectedRun.id} status={selectedRun.status} suiteId={suite.id} runId={selectedRun.id} />
+                <dl className="rating-checks" aria-label="Run acceptance checks">
+                  {rateRun(suite.id, selectedRun.id).checks.map((check) => (
+                    <div key={check.id}>
+                      <dt title={check.definition}>{check.label} · {check.result}</dt>
+                      <dd>{check.reason}</dd>
+                    </div>
+                  ))}
+                </dl>
                 <p className="image-meta">{selectedRun.width} × {selectedRun.height}px · {selectedRun.alpha} · <code>{selectedRun.commit}</code></p>
                 <p className="evidence">{selectedRun.evidence}</p>
                 <div className="card-links">
-                  <a href={selectedRun.design} download>Design ↓</a>
-                  <a href={selectedRun.finalOutput} download>final.md ↓</a>
+                  <a href={assetUrl(selectedRun.design)} download>Design ↓</a>
+                  <a href={assetUrl(selectedRun.finalOutput)} download>final.md ↓</a>
                   <a href={selectedRun.deployment} target="_blank" rel="noreferrer">Storefront ↗</a>
                 </div>
+              </section>
+              <section className="social-preview" aria-labelledby="social-preview-title">
+                <h3 id="social-preview-title" className="final-output-title">Social preview</h3>
+                {selectedStorefront?.socialPreview ? (
+                  <figure className="storefront-preview">
+                    <a href={assetUrl(selectedStorefront.socialPreview.path)} target="_blank" rel="noreferrer" aria-label="Open full-size social preview">
+                      <Image src={selectedStorefront.socialPreview.path} alt={`Published social preview by ${modelName(selectedRun.model)}`} width={selectedStorefront.socialPreview.width} height={selectedStorefront.socialPreview.height} unoptimized />
+                    </a>
+                    <figcaption>{selectedStorefront.socialPreview.width} × {selectedStorefront.socialPreview.height} · Published {selectedStorefront.socialPreview.tag} image, not print artwork</figcaption>
+                  </figure>
+                ) : (
+                  <p className="image-meta">{selectedStorefront?.socialPreviewStatus === "missing" ? "No social preview image published." : selectedStorefront?.socialPreviewStatus === "unavailable" ? "Published social preview could not be retrieved." : "Social preview not captured yet."}</p>
+                )}
               </section>
               <section aria-labelledby="final-output-title">
                 <h3 id="final-output-title" className="final-output-title">Final output</h3>
