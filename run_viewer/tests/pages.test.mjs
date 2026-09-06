@@ -144,6 +144,33 @@ test("static Pages viewer supports suite links, history, scoring, and all archiv
     await dialog.getByRole("button", { name: "Close run details", exact: true }).click();
     await dialog.waitFor({ state: "hidden" });
 
+    // Backdrop dismissal uses the same URL/history path as the close button.
+    const opener = page.locator(".design-card").filter({ has: page.locator(".model-title").filter({ hasText: "claude-opus-5" }) }).locator("button.storefront-thumbnail");
+    await opener.click();
+    await dialog.waitFor();
+    await dialog.locator("#run-drawer-title").click();
+    assert.equal(await dialog.isVisible(), true, "Inside clicks must not dismiss the drawer");
+    const bounds = await dialog.boundingBox();
+    assert.ok(bounds.x > 0, "Desktop has a clickable backdrop");
+    const outside = { x: bounds.x / 2, y: 400 };
+    // Dragging/selecting from inside to outside is not a backdrop click.
+    await page.mouse.move(bounds.x + 20, 400);
+    await page.mouse.down();
+    await page.mouse.move(outside.x, outside.y);
+    await page.mouse.up();
+    assert.equal(await dialog.isVisible(), true);
+    await page.mouse.click(outside.x, outside.y);
+    await dialog.waitFor({ state: "hidden" });
+    assert.equal(new URL(page.url()).searchParams.get("run"), null);
+    assert.equal(new URL(page.url()).searchParams.get("suite"), "20260905-beauty-high");
+    assert.notEqual(await page.evaluate(() => document.body.style.overflow), "hidden", "Restore page scrolling");
+    assert.ok(await opener.evaluate(el => el === document.activeElement), "Return focus to the drawer opener");
+    await page.goBack();
+    await dialog.waitFor();
+    assert.equal(await dialog.locator("#run-drawer-title").innerText(), "claude-opus-5");
+    await page.keyboard.press("Escape");
+    await dialog.waitFor({ state: "hidden" });
+
     const headings = page.locator(".summary-heading");
     const ids = await headings.evaluateAll((nodes) => nodes.map((node) => node.id));
     assert.ok(ids.length > 3);

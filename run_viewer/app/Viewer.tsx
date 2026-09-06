@@ -18,6 +18,12 @@ function ignoreShortcut(event: KeyboardEvent) {
     (target instanceof HTMLElement && (target.isContentEditable || Boolean(target.closest('input, textarea, select, [role="textbox"]'))));
 }
 
+function outsideDialog(dialog: HTMLDialogElement, event: { clientX: number; clientY: number }) {
+  const bounds = dialog.getBoundingClientRect();
+  return event.clientX < bounds.left || event.clientX >= bounds.right ||
+    event.clientY < bounds.top || event.clientY >= bounds.bottom;
+}
+
 function subscribeToNavigation(onChange: () => void) {
   window.addEventListener("popstate", onChange);
   window.addEventListener("hashchange", onChange);
@@ -178,14 +184,31 @@ export default function Viewer() {
     if (!drawerOpen || !dialog) return;
 
     const previousOverflow = document.body.style.overflow;
+    let pointerStartedOnBackdrop = false;
+    const onPointerDown = (event: PointerEvent) => {
+      pointerStartedOnBackdrop = event.isPrimary && event.button === 0 && outsideDialog(dialog, event);
+    };
+    const onPointerCancel = () => { pointerStartedOnBackdrop = false; };
+    const onClick = (event: MouseEvent) => {
+      const dismiss = pointerStartedOnBackdrop && event.detail > 0 &&
+        event.target === dialog && outsideDialog(dialog, event);
+      pointerStartedOnBackdrop = false;
+      if (dismiss) navigateToRun(suite.id);
+    };
+    dialog.addEventListener("pointerdown", onPointerDown);
+    dialog.addEventListener("pointercancel", onPointerCancel);
+    dialog.addEventListener("click", onClick);
     dialog.showModal();
     document.body.style.overflow = "hidden";
 
     return () => {
+      dialog.removeEventListener("pointerdown", onPointerDown);
+      dialog.removeEventListener("pointercancel", onPointerCancel);
+      dialog.removeEventListener("click", onClick);
       dialog.close();
       document.body.style.overflow = previousOverflow;
     };
-  }, [drawerOpen]);
+  }, [drawerOpen, suite.id]);
 
   useEffect(() => {
     drawerContent.current?.scrollTo({ top: 0 });

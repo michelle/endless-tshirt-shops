@@ -51,6 +51,8 @@ Click a card's screenshot or Details to open the run drawer. The large screensho
 inside the drawer opens the live storefront in a new tab, as does the storefront link at the top.
 Use Left/Right or h/l
 to navigate within the selected suite; j/k scroll down/up and Escape closes it.
+Clicking the backdrop outside the drawer also closes it; inside clicks and
+drags that start inside do not. Closing preserves the selected suite permalink.
 With the drawer closed, j/k scroll the main page instead.
 On touchscreens, swipe left/right inside the drawer for the next/previous run.
 Only deliberate horizontal swipes navigate; vertical scrolling, pinch zoom,
