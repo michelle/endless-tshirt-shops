@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2490" height="3510" viewBox="0 0 2490 3510">
+  <rect width="2490" height="3510" fill="#1f2527"/>
+  <g fill="none" stroke="#d9d7cc" stroke-width="15" opacity=".9">
+    <path d="M-90 540 C340 160 600 890 1010 590 S1720 190 2600 620"/><path d="M-110 700 C330 320 600 1030 1040 730 S1740 350 2610 760"/><path d="M-120 870 C330 490 590 1200 1080 900 S1800 520 2600 940"/><path d="M-120 1060 C330 680 630 1380 1120 1080 S1810 700 2610 1130"/><path d="M-120 1250 C330 870 650 1560 1160 1260 S1830 880 2610 1320"/><path d="M-120 1440 C340 1060 690 1740 1200 1440 S1860 1060 2610 1510"/><path d="M-120 1630 C340 1250 720 1910 1250 1630 S1900 1250 2610 1700"/>
+    <path d="M-110 1820 C340 1440 760 2080 1290 1820 S1920 1440 2610 1890"/><path d="M-110 2010 C350 1630 790 2250 1330 2010 S1950 1630 2610 2080"/><path d="M-110 2200 C350 1820 810 2420 1370 2200 S1990 1820 2610 2270"/><path d="M-110 2390 C360 2010 840 2590 1420 2390 S2020 2010 2610 2460"/>
+  </g>
+  <g fill="#f36d2f"><path d="M1245 1130l125 230h-250z"/><rect x="1170" y="1365" width="150" height="30"/></g>
+  <g fill="#f1efe6" font-family="Arial, Helvetica, sans-serif" text-anchor="middle"><text x="1245" y="1710" font-size="94" font-weight="700" letter-spacing="18">SUMMIT GRID</text><text x="1245" y="1828" font-size="43" letter-spacing="14">FIELD EDITION / 01</text><text x="1245" y="2720" font-size="280" font-family="Georgia, serif" letter-spacing="-15">04,892</text><text x="1245" y="2810" font-size="46" letter-spacing="14">FEET ABOVE THE NOISE</text></g>
+  <path d="M640 3000h1210" stroke="#f36d2f" stroke-width="18"/><text x="1245" y="3110" fill="#f1efe6" font-family="Arial, Helvetica, sans-serif" font-size="38" text-anchor="middle" letter-spacing="11">47.6062° N / 122.3321° W</text>
+</svg>
