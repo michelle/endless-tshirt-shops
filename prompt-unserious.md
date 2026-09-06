@@ -1,4 +1,4 @@
-You are in an empty working directory. Build and deploy a production-quality rebuild of datetime.store. Make it the most beautiful and whimsical datetime t-shirt store you can imagine. Work autonomously and make reasonable product and technical decisions.
+You are in an empty working directory. Build and deploy a production-quality rebuild of datetime.store. Work autonomously and make reasonable product and technical decisions. The website should be unserious.
 
 Reference:
 https://github.com/michelle/datetime.store
