@@ -10,6 +10,7 @@ import { explainStatus } from "./status";
 import { rateRun } from "./ratings";
 import { summaryHeadings } from "./summary-headings";
 import { useDrawerSwipe } from "./use-drawer-swipe";
+import { viewerLink } from "./permalinks";
 
 function ignoreShortcut(event: KeyboardEvent) {
   const target = event.target;
@@ -28,12 +29,6 @@ function subscribeToNavigation(onChange: () => void) {
 
 function navigationFromUrl() {
   return window.location.search + window.location.hash;
-}
-
-function viewerLink(suiteId: string, runId?: string, hash = "") {
-  const query = new URLSearchParams({ suite: suiteId });
-  if (runId) query.set("run", runId);
-  return `?${query}${hash ? `#${hash}` : ""}`;
 }
 
 function navigateToRun(suiteId: string, runId?: string) {

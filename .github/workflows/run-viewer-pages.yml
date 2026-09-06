@@ -6,6 +6,9 @@ on:
     paths:
       - "run_viewer/**"
       - ".github/workflows/run-viewer-pages.yml"
+      - ".githooks/**"
+      - "scripts/*viewer*.mjs"
+      - "tests/viewer-pre-push.test.mjs"
   workflow_dispatch:
 
 permissions:
@@ -35,18 +38,11 @@ jobs:
         id: pages
         uses: actions/configure-pages@v5
       - run: npm ci
-      - run: npm run lint
-      - run: npm run test:ratings
-      - run: npm run test:links
-      - name: Build redacted static viewer
-        run: npm run build:pages
-        env:
-          VIEWER_BASE_PATH: "${{ steps.pages.outputs.base_path }}/"
+      - name: Test pre-push snapshot isolation
+        run: node --test ../tests/viewer-pre-push.test.mjs
       - run: npx playwright install --with-deps chromium
-      - run: npm run test:pages
-        env:
-          VIEWER_BASE_PATH: "${{ steps.pages.outputs.base_path }}/"
-      - run: npm run test:mobile
+      - name: Validate permalinks, archive completeness, and built release
+        run: npm run predeploy
         env:
           VIEWER_BASE_PATH: "${{ steps.pages.outputs.base_path }}/"
       - uses: actions/upload-pages-artifact@v4

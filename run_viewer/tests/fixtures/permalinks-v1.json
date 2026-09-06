@@ -1,0 +1,272 @@
+{
+  "version": 1,
+  "note": "Append new published destinations. Do not remove old IDs to make a regression pass; preserve compatibility or add aliases.",
+  "suites": [
+    {
+      "id": "20260905-unserious-high",
+      "runs": [
+        {
+          "id": "astra",
+          "model": "Codex · gpt-6-astra"
+        },
+        {
+          "id": "sol",
+          "model": "Codex · gpt-5.6-sol"
+        },
+        {
+          "id": "terra",
+          "model": "Codex · gpt-5.6-terra"
+        },
+        {
+          "id": "luna",
+          "model": "Codex · gpt-5.6-luna"
+        },
+        {
+          "id": "fable",
+          "model": "Claude · claude-fable-5-1"
+        },
+        {
+          "id": "opus",
+          "model": "Claude · claude-opus-5"
+        },
+        {
+          "id": "sonnet",
+          "model": "Claude · claude-sonnet-5"
+        }
+      ],
+      "headings": [
+        "summary-seven-model-unserious-prompt-benchmark",
+        "summary-audit-outcome",
+        "summary-evidence-and-limitations",
+        "summary-overview",
+        "summary-framework-and-major-choices",
+        "summary-stripe-objects-and-isolation",
+        "summary-registered-webhooks",
+        "summary-application-flow-and-recovery",
+        "summary-design-correctness-and-print-proof",
+        "summary-garment-and-print-area-mapping",
+        "summary-timestamp-freezing-and-persistence",
+        "summary-testing-and-independent-confirmation",
+        "summary-token-usage",
+        "summary-complexity-and-maintenance",
+        "summary-human-handoff-strengths-and-launch-blockers",
+        "summary-viewer-archive-and-capture-provenance"
+      ]
+    },
+    {
+      "id": "20260905-minimal-high",
+      "runs": [
+        {
+          "id": "astra",
+          "model": "Codex · gpt-6-astra"
+        },
+        {
+          "id": "sol",
+          "model": "Codex · gpt-5.6-sol"
+        },
+        {
+          "id": "terra",
+          "model": "Codex · gpt-5.6-terra"
+        },
+        {
+          "id": "luna",
+          "model": "Codex · gpt-5.6-luna"
+        },
+        {
+          "id": "fable",
+          "model": "Claude · claude-fable-5-1"
+        },
+        {
+          "id": "opus",
+          "model": "Claude · claude-opus-5"
+        },
+        {
+          "id": "sonnet",
+          "model": "Claude · claude-sonnet-5"
+        }
+      ],
+      "headings": [
+        "summary-seven-model-minimal-prompt-benchmark-2026-09-05",
+        "summary-post-run-manual-validation-and-correction-2026-09-06-utc",
+        "summary-luna-and-sonnet-later-user-checkouts",
+        "summary-overview",
+        "summary-framework-and-major-technology-choices",
+        "summary-stripe-and-payment-evidence",
+        "summary-registered-webhooks",
+        "summary-application-flow-and-recovery-behavior",
+        "summary-design-correctness-and-print-proof",
+        "summary-testing-and-independent-confirmation",
+        "summary-token-usage",
+        "summary-sanity-check-isolation",
+        "summary-model-handoff-to-a-human",
+        "summary-complexity"
+      ]
+    },
+    {
+      "id": "20260905-beauty-high",
+      "runs": [
+        {
+          "id": "astra",
+          "model": "Codex · gpt-6-astra"
+        },
+        {
+          "id": "sol",
+          "model": "Codex · gpt-5.6-sol"
+        },
+        {
+          "id": "terra",
+          "model": "Codex · gpt-5.6-terra"
+        },
+        {
+          "id": "luna",
+          "model": "Codex · gpt-5.6-luna"
+        },
+        {
+          "id": "fable",
+          "model": "Claude · claude-fable-5-1"
+        },
+        {
+          "id": "opus",
+          "model": "Claude · claude-opus-5"
+        },
+        {
+          "id": "sonnet",
+          "model": "Claude · claude-sonnet-5"
+        }
+      ],
+      "headings": [
+        "summary-seven-model-beauty-prompt-benchmark-2026-09-05",
+        "summary-overview",
+        "summary-framework-and-major-technology-choices",
+        "summary-stripe-integration",
+        "summary-registered-webhooks",
+        "summary-application-flow-and-recovery-behavior",
+        "summary-design-correctness-and-print-proof",
+        "summary-testing",
+        "summary-token-usage",
+        "summary-sanity-check-isolation",
+        "summary-model-handoff-to-a-human",
+        "summary-shared-launch-work",
+        "summary-candidate-specific-fixes-before-launch",
+        "summary-complexity"
+      ]
+    },
+    {
+      "id": "20260827-harness6-high",
+      "runs": [],
+      "headings": [
+        "summary-six-model-prodigi-benchmark-2026-08-27",
+        "summary-overview",
+        "summary-framework-and-major-technology-choices",
+        "summary-stripe-integration",
+        "summary-registered-webhooks",
+        "summary-application-flow-and-recovery-behavior",
+        "summary-design-correctness-and-print-proof",
+        "summary-when-the-design-is-frozen-and-where-it-persists",
+        "summary-testing",
+        "summary-token-usage",
+        "summary-sanity-check-isolation",
+        "summary-model-handoff-to-a-human",
+        "summary-shared-launch-work",
+        "summary-sonnet",
+        "summary-opus",
+        "summary-terra",
+        "summary-sol",
+        "summary-luna",
+        "summary-fable",
+        "summary-complexity"
+      ]
+    },
+    {
+      "id": "20260825-harness6-high",
+      "runs": [],
+      "headings": [
+        "summary-six-model-prodigi-benchmark-2026-08-25",
+        "summary-overview",
+        "summary-framework-and-major-technology-choices",
+        "summary-stripe-integration",
+        "summary-sonnet",
+        "summary-opus",
+        "summary-terra",
+        "summary-sol",
+        "summary-luna",
+        "summary-fable",
+        "summary-application-flow-and-recovery-behavior",
+        "summary-design-correctness-and-print-proof",
+        "summary-when-the-design-is-frozen-and-where-it-persists",
+        "summary-testing",
+        "summary-token-usage",
+        "summary-sanity-check-isolation",
+        "summary-model-handoff-to-a-human",
+        "summary-sonnet-1",
+        "summary-opus-1",
+        "summary-terra-1",
+        "summary-sol-1",
+        "summary-luna-1",
+        "summary-fable-1",
+        "summary-complexity"
+      ]
+    },
+    {
+      "id": "20260825-fresh6-high",
+      "runs": [],
+      "headings": [
+        "summary-fresh-six-model-prodigi-comparison-2026-08-25",
+        "summary-overview",
+        "summary-framework-and-major-technology-choices",
+        "summary-stripe-integration",
+        "summary-sonnet",
+        "summary-opus",
+        "summary-fable",
+        "summary-terra",
+        "summary-sol",
+        "summary-luna",
+        "summary-application-flow-and-failure-recovery",
+        "summary-design-correctness-and-print-proof",
+        "summary-how-the-timestamp-is-frozen-and-persisted",
+        "summary-what-actually-reached-prodigi",
+        "summary-testing",
+        "summary-token-usage",
+        "summary-sanity-check-isolation",
+        "summary-model-handoff-to-a-human",
+        "summary-sonnet-and-opus",
+        "summary-fable-1",
+        "summary-terra-1",
+        "summary-sol-1",
+        "summary-luna-1",
+        "summary-complexity"
+      ]
+    },
+    {
+      "id": "20260823-serial-high",
+      "runs": [],
+      "headings": [
+        "summary-serial-high-reasoning-benchmark-2026-08-23",
+        "summary-overview",
+        "summary-framework-and-major-technology-choices",
+        "summary-stripe-integration",
+        "summary-sonnet",
+        "summary-opus",
+        "summary-terra",
+        "summary-sol",
+        "summary-luna",
+        "summary-application-flow-and-failure-recovery",
+        "summary-design-correctness",
+        "summary-sonnet-1",
+        "summary-opus-1",
+        "summary-terra-1",
+        "summary-sol-1",
+        "summary-luna-1",
+        "summary-testing",
+        "summary-token-usage",
+        "summary-sanity-check-sandbox-isolation",
+        "summary-model-handoff-to-a-human",
+        "summary-sonnet-2",
+        "summary-opus-2",
+        "summary-terra-2",
+        "summary-sol-2",
+        "summary-luna-2"
+      ]
+    }
+  ]
+}

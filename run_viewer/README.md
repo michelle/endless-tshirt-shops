@@ -104,6 +104,48 @@ browser-dispatched touch input, including swipe boundaries, vertical/table
 scrolling, multi-touch, cancellation, and screenshot taps. It also runs before
 automatic Pages deployments. Physical iOS/Android testing is still worthwhile.
 
+## Before pushing or deploying
+
+Run `npm run predeploy` from `run_viewer` (Node 22.13+). It runs lint, fixed
+permalink compatibility tests, registry-driven archive checks, ratings and
+heading tests, a clean static build, HTTP asset checks, and browser/mobile tests.
+The Pages workflow runs the same gate before uploading a deployment artifact.
+Use `CAPTURE_BROWSER=chrome` for installed Chrome, or install Chromium with
+`npx playwright install chromium` once.
+
+Install the local push gate once per clone:
+
+```bash
+cd run_viewer
+npm run hooks:install
+```
+
+The installer refuses to overwrite an existing hook configuration. The hook
+checks the **exact commit being pushed** in a temporary directory with clean
+dependencies, not the working tree: an untracked summary cannot hide a missing
+committed file. It blocks branch pushes that change the viewer or its gate if
+validation fails. Deletions, unchanged viewer trees, and `benchmark-results`
+artifact pushes are skipped, so sequential model runs continue normally.
+The hook uses Node 22 through `npx`, and detects installed macOS Chrome. First
+use may download Node/dependencies; missing browser setup or network failures
+fail closed. Git hooks are local and can be bypassed; CI remains the mandatory
+pre-deployment check. No external storefront/payment endpoints are exercised.
+
+`tests/fixtures/permalinks-v1.json` freezes published suite IDs, short model IDs,
+and summary fragments. Add new destinations after publishing; never remove old
+entries merely to make a failing test pass. Renamed headings need compatibility
+aliases. Tests cold-load historical URLs and confirm the intended drawer or
+heading, as well as checking the literal `?suite=…&run=…#summary-…` contract.
+
+Archive validation follows every registry reference, including summary-only
+older suites and each capture manifest. Summary, final output, design,
+screenshot and declared favicon/social files must be nonempty and publishable.
+Explicit missing/unavailable icons or social cards are allowed; a declared file
+that is absent is not. Every published archive file is then fetched from the
+production build: HTTP 404, HTML fallback disguised as HTTP 200, and wrong bytes
+all fail. This checks the release candidate, not availability after a remote
+hosting outage.
+
 ## Capture a suite
 
 Write the suite's `summary.md`, final outputs, and recovered artwork before
