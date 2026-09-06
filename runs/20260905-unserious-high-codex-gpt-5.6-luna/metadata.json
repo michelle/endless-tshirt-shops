@@ -1,0 +1,22 @@
+{
+  "run_id": "20260905-unserious-high-codex-gpt-5.6-luna",
+  "suite_id": "20260905-unserious-high",
+  "status": "succeeded",
+  "adapter": "codex",
+  "model": "gpt-5.6-luna",
+  "reasoning_effort": "high",
+  "branch": "benchmark-results",
+  "vercel_project": "benchmark-20260905-unserious-high-codex-gpt-5.6-luna",
+  "stripe_config_ref": "20260905-unserious-high-codex-gpt-5.6-luna",
+  "stripe_config_path": ".benchmark-secrets/stripe/20260905-unserious-high-codex-gpt-5.6-luna.toml",
+  "base_commit": "47f0fee2d4632ed732b3df43ce90e4763fe117a6",
+  "prompt_file": "prompt-unserious.md",
+  "prompt_sha256": "5ea01768db6286008e7b9ae6298f5396bfb729894c714e240b90676a14a331eb",
+  "workspace_tree": "853ba152666f875b23ea9e36687abddd1dc8c1af",
+  "started_at": "2026-09-06T04:38:54Z",
+  "finished_at": "2026-09-06T04:54:42Z",
+  "duration_seconds": 948,
+  "agent_exit_code": 0,
+  "usage": {"cached_input_tokens": 5057536, "input_tokens": 5196066, "new_input_tokens": 138530, "output_tokens": 28631},
+  "deployment_url": "https://benchmark-20260905-unserious-high-c-nu.vercel.app)\\n\\nWhat’s"
+}
