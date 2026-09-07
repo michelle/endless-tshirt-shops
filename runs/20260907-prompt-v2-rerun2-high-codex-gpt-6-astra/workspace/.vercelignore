@@ -1,0 +1,9 @@
+.env*
+!.env.example
+tests/
+docs/
+.openai/
+vite.config.ts
+AGENTS.md
+CLAUDE.md
+README.md
