@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1000" height="1200" viewBox="0 0 1000 1200">
+  <defs>
+    <path id="arcTop" d="M 169.23 660.39 A 352 352 0 1 1 830.77 660.39" />
+    <path id="arcBottom" d="M 131.64 674.07 A 392 392 0 0 0 868.36 674.07" />
+  </defs>
+  <g fill="none" stroke="#F2E8D5">
+    <circle cx="500" cy="540" r="440" stroke-width="24" />
+    <circle cx="500" cy="540" r="412" stroke-width="5" />
+    <circle cx="500" cy="540" r="300" stroke-width="9" />
+    <circle cx="500" cy="540" r="286" stroke-width="3" stroke-dasharray="3 9" />
+  </g>
+  <g fill="#F2E8D5" font-family="Alfa Slab One" font-size="43" letter-spacing="5">
+    <text><textPath xlink:href="#arcTop" startOffset="50%" text-anchor="middle">INTERNATIONAL UNION OF TELEGRAPHISTS</textPath></text>
+  </g>
+  <g fill="#F2E8D5" font-family="Oswald" font-weight="600" font-size="44" letter-spacing="8">
+    <text><textPath xlink:href="#arcBottom" startOffset="50%" text-anchor="middle">EVERY WORD COUNTED STOP</textPath></text>
+  </g>
+  <g fill="#D9A441">
+    <circle cx="150.43" cy="667.23" r="12" />
+    <circle cx="849.57" cy="667.23" r="12" />
+  </g>
+  <g transform="translate(500 470) scale(1.0)">
+        <g fill="none" stroke="#F2E8D5" stroke-width="14" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="-120" y="40" width="240" height="30" rx="4" />
+          <path d="M-90 40 l20 -60 h140 l30 40" />
+          <path d="M-70 -20 l0 60" />
+          <path d="M-100 -40 l-20 -20" /><path d="M-130 -40 l-6 -34" />
+        </g>
+        <circle cx="70" cy="-40" r="26" fill="#D9A441" />
+        <g fill="#D9A441">
+          <circle cx="-60" cy="-100" r="9" /><rect x="-40" y="-109" width="50" height="18" rx="9" /><circle cx="30" cy="-100" r="9" />
+          <rect x="50" y="-109" width="50" height="18" rx="9" />
+        </g></g>
+  <text x="500" y="660" text-anchor="middle" font-family="Oswald" font-weight="500" font-size="34" letter-spacing="10" fill="#F2E8D5">EST. 1844</text>
+  <!-- ribbon -->
+  <g transform="translate(500 745)">
+    <path d="M-340 -36 l-42 -24 v120 l42 -24 z" fill="#D9A441" />
+    <path d="M340 -36 l42 -24 v120 l-42 -24 z" fill="#D9A441" />
+    <path d="M-340 -36 h680 l-30 36 l30 36 h-680 l30 -36 z" fill="#F2E8D5" />
+    <text x="0" y="16" text-anchor="middle" font-family="Rye" font-size="46" fill="#1F1B17" letter-spacing="4">LOCAL 1844</text>
+  </g>
+  <text x="500" y="1110" text-anchor="middle" font-family="Special Elite" font-size="44" letter-spacing="6" fill="#F2E8D5">THE OBSOLETE GUILD</text>
+  <text x="500" y="1162" text-anchor="middle" font-family="Special Elite" font-size="27" letter-spacing="4" fill="#F2E8D5">APPAREL FOR TRADES THE WORLD FORGOT</text>
+</svg>

@@ -1,0 +1,41 @@
+@import "tailwindcss";
+
+@theme {
+  --color-paper: #efe7d6;
+  --color-paper-2: #e4dac4;
+  --color-ink: #1f1b17;
+  --color-rust: #b5482b;
+  --color-brass: #d9a441;
+  --font-display: var(--font-display);
+  --font-mono: var(--font-typewriter);
+  --font-sans: var(--font-body);
+}
+
+html {
+  background: var(--color-paper);
+  color: var(--color-ink);
+}
+
+body {
+  font-family: var(--font-body), Georgia, serif;
+  background-image: radial-gradient(rgba(31, 27, 23, 0.06) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+
+.font-display {
+  font-family: var(--font-display), Georgia, serif;
+}
+.font-mono {
+  font-family: var(--font-typewriter), "Courier New", monospace;
+}
+
+input, select, textarea {
+  @apply w-full rounded border border-ink/30 bg-white/70 px-3 py-2 text-ink outline-none focus:border-ink focus:ring-2 focus:ring-brass/40;
+}
+label { @apply block text-xs font-medium uppercase tracking-wider text-ink/70; }
+.btn {
+  @apply inline-flex items-center justify-center rounded-full bg-ink px-6 py-3 font-medium text-paper transition hover:bg-rust disabled:cursor-not-allowed disabled:opacity-50;
+}
+.btn-outline {
+  @apply inline-flex items-center justify-center rounded-full border border-ink px-6 py-3 font-medium text-ink transition hover:bg-ink hover:text-paper;
+}

@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1000" height="1200" viewBox="0 0 1000 1200">
+  <defs>
+    <path id="arcTop" d="M 169.23 660.39 A 352 352 0 1 1 830.77 660.39" />
+    <path id="arcBottom" d="M 131.64 674.07 A 392 392 0 0 0 868.36 674.07" />
+  </defs>
+  <g fill="none" stroke="#1F1B17">
+    <circle cx="500" cy="540" r="440" stroke-width="24" />
+    <circle cx="500" cy="540" r="412" stroke-width="5" />
+    <circle cx="500" cy="540" r="300" stroke-width="9" />
+    <circle cx="500" cy="540" r="286" stroke-width="3" stroke-dasharray="3 9" />
+  </g>
+  <g fill="#1F1B17" font-family="Alfa Slab One" font-size="50" letter-spacing="5">
+    <text><textPath xlink:href="#arcTop" startOffset="50%" text-anchor="middle">ANCIENT GUILD OF TOWN CRIERS</textPath></text>
+  </g>
+  <g fill="#1F1B17" font-family="Oswald" font-weight="600" font-size="44" letter-spacing="8">
+    <text><textPath xlink:href="#arcBottom" startOffset="50%" text-anchor="middle">OYEZ · OYEZ · OYEZ</textPath></text>
+  </g>
+  <g fill="#B5482B">
+    <circle cx="150.43" cy="667.23" r="12" />
+    <circle cx="849.57" cy="667.23" r="12" />
+  </g>
+  <g transform="translate(500 470) scale(1.0)">
+        <g fill="none" stroke="#1F1B17" stroke-width="14" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M0 -130 v40" />
+          <path d="M-16 -130 h32" />
+          <path d="M0 -90 c-40 0 -54 30 -58 80 c-2 30 -14 50 -30 60 h176 c-16 -10 -28 -30 -30 -60 c-4 -50 -18 -80 -58 -80 z" />
+          <path d="M-40 50 c0 30 80 30 80 0" />
+          <path d="M-130 -40 l24 12" /><path d="M-140 10 h26" />
+          <path d="M130 -40 l-24 12" /><path d="M140 10 h-26" />
+        </g>
+        <circle cx="0" cy="78" r="16" fill="#B5482B" /></g>
+  <text x="500" y="660" text-anchor="middle" font-family="Oswald" font-weight="500" font-size="34" letter-spacing="10" fill="#1F1B17">EST. 1066</text>
+  <!-- ribbon -->
+  <g transform="translate(500 745)">
+    <path d="M-340 -36 l-42 -24 v120 l42 -24 z" fill="#B5482B" />
+    <path d="M340 -36 l42 -24 v120 l-42 -24 z" fill="#B5482B" />
+    <path d="M-340 -36 h680 l-30 36 l30 36 h-680 l30 -36 z" fill="#1F1B17" />
+    <text x="0" y="16" text-anchor="middle" font-family="Rye" font-size="46" fill="#F2E8D5" letter-spacing="4">LOCAL 1066</text>
+  </g>
+  <text x="500" y="1110" text-anchor="middle" font-family="Special Elite" font-size="44" letter-spacing="6" fill="#1F1B17">THE OBSOLETE GUILD</text>
+  <text x="500" y="1162" text-anchor="middle" font-family="Special Elite" font-size="27" letter-spacing="4" fill="#1F1B17">APPAREL FOR TRADES THE WORLD FORGOT</text>
+</svg>

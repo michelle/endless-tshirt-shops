@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1000" height="1200" viewBox="0 0 1000 1200">
+  <defs>
+    <path id="arcTop" d="M 169.23 660.39 A 352 352 0 1 1 830.77 660.39" />
+    <path id="arcBottom" d="M 131.64 674.07 A 392 392 0 0 0 868.36 674.07" />
+  </defs>
+  <g fill="none" stroke="#F2E8D5">
+    <circle cx="500" cy="540" r="440" stroke-width="24" />
+    <circle cx="500" cy="540" r="412" stroke-width="5" />
+    <circle cx="500" cy="540" r="300" stroke-width="9" />
+    <circle cx="500" cy="540" r="286" stroke-width="3" stroke-dasharray="3 9" />
+  </g>
+  <g fill="#F2E8D5" font-family="Alfa Slab One" font-size="39" letter-spacing="5">
+    <text><textPath xlink:href="#arcTop" startOffset="50%" text-anchor="middle">INTERNATIONAL BROTHERHOOD OF PINSETTERS</textPath></text>
+  </g>
+  <g fill="#F2E8D5" font-family="Oswald" font-weight="600" font-size="44" letter-spacing="8">
+    <text><textPath xlink:href="#arcBottom" startOffset="50%" text-anchor="middle">RESET · REPEAT</textPath></text>
+  </g>
+  <g fill="#D9A441">
+    <circle cx="150.43" cy="667.23" r="12" />
+    <circle cx="849.57" cy="667.23" r="12" />
+  </g>
+  <g transform="translate(500 470) scale(1.0)"><g fill="none" stroke="#F2E8D5" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"><g transform="translate(0 -20) scale(0.9)"><path d="M0 -110 c-22 0 -30 20 -26 40 c4 22 -30 40 -30 90 c0 40 20 60 56 60 c36 0 56 -20 56 -60 c0 -50 -34 -68 -30 -90 c4 -20 -4 -40 -26 -40 z" /><path d="M-30 -20 h60" stroke="#D9A441" /><path d="M-32 -2 h64" stroke="#D9A441" /></g><g transform="translate(-70 20) scale(0.8)"><path d="M0 -110 c-22 0 -30 20 -26 40 c4 22 -30 40 -30 90 c0 40 20 60 56 60 c36 0 56 -20 56 -60 c0 -50 -34 -68 -30 -90 c4 -20 -4 -40 -26 -40 z" /><path d="M-30 -20 h60" stroke="#D9A441" /><path d="M-32 -2 h64" stroke="#D9A441" /></g><g transform="translate(70 20) scale(0.8)"><path d="M0 -110 c-22 0 -30 20 -26 40 c4 22 -30 40 -30 90 c0 40 20 60 56 60 c36 0 56 -20 56 -60 c0 -50 -34 -68 -30 -90 c4 -20 -4 -40 -26 -40 z" /><path d="M-30 -20 h60" stroke="#D9A441" /><path d="M-32 -2 h64" stroke="#D9A441" /></g></g>
+        <circle cx="0" cy="85" r="34" fill="#D9A441" />
+        <circle cx="-8" cy="76" r="4" fill="#F2E8D5" /><circle cx="8" cy="76" r="4" fill="#F2E8D5" /><circle cx="0" cy="92" r="4" fill="#F2E8D5" /></g>
+  <text x="500" y="660" text-anchor="middle" font-family="Oswald" font-weight="500" font-size="34" letter-spacing="10" fill="#F2E8D5">EST. 1895</text>
+  <!-- ribbon -->
+  <g transform="translate(500 745)">
+    <path d="M-340 -36 l-42 -24 v120 l42 -24 z" fill="#D9A441" />
+    <path d="M340 -36 l42 -24 v120 l-42 -24 z" fill="#D9A441" />
+    <path d="M-340 -36 h680 l-30 36 l30 36 h-680 l30 -36 z" fill="#F2E8D5" />
+    <text x="0" y="16" text-anchor="middle" font-family="Rye" font-size="46" fill="#1F1B17" letter-spacing="4">LOCAL 1895</text>
+  </g>
+  <text x="500" y="1110" text-anchor="middle" font-family="Special Elite" font-size="44" letter-spacing="6" fill="#F2E8D5">THE OBSOLETE GUILD</text>
+  <text x="500" y="1162" text-anchor="middle" font-family="Special Elite" font-size="27" letter-spacing="4" fill="#F2E8D5">APPAREL FOR TRADES THE WORLD FORGOT</text>
+</svg>

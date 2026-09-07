@@ -1,0 +1,122 @@
+[
+  {
+    "slug": "lamplighters",
+    "name": "Lamplighters' Union",
+    "local": "Local 1807",
+    "arcTop": "AMALGAMATED LAMPLIGHTERS' UNION",
+    "arcBottom": "WE KEPT THE DARK HONEST",
+    "est": "EST. 1807",
+    "icon": "lamp",
+    "tagline": "We kept the dark honest.",
+    "blurb": "Every dusk, a man with a pole walked the streets of London lighting gas lamps one by one, and every dawn he walked them again to put them out. Electric lighting retired the trade by the 1930s. A handful of ceremonial lamplighters still walk London's parks.",
+    "obsoletedBy": "Electric street lighting, 1930s"
+  },
+  {
+    "slug": "knocker-uppers",
+    "name": "Knocker-Uppers' Association",
+    "local": "Local 1840",
+    "arcTop": "KNOCKER-UPPERS' BENEVOLENT ASSOCIATION",
+    "arcBottom": "YOUR ALARM BEFORE ALARMS",
+    "est": "EST. 1840",
+    "icon": "knocker",
+    "tagline": "Your alarm before alarms.",
+    "blurb": "Before affordable alarm clocks, mill and dock workers in industrial Britain paid a knocker-upper a few pence a week to rap on their bedroom window with a long pole, or a pea shooter, until they woke. The trade survived in some northern towns into the 1970s.",
+    "obsoletedBy": "The affordable alarm clock, 1950s to 1970s"
+  },
+  {
+    "slug": "ice-harvesters",
+    "name": "Ice Harvesters' Guild",
+    "local": "Local 1806",
+    "arcTop": "FROZEN LAKE ICE HARVESTERS' GUILD",
+    "arcBottom": "COLD · CUT · DELIVERED",
+    "est": "EST. 1806",
+    "icon": "ice",
+    "tagline": "Cold. Cut. Delivered.",
+    "blurb": "Crews sawed blocks of ice from frozen New England lakes each winter, packed them in sawdust, and shipped them as far as Calcutta. Frederic Tudor built an empire on it starting in 1806. Mechanical refrigeration melted the whole industry within a generation.",
+    "obsoletedBy": "Electric refrigeration, 1930s"
+  },
+  {
+    "slug": "human-computers",
+    "name": "Human Computers' Society",
+    "local": "Local 1757",
+    "arcTop": "SOCIETY OF HUMAN COMPUTERS",
+    "arcBottom": "WE WERE THE HARDWARE",
+    "est": "EST. 1757",
+    "icon": "sliderule",
+    "tagline": "We were the hardware.",
+    "blurb": "For two centuries, 'computer' was a job title. Teams of people, very often women, worked long-hand through orbital mechanics, tide tables, and ballistics. In 1757 three of them predicted the return of Halley's comet. The electronic kind took over after 1945.",
+    "obsoletedBy": "The electronic computer, late 1940s"
+  },
+  {
+    "slug": "switchboard-operators",
+    "name": "Switchboard Operators' Local",
+    "local": "Local 1878",
+    "arcTop": "TELEPHONE SWITCHBOARD OPERATORS' LOCAL",
+    "arcBottom": "NUMBER, PLEASE",
+    "est": "EST. 1878",
+    "icon": "switchboard",
+    "tagline": "Number, please.",
+    "blurb": "Every call once passed through a person who plugged a cord into the right jack by hand. The first exchange opened in New Haven in 1878. Direct dialing put most operators out of work by the 1960s, and the last manual exchanges closed in the 1980s.",
+    "obsoletedBy": "Automatic exchanges and direct dialing, 1960s"
+  },
+  {
+    "slug": "pinsetters",
+    "name": "Pinsetters' Brotherhood",
+    "local": "Local 1895",
+    "arcTop": "INTERNATIONAL BROTHERHOOD OF PINSETTERS",
+    "arcBottom": "RESET · REPEAT",
+    "est": "EST. 1895",
+    "icon": "pins",
+    "tagline": "Reset. Repeat.",
+    "blurb": "Pin boys sat on a ledge at the end of the lane, dodging flying pins, resetting them by hand and rolling the ball back. It was fast, loud, and badly paid. The automatic pinsetter arrived in 1946 and cleared the ledge for good.",
+    "obsoletedBy": "The AMF automatic pinsetter, 1946"
+  },
+  {
+    "slug": "rat-catchers",
+    "name": "Rat Catchers' Fraternal Order",
+    "local": "Local 1851",
+    "arcTop": "FRATERNAL ORDER OF RAT CATCHERS",
+    "arcBottom": "BRING US YOUR WORST",
+    "est": "EST. 1851",
+    "icon": "rat",
+    "tagline": "Bring us your worst.",
+    "blurb": "Victorian rat catchers worked with ferrets, terriers and bare hands, and the best of them sold live rats to sporting pubs on the side. Jack Black, self-styled rat catcher to Queen Victoria, wore a sash embroidered with rats. Modern pest control kept the job but lost the flair.",
+    "obsoletedBy": "Municipal pest control, early 1900s"
+  },
+  {
+    "slug": "town-criers",
+    "name": "Town Criers' Guild",
+    "local": "Local 1066",
+    "arcTop": "ANCIENT GUILD OF TOWN CRIERS",
+    "arcBottom": "OYEZ · OYEZ · OYEZ",
+    "est": "EST. 1066",
+    "icon": "bell",
+    "tagline": "Oyez. Oyez. Oyez.",
+    "blurb": "Before newspapers could reach a mostly illiterate public, the crier rang a bell and shouted the news: proclamations, market days, hangings. Harming a crier was harming the crown. Literacy and cheap print made the job a costume.",
+    "obsoletedBy": "Cheap newspapers and literacy, 1800s"
+  },
+  {
+    "slug": "telegraphists",
+    "name": "Telegraphists' Union",
+    "local": "Local 1844",
+    "arcTop": "INTERNATIONAL UNION OF TELEGRAPHISTS",
+    "arcBottom": "EVERY WORD COUNTED STOP",
+    "est": "EST. 1844",
+    "icon": "key",
+    "tagline": "Every word counted. STOP.",
+    "blurb": "Telegraphists sent the world's messages by tapping dots and dashes at up to forty words a minute, and billed by the word, which is why telegrams sound the way they do. The telephone, then the fax, then everything else, shut the last commercial Morse circuits.",
+    "obsoletedBy": "The telephone and telex, 1960s to 1980s"
+  },
+  {
+    "slug": "lectors",
+    "name": "Lectors' Union",
+    "local": "Local 1865",
+    "arcTop": "UNITED CIGAR FACTORY LECTORS",
+    "arcBottom": "READ ALOUD · ROLL ON",
+    "est": "EST. 1865",
+    "icon": "book",
+    "tagline": "Read aloud. Roll on.",
+    "blurb": "In Cuban and Floridian cigar factories, the workers pooled their wages to hire a lector who sat on a platform and read aloud all day: newspapers in the morning, Zola and Cervantes in the afternoon. Factory owners banned the tradition in 1931 for being too political. The radio finished it.",
+    "obsoletedBy": "Factory bans and the radio, 1930s"
+  }
+]
