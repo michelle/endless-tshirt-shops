@@ -61,16 +61,7 @@ extract_url() {
 }
 
 assert_no_staged_secrets() {
-  local value variable
-  for variable in PRODIGI_API_KEY STRIPE_SECRET_KEY STRIPE_PUBLISHABLE_KEY STRIPE_WEBHOOK_SECRET VERCEL_TOKEN; do
-    value=${!variable-}
-    if [[ -n $value ]] && git grep --cached -n -F -- "$value" -- "runs/$RUN_ID" >/dev/null 2>&1; then
-      die "a value from $variable is staged; refusing to commit"
-    fi
-  done
-  if git grep --cached -n -E -- '\b(sk|pk|rkcs|rk)_(test|live)_[A-Za-z0-9_=-]+|\bwhsec_[A-Za-z0-9_=-]+|\b(test|live)_[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\b' -- "runs/$RUN_ID" >/dev/null 2>&1; then
-    die "a provider secret pattern is staged; refusing to commit"
-  fi
+  bash "$SCRIPT_DIR/check-run-artifacts" "$RUN_ID" || die "artifact publication checks failed"
 }
 
 ADAPTER=
@@ -122,6 +113,7 @@ BASE_COMMIT=$(git rev-parse HEAD)
 git remote get-url origin >/dev/null 2>&1 || die "origin remote is required"
 
 SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+TOOLING_COMMIT=$(git -C "$SCRIPT_DIR" rev-parse HEAD) || die "could not identify runner revision"
 ADAPTER_PATH="$SCRIPT_DIR/adapters/$ADAPTER"
 [[ -x $ADAPTER_PATH ]] || die "adapter is not executable: $ADAPTER_PATH"
 command -v node >/dev/null 2>&1 || die "Node.js 20.11+ is required for transcript capture"
@@ -374,6 +366,7 @@ WORKSPACE_TREE=$(git write-tree)
   printf '  "stripe_config_ref": '; json_string "$RUN_ID"; printf ',\n'
   printf '  "stripe_config_path": '; json_string ".benchmark-secrets/stripe/$RUN_ID.toml"; printf ',\n'
   printf '  "base_commit": '; json_string "$BASE_COMMIT"; printf ',\n'
+  printf '  "tooling_commit": '; json_string "$TOOLING_COMMIT"; printf ',\n'
   printf '  "prompt_file": '; json_string "$PROMPT_REF"; printf ',\n'
   printf '  "prompt_sha256": '; json_string "$PROMPT_SHA"; printf ',\n'
   printf '  "workspace_tree": '; json_string "$WORKSPACE_TREE"; printf ',\n'
@@ -387,7 +380,6 @@ WORKSPACE_TREE=$(git write-tree)
 
 git add "runs/$RUN_ID"
 git reset -q -- "$RAW_LOG"
-git diff --cached --check -- . ":(exclude)runs/$RUN_ID/agent.log" || { restore_base_branch; exit 1; }
 assert_no_staged_secrets
 COMMIT_MESSAGE="benchmark: $RUN_ID [$ADAPTER/$MODEL] $RUN_STATUS"
 if ! git commit -m "$COMMIT_MESSAGE" >/dev/null; then
@@ -400,7 +392,6 @@ git switch --detach "$RESULTS_BASE" >/dev/null || die "could not prepare $RESULT
 git switch --create "$PUBLISH_BRANCH" >/dev/null || die "could not create $PUBLISH_BRANCH"
 git checkout "$EXECUTION_COMMIT" -- "runs/$RUN_ID"
 git add "runs/$RUN_ID"
-git diff --cached --check -- . ":(exclude)runs/$RUN_ID/agent.log" || { restore_base_branch; exit 1; }
 assert_no_staged_secrets
 if ! git commit -m "$COMMIT_MESSAGE" >/dev/null; then
   note "results commit failed; generated files remain staged on $PUBLISH_BRANCH"

@@ -67,6 +67,7 @@ printf '%s\n' \
   'mkdir -p "$workspace/node_modules"' \
   'printf "generated dependency\n" >"$workspace/node_modules/example.js"' \
   'printf "generated app\n" >"$workspace/app.txt"' \
+  'mkdir -p "$workspace/public/fonts"; printf "vendor license  \r\nunchanged  \r\n" >"$workspace/public/fonts/OFL.txt"' \
   'printf "formatted CLI output  \n"' \
   "printf '%s\\n' '{\"type\":\"turn.completed\",\"usage\":{\"input_tokens\":11,\"output_tokens\":7,\"total_tokens\":18}}'" \
   'printf "PRODIGI_API_KEY=%s sk_test_abcdefghijklmnop rkcs_test_abcdefghijklmnop https://example.vercel.app\n" "$PRODIGI_API_KEY"' \
@@ -99,6 +100,9 @@ SUCCESS_OUTPUT=$(run success --suite-id beauty-suite --prompt-file prompt-beauty
 assert test "$(git -C "$REPO" branch --show-current)" = main
 assert git --git-dir="$REMOTE" show-ref --verify --quiet refs/heads/benchmark-results
 assert git --git-dir="$REMOTE" show benchmark-results:runs/success/workspace/app.txt
+EXPECTED_LICENSE_HASH=$(printf 'vendor license  \r\nunchanged  \r\n' | git hash-object --stdin)
+ACTUAL_LICENSE_HASH=$(git --git-dir="$REMOTE" rev-parse benchmark-results:runs/success/workspace/public/fonts/OFL.txt)
+assert test "$ACTUAL_LICENSE_HASH" = "$EXPECTED_LICENSE_HASH"
 if git --git-dir="$REMOTE" cat-file -e benchmark-results:runs/success/workspace/node_modules/example.js 2>/dev/null; then
   fail 'generated node_modules was committed'
 fi

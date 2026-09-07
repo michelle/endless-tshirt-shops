@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+# Shared publication gate for fresh runs and unchanged recovered artifacts.
+set -euo pipefail
+RUN_ID=${1:?run ID required}
+[[ $RUN_ID =~ ^[a-zA-Z0-9][a-zA-Z0-9._-]*$ && $RUN_ID != *..* ]] || exit 2
+die() { printf 'error: %s\n' "$*" >&2; exit 2; }
+scan() {
+  local status=0
+  git grep --cached -q "$@" -- "runs/$RUN_ID" || status=$?
+  case $status in
+    0) die 'a provider secret is staged; refusing to commit' ;;
+    1) return 0 ;;
+    *) die 'secret scan failed; refusing to commit' ;;
+  esac
+}
+# Secret checking is mandatory and fails closed. Never print matching lines.
+for variable in PRODIGI_API_KEY STRIPE_SECRET_KEY STRIPE_PUBLISHABLE_KEY STRIPE_WEBHOOK_SECRET VERCEL_TOKEN; do
+  value=${!variable-}
+  [[ -z $value ]] || scan -F -e "$value"
+done
+scan -E -e '(^|[^[:alnum:]_])((sk|pk|rkcs|rk)_(test|live)_[A-Za-z0-9_=-]+|whsec_[A-Za-z0-9_=-]+|(test|live)_[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|(pi|cs)_[A-Za-z0-9_]+_secret_[A-Za-z0-9_]+)'
+# Archive agent output byte-for-byte, including vendor licenses with CRLF or
+# trailing spaces. Formatting is evidence, not a reason to lose a paid run.
+status=0
+git diff --cached --check -- "runs/$RUN_ID" >/dev/null 2>&1 || status=$?
+case $status in
+  0) ;;
+  2) printf 'warning: archived run has whitespace errors; preserving original bytes\n' >&2 ;;
+  *) die 'artifact diff check failed' ;;
+esac

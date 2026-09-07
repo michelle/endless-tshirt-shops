@@ -80,7 +80,22 @@ node scripts/run-suite.mjs --suite 20260906-minimal-inspector-high \
   --prompt prompt-minimal.md --effort high --timeout 7200
 ```
 
-This runs all seven models in harness order, records private progress under `.benchmark-secrets/suites/<suite>/`, and invokes the live read-only inspector after all attempts. Published model failures do not stop later models; publication/cleanup failures pause the controller with artifacts preserved. It refuses duplicate launches for the same suite; inspect interrupted state before deciding how to resume. Run it under your normal persistent process supervisor for unattended operation. A sleeping/offline laptop can still interrupt network work. Completion means `awaiting-human-audit`, not an automatic passing score or viewer publication.
+This runs all seven models in harness order, records private progress under `.benchmark-secrets/suites/<suite>/`, and invokes the live read-only inspector after all attempts. Published model failures do not stop later models; publication/cleanup failures pause the controller with artifacts preserved. Formatting warnings in archived model output do not block publication; secret checks remain mandatory. Run it under your normal persistent process supervisor for unattended operation. A sleeping/offline laptop can still interrupt network work. Completion means `awaiting-human-audit`, not an automatic passing score or viewer publication.
+
+### Resume a blocked suite
+
+Recover/publish any completed-but-unpublished attempt first, preserving its original bytes and metadata. Use `bash scripts/check-run-artifacts <run-id>` on the staged artifact before committing or publishing; never bypass secret checks. Restore the dedicated worktree to its original clean base branch without deleting unpublished evidence, then run:
+
+```sh
+node /path/to/committed-tooling/scripts/run-suite.mjs \
+  --repo /path/to/original-suite-worktree \
+  --suite 20260906-minimal-inspector-high \
+  --prompt prompt-minimal.md --effort high --timeout 7200 --resume
+```
+
+Resume requires a blocked suite with no active attempt, a matching base/prompt/effort/timeout, an ordered list of saved attempts, and matching published metadata plus final/capture/event files for every skipped run. It never reruns a recorded attempt silently. Original failure exit codes remain in progress alongside recovered publication evidence. A controller lock rejects concurrent launches; if a process crashes, verify its `controller.lock/owner.json` PID is dead before manually removing only that lock. Uncertain in-flight attempts require explicit reconciliation, not blind resume.
+
+The controller uses runner/inspector code beside its own script, while model inputs remain pinned to `--repo`. This permits a publication-only tooling repair without changing the comparison's base commit. Use a separate immutable tooling checkout for long runs; progress and new run metadata record its revision. Summary comparisons should disclose mid-suite tooling repairs.
 
 ```sh
 git fetch origin benchmark-results
@@ -93,7 +108,7 @@ Tests (fake CLIs, local Git fixtures, mocked APIs; no model calls):
 
 ```sh
 python3 -m pip install -r scripts/run-inspector/requirements.txt
-node --test tests/run-inspector.test.mjs tests/adapter-capture.test.mjs tests/run-suite.test.mjs
+node --test tests/*.test.mjs
 bash tests/run-benchmark-test.sh
 ```
 

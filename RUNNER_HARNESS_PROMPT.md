@@ -39,6 +39,13 @@ publication or cleanup fails and invokes the inspector after all attempts.
 Use a persistent process supervisor when launching unattended; do not leave
 an unawaited in-tool promise as the only controller.
 
+If publication fails after model execution, preserve and recover that attempt
+instead of paying to rerun it. Archived whitespace is a warning; secret checks
+must still pass via `scripts/check-run-artifacts`. After recovery, `--resume`
+verifies published attempts and continues from the next model. See README for
+the pinned-base, controller-lock and tooling-revision requirements. Record any
+mid-suite tooling repair in the final summary.
+
 After all seven attempts, use the durable inspector first; do not rewrite
 ad-hoc transcript parsers, pagination scripts or image-stat utilities for each
 suite:
