@@ -1,0 +1,4 @@
+import {prodigi,publicOrder} from '@/lib/prodigi';
+import {AppError,authorizeOrder,fail,guard,json} from '@/lib/security';
+export const runtime='nodejs';export const maxDuration=60;
+export async function POST(request:Request,{params}:{params:Promise<{id:string}>}){try{guard(request,10);const {id}=await params;if(!/^ord_[a-zA-Z0-9_-]{1,100}$/.test(id))throw new AppError('Order not found.',404);authorizeOrder(request,id);const existing=await prodigi(`/orders/${id}`);publicOrder(existing.order);const data=await prodigi(`/orders/${id}/actions/cancel`,{});if(String(data.outcome).toLowerCase()==='actionnotavailable')throw new AppError('This test order has progressed too far to cancel.',409);const latest=await prodigi(`/orders/${id}`);return json({order:publicOrder(latest.order),outcome:data.outcome});}catch(error){return fail(error)}}

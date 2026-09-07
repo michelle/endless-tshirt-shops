@@ -1,0 +1,9 @@
+import {z} from 'zod';
+import {sizes} from './catalog';
+export const cartSchema=z.array(z.object({productId:z.enum(['long-way','bird-club']),size:z.enum(sizes),quantity:z.number().int().min(1).max(10)}).strict()).min(1).max(10).refine(items=>items.reduce((s,i)=>s+i.quantity,0)<=10,'A test order can contain up to 10 shirts.').refine(items=>new Set(items.map(i=>`${i.productId}:${i.size}`)).size===items.length,'Duplicate bag entries.');
+const text=(max=100)=>z.string().trim().min(1).max(max);
+const optionalText=(max=100)=>z.string().trim().max(max).optional().default('');
+export const recipientSchema=z.object({name:text(),email:z.email().max(200),phoneNumber:z.string().trim().regex(/^\+?[0-9 ()-]{7,25}$/,'Please enter a valid phone number.'),address:z.object({line1:text(),line2:optionalText(),townOrCity:text(),stateOrCounty:optionalText(),postalOrZipCode:text(12),countryCode:z.enum(['US','GB'])}).strict()}).strict().superRefine((r,ctx)=>{if(r.address.countryCode==='US'){if(!/^[0-9]{5}(-[0-9]{4})?$/.test(r.address.postalOrZipCode))ctx.addIssue({code:'custom',path:['address','postalOrZipCode'],message:'Enter a valid US ZIP code.'});if(!/^[A-Za-z]{2}$/.test(r.address.stateOrCounty))ctx.addIssue({code:'custom',path:['address','stateOrCounty'],message:'Use the two-letter US state code.'});}else if(!/^[A-Z]{1,2}[0-9][A-Z0-9]? ?[0-9][A-Z]{2}$/i.test(r.address.postalOrZipCode))ctx.addIssue({code:'custom',path:['address','postalOrZipCode'],message:'Enter a valid UK postcode.'});});
+export const quoteSchema=z.object({items:cartSchema,recipient:recipientSchema}).strict();
+export const orderSchema=z.object({quoteToken:z.string().min(10).max(20000),shippingMethod:z.enum(['Budget','Standard','StandardPlus','Express','Overnight']),paymentOutcome:z.enum(['approve','decline']),acceptSandbox:z.literal(true)}).strict();
+export type Recipient=z.infer<typeof recipientSchema>;

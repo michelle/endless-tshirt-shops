@@ -1,0 +1,7 @@
+output/
+tests/
+scripts/
+.env*
+README.md
+PRODUCTION.md
+TEST-REPORT.md

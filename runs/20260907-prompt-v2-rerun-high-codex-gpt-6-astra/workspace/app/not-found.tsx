@@ -1,0 +1,2 @@
+import Link from 'next/link';
+export default function NotFound(){return <main id="main" className="empty-state"><div className="eyebrow" style={{justifyContent:'center'}}>A SMALL DETOUR · 404</div><h1 style={{marginTop:20}}>A little off the trail.</h1><p>This page wandered off. The good shirts are back this way.</p><Link href="/#collection" className="button">Back to the collection →</Link></main>}
