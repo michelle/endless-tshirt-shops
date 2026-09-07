@@ -12,8 +12,13 @@ const fd = openSync(target, 'wx', 0o600); let sequence = 0;
 const prompt = readFileSync(env.BENCHMARK_PROMPT_FILE, 'utf8'), effort = env.BENCHMARK_REASONING_EFFORT;
 const args = provider === 'claude'
   ? ['--print', '--dangerously-skip-permissions', '--no-session-persistence', '--output-format', 'stream-json', '--verbose', '--model', env.BENCHMARK_MODEL, ...(effort ? ['--effort', effort] : []), ...extra, prompt]
-  : ['exec', '--dangerously-bypass-approvals-and-sandbox', '--skip-git-repo-check', '--ephemeral', '--color', 'never', '--json', '--cd', env.BENCHMARK_WORKSPACE, '--model', env.BENCHMARK_MODEL, '--output-last-message', env.BENCHMARK_FINAL_OUTPUT, ...(effort ? ['--config', `model_reasoning_effort="${effort}"`] : []), ...extra, prompt];
-const child = spawn(provider, args, { cwd: env.BENCHMARK_WORKSPACE, stdio: ['ignore', 'pipe', 'pipe'] });
+  : ['exec', '--dangerously-bypass-approvals-and-sandbox', '--skip-git-repo-check', '--ephemeral', '--disable', 'memories', '--disable', 'external_agent_memory_import', '--color', 'never', '--json', '--cd', env.BENCHMARK_WORKSPACE, '--model', env.BENCHMARK_MODEL, '--output-last-message', env.BENCHMARK_FINAL_OUTPUT, ...(effort ? ['--config', `model_reasoning_effort="${effort}"`] : []), ...extra, prompt];
+const childEnv = provider === 'claude' ? {
+  ...env,
+  CLAUDE_CODE_DISABLE_AUTO_MEMORY: '1',
+  CLAUDE_CODE_DISABLE_CLAUDE_MDS: '1',
+} : env;
+const child = spawn(provider, args, { cwd: env.BENCHMARK_WORKSPACE, env: childEnv, stdio: ['ignore', 'pipe', 'pipe'] });
 const pending = { stdout: '', stderr: '' };
 function record(stream, line) {
   let event; try { event = JSON.parse(line); } catch { event = { type: 'diagnostic', text: line }; }

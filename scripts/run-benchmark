@@ -361,6 +361,7 @@ WORKSPACE_TREE=$(git write-tree)
   printf '  "capture_version": 1,\n'
   printf '  "model": '; json_string "$MODEL"; printf ',\n'
   printf '  "reasoning_effort": '; json_string "$REASONING_EFFORT"; printf ',\n'
+  printf '  "memory_policy": "explicitly_disabled",\n'
   printf '  "branch": '; json_string "$RESULTS_BRANCH"; printf ',\n'
   printf '  "vercel_project": '; json_string "$VERCEL_PROJECT"; printf ',\n'
   printf '  "stripe_config_ref": '; json_string "$RUN_ID"; printf ',\n'

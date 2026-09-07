@@ -8,10 +8,10 @@ const root = path.resolve(import.meta.dirname, '..');
 async function run(provider, events, t, { exit = 0, final = 'Codex final', tail = '', delay = false } = {}) {
   const dir = await mkdtemp(path.join(os.tmpdir(), 'adapter-capture-')); t.after(() => rm(dir, { recursive: true, force: true }));
   await mkdir(path.join(dir, 'bin'));
-  const script = `#!${process.execPath}\nconst fs = require('node:fs');\nconst args = process.argv.slice(2);\nfs.writeFileSync(process.env.ARGUMENTS, JSON.stringify(args));\n${provider === 'codex' ? `fs.writeFileSync(args[args.indexOf('--output-last-message') + 1], ${JSON.stringify(final)});` : ''}\nfor (const event of ${JSON.stringify(events)}) process.stdout.write(JSON.stringify(event) + '\\n');\nprocess.stdout.write(${JSON.stringify(tail)});\n${delay ? 'setTimeout(() => process.exit(0), 30000);' : `process.exitCode = ${exit};`}`;
+  const script = `#!${process.execPath}\nconst fs = require('node:fs');\nconst args = process.argv.slice(2);\nfs.writeFileSync(process.env.ARGUMENTS, JSON.stringify(args));\nfs.writeFileSync(process.env.MEMORY_ENV, JSON.stringify({ auto: process.env.CLAUDE_CODE_DISABLE_AUTO_MEMORY, md: process.env.CLAUDE_CODE_DISABLE_CLAUDE_MDS }));\n${provider === 'codex' ? `fs.writeFileSync(args[args.indexOf('--output-last-message') + 1], ${JSON.stringify(final)});` : ''}\nfor (const event of ${JSON.stringify(events)}) process.stdout.write(JSON.stringify(event) + '\\n');\nprocess.stdout.write(${JSON.stringify(tail)});\n${delay ? 'setTimeout(() => process.exit(0), 30000);' : `process.exitCode = ${exit};`}`;
   await writeFile(path.join(dir, 'bin', provider), script, { mode: 0o700 });
   await writeFile(path.join(dir, 'prompt.md'), 'Fixture prompt');
-  const env = { ...process.env, PATH: `${dir}/bin:${process.env.PATH}`, ARGUMENTS: `${dir}/args.json`, BENCHMARK_WORKSPACE: dir, BENCHMARK_PROMPT_FILE: `${dir}/prompt.md`, BENCHMARK_MODEL: 'fake', BENCHMARK_REASONING_EFFORT: 'high', BENCHMARK_FINAL_OUTPUT: `${dir}/final.md`, BENCHMARK_USAGE_OUTPUT: `${dir}/usage.json`, BENCHMARK_CAPTURE_DIR: `${dir}/capture` };
+  const env = { ...process.env, PATH: `${dir}/bin:${process.env.PATH}`, ARGUMENTS: `${dir}/args.json`, MEMORY_ENV: `${dir}/memory-env.json`, BENCHMARK_WORKSPACE: dir, BENCHMARK_PROMPT_FILE: `${dir}/prompt.md`, BENCHMARK_MODEL: 'fake', BENCHMARK_REASONING_EFFORT: 'high', BENCHMARK_FINAL_OUTPUT: `${dir}/final.md`, BENCHMARK_USAGE_OUTPUT: `${dir}/usage.json`, BENCHMARK_CAPTURE_DIR: `${dir}/capture` };
   const child = spawn(process.execPath, [path.join(root, 'scripts/adapters/capture.mjs'), provider], { env });
   let stdout = '', stderr = '';
   child.stdout.on('data', d => { stdout += d; if (delay && stdout.includes('item.started')) child.kill('SIGTERM'); });
@@ -33,6 +33,7 @@ test('Claude stream capture retains tools privately and writes only terminal res
   const args = JSON.parse(await readFile(`${r.dir}/args.json`));
   assert.equal(args[args.indexOf('--output-format') + 1], 'stream-json'); assert.ok(args.includes('--verbose'));
   assert.equal(args[args.indexOf('--effort') + 1], 'high');
+  assert.deepEqual(JSON.parse(await readFile(`${r.dir}/memory-env.json`, 'utf8')), { auto: '1', md: '1' });
 });
 
 test('Claude missing or error final returns failure even when CLI exits zero', async t => {
@@ -45,6 +46,9 @@ test('Codex captures final unterminated JSON line and preserves provider exit co
   assert.equal(r.code, 7); assert.equal(r.capture.length, 1);
   assert.equal(JSON.parse(await readFile(`${r.dir}/usage.json`)).new_input_tokens, 12);
   assert.equal(await readFile(`${r.dir}/final.md`, 'utf8'), 'Codex final');
+  const args = JSON.parse(await readFile(`${r.dir}/args.json`));
+  assert.ok(args.includes('--ephemeral'));
+  assert.deepEqual(args.flatMap((arg, index) => arg === '--disable' ? [args[index + 1]] : []), ['memories', 'external_agent_memory_import']);
 });
 
 test('signal interruption retains partial tool history', async t => {
