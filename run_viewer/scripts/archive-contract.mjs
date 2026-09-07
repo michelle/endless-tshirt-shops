@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { readFile, lstat } from "node:fs/promises";
 import path from "node:path";
+import { createHash } from "node:crypto";
 import { isPublishedArchivePath } from "./pages-redaction.mjs";
 
 /** Follow the registry, not directory contents: missing files must fail too. */
@@ -22,6 +23,11 @@ export async function registeredAssets(suites, publicRoot) {
     suiteIds.add(suite.id);
     assert.equal(suite.summary, `/suites/${suite.id}/summary.md`);
     await add(suite.summary);
+    assert.equal(suite.prompt?.path, `/suites/${suite.id}/prompt.md`, `Missing suite prompt: ${suite.id}`);
+    await add(suite.prompt.path);
+    const prompt = await readFile(path.join(publicRoot, suite.prompt.path));
+    assert.equal(createHash("sha256").update(prompt).digest("hex"), suite.prompt.sha256, `Prompt differs from archived revision: ${suite.id}`);
+    assert.match(suite.prompt.revision, /^[a-f0-9]{40}$/);
     if (!suite.runs.length) continue;
     const manifest = `/suites/${suite.id}/storefronts.json`;
     await add(manifest);

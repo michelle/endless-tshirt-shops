@@ -11,17 +11,13 @@ import { rateRun } from "./ratings";
 import { summaryHeadings } from "./summary-headings";
 import { useDrawerSwipe } from "./use-drawer-swipe";
 import { viewerLink } from "./permalinks";
+import { useModalDrawer } from "./use-modal-drawer";
+import { changeTheme, readTheme, subscribeTheme } from "./theme";
 
 function ignoreShortcut(event: KeyboardEvent) {
   const target = event.target;
   return event.defaultPrevented || event.isComposing || event.altKey || event.ctrlKey || event.metaKey || event.shiftKey ||
     (target instanceof HTMLElement && (target.isContentEditable || Boolean(target.closest('input, textarea, select, [role="textbox"]'))));
-}
-
-function outsideDialog(dialog: HTMLDialogElement, event: { clientX: number; clientY: number }) {
-  const bounds = dialog.getBoundingClientRect();
-  return event.clientX < bounds.left || event.clientX >= bounds.right ||
-    event.clientY < bounds.top || event.clientY >= bounds.bottom;
 }
 
 function subscribeToNavigation(onChange: () => void) {
@@ -120,6 +116,9 @@ function CopyPermalink({ suiteId, runId }: { suiteId: string; runId: string }) {
 function Markdown({ source, summarySuite }: { source: string; summarySuite?: string }) {
   const components: Components = {
     a: ({ children, ...props }) => <a {...props} target="_blank" rel="noreferrer">{children}</a>,
+    // Scrollable tables need a focus target for keyboard-only horizontal reading.
+    // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
+    table: ({ children }) => <table tabIndex={0} aria-label="Scrollable data table">{children}</table>,
   };
   if (summarySuite) {
     for (const tag of ["h1", "h2", "h3", "h4", "h5", "h6"] as const) {
@@ -147,11 +146,15 @@ export default function Viewer() {
   const params = new URLSearchParams(search);
   const suiteId = params.get("suite") ?? suites[0].id;
   const [background, setBackground] = useState("#30363d");
+  const theme = useSyncExternalStore(subscribeTheme, readTheme, () => "light");
+  const [promptNavigation, setPromptNavigation] = useState<string | null>(null);
   const [documents, setDocuments] = useState<Record<string, string>>({});
   const [captures, setCaptures] = useState<Record<string, Record<string, Storefront>>>({});
   const selectedRunId = params.get("run");
   const drawer = useRef<HTMLDialogElement>(null);
   const drawerContent = useRef<HTMLDivElement>(null);
+  const promptDrawer = useRef<HTMLDialogElement>(null);
+  const promptContent = useRef<HTMLDivElement>(null);
 
   const suite = useMemo(
     () => suites.find((candidate) => candidate.id === suiteId) ?? suites[0],
@@ -162,6 +165,19 @@ export default function Viewer() {
   const selectedStorefront = selectedRun ? storefronts?.[selectedRun.id] : undefined;
   const selectedIndex = suite.runs.findIndex((run) => run.id === selectedRunId);
   const drawerOpen = Boolean(selectedRun);
+  const promptOpen = promptNavigation !== null && promptNavigation === navigation && !drawerOpen;
+  const closeRun = useCallback(() => navigateToRun(suite.id), [suite.id]);
+  const closePrompt = useCallback(() => setPromptNavigation(null), [setPromptNavigation]);
+  useModalDrawer(drawer, drawerOpen, closeRun);
+  useModalDrawer(promptDrawer, promptOpen, closePrompt);
+  useEffect(() => {
+    if (!promptOpen) return;
+    return subscribeToNavigation(closePrompt);
+  }, [promptOpen, closePrompt]);
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme;
+  }, [theme]);
 
   const moveRun = useCallback((direction: number) => {
     const nextRun = suite.runs[selectedIndex + direction];
@@ -171,44 +187,13 @@ export default function Viewer() {
 
   useEffect(() => {
     function scrollPage(event: KeyboardEvent) {
-      if (drawer.current?.open || ignoreShortcut(event) || !["j", "k"].includes(event.key)) return;
+      if (drawer.current?.open || promptDrawer.current?.open || ignoreShortcut(event) || !["j", "k"].includes(event.key)) return;
       event.preventDefault();
       window.scrollBy({ top: event.key === "j" ? 80 : -80, behavior: "instant" });
     }
     window.addEventListener("keydown", scrollPage);
     return () => window.removeEventListener("keydown", scrollPage);
   }, []);
-
-  useEffect(() => {
-    const dialog = drawer.current;
-    if (!drawerOpen || !dialog) return;
-
-    const previousOverflow = document.body.style.overflow;
-    let pointerStartedOnBackdrop = false;
-    const onPointerDown = (event: PointerEvent) => {
-      pointerStartedOnBackdrop = event.isPrimary && event.button === 0 && outsideDialog(dialog, event);
-    };
-    const onPointerCancel = () => { pointerStartedOnBackdrop = false; };
-    const onClick = (event: MouseEvent) => {
-      const dismiss = pointerStartedOnBackdrop && event.detail > 0 &&
-        event.target === dialog && outsideDialog(dialog, event);
-      pointerStartedOnBackdrop = false;
-      if (dismiss) navigateToRun(suite.id);
-    };
-    dialog.addEventListener("pointerdown", onPointerDown);
-    dialog.addEventListener("pointercancel", onPointerCancel);
-    dialog.addEventListener("click", onClick);
-    dialog.showModal();
-    document.body.style.overflow = "hidden";
-
-    return () => {
-      dialog.removeEventListener("pointerdown", onPointerDown);
-      dialog.removeEventListener("pointercancel", onPointerCancel);
-      dialog.removeEventListener("click", onClick);
-      dialog.close();
-      document.body.style.overflow = previousOverflow;
-    };
-  }, [drawerOpen, suite.id]);
 
   useEffect(() => {
     drawerContent.current?.scrollTo({ top: 0 });
@@ -242,7 +227,7 @@ export default function Viewer() {
 
   useEffect(() => {
     let current = true;
-    const paths = [suite.summary, ...suite.runs.map((run) => run.finalOutput)];
+    const paths = [suite.summary, suite.prompt.path, ...suite.runs.map((run) => run.finalOutput)];
     const missing = paths.filter((documentPath) => documents[documentPath] === undefined);
 
     if (missing.length > 0) {
@@ -267,7 +252,7 @@ export default function Viewer() {
 
   return (
     <main aria-keyshortcuts="j k">
-      <h1 className="viewer-title">Benchmark runs</h1>
+      <h1 className="viewer-title">endless tshirt shops</h1>
 
       <section className="controls" aria-label="Viewer controls">
         <label>
@@ -280,17 +265,21 @@ export default function Viewer() {
             ))}
           </select>
         </label>
+        <button type="button" className="control-button" aria-haspopup="dialog" aria-controls="prompt-drawer" onClick={() => setPromptNavigation(navigation)}>Show prompt</button>
         <label className="color-control">
-          Background
+          T-shirt background
           <span>
             <input
               type="color"
               value={background}
               onChange={(event) => setBackground(event.target.value)}
-              aria-label="Design background color"
+              aria-label="T-shirt background color"
             />
           </span>
         </label>
+        <button type="button" className="control-button theme-toggle" aria-pressed={theme === "dark"} onClick={() => changeTheme(theme === "dark" ? "light" : "dark")}>
+          Dark mode
+        </button>
         <div className="suite-meta">
           <a href={viewerLink(suite.id, undefined, "suite-summary")}>Summary</a>
           <a href={assetUrl(suite.summary)} download aria-label="Download suite summary as Markdown">.md ↓</a>
@@ -469,6 +458,24 @@ export default function Viewer() {
             </div>
           </>
         )}
+      </dialog>
+
+      <dialog ref={promptDrawer} id="prompt-drawer" className="run-drawer prompt-drawer" aria-labelledby="prompt-drawer-title"
+        onCancel={(event) => { event.preventDefault(); closePrompt(); }}
+        onKeyDown={(event) => {
+          if (ignoreShortcut(event.nativeEvent) || !["j", "k"].includes(event.key)) return;
+          event.preventDefault();
+          promptContent.current?.scrollBy({ top: event.key === "j" ? 80 : -80, behavior: "instant" });
+        }}>
+        {promptOpen && <>
+          <div className="drawer-heading">
+            <div><p className="drawer-suite">{suite.label}</p><h2 id="prompt-drawer-title">{suite.prompt.file}</h2></div>
+            <button type="button" className="drawer-close" aria-label="Close prompt" title="Close (Esc)" onClick={closePrompt}>×</button>
+          </div>
+          <div className="drawer-content" ref={promptContent} role="region" aria-label="Suite prompt" aria-keyshortcuts="j k">
+            <div className="markdown"><Markdown source={documents[suite.prompt.path] ?? "Loading…"} /></div>
+          </div>
+        </>}
       </dialog>
     </main>
   );

@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Benchmark run viewer",
+  title: "endless tshirt shops",
   description: "Inspect benchmark outputs and full-canvas t-shirt artwork.",
   icons: {
     icon: "/favicon.svg",

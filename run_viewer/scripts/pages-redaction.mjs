@@ -13,6 +13,6 @@ export function redactForPages(text) {
 
 export function isPublishedArchivePath(path) {
   return path === "favicon.svg" ||
-    /^suites\/[a-zA-Z0-9_-]+\/(?:summary\.md|storefronts\.json)$/.test(path) ||
+    /^suites\/[a-zA-Z0-9_-]+\/(?:summary\.md|prompt\.md|storefronts\.json)$/.test(path) ||
     /^suites\/[a-zA-Z0-9_-]+\/runs\/[a-zA-Z0-9_.-]+\/(?:final\.md|(?:design|paid-design|session-design|submitted)\.(?:png|jpe?g|webp|svg)|social-preview\.(?:png|jpe?g|webp|svg|gif|avif|ico)|storefront\.png|favicon\.(?:png|ico|svg|gif|webp))$/.test(path);
 }

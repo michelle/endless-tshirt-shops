@@ -52,6 +52,8 @@ test("static Pages viewer supports suite links, history, scoring, and all archiv
     page.on("pageerror", (error) => errors.push(error.message));
     page.on("response", (response) => { if (response.status() >= 400) errors.push(`HTTP ${response.status()} ${response.url()}`); });
     await page.goto(`${base}?suite=20260905-beauty-high&keep=1`, { waitUntil: "networkidle" });
+    assert.equal(await page.title(), "endless tshirt shops");
+    assert.equal(await page.locator(".viewer-title").innerText(), "endless tshirt shops");
     const select = page.getByRole("combobox");
     assert.equal(await select.inputValue(), "20260905-beauty-high");
 

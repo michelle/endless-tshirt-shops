@@ -20,14 +20,17 @@ test("server-renders the benchmark viewer", async () => {
   assert.match(response.headers.get("content-type") ?? "", /^text\/html\b/i);
 
   const html = await response.text();
-  assert.match(html, /<title>Benchmark run viewer<\/title>/i);
+  assert.match(html, /<title>endless tshirt shops<\/title>/);
+  assert.match(html, /<h1 class="viewer-title">endless tshirt shops<\/h1>/);
   assert.match(html, /Minimal prompt/);
   assert.match(html, /Beauty prompt/);
   assert.match(html, /Unserious prompt/);
   assert.match(html, /Clean-sheet prompt/);
   assert.match(html, /Harness 6/);
   assert.match(html, /Codex · gpt-6-astra/);
-  assert.match(html, /Design background/);
+  assert.match(html, /T-shirt background/);
+  assert.match(html, /Show prompt/);
+  assert.match(html, /Dark mode/);
   assert.match(html, /Full print canvas generated/);
   assert.match(html, /Suite summary/);
   assert.equal((html.match(/Full print canvas generated/g) ?? []).length, 7);

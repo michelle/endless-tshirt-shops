@@ -31,6 +31,7 @@ export type Suite = {
   id: string;
   label: string;
   summary: string;
+  prompt: { path: string; file: string; revision: string; sha256: string };
   runs: Run[];
 };
 
@@ -49,6 +50,7 @@ export const suites: Suite[] = [
     id: "20260906-clean-sheet-high",
     label: "2026-09-06 · Clean-sheet prompt",
     summary: "/suites/20260906-clean-sheet-high/summary.md",
+    prompt: { path: "/suites/20260906-clean-sheet-high/prompt.md", file: "prompt-clean-sheet.md", revision: "c6fd043cebfe80bedf4aa58ce998b4cedfe4a987", sha256: "8342bfa546623e9fd09dc35be2cc757f574900fc0bb370178dc7675266182206" },
     runs: [
       {
         id: "astra", model: models.astra, commit: "d67a9f00", status: "Paid E2E · asset fetched",
@@ -105,6 +107,7 @@ export const suites: Suite[] = [
     id: "20260905-unserious-high",
     label: "2026-09-05 · Unserious prompt",
     summary: "/suites/20260905-unserious-high/summary.md",
+    prompt: { path: "/suites/20260905-unserious-high/prompt.md", file: "prompt-unserious.md", revision: "47f0fee2d4632ed732b3df43ce90e4763fe117a6", sha256: "5ea01768db6286008e7b9ae6298f5396bfb729894c714e240b90676a14a331eb" },
     runs: [
       {
         id: "astra", model: models.astra, commit: "f30ffc82", status: "Paid fixture · hosted checkout unverified",
@@ -161,6 +164,7 @@ export const suites: Suite[] = [
     id: "20260905-minimal-high",
     label: "2026-09-05 · Minimal prompt",
     summary: "/suites/20260905-minimal-high/summary.md",
+    prompt: { path: "/suites/20260905-minimal-high/prompt.md", file: "prompt-minimal.md", revision: "cbac7b40b29076ab8bc099486c8333729df00b32", sha256: "b211b5d8ded08d9e9f381b7f741f222ad5730eecb87868d4cc437ce10f8a4585" },
     runs: [
       {
         id: "astra", model: models.astra, commit: "bc1b9ba", status: "Paid E2E · 2 completed prints",
@@ -217,6 +221,7 @@ export const suites: Suite[] = [
     id: "20260905-beauty-high",
     label: "2026-09-05 · Beauty prompt",
     summary: "/suites/20260905-beauty-high/summary.md",
+    prompt: { path: "/suites/20260905-beauty-high/prompt.md", file: "prompt-beauty.md", revision: "cbac7b40b29076ab8bc099486c8333729df00b32", sha256: "af594c565b450979255e462eacd25bd9052bf9b3cc5124cc1c2873c1d3662aa9" },
     runs: [
       {
         id: "astra", model: models.astra, commit: "2c69af3", status: "Paid E2E · completed print",
@@ -273,24 +278,28 @@ export const suites: Suite[] = [
     id: "20260827-harness6-high",
     label: "2026-08-27 · Harness 6",
     summary: "/suites/20260827-harness6-high/summary.md",
+    prompt: { path: "/suites/20260827-harness6-high/prompt.md", file: "prompt.md", revision: "3ca2c2c4cb9a88cdf07b7941fa0fcd282109a609", sha256: "4d3eb6c30ac497d510abb0f3bb8ec7b13ea255acd6d0b8fed28b9ec636cb1892" },
     runs: [],
   },
   {
     id: "20260825-harness6-high",
     label: "2026-08-25 · Harness 6",
     summary: "/suites/20260825-harness6-high/summary.md",
+    prompt: { path: "/suites/20260825-harness6-high/prompt.md", file: "prompt.md", revision: "b8ae3ed95ad55b6697641932e686aa36a2914eb9", sha256: "4d3eb6c30ac497d510abb0f3bb8ec7b13ea255acd6d0b8fed28b9ec636cb1892" },
     runs: [],
   },
   {
     id: "20260825-fresh6-high",
     label: "2026-08-25 · Fresh 6",
     summary: "/suites/20260825-fresh6-high/summary.md",
+    prompt: { path: "/suites/20260825-fresh6-high/prompt.md", file: "prompt.md", revision: "d78bcf272d77b4becb2da7bcfdb4f262a8130470", sha256: "4d3eb6c30ac497d510abb0f3bb8ec7b13ea255acd6d0b8fed28b9ec636cb1892" },
     runs: [],
   },
   {
     id: "20260823-serial-high",
     label: "2026-08-23 · Serial high",
     summary: "/suites/20260823-serial-high/summary.md",
+    prompt: { path: "/suites/20260823-serial-high/prompt.md", file: "prompt.md", revision: "8a52f74ded87645e0d24e0d5c4ab3fe94ae529fa", sha256: "5eebcabf76311a711af491d7b450086d9f454ace8a153b7ca10ed1d2b99010a0" },
     runs: [],
   },
 ];

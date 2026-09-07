@@ -109,9 +109,16 @@ layout:
 
 ```text
 run_viewer/public/suites/<suite-id>/summary.md
+run_viewer/public/suites/<suite-id>/prompt.md
 run_viewer/public/suites/<suite-id>/runs/<run-id>/final.md
 run_viewer/public/suites/<suite-id>/runs/<run-id>/design.png
 ```
+
+For Show prompt, archive the task prompt from the suite's recorded base commit,
+preserving its original bytes, and check its SHA-256 against run metadata.
+Register `prompt: { path, file, revision, sha256 }` on the viewer suite. Do not
+substitute today's prompt file or the runner instructions. Every suite,
+including legacy imports, needs this asset; pre-deploy checks validate it.
 
 Keep the human audit outside the inspector's generated markers. Use
 `--update-summary run_viewer/public/suites/<suite-id>/summary.md` to add or

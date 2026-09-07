@@ -15,6 +15,18 @@ test("a registered but missing summary fails (the unserious import regression)",
   await assert.rejects(registeredAssets([{ id: "missing-suite", summary: "/suites/missing-suite/summary.md", runs: [] }], root), /Missing registered asset.*summary\.md/);
 });
 
+test("every suite includes its original prompt and rejects missing or changed copies", async () => {
+  for (const original of suites) {
+    assert.equal(original.prompt.path, `/suites/${original.id}/prompt.md`);
+    const changed = structuredClone(original);
+    changed.prompt.sha256 = "0".repeat(64);
+    await assert.rejects(registeredAssets([changed], root), /Prompt differs from archived revision/);
+  }
+  const absent = structuredClone(suites[0]);
+  delete absent.prompt;
+  await assert.rejects(registeredAssets([absent], root), /Missing suite prompt/);
+});
+
 test("a missing final or image fails even when every existing file is valid", async () => {
   for (const field of ["finalOutput", "design"]) {
     const suite = structuredClone(suites.find(s => s.runs.length));

@@ -1,4 +1,4 @@
-# Benchmark run viewer
+# endless tshirt shops
 
 A deliberately simple viewer for the beauty, minimal, and unserious benchmark
 suites. The newest imported suite is the default.
@@ -12,6 +12,23 @@ All suite reports live at `public/suites/<suite-id>/summary.md`. Suites with
 recovered run artifacts use
 `public/suites/<suite-id>/runs/<run-id>/{final.md,design.*}`. The archive also
 contains the four earlier generated suite reports in the same layout.
+
+Each suite also has a **Show prompt** button opening its archived task prompt
+in a drawer (including legacy suites). Prompts live at
+`public/suites/<suite-id>/prompt.md`; the registry records their original
+filename, source revision and SHA-256. Archive the prompt from that suite's
+recorded base commit, not today's working copy, and verify its hash against run
+metadata. Preserve historical typos and whitespace. The pre-deploy asset
+contract requires a matching prompt for every suite and publishes it with the
+other archive files. Prompt drawers close with Escape, Close or the backdrop;
+j/k scroll inside them without navigating between models.
+
+Markdown has an 88-character maximum measure. Tables scroll horizontally when
+needed and wrap between words rather than splitting model names. **T-shirt
+background** changes only the artwork transparency-check background. **Dark
+mode** changes the viewer's reading colors, including both drawers and tables,
+and saves that preference in browser storage. It never recolors screenshots or
+designs. Light mode remains the default.
 
 The main image represents the customer ordering path. Prefer the asset from an
 actual paid order; otherwise show recorded customer Session artwork or an exact
