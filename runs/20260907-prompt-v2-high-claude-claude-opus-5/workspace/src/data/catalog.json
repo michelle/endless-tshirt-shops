@@ -1,0 +1,56 @@
+[
+  {
+    "slug": "knocker-upper",
+    "trade": "Knocker-Upper",
+    "years": "1750 — 1973",
+    "local": "LOCAL №Ⅰ",
+    "motto": "Sleep Is Not An Excuse",
+    "blurb": "Before the alarm clock was cheap, somebody had to wake the town. Knocker-uppers walked the pre-dawn streets with a long bamboo pole, tapping bedroom panes for a few pence a week — and were themselves woken by someone even poorer. Britain kept them on the payroll until the 1970s.",
+    "fact": "Paid roughly sixpence a week per window. Nobody has ever explained who woke the last one."
+  },
+  {
+    "slug": "lamplighter",
+    "trade": "Lamplighter",
+    "years": "1417 — 1962",
+    "local": "LOCAL №Ⅱ",
+    "motto": "We Held Back The Night",
+    "blurb": "Every dusk, a ladder against a cast-iron post and a wick brought to life — one lamp at a time, the whole city. The lamplighter carried the ladder, the flame, and a quiet responsibility for whether the streets were safe after dark. Electricity retired the trade a lamp at a time.",
+    "fact": "A good London lamplighter lit around 100 lamps an hour. Some routes are still walked by hand in Wales."
+  },
+  {
+    "slug": "switchboard-operator",
+    "trade": "Switchboard Operator",
+    "years": "1878 — 1983",
+    "local": "LOCAL №Ⅲ",
+    "motto": "One Moment, Connecting You",
+    "blurb": "For a century, every long-distance conversation on earth passed through a pair of human hands and a brass patch cord. Operators memorised hundreds of jacks, worked in perfect posture, and heard the century go by one call at a time. Automatic exchanges cut the last cord in 1983.",
+    "fact": "The first operators were teenage boys. They were replaced by women within a year for being rude to customers."
+  },
+  {
+    "slug": "ice-cutter",
+    "trade": "Ice Cutter",
+    "years": "1806 — 1935",
+    "local": "LOCAL №Ⅳ",
+    "motto": "We Sold Winter In July",
+    "blurb": "An entire industry stood on frozen lakes with handsaws, cut the winter into blocks, packed it in sawdust and shipped it to the tropics. New England ice reached Calcutta in good condition. Then somebody built a compressor, and a hundred thousand jobs melted.",
+    "fact": "In 1886 the United States harvested 25 million tons of natural ice. By 1935 the trade was essentially gone."
+  },
+  {
+    "slug": "human-computer",
+    "trade": "Human Computer",
+    "years": "1758 — 1974",
+    "local": "LOCAL №Ⅴ",
+    "motto": "The Answers Came By Hand",
+    "blurb": "\"Computer\" was a job title long before it was a machine. Rooms of them — overwhelmingly women — worked orbital mechanics and ballistics tables with slide rules and mechanical calculators. They checked the electronic machines that replaced them, and were usually right.",
+    "fact": "Katherine Johnson hand-verified the IBM 7090 trajectory for Friendship 7. John Glenn would not fly until she did."
+  },
+  {
+    "slug": "log-driver",
+    "trade": "Log Driver",
+    "years": "1800 — 1974",
+    "local": "LOCAL №Ⅵ",
+    "motto": "Never Turn Your Back On The River",
+    "blurb": "They rode the spring drive downriver on the logs themselves, peavey in hand, breaking jams that could kill a man instantly. It was the most dangerous work in North America and among the best paid. Trucks and highways ended the last big drive in the 1970s.",
+    "fact": "A log jam on the Chippewa in 1869 was 15 miles long and took 200 men six weeks to break."
+  }
+]

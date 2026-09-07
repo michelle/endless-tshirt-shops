@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "provider": "claude",
+  "format": "event_stream",
+  "terminalEvent": true,
+  "malformedLines": 0,
+  "capturedRecords": 1222,
+  "toolCalls": 146,
+  "limitations": [
+    "A search or fetch does not prove comprehension or influence.",
+    "Shell classification is heuristic; mixed write/read commands and dynamic URLs may be missed."
+  ]
+}
