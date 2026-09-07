@@ -1,0 +1,24 @@
+{
+  "name": "night-shift-field-club",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint"
+  },
+  "dependencies": {
+    "next": "15.5.25",
+    "react": "19.1.1",
+    "react-dom": "19.1.1"
+  },
+  "devDependencies": {
+    "@types/node": "22.15.3",
+    "@types/react": "19.1.8",
+    "@types/react-dom": "19.1.6",
+    "eslint": "9.33.0",
+    "eslint-config-next": "15.5.25",
+    "typescript": "5.8.3"
+  }
+}
