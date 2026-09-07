@@ -1,0 +1,11 @@
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
+import {normalizeCart,subtotal} from '../lib/catalog';
+import {recipient,sign,verify,checkoutInput,digest} from '../lib/server';
+process.env.ORDER_SIGNING_SECRET='test-secret-not-for-production-123456789';
+const address={name:'Test Wanderer',email:'test@example.com',address:{line1:'123 Test Street',line2:'',postalOrZipCode:'94103',countryCode:'US',townOrCity:'San Francisco',stateOrCounty:'CA'}};
+test('prices come from catalog, duplicates merge, variants remain separate',()=>{const cart=normalizeCart([{id:'long-way',size:'m',quantity:2,price:1},{id:'long-way',size:'m',quantity:1},{id:'long-way',size:'l',quantity:1}]);assert.equal(cart.length,2);assert.equal(subtotal(cart),13600)});
+test('reject invalid products, quantities and excessive orders',()=>{for(const raw of [[],[{id:'fake',size:'m',quantity:1}],[{id:'long-way',size:'xxs',quantity:1}],[{id:'long-way',size:'m',quantity:-1}],[{id:'long-way',size:'m',quantity:1.5}],[{id:'long-way',size:'m',quantity:11}]])assert.throws(()=>normalizeCart(raw))});
+test('address validates US state, zip, email and country',()=>{assert.equal(recipient(address).name,'Test Wanderer');assert.equal('line2' in recipient(address).address,false);for(const bad of [{...address,email:'nope'},{...address,address:{...address.address,countryCode:'GB'}},{...address,address:{...address.address,stateOrCounty:'ZZ'}},{...address,address:{...address.address,postalOrZipCode:'123'}}])assert.throws(()=>recipient(bad))});
+test('signed quotes cannot be tampered with, reused as receipts, or used after expiry',()=>{const t=sign({kind:'quote',total:3874,exp:Date.now()+10000});assert.equal(verify(t,'quote').total,3874);assert.throws(()=>verify(t+'x','quote'));assert.throws(()=>verify(t,'order'));assert.throws(()=>verify(sign({kind:'quote',exp:Date.now()-1}),'quote'))});
+test('idempotency input stable across cart ordering and changes with destination',()=>{const base={checkoutId:'12345678-1234-1234-1234-123456789012',recipient:address,cart:[{id:'long-way',size:'m',quantity:1},{id:'no-signal',size:'s',quantity:1}]};assert.equal(digest(checkoutInput(base)),digest(checkoutInput({...base,cart:[...base.cart].reverse()})));assert.notEqual(digest(checkoutInput(base)),digest(checkoutInput({...base,recipient:{...address,name:'Someone Else'}})))});

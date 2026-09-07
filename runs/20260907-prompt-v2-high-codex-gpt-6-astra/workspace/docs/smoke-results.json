@@ -1,0 +1,47 @@
+{
+  "base": "https://benchmark-20260907-prompt-v2-high-c.vercel.app",
+  "checkedAt": "2026-09-07T16:07:24.393Z",
+  "checks": [
+    "/ responds publicly",
+    "/product/long-way responds publicly",
+    "/product/no-signal responds publicly",
+    "/product/unavailable responds publicly",
+    "/checkout responds publicly",
+    "/info/shipping responds publicly",
+    "/info/privacy responds publicly",
+    "/info/sizing responds publicly",
+    "/info/test-mode responds publicly",
+    "/art/long-way.png responds publicly",
+    "/art/no-signal.png responds publicly",
+    "/art/unavailable.png responds publicly",
+    "/art/shirt-base.png responds publicly",
+    "Unknown catalog item rejected",
+    "Live sandbox shipping quote and authoritative price",
+    "Cart changes invalidate shipping authorization",
+    "Forged quote rejected",
+    "Sandbox acknowledgement required",
+    "All three graphics submitted in genuine Prodigi sandbox order",
+    "Retry returns same order; no duplicate fulfillment",
+    "Order status protected by signed private receipt",
+    "Live order status and receipt totals returned without shipping PII"
+  ],
+  "orderId": "ord_1170873",
+  "orderStatus": {
+    "stage": "InProgress",
+    "issues": [],
+    "details": {
+      "downloadAssets": "NotStarted",
+      "printReadyAssetsPrepared": "NotStarted",
+      "allocateProductionLocation": "NotStarted",
+      "inProduction": "NotStarted",
+      "shipping": "NotStarted"
+    }
+  },
+  "totals": {
+    "subtotal": 10200,
+    "shipping": 745,
+    "tax": 0,
+    "total": 10945,
+    "currency": "USD"
+  }
+}
