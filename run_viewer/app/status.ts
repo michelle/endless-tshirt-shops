@@ -1,4 +1,5 @@
 export const statusDefinitions: Record<string, string> = {
+  "isolation failure": "Live inspection found a Stripe webhook pointing to another run's storefront. Results cannot be treated as independent account-isolated experiments; see the suite summary.",
   "asset fetched": "Prodigi downloaded the original artwork successfully. This is not confirmation of physical manufacture or print quality.",
   "theme design": "Clean-sheet permits any appealing shirt theme, not only a timestamp. The artwork check is assessed against that prompt.",
   "opaque panel": "The artwork includes an intentional colored background panel. Changing the viewer background will not show through that panel.",

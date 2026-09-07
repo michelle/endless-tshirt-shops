@@ -1,0 +1,162 @@
+{
+  "astra": {
+    "screenshot": "/suites/20260906-minimal-inspector-high/runs/20260906-minimal-inspector-high-codex-gpt-6-astra/storefront.png",
+    "favicon": {
+      "path": "/suites/20260906-minimal-inspector-high/runs/20260906-minimal-inspector-high-codex-gpt-6-astra/favicon.svg",
+      "source": "https://datetime-20260906-6b537472.vercel.app/icon.svg?icon.3zyf3_3vihuw0.svg",
+      "mime": "image/svg+xml"
+    },
+    "faviconStatus": "found",
+    "socialPreview": null,
+    "socialPreviewStatus": "missing",
+    "url": "https://datetime-20260906-6b537472.vercel.app/",
+    "title": "datetime.store — A moment. A t-shirt.",
+    "width": 1440,
+    "height": 900,
+    "capturedAt": "2026-09-07T04:12:48.124Z",
+    "httpStatus": 200,
+    "errors": [],
+    "browser": "151.0.7922.34",
+    "deviceScaleFactor": 1,
+    "colorScheme": "light",
+    "timezone": "America/Los_Angeles"
+  },
+  "sol": {
+    "screenshot": "/suites/20260906-minimal-inspector-high/runs/20260906-minimal-inspector-high-codex-gpt-5.6-sol/storefront.png",
+    "favicon": {
+      "path": "/suites/20260906-minimal-inspector-high/runs/20260906-minimal-inspector-high-codex-gpt-5.6-sol/favicon.svg",
+      "source": "https://benchmark-20260906-minimal-inspecto-inky.vercel.app/icon.svg?icon.01gv05nnfe1tf.svg",
+      "mime": "image/svg+xml"
+    },
+    "faviconStatus": "found",
+    "socialPreview": null,
+    "socialPreviewStatus": "missing",
+    "url": "https://benchmark-20260906-minimal-inspecto-inky.vercel.app/",
+    "title": "datetime.store — wear this exact moment",
+    "width": 1440,
+    "height": 900,
+    "capturedAt": "2026-09-07T04:12:49.191Z",
+    "httpStatus": 200,
+    "errors": [
+      "Minified React error #418; visit https://react.dev/errors/418?args[]=text&args[]= for the full message or use the non-minified dev environment for full errors and additional helpful warnings."
+    ],
+    "browser": "151.0.7922.34",
+    "deviceScaleFactor": 1,
+    "colorScheme": "light",
+    "timezone": "America/Los_Angeles"
+  },
+  "terra": {
+    "screenshot": "/suites/20260906-minimal-inspector-high/runs/20260906-minimal-inspector-high-codex-gpt-5.6-terra/storefront.png",
+    "favicon": null,
+    "faviconStatus": "missing",
+    "socialPreview": null,
+    "socialPreviewStatus": "missing",
+    "url": "https://benchmark-20260906-minimal-inspecto-plum.vercel.app/",
+    "title": "datetime.store — a t-shirt with the current datetime",
+    "width": 1440,
+    "height": 900,
+    "capturedAt": "2026-09-07T04:12:50.608Z",
+    "httpStatus": 200,
+    "errors": [
+      "Minified React error #418; visit https://react.dev/errors/418?args[]=text&args[]= for the full message or use the non-minified dev environment for full errors and additional helpful warnings."
+    ],
+    "browser": "151.0.7922.34",
+    "deviceScaleFactor": 1,
+    "colorScheme": "light",
+    "timezone": "America/Los_Angeles"
+  },
+  "luna": {
+    "screenshot": "/suites/20260906-minimal-inspector-high/runs/20260906-minimal-inspector-high-codex-gpt-5.6-luna/storefront.png",
+    "favicon": null,
+    "faviconStatus": "missing",
+    "socialPreview": null,
+    "socialPreviewStatus": "missing",
+    "url": "https://benchmark-20260906-minimal-inspecto-orpin.vercel.app/",
+    "title": "datetime.store — the present, printed",
+    "width": 1440,
+    "height": 900,
+    "capturedAt": "2026-09-07T04:12:52.005Z",
+    "httpStatus": 200,
+    "errors": [
+      "Minified React error #418; visit https://react.dev/errors/418?args[]=text&args[]= for the full message or use the non-minified dev environment for full errors and additional helpful warnings."
+    ],
+    "browser": "151.0.7922.34",
+    "deviceScaleFactor": 1,
+    "colorScheme": "light",
+    "timezone": "America/Los_Angeles"
+  },
+  "fable": {
+    "screenshot": "/suites/20260906-minimal-inspector-high/runs/20260906-minimal-inspector-high-claude-claude-fable-5-1/storefront.png",
+    "favicon": {
+      "path": "/suites/20260906-minimal-inspector-high/runs/20260906-minimal-inspector-high-claude-claude-fable-5-1/favicon.ico",
+      "source": "https://benchmark-20260906-minimal-inspecto-five.vercel.app/favicon.ico",
+      "mime": "image/x-icon"
+    },
+    "faviconStatus": "found",
+    "socialPreview": null,
+    "socialPreviewStatus": "missing",
+    "url": "https://benchmark-20260906-minimal-inspecto-five.vercel.app/",
+    "title": "the datetime store",
+    "width": 1440,
+    "height": 900,
+    "capturedAt": "2026-09-07T04:12:53.056Z",
+    "httpStatus": 200,
+    "errors": [],
+    "browser": "151.0.7922.34",
+    "deviceScaleFactor": 1,
+    "colorScheme": "light",
+    "timezone": "America/Los_Angeles"
+  },
+  "opus": {
+    "screenshot": "/suites/20260906-minimal-inspector-high/runs/20260906-minimal-inspector-high-claude-claude-opus-5/storefront.png",
+    "favicon": {
+      "path": "/suites/20260906-minimal-inspector-high/runs/20260906-minimal-inspector-high-claude-claude-opus-5/favicon.svg",
+      "source": "https://benchmark-20260906-minimal-inspecto-mu.vercel.app/icon.svg?icon.1agb81xauz3i-.svg",
+      "mime": "image/svg+xml"
+    },
+    "faviconStatus": "found",
+    "socialPreview": {
+      "path": "/suites/20260906-minimal-inspector-high/runs/20260906-minimal-inspector-high-claude-claude-opus-5/social-preview.png",
+      "source": "https://benchmark-20260906-minimal-inspecto-mu.vercel.app/api/og",
+      "mime": "image/png",
+      "tag": "og:image",
+      "width": 1200,
+      "height": 630,
+      "capturedAt": "2026-09-07T04:12:55.302Z"
+    },
+    "socialPreviewStatus": "found",
+    "url": "https://benchmark-20260906-minimal-inspecto-mu.vercel.app/",
+    "title": "the datetime store",
+    "width": 1440,
+    "height": 900,
+    "capturedAt": "2026-09-07T04:12:55.542Z",
+    "httpStatus": 200,
+    "errors": [],
+    "browser": "151.0.7922.34",
+    "deviceScaleFactor": 1,
+    "colorScheme": "light",
+    "timezone": "America/Los_Angeles"
+  },
+  "sonnet": {
+    "screenshot": "/suites/20260906-minimal-inspector-high/runs/20260906-minimal-inspector-high-claude-claude-sonnet-5/storefront.png",
+    "favicon": {
+      "path": "/suites/20260906-minimal-inspector-high/runs/20260906-minimal-inspector-high-claude-claude-sonnet-5/favicon.ico",
+      "source": "https://benchmark-20260906-minimal-inspecto-flax.vercel.app/favicon.ico?favicon.3fpu2ql9ns1a0.ico",
+      "mime": "image/x-icon"
+    },
+    "faviconStatus": "found",
+    "socialPreview": null,
+    "socialPreviewStatus": "missing",
+    "url": "https://benchmark-20260906-minimal-inspecto-flax.vercel.app/",
+    "title": "datetime.store — a t-shirt with the current datetime",
+    "width": 1440,
+    "height": 900,
+    "capturedAt": "2026-09-07T04:12:55.918Z",
+    "httpStatus": 200,
+    "errors": [],
+    "browser": "151.0.7922.34",
+    "deviceScaleFactor": 1,
+    "colorScheme": "light",
+    "timezone": "America/Los_Angeles"
+  }
+}

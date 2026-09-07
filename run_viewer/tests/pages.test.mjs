@@ -60,11 +60,11 @@ test("static Pages viewer supports suite links, history, scoring, and all archiv
     for (const id of ["20260823-serial-high", "20260825-fresh6-high", "20260825-harness6-high", "20260827-harness6-high"]) {
       assert.match(await select.locator(`option[value="${id}"]`).innerText(), / \(legacy\)$/);
     }
-    for (const id of ["20260906-clean-sheet-high", "20260905-beauty-high", "20260905-minimal-high", "20260905-unserious-high"]) {
+    for (const id of ["20260906-minimal-inspector-high", "20260906-clean-sheet-high", "20260905-beauty-high", "20260905-minimal-high", "20260905-unserious-high"]) {
       assert.doesNotMatch(await select.locator(`option[value="${id}"]`).innerText(), /\(legacy\)/);
     }
 
-    for (const [suite, expected] of [["20260906-clean-sheet-high", [2, 1, 4]], ["20260905-unserious-high", [1, 3, 3]], ["20260905-beauty-high", [2, 1, 4]], ["20260905-minimal-high", [3, 3, 1]]]) {
+    for (const [suite, expected] of [["20260906-minimal-inspector-high", [2, 1, 4]], ["20260906-clean-sheet-high", [2, 1, 4]], ["20260905-unserious-high", [1, 3, 3]], ["20260905-beauty-high", [2, 1, 4]], ["20260905-minimal-high", [3, 3, 1]]]) {
       await select.selectOption(suite);
       await page.waitForLoadState("networkidle");
       await page.waitForFunction(() => document.querySelectorAll(".storefront-thumbnail img").length === 7 &&
@@ -77,7 +77,7 @@ test("static Pages viewer supports suite links, history, scoring, and all archiv
       assert.ok(Math.max(...captures) - Math.min(...captures) < 1, "Screenshots stay vertically aligned");
       const customerArt = page.locator(".design-card").filter({ has: page.locator(".model-title").filter({ hasText: suite.includes("minimal") ? "gpt-5.6-sol" : "claude-sonnet-5" }) }).locator(".art-canvas img");
       const unserious = suite.includes("unserious");
-      assert.ok((await customerArt.getAttribute("src")).endsWith(unserious || suite.includes("clean-sheet") ? "/design.png" : suite.includes("minimal") ? "/paid-design.png" : "/design.jpg"), "Customer artwork must not be replaced with smoke-test placeholders or earlier local reproductions");
+      assert.ok((await customerArt.getAttribute("src")).endsWith(unserious || suite.includes("clean-sheet") || suite.includes("inspector") ? "/design.png" : suite.includes("minimal") ? "/paid-design.png" : "/design.jpg"), "Artwork must remain the reviewed exact source for this suite, not a local repair or substituted image");
       assert.deepEqual(await customerArt.evaluate((image) => [image.naturalWidth, image.naturalHeight]), unserious ? [1200, 1500] : [4665, 5844]);
       for (const card of await page.locator(".design-card").all()) {
         const thumbnail = card.locator("button.storefront-thumbnail");
@@ -120,7 +120,7 @@ test("static Pages viewer supports suite links, history, scoring, and all archiv
     assert.equal(await page.locator(".design-card").count(), 0);
     assert.ok((await page.locator(".summary-section").innerText()).length > 100);
     await page.goto(`${base}?suite=unknown`, { waitUntil: "networkidle" });
-    assert.equal(await select.inputValue(), "20260906-clean-sheet-high");
+    assert.equal(await select.inputValue(), "20260906-minimal-inspector-high");
 
     await page.goto(`${base}?suite=20260905-beauty-high&run=opus`, { waitUntil: "networkidle" });
     const dialog = page.getByRole("dialog");

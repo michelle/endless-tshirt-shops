@@ -36,8 +36,8 @@ test("server-renders the benchmark viewer", async () => {
   assert.equal((html.match(/Full print canvas generated/g) ?? []).length, 7);
 });
 
-test("packages all 28 full-canvas designs, final outputs, and all summaries", async () => {
-  const suiteNames = ["20260906-clean-sheet-high", "20260905-minimal-high", "20260905-beauty-high", "20260905-unserious-high"];
+test("packages all 35 full-canvas designs, final outputs, and all summaries", async () => {
+  const suiteNames = ["20260906-minimal-inspector-high", "20260906-clean-sheet-high", "20260905-minimal-high", "20260905-beauty-high", "20260905-unserious-high"];
 
   for (const suite of suiteNames) {
     const [designs, finals, summary] = await Promise.all([
@@ -75,6 +75,7 @@ test("packages all 28 full-canvas designs, final outputs, and all summaries", as
 });
 
 for (const [suiteId, missingIcons] of [
+  ["20260906-minimal-inspector-high", ["terra", "luna"]],
   ["20260906-clean-sheet-high", ["astra", "luna", "opus"]],
   ["20260905-unserious-high", ["terra", "luna"]],
   ["20260905-beauty-high", ["terra", "luna"]],

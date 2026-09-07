@@ -14,6 +14,43 @@ const unverified = (reason: string): Check => ({ result: "unverified", reason })
 // Audit judgments from each suite's summary.md plus inspection of archived art.
 // These are benchmark checks, not a live health check or launch certification.
 export const assessments: Record<string, Record<string, Assessment>> = {
+  "20260906-minimal-inspector-high": {
+    astra: {
+      artwork: fail("The exact transparent source cuts off the timestamp's final digits. Its MD5 matches Prodigi: this is the submitted defect, not viewer cropping."),
+      checkout: unverified("Product-tagged app Sessions remain unpaid. A separate succeeded PaymentIntent and smoke orders do not prove hosted checkout; the account also contains Terra's webhook."),
+      prodigi: unverified("Both cuts were tested directly, but no paid customer Session verifies app fulfillment. Cross-run Stripe contamination prevents independent attribution."),
+    },
+    sol: {
+      artwork: fail("Actual 4665×5844 output has only 754 nontransparent pixels and 129×12-pixel text bounds: effectively invisible at shirt scale."),
+      checkout: unverified("Both app Checkout Sessions remain unpaid, with no PaymentIntents or payment events."),
+      prodigi: unverified("Order ord_1170762 is a standalone fitted/M API test using the app renderer, not the paid application fulfillment path."),
+    },
+    terra: {
+      artwork: pass("Exact 2480×3507 customer-renderer test source is a readable raw timestamp on transparency; MD5 matches Prodigi."),
+      checkout: unverified("Saved profile has no test key; Terra's webhook appears on Astra's account. No independent paid customer flow was established."),
+      prodigi: unverified("Only direct garment API tests are confirmed. Current shipping extraction and body idempotency exist, but paid app delivery is unverified."),
+    },
+    luna: {
+      artwork: fail("Exact paid source has only 4,636 nontransparent pixels and adds date, fit and DATETIME.STORE branding beyond the timestamp."),
+      checkout: pass("Succeeded app-shaped PaymentIntent, fulfillment metadata and completed fitted/L order ord_1170769 agree. Independent browser card-entry replay was not performed."),
+      prodigi: pass("Final paid fitted/L order uses Bella + Canvas 6004 and the intended asset; MD5 matches and asset is Complete. Earlier unisex asset failures remain recorded."),
+    },
+    fable: {
+      artwork: pass("Exact 2490×3510 transparent Chivo timestamp is legible and source MD5 matches the completed paid order."),
+      checkout: pass("Paid app PaymentIntent and unisex/L order ord_1170778 agree, corroborating archived browser-purchase evidence. This audit did not replay payment."),
+      prodigi: pass("Intended Bella + Canvas 3001 black/L mapping and source fetched successfully; webhook and browser fallback use body idempotency."),
+    },
+    opus: {
+      artwork: pass("Exact 4680×5790 timestamp-only transparent print is legible, with source MD5 matching paid order ord_1170792."),
+      checkout: pass("Latest app payment completed and produced the fitted/M order, corroborating the browser-test report. A forced-failure authorization was canceled separately."),
+      prodigi: pass("Final Bella + Canvas 6004 black/M order is Complete with intended asset and body idempotency. Earlier asset errors and physical samples remain caveats."),
+    },
+    sonnet: {
+      artwork: fail("The actual paid 1500×1800 transparent artwork adds an ISO-date subtitle below the raw timestamp."),
+      checkout: pass("Paid app PaymentIntents triggered matching completed orders, including ord_1170804. Independent browser replay remains unverified."),
+      prodigi: fail("Two earlier payments each produced duplicate orders. Final code still uses non-atomic metadata claiming and omits Prodigi idempotencyKey; successful asset delivery does not close that race."),
+    },
+  },
   "20260906-clean-sheet-high": {
     astra: {
       artwork: pass("Legible high-resolution astronomy artwork on transparency; exact paid orbit and phase-v2 source hashes match Prodigi."),
