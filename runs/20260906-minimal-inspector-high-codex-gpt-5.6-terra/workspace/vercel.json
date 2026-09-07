@@ -1,0 +1,6 @@
+{
+  "functions": {
+    "app/api/artwork/route.js": { "maxDuration": 15 },
+    "app/api/stripe-webhook/route.js": { "maxDuration": 15 }
+  }
+}

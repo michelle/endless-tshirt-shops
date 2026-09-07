@@ -1,0 +1,43 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&display=swap');
+
+:root { --ink:#111317; --blue:#bde9fb; --acid:#e9ff5a; --muted:#687078; --line:rgba(17,19,23,.16); }
+* { box-sizing:border-box; }
+html { background:#f8fafb; }
+body { margin:0; color:var(--ink); font-family:'DM Sans',Arial,sans-serif; min-width:320px; }
+button { font:inherit; }
+main { max-width:1440px; min-height:100svh; margin:0 auto; padding:0 44px; display:flex; flex-direction:column; }
+.site-header { height:112px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid var(--line); }
+.wordmark { font-family:'DM Mono',monospace; font-size:1.08rem; font-weight:500; color:inherit; text-decoration:none; letter-spacing:-.06em; }
+.edition,.eyebrow,.stage-label,legend,.moment-card span,footer { font-family:'DM Mono',monospace; text-transform:uppercase; letter-spacing:.06em; font-size:.69rem; }
+.edition { color:var(--muted); }
+.product-grid { display:grid; grid-template-columns:minmax(0,1.15fr) minmax(370px,.85fr); flex:1; align-items:center; gap:clamp(36px,7vw,120px); padding:64px 0 72px; }
+.shirt-stage { min-height:560px; position:relative; display:grid; place-items:center; overflow:hidden; background:var(--blue); isolation:isolate; }
+.shirt-stage::before { content:''; position:absolute; inset:22px; border:1px solid rgba(17,19,23,.18); z-index:-1; }
+.stage-label { position:absolute; top:42px; left:42px; font-weight:500; }
+.shirt { width:min(84%,590px); filter:drop-shadow(0 19px 15px rgba(15,54,75,.24)); mix-blend-mode:multiply; transition:width .35s ease; }
+.shirt.fitted { width:min(70%,500px); }
+.timestamp { position:absolute; top:42.7%; left:50%; transform:translateX(-50%); color:white; font:500 clamp(1rem,2.4vw,1.75rem)/1 'DM Mono',monospace; letter-spacing:-.08em; text-shadow:0 1px 2px rgba(0,0,0,.48); white-space:nowrap; }
+.stamp-note { position:absolute; bottom:42px; right:42px; font: .63rem 'DM Mono',monospace; letter-spacing:.03em; text-transform:uppercase; opacity:.65; }
+.purchase-panel { max-width:460px; }
+.eyebrow { margin:0 0 15px; color:#28728e; font-weight:500; }
+h1 { margin:0; font-size:clamp(2.65rem,4.4vw,4.6rem); line-height:.96; letter-spacing:-.065em; font-weight:700; }
+.intro { color:#465059; font-size:1.05rem; line-height:1.55; margin:25px 0 28px; max-width:42ch; }
+.price-row { display:flex; align-items:baseline; gap:12px; padding:19px 0 20px; border-top:1px solid var(--line); border-bottom:1px solid var(--line); }
+.old-price { text-decoration:line-through; color:var(--muted); font: .85rem 'DM Mono',monospace; }
+.price { font:500 1.6rem 'DM Mono',monospace; letter-spacing:-.08em; }
+.shipping { margin-left:auto; color:#28728e; font-size:.82rem; }
+fieldset { border:0; padding:25px 0 0; margin:0; }
+legend { padding:0 0 11px; font-weight:500; }
+.segmented,.size-grid { display:grid; gap:8px; }
+.segmented { grid-template-columns:1fr 1fr; }.size-grid { grid-template-columns:repeat(4,1fr); }
+.segmented button,.size-grid button { height:47px; background:white; border:1px solid var(--line); cursor:pointer; color:var(--ink); text-transform:capitalize; transition:background .16s,color .16s,border .16s; }
+.size-grid button { font-family:'DM Mono',monospace; text-transform:uppercase; }
+.segmented button:hover,.size-grid button:hover { border-color:var(--ink); }.segmented button.selected,.size-grid button.selected { background:var(--ink); color:white; border-color:var(--ink); }
+.moment-card { margin-top:28px; padding:15px 17px; background:var(--acid); display:grid; grid-template-columns:auto 1fr; column-gap:14px; align-items:center; }
+.moment-card strong { font:500 1.05rem 'DM Mono',monospace; letter-spacing:-.08em; }.moment-card small { grid-column:2; color:#455000; font-size:.68rem; padding-top:2px; }
+.checkout { width:100%; min-height:58px; margin-top:16px; padding:0 20px; border:1px solid var(--ink); background:var(--ink); color:white; display:flex; justify-content:space-between; align-items:center; font-weight:500; cursor:pointer; transition:background .16s,color .16s; }
+.checkout:hover:not(:disabled) { background:var(--blue); color:var(--ink); }.checkout:disabled { opacity:.64; cursor:wait; }.checkout span { font-size:1.4rem; }
+.microcopy { margin:12px 0 0; color:var(--muted); font-size:.72rem; text-align:center; }.error { margin:16px 0 0; color:#a31919; font-size:.88rem; }
+footer { min-height:64px; display:flex; justify-content:space-between; align-items:center; color:var(--muted); border-top:1px solid var(--line); }
+.success { min-height:100svh; display:grid; place-content:center; text-align:center; padding:32px; background:var(--blue); }.success-box { max-width:540px; }.success h1 { margin:13px 0 20px; }.success p { color:#31404a; line-height:1.5; }.success a { display:inline-block; margin-top:18px; padding:15px 20px; background:#111317; color:#fff; text-decoration:none; }
+@media (max-width:800px) { main{padding:0 20px}.site-header{height:76px}.edition{display:none}.product-grid{grid-template-columns:1fr;padding:28px 0 42px;gap:36px}.shirt-stage{min-height:min(112vw,540px)}.stage-label{top:25px;left:25px}.stamp-note{bottom:25px;right:25px}.purchase-panel{max-width:none}.shirt{width:78%}.shirt.fitted{width:65%}footer{min-height:52px;font-size:.58rem} }
