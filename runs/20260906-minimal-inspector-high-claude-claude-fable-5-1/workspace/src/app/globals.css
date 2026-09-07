@@ -1,0 +1,385 @@
+:root {
+  --blue: #337ab7;
+  --blue-light: #a4d5ff;
+  --ink: #111;
+  --muted: #777;
+  --line: #eee;
+  --danger: #eb1c26;
+  --font: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: #fff;
+  color: var(--ink);
+  font-family: var(--font);
+  font-size: 16px;
+  line-height: 1.4;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  color: var(--blue);
+}
+
+.container {
+  max-width: 1140px;
+  margin: 0 auto;
+  padding: 24px 20px 48px;
+}
+
+/* Header, in the spirit of Bootstrap 3's .page-header */
+.page-header {
+  border-bottom: 1px solid var(--line);
+  padding: 28px 0 14px;
+  margin: 0 0 32px;
+}
+.page-header h1 {
+  font-size: 36px;
+  font-weight: 300;
+  margin: 0;
+  line-height: 1.1;
+  letter-spacing: -0.5px;
+}
+.page-header h2 {
+  color: var(--blue);
+  font-weight: 400;
+  font-size: 19px;
+  margin: 6px 0 0;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+  gap: 40px;
+  align-items: start;
+}
+@media (max-width: 767px) {
+  .layout {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+  .page-header {
+    padding-top: 8px;
+  }
+  .page-header h1 {
+    font-size: 30px;
+  }
+}
+
+/* Shirt preview */
+.Shirt {
+  position: relative;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  user-select: none;
+}
+.Shirt-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.Shirt-svg path {
+  fill: #0f0f0f;
+}
+.Shirt-time {
+  position: absolute;
+  top: 20%;
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+}
+.Shirt-time canvas {
+  width: 30%;
+  height: auto;
+}
+.Shirt-frozen {
+  position: absolute;
+  top: 27%;
+  left: 0;
+  width: 100%;
+  text-align: center;
+  color: var(--blue-light);
+  font-size: 11px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  pointer-events: none;
+}
+.Shirt-price {
+  position: absolute;
+  top: 70%;
+  left: 10%;
+}
+.Shirt-price .price-label {
+  display: inline-block;
+  background: var(--blue);
+  color: #fff;
+  font-size: 22px;
+  font-weight: 300;
+  padding: 4px 10px;
+  border-radius: 3px;
+  white-space: nowrap;
+}
+.Shirt-price .price-label s {
+  opacity: 0.75;
+  margin-right: 6px;
+}
+.Shirt-caption {
+  margin: 12px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+  text-align: center;
+}
+
+/* Style + size pickers */
+.choices {
+  display: grid;
+  gap: 0;
+  margin-bottom: 8px;
+}
+.choices.styles {
+  grid-template-columns: repeat(2, 1fr);
+}
+.choices.sizes {
+  grid-template-columns: repeat(4, 1fr);
+}
+.choice input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  pointer-events: none;
+}
+.choice label {
+  display: block;
+  width: 100%;
+  text-align: center;
+  background: var(--blue-light);
+  color: var(--ink);
+  padding: 8px 14px;
+  line-height: 28px;
+  cursor: pointer;
+  transition: opacity 200ms ease-in-out, background-color 150ms ease-in-out;
+}
+.choice label:hover {
+  opacity: 0.8;
+}
+.choice input:checked + label {
+  background: #000;
+  color: #fff;
+}
+.choice input:focus-visible + label {
+  outline: 2px solid var(--blue);
+  outline-offset: -2px;
+}
+.choice input:disabled + label {
+  cursor: default;
+  opacity: 0.6;
+}
+.choices-hint {
+  margin: 0 0 20px;
+  color: var(--muted);
+  font-size: 13px;
+  text-align: center;
+}
+
+/* Checkout */
+.Checkout {
+  position: relative;
+}
+.Checkout-express {
+  margin: 20px 0 8px;
+}
+.Checkout-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--muted);
+  font-size: 13px;
+  margin: 16px 0 8px;
+}
+.Checkout-divider::before,
+.Checkout-divider::after {
+  content: "";
+  flex: 1;
+  border-top: 1px solid var(--line);
+}
+.Checkout-switch {
+  display: block;
+  margin: 12px auto 0;
+  background: none;
+  border: 0;
+  color: var(--blue);
+  font-size: 14px;
+  cursor: pointer;
+  text-align: center;
+}
+.Checkout-switch:hover {
+  text-decoration: underline;
+}
+.Checkout-section {
+  margin: 18px 0;
+}
+.Checkout-section h3 {
+  font-size: 13px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--muted);
+  margin: 0 0 8px;
+}
+/* Native inputs styled to sit next to Stripe Elements' default "stripe" theme */
+.field-label {
+  display: block;
+  font-size: 14.88px;
+  margin-bottom: 4px;
+  color: #30313d;
+}
+.field-input {
+  display: block;
+  width: 100%;
+  font-family: var(--font);
+  font-size: 16px;
+  color: #30313d;
+  padding: 12px;
+  background: #fff;
+  border: 1px solid #e6e6e6;
+  border-radius: 3px;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.03), 0 3px 6px rgba(0, 0, 0, 0.02);
+  transition: box-shadow 150ms ease, border-color 150ms ease;
+  outline: none;
+}
+.field-input::placeholder {
+  color: #77787f;
+}
+.field-input:focus {
+  border-color: var(--blue);
+  box-shadow: 0 0 0 3px rgba(51, 122, 183, 0.25);
+}
+.Checkout-loading {
+  color: var(--muted);
+  font-size: 14px;
+  text-align: center;
+  padding: 24px 0;
+}
+
+.btn-buy {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  height: 47px;
+  margin: 18px 0 8px;
+  background: #000;
+  color: #fff;
+  border: 0;
+  font-size: 19px;
+  font-weight: 400;
+  font-family: var(--font);
+  cursor: pointer;
+  transition: opacity 200ms ease-in-out, background-color 150ms ease-in-out;
+}
+.btn-buy:hover {
+  opacity: 0.85;
+}
+.btn-buy:focus-visible,
+.btn-buy:active {
+  background: var(--blue);
+  outline: none;
+}
+.btn-buy:disabled {
+  cursor: wait;
+  opacity: 0.7;
+}
+.btn-buy.secondary {
+  background: var(--blue);
+}
+
+.spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.9s linear infinite;
+}
+.spinner.dark {
+  border-color: rgba(0, 0, 0, 0.15);
+  border-top-color: var(--blue);
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.alert {
+  background: #fdecea;
+  color: #8a1c1c;
+  border: 1px solid #f5c2c0;
+  padding: 10px 12px;
+  border-radius: 3px;
+  font-size: 14px;
+  margin: 12px 0;
+}
+.alert.info {
+  background: #eef6fd;
+  color: #1c4d7a;
+  border-color: #c6e0f5;
+}
+
+.fine-print {
+  color: var(--muted);
+  font-size: 12px;
+  text-align: center;
+  margin: 8px 0 0;
+}
+
+/* Success */
+.Checkout-success {
+  text-align: center;
+  padding-top: 12%;
+}
+.Checkout-success-title {
+  font-size: 20px;
+  font-weight: 500;
+  margin: 0 0 12px;
+}
+.Checkout-success p {
+  margin: 0 0 10px;
+}
+.Checkout-success .order-ref {
+  display: inline-block;
+  font-family: var(--font-chivo), monospace;
+  background: #f4f4f4;
+  padding: 2px 8px;
+  border-radius: 3px;
+}
+.Checkout-success .btn-buy {
+  margin-top: 28px;
+}
+
+footer {
+  margin-top: 56px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 13px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+  justify-content: space-between;
+}
