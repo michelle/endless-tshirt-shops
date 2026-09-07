@@ -1,0 +1,74 @@
+{
+  "origin": "https://datetime-20260906-6b537472.vercel.app",
+  "checkedAt": "2026-09-06T23:16:46.585Z",
+  "homepage": "200",
+  "inputAndWebhookGuards": "passed",
+  "checkout": {
+    "id": "cs_test_a12o7HL9j87cJFACPOupakSoqb2J2j0dTbP2X6WKdGQE8YjLN8VgBqLNAc",
+    "amount": 2250,
+    "idempotency": "passed"
+  },
+  "unpaidOrderGuard": "passed",
+  "signedUnpaidWebhook": "accepted without fulfillment",
+  "artwork": {
+    "width": 4677,
+    "height": 5881,
+    "format": "png",
+    "density": 300
+  },
+  "testPaymentIntent": "pi_3UCpIpPOEXafQaz11VoyXHJP",
+  "sandboxOrders": [
+    {
+      "fit": "unisex",
+      "id": "ord_1170757",
+      "outcome": "Created",
+      "duplicate": "AlreadyExists",
+      "processing": {
+        "status": {
+          "stage": "InProgress",
+          "issues": [],
+          "details": {
+            "downloadAssets": "NotStarted",
+            "printReadyAssetsPrepared": "NotStarted",
+            "allocateProductionLocation": "NotStarted",
+            "inProduction": "NotStarted",
+            "shipping": "NotStarted"
+          }
+        },
+        "assets": [
+          [
+            {
+              "status": "InProgress"
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "fit": "fitted",
+      "id": "ord_1170758",
+      "outcome": "Created",
+      "duplicate": "AlreadyExists",
+      "processing": {
+        "status": {
+          "stage": "InProgress",
+          "issues": [],
+          "details": {
+            "downloadAssets": "NotStarted",
+            "printReadyAssetsPrepared": "NotStarted",
+            "allocateProductionLocation": "NotStarted",
+            "inProduction": "NotStarted",
+            "shipping": "NotStarted"
+          }
+        },
+        "assets": [
+          [
+            {
+              "status": "InProgress"
+            }
+          ]
+        ]
+      }
+    }
+  ]
+}

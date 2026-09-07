@@ -1,0 +1,1 @@
+{"framework":"nextjs","buildCommand":"npm run build","installCommand":"npm ci","functions":{"app/api/artwork/route.ts":{"maxDuration":30},"app/api/checkout/route.ts":{"maxDuration":60},"app/api/stripe/webhook/route.ts":{"maxDuration":60},"app/api/order/route.ts":{"maxDuration":60}}}
