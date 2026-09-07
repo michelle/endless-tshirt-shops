@@ -1,0 +1,5 @@
+node_modules.broken
+package-lock.broken
+.next
+.wrangler
+dist
