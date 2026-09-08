@@ -26,7 +26,7 @@ test("server-renders the benchmark viewer", async () => {
   assert.match(html, /Beauty prompt/);
   assert.match(html, /Unserious prompt/);
   assert.match(html, /Clean-sheet prompt/);
-  assert.match(html, /Harness 6/);
+  assert.doesNotMatch(html, /Harness 6/);
   assert.match(html, /Codex · gpt-6-astra/);
   assert.match(html, /T-shirt background/);
   assert.match(html, /Show prompt/);

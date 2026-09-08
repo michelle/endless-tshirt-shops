@@ -17,7 +17,7 @@ test("prompts, readable Markdown, and persistent dark mode work without changing
     await page.goto(`${base}?suite=20260905-beauty-high&keep=1`, { waitUntil: "networkidle" });
     const showPrompt = page.getByRole("button", { name: "Show prompt", exact: true });
     const prompt = page.locator("#prompt-drawer");
-    for (const suite of suites) {
+    for (const suite of suites.filter((candidate) => candidate.runs.length > 0)) {
       await page.getByRole("combobox").selectOption(suite.id);
       await page.waitForLoadState("networkidle");
       const before = page.url();

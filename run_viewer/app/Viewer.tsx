@@ -14,6 +14,10 @@ import { viewerLink } from "./permalinks";
 import { useModalDrawer } from "./use-modal-drawer";
 import { changeTheme, readTheme, subscribeTheme } from "./theme";
 
+const pickerSuites = suites
+  .filter((candidate) => candidate.runs.length > 0)
+  .sort((left, right) => Number(Boolean(left.incomplete)) - Number(Boolean(right.incomplete)));
+
 function ignoreShortcut(event: KeyboardEvent) {
   const target = event.target;
   return event.defaultPrevented || event.isComposing || event.altKey || event.ctrlKey || event.metaKey || event.shiftKey ||
@@ -261,8 +265,11 @@ export default function Viewer() {
           <select value={suite.id} onChange={(event) => {
             navigateToRun(event.target.value);
           }}>
-            {suites.map((candidate) => (
-              <option key={candidate.id} value={candidate.id}>{candidate.label}{candidate.runs.length === 0 ? " (legacy)" : ""}</option>
+            {suite.runs.length === 0 ? <option value={suite.id} hidden>{suite.label}</option> : null}
+            {pickerSuites.map((candidate) => (
+              <option key={candidate.id} value={candidate.id}>
+                {candidate.label} · Prompt: {candidate.prompt.file}
+              </option>
             ))}
           </select>
         </label>

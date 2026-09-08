@@ -30,6 +30,7 @@ export type Run = {
 export type Suite = {
   id: string;
   label: string;
+  incomplete?: boolean;
   summary: string;
   prompt: { path: string; file: string; revision: string; sha256: string };
   runs: Run[];
@@ -112,7 +113,8 @@ export const suites: Suite[] = [
   },
   {
     id: "20260907-prompt-v2-rerun-high",
-    label: "2026-09-07 · Prompt v2 rerun",
+    label: "2026-09-07 · Prompt v2 · First rerun [incomplete]",
+    incomplete: true,
     summary: "/suites/20260907-prompt-v2-rerun-high/summary.md",
     prompt: { path: "/suites/20260907-prompt-v2-rerun-high/prompt.md", file: "prompt-v2.md", revision: "01bb32d2b9201a1caf0eee56f755259c6f1ce183", sha256: "9b6228722b8330ca6d1311de695eb99ec4da2809a92e17be2e7c82a0e13f316b" },
     runs: [
@@ -278,7 +280,8 @@ export const suites: Suite[] = [
   },
   {
     id: "20260907-prompt-v2-high",
-    label: "2026-09-07 · Prompt v2",
+    label: "2026-09-07 · Prompt v2 · Original [incomplete]",
+    incomplete: true,
     summary: "/suites/20260907-prompt-v2-high/summary.md",
     prompt: { path: "/suites/20260907-prompt-v2-high/prompt.md", file: "prompt-v2.md", revision: "01bb32d2b9201a1caf0eee56f755259c6f1ce183", sha256: "9b6228722b8330ca6d1311de695eb99ec4da2809a92e17be2e7c82a0e13f316b" },
     runs: [

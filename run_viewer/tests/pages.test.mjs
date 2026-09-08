@@ -58,7 +58,7 @@ test("static Pages viewer supports suite links, history, scoring, and all archiv
     assert.equal(await select.inputValue(), "20260905-beauty-high");
 
     for (const id of ["20260823-serial-high", "20260825-fresh6-high", "20260825-harness6-high", "20260827-harness6-high"]) {
-      assert.match(await select.locator(`option[value="${id}"]`).innerText(), / \(legacy\)$/);
+      assert.equal(await select.locator(`option[value="${id}"]`).count(), 0);
     }
     for (const id of ["20260907-prompt-v2-rerun2-high", "20260907-prompt-v2-rerun-high", "20260906-minimal-inspector-high", "20260906-clean-sheet-high", "20260905-beauty-high", "20260905-minimal-high", "20260905-unserious-high"]) {
       assert.doesNotMatch(await select.locator(`option[value="${id}"]`).innerText(), /\(legacy\)/);
@@ -124,7 +124,8 @@ test("static Pages viewer supports suite links, history, scoring, and all archiv
     assert.equal(await select.inputValue(), "20260905-minimal-high");
     await page.reload({ waitUntil: "networkidle" });
     assert.equal(await select.inputValue(), "20260905-minimal-high");
-    await select.selectOption("20260827-harness6-high");
+    await page.goto(`${base}?suite=20260827-harness6-high`, { waitUntil: "networkidle" });
+    assert.equal(await select.locator('option[value="20260827-harness6-high"]').getAttribute("hidden"), "");
     await page.waitForFunction(() => {
       const text = document.querySelector(".summary-section")?.textContent ?? "";
       return text.length > 100 && !text.includes("Loading…");
