@@ -18,21 +18,6 @@ Every deployed run now includes a representative image from its customer-facing 
 
 All five deployed storefront screenshots were captured on 2026-09-08 with HTTP 200 responses. Isolation checks passed for unique run IDs, profile paths, prompt hash, base commit, reasoning effort, and the paid Fable webhook destination. Overall isolation remains `unknown` because most Stripe identities were unavailable, two deployments do not exist, and Prodigi is intentionally shared.
 
-## Third-party source and API callouts
-
-Counts come from normalized captured tool events. `S/D/L` means search queries / remote document requests / local reference reads. API calls are classified runtime or command-line interactions, not documentation reads. Coverage is partial and a zero does not establish training-data reliance.
-
-| Model | Stripe S/D/L; API | Prodigi S/D/L; API | Framework S/D/L; API |
-| --- | --- | --- | --- |
-| Astra | 1/0/0; 0 | 3/2/0; 2 | 0/0/0; 0 |
-| Sol | 1/0/2; 0 | 8/0/0; 2 | 0/0/0; 0 |
-| Terra | 1/0/0; 0 | 7/0/0; 3 | 0/0/0; 0 |
-| Luna | 1/0/1; 0 | 5/0/0; 4 | 0/0/0; 0 |
-| Fable | 0/0/0; 7 | 1/2/0; 13 | 0/0/0; 2 |
-| Opus | 0/0/0; 0 | 0/0/0; 2 | 0/0/0; 0 |
-| Sonnet | 0/0/0; 0 | 0/0/0; 0 | 0/0/0; 0 |
-
-A returned result proves capture, not usefulness or comprehension. API counts describe observed interactions, not whether the final integration was correct. Provider-limited partial runs remain included rather than silently omitted.
 
 ## Audit note
 
