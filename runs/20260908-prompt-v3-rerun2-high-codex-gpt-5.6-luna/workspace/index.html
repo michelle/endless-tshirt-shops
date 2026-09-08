@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#121216" />
+    <meta name="description" content="Signal Bloom makes one-of-one graphic tees from the phrases that keep you moving." />
+    <title>Signal Bloom — Wear your frequency</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="grain" aria-hidden="true"></div>
+    <header class="site-header">
+      <a class="logo" href="#top" aria-label="Signal Bloom home"><span class="logo-mark">✦</span><span>signal<br /><i>bloom</i></span></a>
+      <nav class="nav-links" aria-label="Main navigation"><a href="#customizer">Make yours</a><a href="#how-it-works">How it works</a></nav>
+      <button class="bag-button" id="bagButton" type="button" aria-label="Open your bag"><span>Bag</span><b id="bagCount">0</b></button>
+    </header>
+
+    <main id="top">
+      <section class="hero section-shell">
+        <div class="hero-copy">
+          <p class="eyebrow"><span class="live-dot"></span> made to order · never repeated</p>
+          <h1>Wear your<br /><em>frequency.</em></h1>
+          <p class="hero-lede">A tee built from the words that keep you moving. Type your phrase, choose your signal, and we’ll turn it into a one-of-one print.</p>
+          <a class="primary-button" href="#customizer">Create your signal <span>↘</span></a>
+          <div class="hero-note"><span class="mini-orbit"></span><span>Printed in rich, full-color DTG<br /><strong>on heavyweight-soft cotton</strong></span></div>
+        </div>
+        <div class="hero-art" aria-label="Preview of a Signal Bloom custom shirt">
+          <div class="orbit orbit-a"></div><div class="orbit orbit-b"></div><div class="orbit orbit-c"></div>
+          <div class="hero-shirt"><div class="shirt-neck"></div><div class="shirt-art"><span class="art-small">SB / 001</span><strong>KEEP<br /><i>GOING</i></strong><span class="art-line"></span><span class="art-small">your signal is yours</span></div></div>
+          <span class="floating-tag tag-top">YOUR WORDS<br /><b>YOUR WAVE</b></span><span class="floating-tag tag-bottom">01 / 01<br /><b>UNIQUE PRINT</b></span>
+        </div>
+      </section>
+
+      <section class="manifesto section-shell" id="how-it-works">
+        <div><p class="eyebrow">the signal bloom method</p><h2>Small words.<br /><em>Big signal.</em></h2></div>
+        <div class="method-grid"><article><span class="step-num">01</span><h3>Find your phrase</h3><p>A mantra, a lyric, a private joke. If it matters to you, it belongs on the shirt.</p></article><article><span class="step-num">02</span><h3>Shape the wave</h3><p>Pick a signal style and color. Our generator composes a fresh orbit around your words.</p></article><article><span class="step-num">03</span><h3>Send it into orbit</h3><p>We print your final artwork only after payment, then ship it straight to your door.</p></article></div>
+      </section>
+
+      <section class="customizer-section section-shell" id="customizer">
+        <div class="section-heading"><div><p class="eyebrow">the one-of-one studio</p><h2>Make the <em>signal.</em></h2></div><p class="heading-note">No templates. No two alike.<br />Start with a few words.</p></div>
+        <div class="studio-card">
+          <div class="studio-preview" id="studioPreview">
+            <div class="preview-grid"></div><div class="preview-orbit preview-orbit-1"></div><div class="preview-orbit preview-orbit-2"></div><div class="preview-orbit preview-orbit-3"></div>
+            <div class="preview-spark spark-1">✦</div><div class="preview-spark spark-2">·</div><div class="preview-spark spark-3">✦</div>
+            <div class="preview-tee"><div class="preview-collar"></div><div class="preview-print"><span class="preview-kicker">SIGNAL BLOOM / <span id="previewStyle">ORBIT</span></span><strong id="previewPhrase">KEEP<br /><i>GOING</i></strong><span class="preview-rule"></span><span class="preview-signature">ONE OF ONE</span></div></div>
+            <div class="preview-label"><span class="label-pulse"></span><span>LIVE PREVIEW</span><b id="previewCode">SB-001</b></div>
+          </div>
+          <div class="studio-controls">
+            <div class="control-block"><label for="phrase">Your phrase <span>up to 24 characters</span></label><input id="phrase" maxlength="24" value="KEEP GOING" autocomplete="off" /></div>
+            <div class="control-block"><label>Signal style</label><div class="choice-row" id="styleChoices"><button class="choice active" data-style="ORBIT" type="button"><span class="choice-icon">◎</span> Orbit</button><button class="choice" data-style="PULSE" type="button"><span class="choice-icon">⌁</span> Pulse</button><button class="choice" data-style="ECHO" type="button"><span class="choice-icon">◌</span> Echo</button></div></div>
+            <div class="control-block"><label>Ink tone</label><div class="swatch-row" id="inkChoices"><button class="swatch active" data-ink="coral" style="--swatch:#ff725e" aria-label="Coral ink" type="button"></button><button class="swatch" data-ink="lime" style="--swatch:#c7f464" aria-label="Lime ink" type="button"></button><button class="swatch" data-ink="lilac" style="--swatch:#b9a7ff" aria-label="Lilac ink" type="button"></button><button class="swatch" data-ink="sky" style="--swatch:#8edbff" aria-label="Sky ink" type="button"></button></div></div>
+            <div class="control-split"><div class="control-block"><label for="shirtColor">Shirt color</label><select id="shirtColor"><option value="black">Black</option><option value="natural">Natural</option><option value="navy blue">Navy blue</option><option value="sport grey">Sport grey</option><option value="white">White</option></select></div><div class="control-block"><label for="shirtSize">Size</label><select id="shirtSize"><option value="xs">XS</option><option value="s">S</option><option value="m" selected>M</option><option value="l">L</option><option value="xl">XL</option><option value="2xl">2XL</option><option value="3xl">3XL</option></select></div></div>
+            <div class="price-row"><div><span class="price-label">Your one-of-one tee</span><strong>$34.00</strong><span class="shipping-copy">+ flat-rate shipping calculated at checkout</span></div><button class="primary-button add-button" id="addButton" type="button">Add to bag <span>＋</span></button></div>
+            <p class="fine-print">Printed only after payment succeeds. Fulfillment is handled by Prodigi. <a href="#details">Read the details</a></p>
+          </div>
+        </div>
+      </section>
+
+      <section class="details section-shell" id="details"><div class="detail-card"><span class="detail-icon">✳</span><div><p class="eyebrow">made for the long way around</p><h2>Soft on you.<br /><em>Loud in the world.</em></h2><p>Our Gildan Softstyle cotton tee gives your custom signal a smooth, saturated canvas. Every piece is printed on demand to reduce overproduction and shipped with tracking.</p></div><div class="detail-list"><span><b>100%</b> cotton</span><span><b>DTG</b> full color</span><span><b>one</b> per phrase</span></div></div></section>
+    </main>
+
+    <div class="bag-drawer" id="bagDrawer" aria-hidden="true"><div class="drawer-scrim" id="drawerScrim"></div><aside class="drawer-panel"><div class="drawer-head"><div><p class="eyebrow">your orbit</p><h2>Your bag <span id="drawerCount">(0)</span></h2></div><button class="close-button" id="closeDrawer" type="button" aria-label="Close bag">×</button></div><div class="bag-items" id="bagItems"><div class="empty-bag"><span>✦</span><p>Your signal is waiting.</p><a href="#customizer" id="emptyLink">Make a tee</a></div></div><div class="drawer-footer" id="drawerFooter" hidden><div class="subtotal"><span>Subtotal</span><strong id="subtotal">$0.00</strong></div><button class="checkout-button" id="checkoutButton" type="button">Pay securely with Stripe <span>↗</span></button><p class="secure-note">🔒 Secure checkout · shipping collected by Stripe</p></div></aside></div>
+    <div class="toast" id="toast" role="status"></div>
+    <script src="app.js" defer></script>
+  </body>
+</html>

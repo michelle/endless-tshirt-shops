@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "provider": "codex",
+  "format": "event_stream",
+  "terminalEvent": true,
+  "malformedLines": 0,
+  "capturedRecords": 88,
+  "toolCalls": 28,
+  "limitations": [
+    "A search or fetch does not prove comprehension or influence.",
+    "Shell classification is heuristic; mixed write/read commands and dynamic URLs may be missed.",
+    "Exec web events may omit resolved URLs and result contents."
+  ]
+}

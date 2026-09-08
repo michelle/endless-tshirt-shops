@@ -1,0 +1,10 @@
+{
+  "name": "signal-bloom-store",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vercel dev",
+    "check": "node --check api/create-checkout.js && node --check api/stripe-webhook.js && node --check api/artwork.js && node --check app.js"
+  }
+}
