@@ -57,7 +57,10 @@ vercel_project_name() {
 }
 
 extract_url() {
-  grep -Eo 'https://[^[:space:]"'"'"'<>]+' "$1" 2>/dev/null | grep -E 'vercel\.app|vercel\.sh' | tail -n 1 || true
+  grep -Eo 'https://[^[:space:]"'"'"'<>]+' "$1" 2>/dev/null |
+    grep -E 'vercel\.app|vercel\.sh' |
+    sed -E 's/[][),.;]+$//' |
+    tail -n 1 || true
 }
 
 assert_no_staged_secrets() {
