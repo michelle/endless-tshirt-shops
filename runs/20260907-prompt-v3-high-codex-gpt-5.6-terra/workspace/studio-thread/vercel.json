@@ -1,0 +1,1 @@
+{ "functions": { "src/app/api/webhooks/stripe/route.ts": { "maxDuration": 30 } } }
