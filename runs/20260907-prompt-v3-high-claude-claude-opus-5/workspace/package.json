@@ -1,0 +1,25 @@
+{
+  "name": "cryptidae",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start"
+  },
+  "dependencies": {
+    "@resvg/resvg-js": "^2.6.2",
+    "next": "^15.5.25",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
+    "sharp": "^0.34.2",
+    "stripe": "^18.5.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.3",
+    "@types/react": "^19.1.8",
+    "@types/react-dom": "^19.1.6",
+    "puppeteer-core": "^23.11.1",
+    "typescript": "^5.8.3"
+  }
+}
