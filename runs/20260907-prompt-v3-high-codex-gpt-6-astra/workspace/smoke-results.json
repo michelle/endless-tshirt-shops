@@ -1,0 +1,57 @@
+{
+  "origin": "https://benchmark-20260907-prompt-v3-high-codex-gpt-6-astra.vercel.app",
+  "checks": [
+    {
+      "check": "Public /",
+      "passed": true
+    },
+    {
+      "check": "Public /order",
+      "passed": true
+    },
+    {
+      "check": "Public /policies",
+      "passed": true
+    },
+    {
+      "check": "Public /images/black-shirt.png",
+      "passed": true
+    },
+    {
+      "check": "Public /favicon.svg",
+      "passed": true
+    },
+    {
+      "check": "Personalized outlined SVG preview",
+      "passed": true
+    },
+    {
+      "check": "Preview rejects invalid content",
+      "passed": true
+    },
+    {
+      "check": "Forged print URL rejected",
+      "passed": true
+    },
+    {
+      "check": "Cross-origin checkout rejected",
+      "passed": true
+    },
+    {
+      "check": "Invalid quantity rejected",
+      "passed": true
+    },
+    {
+      "check": "Missing Stripe connection fails closed with clear message",
+      "passed": true
+    },
+    {
+      "check": "Unconfigured webhook cannot submit an order",
+      "passed": true
+    },
+    {
+      "check": "Deployed print asset renders at 4677 x 5881",
+      "passed": true
+    }
+  ]
+}
