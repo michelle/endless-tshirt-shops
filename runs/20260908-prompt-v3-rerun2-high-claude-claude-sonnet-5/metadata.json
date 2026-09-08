@@ -1,0 +1,31 @@
+{
+  "run_id": "20260908-prompt-v3-rerun2-high-claude-claude-sonnet-5",
+  "suite_id": "20260908-prompt-v3-rerun2-high",
+  "status": "failed",
+  "adapter": "claude",
+  "capture_version": 1,
+  "model": "claude-sonnet-5",
+  "reasoning_effort": "high",
+  "memory_policy": "explicitly_disabled",
+  "branch": "benchmark-results",
+  "vercel_project": "benchmark-20260908-prompt-v3-rerun2-high-claude-claude-sonnet-5",
+  "stripe_config_ref": "20260908-prompt-v3-rerun2-high-claude-claude-sonnet-5",
+  "stripe_config_path": ".benchmark-secrets/stripe/20260908-prompt-v3-rerun2-high-claude-claude-sonnet-5.toml",
+  "base_commit": "1e9a34acb43bde2a03857309dc46185252f1718d",
+  "tooling_commit": "d3884b6ef8c645d04bc377bc9b3032662ed51e93",
+  "prompt_file": "prompt-v3.md",
+  "prompt_sha256": "30868370940510cfeb6f8c1da9e0f748ad6ac4f3e1e5e59e3e85adcecc910f99",
+  "workspace_tree": "fcd7218e11e6b7533cf8f28ebd4fee655d0871a6",
+  "started_at": "2026-09-08T16:59:47Z",
+  "finished_at": "2026-09-08T17:11:47Z",
+  "duration_seconds": 720,
+  "agent_exit_code": 1,
+  "usage": {
+  "input_tokens": 130,
+  "cache_creation_input_tokens": 70974,
+  "cache_read_input_tokens": 3240863,
+  "output_tokens": 45253,
+  "new_input_tokens": 71104
+},
+  "deployment_url": ""
+}
