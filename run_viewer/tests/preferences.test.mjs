@@ -67,7 +67,11 @@ test("prompts, readable Markdown, and persistent dark mode work without changing
 
     for (const width of [1920, 390, 320]) {
       await page.setViewportSize({ width, height: 844 });
-      assert.equal(await page.evaluate(() => document.documentElement.scrollWidth), width, "Wide tables must not expand the page");
+      const pageWidths = await page.evaluate(() => ({
+        client: document.documentElement.clientWidth,
+        scroll: document.documentElement.scrollWidth,
+      }));
+      assert.equal(pageWidths.scroll, pageWidths.client, "Wide tables must not expand the page");
       const words = await markdown.evaluate(el => {
         const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
         const result = [];
