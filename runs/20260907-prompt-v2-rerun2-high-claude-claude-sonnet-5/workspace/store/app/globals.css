@@ -1,0 +1,38 @@
+@import "tailwindcss";
+
+:root {
+  --paper: #f3ead4;
+  --paper-dark: #e8dcbd;
+  --ink: #241c14;
+  --stamp: #b23a2e;
+}
+
+@theme inline {
+  --color-paper: var(--paper);
+  --color-paper-dark: var(--paper-dark);
+  --color-ink: var(--ink);
+  --color-stamp: var(--stamp);
+  --font-display: var(--font-display);
+  --font-type: var(--font-type);
+}
+
+body {
+  background-color: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-display), Arial, Helvetica, sans-serif;
+  background-image: radial-gradient(
+      circle at 1px 1px,
+      rgba(36, 28, 20, 0.07) 1px,
+      transparent 0
+    );
+  background-size: 22px 22px;
+}
+
+.font-type {
+  font-family: var(--font-type), "Courier New", monospace;
+}
+
+.stamped {
+  border: 3px solid var(--ink);
+  box-shadow: 4px 4px 0 var(--ink);
+}
