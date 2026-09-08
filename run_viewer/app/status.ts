@@ -1,4 +1,9 @@
 export const statusDefinitions: Record<string, string> = {
+  "Sandbox checkout": "The customer flow created a Prodigi sandbox order without collecting a real payment. Sandbox orders are API test evidence only and are not manufactured or shipped.",
+  "Provider limit": "The model adapter stopped because the provider's shared session quota was exhausted. This is an availability failure, not a completed implementation assessment.",
+  "partial build": "A workspace contains meaningful implementation work, but the run ended before deployment and end-to-end verification.",
+  "no build": "The provider ended the attempt before an application workspace was produced.",
+  "submitted shirt mockup": "The fulfillment request used a rendered product photograph/mockup as the front print source instead of isolated print artwork.",
   "isolation failure": "Live inspection found a Stripe webhook pointing to another run's storefront. Results cannot be treated as independent account-isolated experiments; see the suite summary.",
   "asset fetched": "Prodigi downloaded the original artwork successfully. This is not confirmation of physical manufacture or print quality.",
   "theme design": "Clean-sheet permits any appealing shirt theme, not only a timestamp. The artwork check is assessed against that prompt.",

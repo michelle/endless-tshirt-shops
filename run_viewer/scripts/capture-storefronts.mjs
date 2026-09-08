@@ -128,8 +128,10 @@ async function captureRun(browser, root, suite, run, socialOnly = false) {
 }
 
 export async function captureSuite({ suite, root = projectRoot, browser, runId, overwrite = false, socialOnly = false, log = console.log }) {
-  const runs = runId ? suite.runs.filter((run) => run.id === runId) : suite.runs;
-  if (!runs.length) throw new Error(runId ? `No run ${runId} in ${suite.id}` : `No runs registered for ${suite.id}`);
+  const selected = runId ? suite.runs.filter((run) => run.id === runId) : suite.runs;
+  if (!selected.length) throw new Error(runId ? `No run ${runId} in ${suite.id}` : `No runs registered for ${suite.id}`);
+  const runs = selected.filter((run) => run.deployment);
+  if (!runs.length) throw new Error(runId ? `Run ${runId} has no deployment to capture` : `No deployed runs registered for ${suite.id}`);
   const directories = runs.map((run) => artifactDirectory(root, suite, run).publicDir);
   if (new Set(directories).size !== runs.length || new Set(runs.map((run) => run.id)).size !== runs.length) throw new Error("Run IDs and artifact directories must be unique within a suite");
   const suiteDir = path.join(root, "public/suites", suite.id);

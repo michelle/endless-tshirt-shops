@@ -40,10 +40,19 @@ export async function registeredAssets(suites, publicRoot) {
       assert.ok(run.finalOutput.startsWith(prefix) && run.finalOutput.endsWith("/final.md"));
       const directory = path.posix.dirname(run.finalOutput);
       assert.notEqual(directory, prefix.slice(0, -1));
-      assert.equal(path.posix.dirname(run.design), directory, `Artwork belongs to another run: ${run.id}`);
       await add(run.finalOutput);
-      await add(run.design);
+      if (run.design) {
+        assert.equal(path.posix.dirname(run.design), directory, `Artwork belongs to another run: ${run.id}`);
+        await add(run.design);
+      } else {
+        assert.equal(run.width, null, `Missing artwork must not declare width: ${run.id}`);
+        assert.equal(run.height, null, `Missing artwork must not declare height: ${run.id}`);
+      }
       const capture = captures[run.id];
+      if (!run.deployment) {
+        assert.equal(capture, undefined, `Run without deployment has a capture: ${suite.id}/${run.id}`);
+        continue;
+      }
       assert.ok(capture, `Missing capture record: ${suite.id}/${run.id}`);
       assert.equal(new URL(capture.url).href, new URL(run.deployment).href, `Capture belongs to another deployment: ${run.id}`);
       assert.equal(path.posix.dirname(capture.screenshot), directory);
@@ -59,7 +68,7 @@ export async function registeredAssets(suites, publicRoot) {
         } else assert.notEqual(status, "found", `Found ${key} without a file: ${run.id}`);
       }
     }
-    assert.deepEqual(Object.keys(captures).sort(), [...runIds].sort(), `Unexpected capture records: ${suite.id}`);
+    assert.deepEqual(Object.keys(captures).sort(), suite.runs.filter(run => run.deployment).map(run => run.id).sort(), `Unexpected capture records: ${suite.id}`);
   }
   return [...assets];
 }

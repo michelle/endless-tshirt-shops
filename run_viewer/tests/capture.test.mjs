@@ -34,6 +34,7 @@ test("captures arbitrary future suites, resumes, and preserves successful captur
     const suite = {
       id: "20990101-future-suite",
       runs: [
+        { id: "not-deployed", deployment: null },
         { id: "failed", deployment: "ftp://invalid/" },
         { id: "brand-new-model", deployment: `${base}/inline` },
         { id: "another-model", deployment: `${base}/no-icon` },
@@ -42,6 +43,7 @@ test("captures arbitrary future suites, resumes, and preserves successful captur
     const options = { root, browser, suite, log: () => {} };
     const first = await captureSuite(options);
     assert.equal(first.failureCount, 1);
+    assert.equal(first.captures["not-deployed"], undefined);
     assert.equal(first.captures["brand-new-model"].faviconStatus, "found");
     assert.equal(first.captures["another-model"].faviconStatus, "missing");
     assert.equal(first.captures["brand-new-model"].favicon.source, icon);
@@ -55,7 +57,7 @@ test("captures arbitrary future suites, resumes, and preserves successful captur
     assert.equal(png.readUInt32BE(20), 900);
     assert.equal(await readFile(path.join(root, "public", original.favicon.path), "utf8"), svg);
 
-    suite.runs[0].deployment = `${base}/recovered`;
+    suite.runs[1].deployment = `${base}/recovered`;
     const resumed = await captureSuite(options);
     assert.equal(resumed.failureCount, 0);
     assert.equal(Object.keys(resumed.captures).length, 3);
@@ -77,7 +79,7 @@ test("captures arbitrary future suites, resumes, and preserves successful captur
     assert.equal(failedSocial.failureCount, 1);
     assert.deepEqual(failedSocial.captures["brand-new-model"], archived);
 
-    suite.runs[1].deployment = "ftp://invalid/";
+    suite.runs[2].deployment = "ftp://invalid/";
     const failedRefresh = await captureSuite({ ...options, runId: "brand-new-model", overwrite: true });
     assert.equal(failedRefresh.failureCount, 1);
     assert.deepEqual(failedRefresh.captures["brand-new-model"], archived);

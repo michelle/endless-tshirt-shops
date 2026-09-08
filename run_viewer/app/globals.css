@@ -204,6 +204,16 @@ code {
   overflow: hidden;
 }
 
+.missing-artwork {
+  min-height: 220px;
+  display: grid;
+  place-items: center;
+  border: 1px dashed var(--rule);
+  color: var(--muted);
+  text-align: center;
+  padding: 24px;
+}
+
 .art-canvas img {
   display: block;
   width: 100%;
