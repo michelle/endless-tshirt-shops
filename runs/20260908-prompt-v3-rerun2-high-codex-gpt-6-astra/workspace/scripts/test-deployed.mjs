@@ -1,0 +1,14 @@
+import Stripe from 'stripe';
+import fs from 'node:fs';
+const api=new Stripe(process.env.STRIPE_SECRET_KEY);
+const base=process.env.SITE_URL;
+const d={place:'PACIFIC TEST',caption:'A MEMORY MADE JUST FOR YOU',date:'2026-09-08',latitude:36.2704,longitude:-121.8081,palette:'ocean',size:'m',color:'natural'};
+const response=await fetch(base+'/api/checkout',{method:'POST',headers:{'Content-Type':'application/json',Origin:base},body:JSON.stringify(d)});
+const body=await response.json();if(!response.ok)throw new Error(JSON.stringify(body));
+const sessionId=body.url.match(/cs_test_[A-Za-z0-9]+/)?.[0];if(!sessionId)throw new Error('Missing session ID');
+const s=await api.checkout.sessions.retrieve(sessionId);
+const privateData={sessionId,token:s.metadata.accessToken,url:body.url};fs.writeFileSync('.private/test-order.json',JSON.stringify(privateData),{mode:0o600});
+console.log('Created deployed checkout',sessionId,'payment:',s.payment_status,'amount:',s.amount_total);
+const r=await fetch(base+'/api/order',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(privateData)});console.log('Unpaid order check:',await r.json());
+const p=await fetch(`https://api.stripe.com/v1/payment_pages/${sessionId}`,{headers:{Authorization:`Bearer ${process.env.STRIPE_SECRET_KEY}`,'Stripe-Version':'2025-08-27.basil'}});const page=await p.json();fs.writeFileSync('.private/payment-page.json',JSON.stringify(page),{mode:0o600});
+console.log('Payment page response:',p.status);

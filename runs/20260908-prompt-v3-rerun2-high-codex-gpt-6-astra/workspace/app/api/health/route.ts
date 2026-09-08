@@ -1,0 +1,1 @@
+export async function GET(){return Response.json({store:'daymark',paymentsConfigured:!!process.env.STRIPE_SECRET_KEY,webhookConfigured:!!process.env.STRIPE_WEBHOOK_SECRET,fulfillmentConfigured:!!process.env.PRODIGI_API_KEY,environment:process.env.PRODIGI_ENV||'sandbox'});}
