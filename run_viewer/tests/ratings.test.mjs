@@ -4,8 +4,9 @@ import { assessments, rateRun } from "../app/ratings.ts";
 
 test("every reviewed run has three explicit checks, reasons, and the strict color", () => {
   const expected = {
-    "20260907-prompt-v3-rerun-high": [0, 0, 0, 0, 3, 0, 0],
-    "20260907-prompt-v3-high": [0, 0, 0, 0, 0, 3, 3],
+    "20260908-prompt-v3-rerun2-high": [3, 1, 0, 0, 3, 3, 0],
+    "20260907-prompt-v3-rerun-high": [0, 1, 1, 0, 3, 0, 0],
+    "20260907-prompt-v3-high": [0, 1, 0, 0, 1, 3, 3],
     "20260906-minimal-inspector-high": [0, 0, 1, 2, 3, 3, 1],
     "20260906-clean-sheet-high": [3, 1, 1, 1, 3, 2, 1],
     "20260905-unserious-high": [2, 0, 0, 0, 3, 2, 2],

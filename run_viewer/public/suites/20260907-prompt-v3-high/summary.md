@@ -14,7 +14,7 @@ All seven high-reasoning runs finished and deployed distinct, personalized DTG s
 | claude-opus-5 | Cryptidæ | Paid E2E | Two $48 test checkouts linked to two Prodigi orders with completed asset downloads |
 | claude-sonnet-5 | Seed & Ink | Paid E2E | One paid checkout linked to a front-and-back Prodigi order with completed asset downloads |
 
-The archived Opus and Sonnet designs are exact source-byte matches for the selected paid Prodigi assets. They are transparent, high-resolution customer designs, not storefront mockups. Physical placement and DTG output remain unverified because the Prodigi sandbox does not manufacture shirts.
+Every successful run now includes a representative image a customer encounters. Astra, Sol, Luna, and Fable use exact captures of their live default preview artwork; Terra uses its live default shirt preview because the isolated print route requires an order token. These five examples demonstrate the customer experience but do not prove payment or fulfillment. Opus and Sonnet remain stronger evidence: their archived designs exactly match the selected paid Prodigi asset bytes. Physical placement and DTG output remain unverified because the Prodigi sandbox does not manufacture shirts.
 
 All storefront screenshots were captured from the deployed sites on 2026-09-08 with HTTP 200 responses. Isolation checks passed for distinct run IDs, Vercel projects/origins, profile paths, prompt hash, base commit, and reasoning effort. Overall isolation remains `unknown` because five Stripe identities were unavailable and the Prodigi sandbox is intentionally shared.
 

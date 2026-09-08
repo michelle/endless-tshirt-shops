@@ -348,7 +348,7 @@ export default function Viewer() {
                   />
                 </div>
               ) : (
-                <div className="art-canvas missing-artwork"><p>No print artwork generated.</p></div>
+                <div className="art-canvas missing-artwork"><p>No representative artwork archived.</p></div>
               )}
 
               <button

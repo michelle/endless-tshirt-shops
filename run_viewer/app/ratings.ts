@@ -14,24 +14,61 @@ const unverified = (reason: string): Check => ({ result: "unverified", reason })
 // Audit judgments from each suite's summary.md plus inspection of archived art.
 // These are benchmark checks, not a live health check or launch certification.
 export const assessments: Record<string, Record<string, Assessment>> = {
+  "20260908-prompt-v3-rerun2-high": {
+    astra: {
+      artwork: pass("The exact paid-order source is a coherent 2490×3510 transparent contour design with 300 DPI metadata; physical sampling remains."),
+      checkout: pass("A genuine paid Stripe test Checkout Session reached the deployed application and triggered fulfillment."),
+      prodigi: pass("Paid order ord_1171056 used the intended natural/M Bella + Canvas 3001 mapping and completed an exact MD5-matched asset."),
+    },
+    sol: {
+      artwork: pass("The reviewed default orbital-map SVG is coherent and legible, and source provides a separate signed 4680×5790 print renderer; physical sampling remains."),
+      checkout: fail("No genuine paid Checkout Session was observed in the isolated profile, so the customer payment flow is unverified despite the test instructions."),
+      prodigi: unverified("Payment-gated fulfillment is implemented, but no attributable paid application order demonstrated artwork delivery or garment mapping."),
+    },
+    terra: {
+      artwork: unverified("The reviewed customer-facing signal-card tee is coherent, but the archived example is a shirt preview rather than the claimed 2400×3000 print source."),
+      checkout: fail("Stripe credentials were unavailable, so checkout fails closed and no genuine customer payment completed."),
+      prodigi: unverified("Catalog and quote integration were exercised, but no paid application flow submitted an attributable order."),
+    },
+    luna: {
+      artwork: unverified("The reviewed KEEP / GOING customer preview is coherent, but the fulfillment asset is a separate PDF that was not archived or submitted by a paid flow."),
+      checkout: fail("Stripe credentials were unavailable, so checkout remained blocked and no genuine customer payment completed."),
+      prodigi: unverified("Webhook fulfillment code exists, but no paid customer order established successful artwork delivery or garment mapping."),
+    },
+    fable: {
+      artwork: pass("The exact paid-order source is a detailed 4665×5844 transparent night-sky print with an exact Prodigi hash match; physical sampling remains."),
+      checkout: pass("Four genuine paid Stripe test Checkout Sessions linked through the deployed application to fulfillment attempts."),
+      prodigi: pass("Order ord_1171080 completed with the intended navy-blue/L asset and exact source hash; three earlier linked asset errors still require reliability investigation."),
+    },
+    opus: {
+      artwork: pass("The exact paid-order source is a detailed 3120×3860 transparent personalized sea chart; edge-reaching content needs physical clipping and scale validation."),
+      checkout: pass("Three genuine paid Stripe test Checkout Sessions completed through the deployed application."),
+      prodigi: pass("All three paid Sessions linked to completed Prodigi assets; selected forest-green/L order ord_1171090 exactly matches the archived source."),
+    },
+    sonnet: {
+      artwork: unverified("The provider session limit stopped the partial build before any deployed customer artwork could be reviewed."),
+      checkout: unverified("No deployable customer checkout or genuine payment completed before the provider limit."),
+      prodigi: unverified("Partial integration source exists, but no deployed fulfillment path or attributable order was produced."),
+    },
+  },
   "20260907-prompt-v3-rerun-high": {
     astra: {
-      artwork: unverified("The deployed customizer and full-resolution print route passed tests, but no exact customer-order source was archived for visual review."),
+      artwork: unverified("The reviewed live default park print is coherent, but the archived example is the 600×754 preview rather than the signed full-resolution order source."),
       checkout: fail("The isolated Stripe profile had no test key, so checkout intentionally blocked and no customer payment completed."),
       prodigi: unverified("Product and shipping quotes were checked, but no paid application fulfillment reached a Prodigi order."),
     },
     sol: {
-      artwork: unverified("The live topographic customizer and signed 4680×5790 renderer exist, but no exact fulfilled customer design was archived."),
+      artwork: pass("The reviewed default Fieldmark SVG is coherent and legible, and source provides a separate signed 4680×5790 print renderer; physical sampling remains."),
       checkout: fail("Stripe credentials were unavailable; no genuine paid Checkout Session was completed."),
       prodigi: unverified("Paid-webhook fulfillment is implemented, but no payment-linked application order demonstrated it."),
     },
     terra: {
-      artwork: unverified("The deployed cosmic customizer renders personalized art, but no exact customer-order print source was recovered for review."),
+      artwork: pass("The exact live default customer route produces a coherent 3307×4606 transparent cosmic design suitable for print-scale testing."),
       checkout: fail("Checkout fails closed because the isolated Stripe credentials were absent; no payment completed."),
       prodigi: unverified("The catalog variant was validated, but the paid application path never submitted an attributable order."),
     },
     luna: {
-      artwork: unverified("The phrase/name/badge customizer deployed, but no exact paid customer print asset was available for independent review."),
+      artwork: fail("The exact 2400×3000 live print route renders missing-glyph boxes and places very little visible artwork on the canvas."),
       checkout: fail("Payments were not connected in the isolated profile, so no end-to-end Stripe checkout occurred."),
       prodigi: unverified("Webhook fulfillment code exists, but no paid customer order established successful application delivery."),
     },
@@ -53,27 +90,27 @@ export const assessments: Record<string, Record<string, Assessment>> = {
   },
   "20260907-prompt-v3-high": {
     astra: {
-      artwork: unverified("Automated print-route checks passed, but no exact paid customer-order artwork was archived for independent visual review."),
+      artwork: unverified("The reviewed live Personal Orbit preview is coherent, while the archived example is a 540×586 preview rather than the tested high-resolution print source."),
       checkout: fail("The isolated Stripe profile had no test key, so checkout safely blocked and no real payment completed."),
       prodigi: unverified("Paid-only fulfillment and idempotency tests exist, but no paid application order reached Prodigi."),
     },
     sol: {
-      artwork: unverified("The deterministic high-resolution renderer is deployed, but no exact fulfilled customer source was archived for review."),
+      artwork: pass("The reviewed default ORBIT/ONE SVG is coherent and legible, and the implementation provides a separate deterministic 4677×5787 renderer."),
       checkout: fail("Stripe credentials were unavailable, leaving all customer payment behavior unexecuted."),
       prodigi: unverified("Signed asset and webhook code exists, but no paid app order verified delivery and garment mapping."),
     },
     terra: {
-      artwork: unverified("The personalized 2490×3510 design path is live, but no exact customer-order asset was recovered for independent review."),
+      artwork: unverified("The reviewed customer-facing tee preview is coherent, but it includes the shirt silhouette and checker background rather than the signed 2490×3510 print source."),
       checkout: fail("Checkout intentionally reports missing Stripe configuration and no genuine payment completed."),
       prodigi: unverified("A product variant was validated, but the paid application fulfillment path was not exercised."),
     },
     luna: {
-      artwork: unverified("The signal-map preview is deployed, but no exact paid customer print source was archived for visual and scale review."),
+      artwork: unverified("The reviewed KEEP / GOING signal-map SVG is coherent, but only the relatively small live preview—not the exact fulfillment raster—was archived."),
       checkout: fail("The missing isolated Stripe credentials prevent checkout; no genuine paid Session exists."),
       prodigi: unverified("Idempotent webhook fulfillment is implemented, but no paid application order demonstrated it."),
     },
     fable: {
-      artwork: unverified("Bloomprint generated a print-ready direct sandbox asset, but no paid customer-order source was established for this audit."),
+      artwork: pass("The reviewed live Amelia alpina botanical plate is coherent and detailed; a separate high-resolution direct sandbox asset also completed."),
       checkout: fail("The isolated Stripe profile was empty, so the deployed checkout stayed disabled and no payment occurred."),
       prodigi: unverified("A direct sandbox asset check completed, but it bypassed a paid customer Checkout Session."),
     },
@@ -353,7 +390,7 @@ export function rateRun(suiteId: string, runId: string) {
   const assessment = assessments[suiteId]?.[runId];
   const checks = criteria.map((criterion) => ({
     ...criterion,
-    ...(["20260906-clean-sheet-high", "20260907-prompt-v2-high", "20260907-prompt-v2-rerun-high", "20260907-prompt-v2-rerun2-high", "20260907-prompt-v3-high", "20260907-prompt-v3-rerun-high"].includes(suiteId) && criterion.id === "artwork" ? {
+    ...(["20260906-clean-sheet-high", "20260907-prompt-v2-high", "20260907-prompt-v2-rerun-high", "20260907-prompt-v2-rerun2-high", "20260907-prompt-v3-high", "20260907-prompt-v3-rerun-high", "20260908-prompt-v3-rerun2-high"].includes(suiteId) && criterion.id === "artwork" ? {
       label: "Printable theme design",
       definition: "A coherent theme design legible at shirt scale with suitable raster detail. This prompt allows graphics and intentional colored panels; opacity is disclosed, not automatically failed. Physical samples remain unverified.",
     } : {}),
