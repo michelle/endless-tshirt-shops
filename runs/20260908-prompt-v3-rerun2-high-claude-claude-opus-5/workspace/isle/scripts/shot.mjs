@@ -1,0 +1,12 @@
+import { chromium } from 'playwright';
+const base = process.env.BASE || 'http://localhost:3210';
+const b = await chromium.launch();
+const p = await b.newPage({ viewport: { width: 1400, height: 1150 }, deviceScaleFactor: 2 });
+await p.goto(base, { waitUntil: 'networkidle' });
+await p.waitForTimeout(1200);
+await p.screenshot({ path: 'out/store-top.png' });
+await p.evaluate(() => window.scrollTo(0, 620));
+await p.waitForTimeout(400);
+await p.screenshot({ path: 'out/store-studio.png' });
+console.log('shots done');
+await b.close();
