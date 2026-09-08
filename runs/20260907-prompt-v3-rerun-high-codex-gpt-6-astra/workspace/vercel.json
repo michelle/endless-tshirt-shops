@@ -1,0 +1,8 @@
+{
+  "framework": "nextjs",
+  "functions": {
+    "app/api/artwork/route.ts": { "maxDuration": 60 },
+    "app/api/webhooks/stripe/route.ts": { "maxDuration": 60 },
+    "app/api/order/route.ts": { "maxDuration": 60 }
+  }
+}
