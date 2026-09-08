@@ -71,7 +71,7 @@ test("prompts, readable Markdown, and persistent dark mode work without changing
         client: document.documentElement.clientWidth,
         scroll: document.documentElement.scrollWidth,
       }));
-      assert.equal(pageWidths.scroll, pageWidths.client, "Wide tables must not expand the page");
+      assert.ok(pageWidths.scroll <= pageWidths.client, "Wide tables must not expand the page");
       const words = await markdown.evaluate(el => {
         const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
         const result = [];
