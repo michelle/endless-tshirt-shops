@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1200" width="1000" height="1200">
+  <defs>
+    <path id="arc-top-meal-pill-nutrition" d="M154,430 A346,346 0 0,1 846,430"/>
+    <path id="arc-bottom-meal-pill-nutrition" d="M124,430 A376,376 0 0,0 876,430"/>
+  </defs>
+  
+  <g>
+    <circle cx="500" cy="430" r="392" fill="none" stroke="#f4ecd8" stroke-width="16"/>
+    <circle cx="500" cy="430" r="330" fill="none" stroke="#f4ecd8" stroke-width="5"/>
+    <circle cx="500" cy="430" r="318" fill="none" stroke="#f4ecd8" stroke-width="2" stroke-dasharray="4 8"/>
+    <text font-family="'Space Mono', 'Courier New', monospace" font-weight="700" font-size="34" letter-spacing="5" fill="#f4ecd8">
+      <textPath href="#arc-top-meal-pill-nutrition" startOffset="50%" text-anchor="middle">DEPARTMENT OF OBSOLETE FUTURES</textPath>
+    </text>
+    <text font-family="'Space Mono', 'Courier New', monospace" font-weight="700" font-size="30" letter-spacing="4" fill="#f4ecd8">
+      <textPath href="#arc-bottom-meal-pill-nutrition" startOffset="50%" text-anchor="middle">THREE COURSES · ONE CAPSULE</textPath>
+    </text>
+    <g fill="#e3557a">
+      <path transform="translate(139,430)" d="M0,-14 l4,10 l10,4 l-10,4 l-4,10 l-4,-10 l-10,-4 l10,-4 z"/>
+      <path transform="translate(861,430)" d="M0,-14 l4,10 l10,4 l-10,4 l-4,10 l-4,-10 l-10,-4 l10,-4 z"/>
+    </g>
+    <g transform="translate(500,390)">
+    <g fill="none" stroke="#f4ecd8" stroke-width="13" stroke-linecap="round" stroke-linejoin="round">
+      <ellipse cx="0" cy="110" rx="150" ry="42"/>
+      <ellipse cx="0" cy="110" rx="112" ry="26" stroke-width="6.5"/>
+      <g transform="rotate(-30)">
+        <path d="M0,-48 H-72 A48,48 0 0,0 -72,48 H0 Z" fill="#e3557a" stroke="none"/>
+        <rect x="-120" y="-48" width="240" height="96" rx="48"/>
+        <line x1="0" y1="-48" x2="0" y2="48"/>
+        <path d="M-92,-22 A30,30 0 0,1 -66,-34" stroke="#f4ecd8" stroke-width="7.8"/>
+      </g>
+      <g>
+        <line x1="-215" y1="-70" x2="-215" y2="130"/>
+        <path d="M-245,-100 L-245,-50 A30,30 0 0,0 -185,-50 L-185,-100 M-215,-100 L-215,-52"/>
+      </g>
+      <g>
+        <line x1="215" y1="-30" x2="215" y2="130"/>
+        <path d="M200,-30 L200,-125 Q245,-95 232,-30 Z" fill="#f4ecd8"/>
+      </g>
+    </g></g>
+    <text x="500" y="685" font-family="'Space Mono', 'Courier New', monospace" font-weight="700" font-size="30" letter-spacing="6" text-anchor="middle" fill="#f4ecd8">EST. 1936</text>
+    <line x1="410" y1="710" x2="590" y2="710" stroke="#e3557a" stroke-width="5"/>
+  </g>
+  <g text-anchor="middle" font-family="'Alfa Slab One', 'Rockwell', 'Georgia', serif" fill="#f4ecd8">
+    <text x="500" y="945" font-size="92" letter-spacing="1">MEAL PILL</text>
+    <text x="500" y="1045" font-size="90" letter-spacing="1">NUTRITION BOARD</text>
+  </g>
+  <text x="500" y="1125" font-family="'Space Mono', 'Courier New', monospace" font-size="28" letter-spacing="3" text-anchor="middle" fill="#e3557a">DINNER IS NOW A SUPPLEMENT.</text>
+</svg>

@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1200" width="1000" height="1200">
+  <defs>
+    <path id="arc-top-household-robot-union" d="M154,430 A346,346 0 0,1 846,430"/>
+    <path id="arc-bottom-household-robot-union" d="M124,430 A376,376 0 0,0 876,430"/>
+  </defs>
+  
+  <g>
+    <circle cx="500" cy="430" r="392" fill="none" stroke="#1b1b1b" stroke-width="16"/>
+    <circle cx="500" cy="430" r="330" fill="none" stroke="#1b1b1b" stroke-width="5"/>
+    <circle cx="500" cy="430" r="318" fill="none" stroke="#1b1b1b" stroke-width="2" stroke-dasharray="4 8"/>
+    <text font-family="'Space Mono', 'Courier New', monospace" font-weight="700" font-size="34" letter-spacing="5" fill="#1b1b1b">
+      <textPath href="#arc-top-household-robot-union" startOffset="50%" text-anchor="middle">DEPARTMENT OF OBSOLETE FUTURES</textPath>
+    </text>
+    <text font-family="'Space Mono', 'Courier New', monospace" font-weight="700" font-size="30" letter-spacing="4" fill="#1b1b1b">
+      <textPath href="#arc-bottom-household-robot-union" startOffset="50%" text-anchor="middle">LOCAL 2001 · DOMESTIC AUTOMATONS</textPath>
+    </text>
+    <g fill="#c9a4ff">
+      <path transform="translate(139,430)" d="M0,-14 l4,10 l10,4 l-10,4 l-4,10 l-4,-10 l-10,-4 l10,-4 z"/>
+      <path transform="translate(861,430)" d="M0,-14 l4,10 l10,4 l-10,4 l-4,10 l-4,-10 l-10,-4 l10,-4 z"/>
+    </g>
+    <g transform="translate(500,390)">
+    <g fill="none" stroke="#1b1b1b" stroke-width="13" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="0" y1="-190" x2="0" y2="-226"/>
+      <circle cx="0" cy="-238" r="12" fill="#c9a4ff" stroke="none"/>
+      <rect x="-76" y="-190" width="152" height="104" rx="14"/>
+      <circle cx="-34" cy="-146" r="13" fill="#c9a4ff" stroke="none"/>
+      <circle cx="34" cy="-146" r="13" fill="#c9a4ff" stroke="none"/>
+      <rect x="-38" y="-118" width="76" height="14" rx="3"/>
+      <line x1="-14" y1="-118" x2="-14" y2="-104"/><line x1="14" y1="-118" x2="14" y2="-104"/>
+      <rect x="-22" y="-86" width="44" height="20"/>
+      <rect x="-96" y="-66" width="192" height="156" rx="18"/>
+      <circle cx="0" cy="-6" r="26"/>
+      <line x1="0" y1="-6" x2="14" y2="-24"/>
+      <circle cx="-44" cy="52" r="8" fill="#c9a4ff" stroke="none"/><circle cx="0" cy="52" r="8" fill="#c9a4ff" stroke="none"/><circle cx="44" cy="52" r="8" fill="#c9a4ff" stroke="none"/>
+      <path d="M-96,-36 L-160,30"/>
+      <circle cx="-166" cy="42" r="14"/>
+      <path d="M96,-36 L152,10"/>
+      <circle cx="160" cy="18" r="14"/>
+      <line x1="176" y1="-130" x2="176" y2="140"/>
+      <polygon points="146,140 206,140 220,196 132,196" fill="#c9a4ff"/>
+      <rect x="-82" y="90" width="64" height="34" rx="10" fill="#1b1b1b"/>
+      <rect x="18" y="90" width="64" height="34" rx="10" fill="#1b1b1b"/>
+    </g></g>
+    <text x="500" y="685" font-family="'Space Mono', 'Courier New', monospace" font-weight="700" font-size="30" letter-spacing="6" text-anchor="middle" fill="#1b1b1b">EST. 1959</text>
+    <line x1="410" y1="710" x2="590" y2="710" stroke="#c9a4ff" stroke-width="5"/>
+  </g>
+  <g text-anchor="middle" font-family="'Alfa Slab One', 'Rockwell', 'Georgia', serif" fill="#1b1b1b">
+    <text x="500" y="945" font-size="92" letter-spacing="1">HOUSEHOLD</text>
+    <text x="500" y="1045" font-size="92" letter-spacing="1">ROBOT UNION</text>
+  </g>
+  <text x="500" y="1125" font-family="'Space Mono', 'Courier New', monospace" font-size="28" letter-spacing="3" text-anchor="middle" fill="#c9a4ff">SOLIDARITY IN EVERY KITCHEN.</text>
+</svg>

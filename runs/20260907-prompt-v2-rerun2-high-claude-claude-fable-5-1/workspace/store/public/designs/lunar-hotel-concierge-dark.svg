@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1200" width="1000" height="1200">
+  <defs>
+    <path id="arc-top-lunar-hotel-concierge" d="M154,430 A346,346 0 0,1 846,430"/>
+    <path id="arc-bottom-lunar-hotel-concierge" d="M124,430 A376,376 0 0,0 876,430"/>
+  </defs>
+  
+  <g>
+    <circle cx="500" cy="430" r="392" fill="none" stroke="#1b1b1b" stroke-width="16"/>
+    <circle cx="500" cy="430" r="330" fill="none" stroke="#1b1b1b" stroke-width="5"/>
+    <circle cx="500" cy="430" r="318" fill="none" stroke="#1b1b1b" stroke-width="2" stroke-dasharray="4 8"/>
+    <text font-family="'Space Mono', 'Courier New', monospace" font-weight="700" font-size="34" letter-spacing="5" fill="#1b1b1b">
+      <textPath href="#arc-top-lunar-hotel-concierge" startOffset="50%" text-anchor="middle">DEPARTMENT OF OBSOLETE FUTURES</textPath>
+    </text>
+    <text font-family="'Space Mono', 'Courier New', monospace" font-weight="700" font-size="30" letter-spacing="4" fill="#1b1b1b">
+      <textPath href="#arc-bottom-lunar-hotel-concierge" startOffset="50%" text-anchor="middle">SEA OF TRANQUILITY · VACANCY</textPath>
+    </text>
+    <g fill="#f5d34c">
+      <path transform="translate(139,430)" d="M0,-14 l4,10 l10,4 l-10,4 l-4,10 l-4,-10 l-10,-4 l10,-4 z"/>
+      <path transform="translate(861,430)" d="M0,-14 l4,10 l10,4 l-10,4 l-4,10 l-4,-10 l-10,-4 l10,-4 z"/>
+    </g>
+    <g transform="translate(500,390)">
+    <g fill="none" stroke="#1b1b1b" stroke-width="13" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M-40,-165 A165,165 0 1,0 -40,165 A215,215 0 0,1 -40,-165 Z" fill="#f5d34c" fill-opacity="0.9"/>
+      <g transform="translate(40,-10)">
+        <rect x="0" y="-10" width="140" height="180" rx="6"/>
+        <rect x="0" y="-60" width="140" height="50" rx="6" fill="#1b1b1b"/>
+        <text x="70" y="-24" font-family="'Space Mono', 'Courier New', monospace" font-weight="700" font-size="30" text-anchor="middle" fill="#f5d34c" stroke="none">VACANCY</text>
+        <rect x="18" y="12" width="26" height="30"/><rect x="57" y="12" width="26" height="30"/><rect x="96" y="12" width="26" height="30"/>
+        <rect x="18" y="60" width="26" height="30"/><rect x="57" y="60" width="26" height="30"/><rect x="96" y="60" width="26" height="30"/>
+        <rect x="52" y="112" width="36" height="58"/>
+        <path d="M70,-60 L70,-110 L112,-96 L70,-82"/>
+      </g>
+      <path d="M-160,-200 l6,14 l14,6 l-14,6 l-6,14 l-6,-14 l-14,-6 l14,-6 z" fill="#1b1b1b" stroke="none"/>
+      <path d="M150,-190 l5,11 l11,5 l-11,5 l-5,11 l-5,-11 l-11,-5 l11,-5 z" fill="#1b1b1b" stroke="none"/>
+      <path d="M-190,170 l4,9 l9,4 l-9,4 l-4,9 l-4,-9 l-9,-4 l9,-4 z" fill="#1b1b1b" stroke="none"/>
+    </g></g>
+    <text x="500" y="685" font-family="'Space Mono', 'Courier New', monospace" font-weight="700" font-size="30" letter-spacing="6" text-anchor="middle" fill="#1b1b1b">EST. 1969</text>
+    <line x1="410" y1="710" x2="590" y2="710" stroke="#f5d34c" stroke-width="5"/>
+  </g>
+  <g text-anchor="middle" font-family="'Alfa Slab One', 'Rockwell', 'Georgia', serif" fill="#1b1b1b">
+    <text x="500" y="945" font-size="92" letter-spacing="1">LUNAR HOTEL</text>
+    <text x="500" y="1045" font-size="92" letter-spacing="1">CONCIERGE</text>
+  </g>
+  <text x="500" y="1125" font-family="'Space Mono', 'Courier New', monospace" font-size="28" letter-spacing="3" text-anchor="middle" fill="#f5d34c">CHECKOUT IS AT 06:00 LUNAR TIME.</text>
+</svg>

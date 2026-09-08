@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1200" width="1000" height="1200">
+  <defs>
+    <path id="arc-top-jetpack-commuting" d="M154,430 A346,346 0 0,1 846,430"/>
+    <path id="arc-bottom-jetpack-commuting" d="M124,430 A376,376 0 0,0 876,430"/>
+  </defs>
+  
+  <g>
+    <circle cx="500" cy="430" r="392" fill="none" stroke="#f4ecd8" stroke-width="16"/>
+    <circle cx="500" cy="430" r="330" fill="none" stroke="#f4ecd8" stroke-width="5"/>
+    <circle cx="500" cy="430" r="318" fill="none" stroke="#f4ecd8" stroke-width="2" stroke-dasharray="4 8"/>
+    <text font-family="'Space Mono', 'Courier New', monospace" font-weight="700" font-size="34" letter-spacing="5" fill="#f4ecd8">
+      <textPath href="#arc-top-jetpack-commuting" startOffset="50%" text-anchor="middle">DEPARTMENT OF OBSOLETE FUTURES</textPath>
+    </text>
+    <text font-family="'Space Mono', 'Courier New', monospace" font-weight="700" font-size="30" letter-spacing="4" fill="#f4ecd8">
+      <textPath href="#arc-bottom-jetpack-commuting" startOffset="50%" text-anchor="middle">STILL WAITING · FLIGHT LANE 4</textPath>
+    </text>
+    <g fill="#f0742b">
+      <path transform="translate(139,430)" d="M0,-14 l4,10 l10,4 l-10,4 l-4,10 l-4,-10 l-10,-4 l10,-4 z"/>
+      <path transform="translate(861,430)" d="M0,-14 l4,10 l10,4 l-10,4 l-4,10 l-4,-10 l-10,-4 l10,-4 z"/>
+    </g>
+    <g transform="translate(500,390)">
+    <g fill="none" stroke="#f4ecd8" stroke-width="13" stroke-linecap="round" stroke-linejoin="round">
+      <polygon points="-104,60 -56,60 -80,165" fill="#f0742b" stroke="none"/>
+      <polygon points="56,60 104,60 80,165" fill="#f0742b" stroke="none"/>
+      <rect x="-108" y="-80" width="52" height="140" rx="26"/>
+      <rect x="56" y="-80" width="52" height="140" rx="26"/>
+      <rect x="-48" y="-72" width="96" height="124" rx="22" fill="#f0742b" fill-opacity="0.18"/>
+      <circle cx="0" cy="-124" r="44"/>
+      <path d="M-30,-118 Q0,-140 30,-118"/>
+      <path d="M-48,-52 L-118,-8 L-104,10"/>
+      <path d="M48,-52 L118,-8 L104,10"/>
+      <path d="M-18,52 L-26,140 L-42,144"/>
+      <path d="M18,52 L26,140 L42,144"/>
+      <path d="M-160,-150 L-130,-150 M-175,-120 L-135,-120 M-160,-90 L-140,-90"/>
+    </g></g>
+    <text x="500" y="685" font-family="'Space Mono', 'Courier New', monospace" font-weight="700" font-size="30" letter-spacing="6" text-anchor="middle" fill="#f4ecd8">EST. 1962</text>
+    <line x1="410" y1="710" x2="590" y2="710" stroke="#f0742b" stroke-width="5"/>
+  </g>
+  <g text-anchor="middle" font-family="'Alfa Slab One', 'Rockwell', 'Georgia', serif" fill="#f4ecd8">
+    <text x="500" y="945" font-size="92" letter-spacing="1">JETPACK</text>
+    <text x="500" y="1045" font-size="92" letter-spacing="1">COMMUTING</text>
+  </g>
+  <text x="500" y="1125" font-family="'Space Mono', 'Courier New', monospace" font-size="28" letter-spacing="3" text-anchor="middle" fill="#f0742b">YOUR FLIGHT LANE IS BEING PROCESSED.</text>
+</svg>

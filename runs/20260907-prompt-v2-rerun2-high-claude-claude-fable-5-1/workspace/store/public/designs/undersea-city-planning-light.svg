@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1200" width="1000" height="1200">
+  <defs>
+    <path id="arc-top-undersea-city-planning" d="M154,430 A346,346 0 0,1 846,430"/>
+    <path id="arc-bottom-undersea-city-planning" d="M124,430 A376,376 0 0,0 876,430"/>
+  </defs>
+  
+  <g>
+    <circle cx="500" cy="430" r="392" fill="none" stroke="#f4ecd8" stroke-width="16"/>
+    <circle cx="500" cy="430" r="330" fill="none" stroke="#f4ecd8" stroke-width="5"/>
+    <circle cx="500" cy="430" r="318" fill="none" stroke="#f4ecd8" stroke-width="2" stroke-dasharray="4 8"/>
+    <text font-family="'Space Mono', 'Courier New', monospace" font-weight="700" font-size="34" letter-spacing="5" fill="#f4ecd8">
+      <textPath href="#arc-top-undersea-city-planning" startOffset="50%" text-anchor="middle">DEPARTMENT OF OBSOLETE FUTURES</textPath>
+    </text>
+    <text font-family="'Space Mono', 'Courier New', monospace" font-weight="700" font-size="30" letter-spacing="4" fill="#f4ecd8">
+      <textPath href="#arc-bottom-undersea-city-planning" startOffset="50%" text-anchor="middle">ZONING FOR 20,000 LEAGUES</textPath>
+    </text>
+    <g fill="#4cc9f0">
+      <path transform="translate(139,430)" d="M0,-14 l4,10 l10,4 l-10,4 l-4,10 l-4,-10 l-10,-4 l10,-4 z"/>
+      <path transform="translate(861,430)" d="M0,-14 l4,10 l10,4 l-10,4 l-4,10 l-4,-10 l-10,-4 l10,-4 z"/>
+    </g>
+    <g transform="translate(500,390)">
+    <g fill="none" stroke="#f4ecd8" stroke-width="13" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M-230,-190 Q-200,-220 -170,-190 T-110,-190 T-50,-190 T10,-190 T70,-190 T130,-190 T190,-190 T250,-190"/>
+      <path d="M-230,-150 Q-200,-180 -170,-150 T-110,-150 T-50,-150 T10,-150 T70,-150 T130,-150 T190,-150 T250,-150" stroke-width="7.8"/>
+      <path d="M-175,70 A175,175 0 0,1 175,70 Z" fill="#4cc9f0" fill-opacity="0.18"/>
+      <rect x="-200" y="70" width="400" height="22" fill="#f4ecd8"/>
+      <rect x="-128" y="-30" width="44" height="100"/>
+      <rect x="-66" y="-90" width="54" height="160"/>
+      <line x1="-39" y1="-90" x2="-39" y2="-130"/>
+      <rect x="6" y="-56" width="38" height="126"/>
+      <rect x="62" y="-16" width="64" height="86"/>
+      <rect x="-52" y="-70" width="10" height="12" fill="#f4ecd8"/><rect x="-32" y="-70" width="10" height="12" fill="#f4ecd8"/>
+      <rect x="-52" y="-44" width="10" height="12" fill="#f4ecd8"/><rect x="-32" y="-44" width="10" height="12" fill="#f4ecd8"/>
+      <rect x="16" y="-36" width="8" height="10" fill="#f4ecd8"/><rect x="30" y="-36" width="8" height="10" fill="#f4ecd8"/>
+      <g transform="translate(-205,-70)">
+        <path d="M-22,0 Q0,-18 22,0 Q0,18 -22,0 Z" fill="#4cc9f0" stroke="none"/>
+        <polygon points="20,0 36,-12 36,12" fill="#4cc9f0" stroke="none"/>
+      </g>
+      <circle cx="-190" cy="-110" r="5"/><circle cx="-180" cy="-130" r="3"/>
+      <path d="M210,70 Q200,40 214,10 Q228,-20 214,-50" stroke-width="9.1"/>
+      <path d="M-215,70 Q-225,40 -211,10 Q-197,-20 -211,-50" stroke-width="9.1"/>
+    </g></g>
+    <text x="500" y="685" font-family="'Space Mono', 'Courier New', monospace" font-weight="700" font-size="30" letter-spacing="6" text-anchor="middle" fill="#f4ecd8">EST. 1964</text>
+    <line x1="410" y1="710" x2="590" y2="710" stroke="#4cc9f0" stroke-width="5"/>
+  </g>
+  <g text-anchor="middle" font-family="'Alfa Slab One', 'Rockwell', 'Georgia', serif" fill="#f4ecd8">
+    <text x="500" y="945" font-size="92" letter-spacing="1">UNDERSEA CITY</text>
+    <text x="500" y="1045" font-size="92" letter-spacing="1">PLANNING</text>
+  </g>
+  <text x="500" y="1125" font-family="'Space Mono', 'Courier New', monospace" font-size="28" letter-spacing="3" text-anchor="middle" fill="#4cc9f0">WATERFRONT PROPERTY, ALL SIDES.</text>
+</svg>
