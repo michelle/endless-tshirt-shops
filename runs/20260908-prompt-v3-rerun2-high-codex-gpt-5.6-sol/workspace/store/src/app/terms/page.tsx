@@ -1,0 +1,5 @@
+import Link from "next/link";
+
+export default function TermsPage() {
+  return <main className="legal-page"><Link className="wordmark" href="/">SIGNAL <span>✦</span> ATLAS</Link><h1>Terms</h1><p>Signal Atlas shirts are personalized and made to order. Review names, dates, places, color, and size before paying; production can begin as soon as payment succeeds.</p><h2>Returns and replacements</h2><p>Personalized items cannot be returned for a change of mind. If an item arrives damaged, misprinted, or materially different from the approved design, contact the store operator with a photo within 14 days of delivery for review and, when appropriate, a replacement or refund.</p><h2>Customer content</h2><p>You confirm that you have the right to print the words you submit and that they do not violate another person’s rights or applicable law.</p><p>Before opening the store publicly, the operator must add legal business details, a support contact, and terms suitable for the countries served.</p></main>;
+}
