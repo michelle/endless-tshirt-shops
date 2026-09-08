@@ -14,6 +14,80 @@ const unverified = (reason: string): Check => ({ result: "unverified", reason })
 // Audit judgments from each suite's summary.md plus inspection of archived art.
 // These are benchmark checks, not a live health check or launch certification.
 export const assessments: Record<string, Record<string, Assessment>> = {
+  "20260907-prompt-v2-rerun2-high": {
+    astra: {
+      artwork: unverified("The transparent outdoor illustration is coherent, but the 1024×1536 source needs a higher-resolution master and physical-scale validation."),
+      checkout: fail("The storefront creates a Prodigi sandbox order without collecting payment."),
+      prodigi: pass("Direct navy/XL order ord_1170933 fetched the intended asset; its MD5 matches the archived source and preparation completed."),
+    },
+    sol: {
+      artwork: unverified("The transparent Cloud Library illustration is coherent, but 1024×1536 is below the agent's own recommended print-master resolution."),
+      checkout: fail("The storefront creates a Prodigi sandbox order without collecting payment."),
+      prodigi: pass("Direct vintage-white/L order ord_1170943 completed with the intended asset and an exact source hash match."),
+    },
+    terra: {
+      artwork: unverified("The detailed transparent moth design is coherent, but its 1024×1536 source is web-resolution and requires a new print master."),
+      checkout: fail("The storefront intentionally has no payment step."),
+      prodigi: pass("The committed source MD5 matches completed direct orders ord_1170945 and ord_1170946."),
+    },
+    luna: {
+      artwork: fail("The submitted 1254×1254 source is a complete black-shirt product mockup on a decorative background, not isolated print artwork."),
+      checkout: fail("The checkout sends a sandbox order directly and collects no payment."),
+      prodigi: fail("Prodigi accepted the request, but the supplied front asset is the product mockup rather than a printable design."),
+    },
+    fable: {
+      artwork: pass("The exact paid-order source is a 4680×5790 transparent seal with suitable detail for the selected light garment; physical sampling remains."),
+      checkout: pass("Two genuine $42.95 Stripe test Checkout Sessions reached paid and linked to the application's fulfillment flow."),
+      prodigi: pass("Both paid Sessions linked to completed orders; selected white/L order ord_1170954 has an exact source hash match and the deployed webhook is enabled."),
+    },
+    opus: {
+      artwork: pass("The 3600×4680 transparent St. Junia print includes 300 DPI metadata and is the suite's strongest prepared print master."),
+      checkout: fail("No payment key was configured; the tested storefront path submits directly to Prodigi."),
+      prodigi: pass("Direct charcoal/XL order ord_1170971 completed with the intended source and exact MD5 match."),
+    },
+    sonnet: {
+      artwork: unverified("The 2000×2505 transparent Yeti badge is coherent, but its print scale and low-contrast details need physical validation."),
+      checkout: fail("The storefront creates a Prodigi sandbox order without collecting payment."),
+      prodigi: pass("Direct navy/XL order ord_1170976 downloaded the intended hash-matched source; print-ready preparation was still in progress at audit time."),
+    },
+  },
+  "20260907-prompt-v2-rerun-high": {
+    astra: {
+      artwork: unverified("The exact 1122×1402 opaque design was accepted and prepared by Prodigi, but print size and physical quality were not sampled."),
+      checkout: fail("Checkout uses a simulated approve/decline selector; no real payment provider is configured."),
+      prodigi: pass("Customer-path order ord_1170913 completed with the intended Natural/M asset, whose MD5 matches the archived source."),
+    },
+    sol: {
+      artwork: unverified("The transparent luna-moth source is coherent, but 1024×1536 resolution and physical placement need sample validation."),
+      checkout: fail("The storefront creates a Prodigi sandbox order without collecting payment."),
+      prodigi: pass("Customer-path black/M order ord_1170918 completed and its source MD5 matches the archived design."),
+    },
+    terra: {
+      artwork: pass("The reviewed 4680×5848 transparent Night Shift Atlas source is detailed and byte-identical to the completed order asset."),
+      checkout: fail("The checkout intentionally has no payment step."),
+      prodigi: pass("Customer-path black/M order ord_1170920 completed with the intended Bella + Canvas 3001 asset."),
+    },
+    luna: {
+      artwork: fail("The customer path submits a 1254×1254 opaque photograph of a complete shirt mockup as front-print artwork."),
+      checkout: fail("The checkout sends a sandbox order directly and collects no payment."),
+      prodigi: fail("Prodigi accepted the request, but the supplied front asset is the product mockup rather than isolated printable artwork."),
+    },
+    fable: {
+      artwork: unverified("A 4665×5844 transparent print asset exists in the partial workspace, but it was not tied to a deployed customer order."),
+      checkout: unverified("Stripe Checkout and webhook code exist, but the provider session limit stopped the run before deployment or payment testing."),
+      prodigi: unverified("Prodigi quote/order calls occurred during development, but no deployed run-specific customer order was established."),
+    },
+    opus: {
+      artwork: unverified("The exhausted provider session produced no build or artwork."),
+      checkout: unverified("The exhausted provider session produced no checkout implementation."),
+      prodigi: unverified("The exhausted provider session produced no Prodigi implementation or call history."),
+    },
+    sonnet: {
+      artwork: unverified("The exhausted provider session produced no build or artwork."),
+      checkout: unverified("The exhausted provider session produced no checkout implementation."),
+      prodigi: unverified("The exhausted provider session produced no Prodigi implementation or call history."),
+    },
+  },
   "20260906-minimal-inspector-high": {
     astra: {
       artwork: fail("The exact transparent source cuts off the timestamp's final digits. Its MD5 matches Prodigi: this is the submitted defect, not viewer cropping."),
@@ -205,7 +279,7 @@ export function rateRun(suiteId: string, runId: string) {
   const assessment = assessments[suiteId]?.[runId];
   const checks = criteria.map((criterion) => ({
     ...criterion,
-    ...(suiteId === "20260906-clean-sheet-high" && criterion.id === "artwork" ? {
+    ...(["20260906-clean-sheet-high", "20260907-prompt-v2-high", "20260907-prompt-v2-rerun-high", "20260907-prompt-v2-rerun2-high"].includes(suiteId) && criterion.id === "artwork" ? {
       label: "Printable theme design",
       definition: "A coherent theme design legible at shirt scale with suitable raster detail. This prompt allows graphics and intentional colored panels; opacity is disclosed, not automatically failed. Physical samples remain unverified.",
     } : {}),

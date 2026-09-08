@@ -18,11 +18,11 @@ export type Run = {
   model: string;
   commit: string;
   status: string;
-  deployment: string;
+  deployment: string | null;
   finalOutput: string;
-  design: string;
-  width: number;
-  height: number;
+  design: string | null;
+  width: number | null;
+  height: number | null;
   alpha: string;
   evidence: string;
 };
@@ -46,6 +46,132 @@ const models = {
 };
 
 export const suites: Suite[] = [
+  {
+    id: "20260907-prompt-v2-rerun2-high",
+    label: "2026-09-07 · Prompt v2 · Second rerun",
+    summary: "/suites/20260907-prompt-v2-rerun2-high/summary.md",
+    prompt: { path: "/suites/20260907-prompt-v2-rerun2-high/prompt.md", file: "prompt-v2.md", revision: "01bb32d2b9201a1caf0eee56f755259c6f1ce183", sha256: "9b6228722b8330ca6d1311de695eb99ec4da2809a92e17be2e7c82a0e13f316b" },
+    runs: [
+      {
+        id: "astra", model: models.astra, commit: "bd649736", status: "Sandbox checkout · completed print",
+        deployment: "https://amateur-weather-club-20260907-r2-astra-7f4c.vercel.app",
+        finalOutput: "/suites/20260907-prompt-v2-rerun2-high/runs/20260907-prompt-v2-rerun2-high-codex-gpt-6-astra/final.md",
+        design: "/suites/20260907-prompt-v2-rerun2-high/runs/20260907-prompt-v2-rerun2-high-codex-gpt-6-astra/submitted.png",
+        width: 1024, height: 1536, alpha: "RGBA transparency",
+        evidence: "Exact navy/XL source from direct sandbox order ord_1170933; its MD5 matches Prodigi and asset preparation completed. The storefront has no payment provider. The artwork is coherent but needs a higher-resolution master and a physical sample.",
+      },
+      {
+        id: "sol", model: models.sol, commit: "f404c767", status: "Sandbox checkout · completed print",
+        deployment: "https://benchmark-20260907-prompt-v2-rerun2-rho.vercel.app",
+        finalOutput: "/suites/20260907-prompt-v2-rerun2-high/runs/20260907-prompt-v2-rerun2-high-codex-gpt-5.6-sol/final.md",
+        design: "/suites/20260907-prompt-v2-rerun2-high/runs/20260907-prompt-v2-rerun2-high-codex-gpt-5.6-sol/submitted.png",
+        width: 1024, height: 1536, alpha: "RGBA transparency",
+        evidence: "Exact vintage-white/L Cloud Library source from direct sandbox order ord_1170943; its MD5 matches Prodigi and the order completed. No payment is collected. The agent itself recommends replacing this 1024×1536 image with a 3307×4606 print master.",
+      },
+      {
+        id: "terra", model: models.terra, commit: "7a1675e6", status: "Sandbox checkout · completed print",
+        deployment: "https://benchmark-20260907-prompt-v2-rerun2-one.vercel.app",
+        finalOutput: "/suites/20260907-prompt-v2-rerun2-high/runs/20260907-prompt-v2-rerun2-high-codex-gpt-5.6-terra/final.md",
+        design: "/suites/20260907-prompt-v2-rerun2-high/runs/20260907-prompt-v2-rerun2-high-codex-gpt-5.6-terra/design.png",
+        width: 1024, height: 1536, alpha: "RGBA transparency",
+        evidence: "The committed Night Shift Field Club source has the same MD5 as completed direct sandbox orders ord_1170945 and ord_1170946. The customer path collects no payment. The detailed design is web-resolution and needs a higher-resolution master.",
+      },
+      {
+        id: "luna", model: models.luna, commit: "7f1a3335", status: "Sandbox checkout · submitted shirt mockup",
+        deployment: "https://benchmark-20260907-prompt-v2-rerun2-plum.vercel.app",
+        finalOutput: "/suites/20260907-prompt-v2-rerun2-high/runs/20260907-prompt-v2-rerun2-high-codex-gpt-5.6-luna/final.md",
+        design: "/suites/20260907-prompt-v2-rerun2-high/runs/20260907-prompt-v2-rerun2-high-codex-gpt-5.6-luna/submitted.png",
+        width: 1254, height: 1254, alpha: "RGB · opaque product mockup",
+        evidence: "Exact black/M source from direct sandbox order ord_1170950; its MD5 matches Prodigi. The customer path submits a complete black-shirt mockup on a decorative background as the front print source, rather than isolated print artwork. No payment is collected.",
+      },
+      {
+        id: "fable", model: models.fable, commit: "bdd9fc00", status: "Paid E2E · 2 completed prints",
+        deployment: "https://benchmark-20260907-prompt-v2-rerun2-eta.vercel.app",
+        finalOutput: "/suites/20260907-prompt-v2-rerun2-high/runs/20260907-prompt-v2-rerun2-high-claude-claude-fable-5-1/final.md",
+        design: "/suites/20260907-prompt-v2-rerun2-high/runs/20260907-prompt-v2-rerun2-high-claude-claude-fable-5-1/design.png",
+        width: 4680, height: 5790, alpha: "RGBA transparency · dark ink for light shirt",
+        evidence: "Two genuine $42.95 Stripe test Checkout Sessions reached paid and linked to completed Prodigi orders. The selected white/L order ord_1170954 has an exact 4680×5790 source hash match. The enabled webhook targets this deployment; no physical sample was inspected.",
+      },
+      {
+        id: "opus", model: models.opus, commit: "d5d700e5", status: "Direct smoke order · completed print",
+        deployment: "https://benchmark-20260907-prompt-v2-rerun2-gamma.vercel.app",
+        finalOutput: "/suites/20260907-prompt-v2-rerun2-high/runs/20260907-prompt-v2-rerun2-high-claude-claude-opus-5/final.md",
+        design: "/suites/20260907-prompt-v2-rerun2-high/runs/20260907-prompt-v2-rerun2-high-claude-claude-opus-5/submitted.png",
+        width: 3600, height: 4680, alpha: "RGBA transparency · 300 DPI metadata",
+        evidence: "Exact charcoal/XL St. Junia source from direct sandbox order ord_1170971; its MD5 matches Prodigi and the order completed. The 3600×4680 file is the strongest prepared print master in the suite. A Stripe path exists but had no configured key or paid execution.",
+      },
+      {
+        id: "sonnet", model: models.sonnet, commit: "4d6dfb0e", status: "Direct smoke order · asset fetched",
+        deployment: "https://benchmark-20260907-prompt-v2-rerun2-seven.vercel.app",
+        finalOutput: "/suites/20260907-prompt-v2-rerun2-high/runs/20260907-prompt-v2-rerun2-high-claude-claude-sonnet-5/final.md",
+        design: "/suites/20260907-prompt-v2-rerun2-high/runs/20260907-prompt-v2-rerun2-high-claude-claude-sonnet-5/submitted.png",
+        width: 2000, height: 2505, alpha: "RGBA transparency",
+        evidence: "Exact navy/XL Yeti source from direct sandbox order ord_1170976; its MD5 matches Prodigi. The asset downloaded successfully but print-ready preparation had not completed at snapshot time. The storefront collects no payment; scale and low-contrast details need sample testing.",
+      },
+    ],
+  },
+  {
+    id: "20260907-prompt-v2-rerun-high",
+    label: "2026-09-07 · Prompt v2 rerun",
+    summary: "/suites/20260907-prompt-v2-rerun-high/summary.md",
+    prompt: { path: "/suites/20260907-prompt-v2-rerun-high/prompt.md", file: "prompt-v2.md", revision: "01bb32d2b9201a1caf0eee56f755259c6f1ce183", sha256: "9b6228722b8330ca6d1311de695eb99ec4da2809a92e17be2e7c82a0e13f316b" },
+    runs: [
+      {
+        id: "astra", model: models.astra, commit: "b697f342", status: "Sandbox checkout · completed print",
+        deployment: "https://benchmark-20260907-prompt-v2-rerun-high-codex-gpt-6-astra.vercel.app",
+        finalOutput: "/suites/20260907-prompt-v2-rerun-high/runs/20260907-prompt-v2-rerun-high-codex-gpt-6-astra/final.md",
+        design: "/suites/20260907-prompt-v2-rerun-high/runs/20260907-prompt-v2-rerun-high-codex-gpt-6-astra/design.png",
+        width: 1122, height: 1402, alpha: "RGB · opaque cream panel",
+        evidence: "Exact customer-path Natural/M source from direct sandbox order ord_1170913; MD5 matches Prodigi and asset preparation completed. The app simulates payment instead of collecting it. The 1122×1402 raster needs physical-size review before sale.",
+      },
+      {
+        id: "sol", model: models.sol, commit: "5d20510b", status: "Sandbox checkout · completed print",
+        deployment: "https://benchmark-20260907-prompt-v2-rerun-five.vercel.app",
+        finalOutput: "/suites/20260907-prompt-v2-rerun-high/runs/20260907-prompt-v2-rerun-high-codex-gpt-5.6-sol/final.md",
+        design: "/suites/20260907-prompt-v2-rerun-high/runs/20260907-prompt-v2-rerun-high-codex-gpt-5.6-sol/design.png",
+        width: 1024, height: 1536, alpha: "RGBA transparency",
+        evidence: "Exact customer-path black/M luna-moth source from direct sandbox order ord_1170918; MD5 matches Prodigi and the order completed. No payment is collected. The 1024×1536 source and physical placement require sample validation.",
+      },
+      {
+        id: "terra", model: models.terra, commit: "23a1ad2f", status: "Sandbox checkout · completed print",
+        deployment: "https://benchmark-20260907-prompt-v2-rerun-mu.vercel.app",
+        finalOutput: "/suites/20260907-prompt-v2-rerun-high/runs/20260907-prompt-v2-rerun-high-codex-gpt-5.6-terra/final.md",
+        design: "/suites/20260907-prompt-v2-rerun-high/runs/20260907-prompt-v2-rerun-high-codex-gpt-5.6-terra/design.png",
+        width: 4680, height: 5848, alpha: "RGBA transparency",
+        evidence: "Committed Night Shift Atlas source is byte-identical to the asset Prodigi fetched for direct sandbox order ord_1170920 (MD5 291866…); black/M, Bella + Canvas 3001, fillPrintArea. No payment is collected; physical sample unverified.",
+      },
+      {
+        id: "luna", model: models.luna, commit: "2c0f6f29", status: "Sandbox checkout · submitted shirt mockup",
+        deployment: "https://benchmark-20260907-prompt-v2-rerun-lemon.vercel.app",
+        finalOutput: "/suites/20260907-prompt-v2-rerun-high/runs/20260907-prompt-v2-rerun-high-codex-gpt-5.6-luna/final.md",
+        design: "/suites/20260907-prompt-v2-rerun-high/runs/20260907-prompt-v2-rerun-high-codex-gpt-5.6-luna/design.png",
+        width: 1254, height: 1254, alpha: "RGB · opaque product mockup",
+        evidence: "Exact committed Waypoint image is byte-identical to Prodigi order ord_1170923 (MD5 a7e7a9…). The customer path submits a complete cream-shirt mockup as the front print source, not isolated print artwork. The sandbox order completed, but there is no payment.",
+      },
+      {
+        id: "fable", model: models.fable, commit: "c1989096", status: "Provider limit · partial build",
+        deployment: null,
+        finalOutput: "/suites/20260907-prompt-v2-rerun-high/runs/20260907-prompt-v2-rerun-high-claude-claude-fable-5-1/final.md",
+        design: "/suites/20260907-prompt-v2-rerun-high/runs/20260907-prompt-v2-rerun-high-claude-claude-fable-5-1/design.png",
+        width: 4665, height: 5844, alpha: "RGBA transparency · partial-build asset",
+        evidence: "The session limit stopped the run before deployment after 15m19s. The archived workspace contains a substantial Next.js/Stripe/Prodigi implementation and eight print files; this reviewed local Dial-up Canyon asset was never tied to a run-specific deployed customer order.",
+      },
+      {
+        id: "opus", model: models.opus, commit: "ff816451", status: "Provider limit · no build",
+        deployment: null,
+        finalOutput: "/suites/20260907-prompt-v2-rerun-high/runs/20260907-prompt-v2-rerun-high-claude-claude-opus-5/final.md",
+        design: null, width: null, height: null, alpha: "No artwork generated",
+        evidence: "The shared Claude session quota was already exhausted. The adapter returned the provider-limit message after about one second; no workspace, technology choice, deployment, or source-use history was produced.",
+      },
+      {
+        id: "sonnet", model: models.sonnet, commit: "ca0d28f8", status: "Provider limit · no build",
+        deployment: null,
+        finalOutput: "/suites/20260907-prompt-v2-rerun-high/runs/20260907-prompt-v2-rerun-high-claude-claude-sonnet-5/final.md",
+        design: null, width: null, height: null, alpha: "No artwork generated",
+        evidence: "The shared Claude session quota was already exhausted. The adapter returned the provider-limit message after about one second; no workspace, technology choice, deployment, or source-use history was produced.",
+      },
+    ],
+  },
   {
     "id": "20260906-minimal-inspector-high",
     "label": "2026-09-06 · Minimal prompt · Inspector",
@@ -149,6 +275,21 @@ export const suites: Suite[] = [
         "evidence": "Exact paid fitted/M source includes a date subtitle, failing timestamp-only scoring. Two earlier PaymentIntents each produced duplicate orders. Final code uses a non-atomic metadata claim without Prodigi idempotencyKey; Gildan 64000 is the chosen Softstyle 'fitted' mapping, not a women's fitted SKU. ord_1170804; original MD5 matches Prodigi. GLOBAL-TEE-GIL-64000, black/m, front, fitPrintArea. Canvas 1500×1800; 77,376 nontransparent pixels; bounds (87, 777, 1386, 1062). Full canvas preserved; physical placement/sample unverified."
       }
     ]
+  },
+  {
+    id: "20260907-prompt-v2-high",
+    label: "2026-09-07 · Prompt v2",
+    summary: "/suites/20260907-prompt-v2-high/summary.md",
+    prompt: { path: "/suites/20260907-prompt-v2-high/prompt.md", file: "prompt-v2.md", revision: "01bb32d2b9201a1caf0eee56f755259c6f1ce183", sha256: "9b6228722b8330ca6d1311de695eb99ec4da2809a92e17be2e7c82a0e13f316b" },
+    runs: [
+      { id: "astra", model: models.astra, commit: "37983374", status: "Prodigi sandbox · no payment", deployment: "https://benchmark-20260907-prompt-v2-high-c.vercel.app", finalOutput: "/suites/20260907-prompt-v2-high/runs/20260907-prompt-v2-high-codex-gpt-6-astra/final.md", design: "/suites/20260907-prompt-v2-high/runs/20260907-prompt-v2-high-codex-gpt-6-astra/design.png", width: 1122, height: 1402, alpha: "RGB · representative committed print asset", evidence: "Out of Office Club. Direct sandbox order verified; no payment collection. Representative committed catalog art; physical print quality unverified." },
+      { id: "sol", model: models.sol, commit: "a35eaf9b", status: "Prodigi sandbox · no payment", deployment: "https://benchmark-20260907-prompt-v2-high-c-gold.vercel.app", finalOutput: "/suites/20260907-prompt-v2-high/runs/20260907-prompt-v2-high-codex-gpt-5.6-sol/final.md", design: "/suites/20260907-prompt-v2-high/runs/20260907-prompt-v2-high-codex-gpt-5.6-sol/design.png", width: 2490, height: 3510, alpha: "Indexed PNG · representative committed print asset", evidence: "Afterglow Supply Co. Direct sandbox order verified; no payment collection. Night Signal catalog print selected; physical sample unverified." },
+      { id: "terra", model: models.terra, commit: "ea88338a", status: "Prodigi sandbox · no payment", deployment: "https://benchmark-20260907-prompt-v2-high-c-psi.vercel.app", finalOutput: "/suites/20260907-prompt-v2-high/runs/20260907-prompt-v2-high-codex-gpt-5.6-terra/final.md", design: "/suites/20260907-prompt-v2-high/runs/20260907-prompt-v2-high-codex-gpt-5.6-terra/design.png", width: 2490, height: 3510, alpha: "RGBA · representative committed print asset", evidence: "Night Hike Club. Direct sandbox order verified; no payment collection. Moth Signal print selected; physical sample unverified." },
+      { id: "luna", model: models.luna, commit: "fc154f3a", status: "Prodigi sandbox · no payment", deployment: "https://benchmark-20260907-prompt-v2-high-codex-gpt-56-luna-lvfynlvgr.vercel.app", finalOutput: "/suites/20260907-prompt-v2-high/runs/20260907-prompt-v2-high-codex-gpt-5.6-luna/final.md", design: "/suites/20260907-prompt-v2-high/runs/20260907-prompt-v2-high-codex-gpt-5.6-luna/design.svg", width: 600, height: 700, alpha: "SVG · representative committed artwork", evidence: "Moonmoth Supply Co. Direct sandbox order verified; no payment collection. SVG catalog artwork selected; raster print readiness and physical sample unverified." },
+      { id: "fable", model: models.fable, commit: "34f756ce", status: "Prodigi sandbox · no payment", deployment: "https://benchmark-20260907-prompt-v2-high-c-nine.vercel.app", finalOutput: "/suites/20260907-prompt-v2-high/runs/20260907-prompt-v2-high-claude-claude-fable-5-1/final.md", design: "/suites/20260907-prompt-v2-high/runs/20260907-prompt-v2-high-claude-claude-fable-5-1/design.png", width: 4500, height: 5400, alpha: "RGBA · dark-garment print asset", evidence: "The Obsolete Guild. Direct sandbox orders and asset download reported; no payment collection. Lamplighter dark-garment print selected; sample unverified." },
+      { id: "opus", model: models.opus, commit: "92e24cd5", status: "8 paid sessions · 8 linked orders", deployment: "https://benchmark-20260907-prompt-v2-high-c-nu.vercel.app", finalOutput: "/suites/20260907-prompt-v2-high/runs/20260907-prompt-v2-high-claude-claude-opus-5/final.md", design: "/suites/20260907-prompt-v2-high/runs/20260907-prompt-v2-high-claude-claude-opus-5/design.png", width: 4665, height: 5844, alpha: "RGBA · dark-garment print asset", evidence: "Last Shift. Inspector observed eight paid Stripe sessions and eight linked Prodigi orders. Lamplighter dark print selected; concurrency/reconciliation logic and physical sample still require review." },
+      { id: "sonnet", model: models.sonnet, commit: "e09d0cf0", status: "Prodigi sandbox · no payment", deployment: "https://benchmark-20260907-prompt-v2-high-c-eight.vercel.app", finalOutput: "/suites/20260907-prompt-v2-high/runs/20260907-prompt-v2-high-claude-claude-sonnet-5/final.md", design: "/suites/20260907-prompt-v2-high/runs/20260907-prompt-v2-high-claude-claude-sonnet-5/design.png", width: 3600, height: 3600, alpha: "RGBA · representative committed print asset", evidence: "Night Shift Cryptids. Direct sandbox orders and asset validation reported; no payment collection. Mothman print selected; physical sample unverified." },
+    ],
   },
   {
     id: "20260906-clean-sheet-high",

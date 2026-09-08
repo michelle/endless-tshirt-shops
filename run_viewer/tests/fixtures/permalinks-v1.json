@@ -3,6 +3,54 @@
   "note": "Append new published destinations. Do not remove old IDs to make a regression pass; preserve compatibility or add aliases.",
   "suites": [
     {
+      "id": "20260907-prompt-v2-rerun2-high",
+      "runs": [
+        { "id": "astra", "model": "Codex · gpt-6-astra" },
+        { "id": "sol", "model": "Codex · gpt-5.6-sol" },
+        { "id": "terra", "model": "Codex · gpt-5.6-terra" },
+        { "id": "luna", "model": "Codex · gpt-5.6-luna" },
+        { "id": "fable", "model": "Claude · claude-fable-5-1" },
+        { "id": "opus", "model": "Claude · claude-opus-5" },
+        { "id": "sonnet", "model": "Claude · claude-sonnet-5" }
+      ],
+      "headings": [
+        "summary-seven-model-prompt-v2-second-rerun-2026-09-07",
+        "summary-overview",
+        "summary-technology-choices",
+        "summary-third-party-source-and-api-callouts",
+        "summary-payment-and-fulfillment",
+        "summary-design-correctness-and-print-proof",
+        "summary-testing-and-independent-checks",
+        "summary-token-usage-and-complexity",
+        "summary-isolation-and-production-handoff",
+        "summary-automated-inspection-evidence"
+      ]
+    },
+    {
+      "id": "20260907-prompt-v2-rerun-high",
+      "runs": [
+        { "id": "astra", "model": "Codex · gpt-6-astra" },
+        { "id": "sol", "model": "Codex · gpt-5.6-sol" },
+        { "id": "terra", "model": "Codex · gpt-5.6-terra" },
+        { "id": "luna", "model": "Codex · gpt-5.6-luna" },
+        { "id": "fable", "model": "Claude · claude-fable-5-1" },
+        { "id": "opus", "model": "Claude · claude-opus-5" },
+        { "id": "sonnet", "model": "Claude · claude-sonnet-5" }
+      ],
+      "headings": [
+        "summary-seven-model-prompt-v2-rerun-2026-09-07",
+        "summary-overview",
+        "summary-technology-choices",
+        "summary-third-party-source-and-api-callouts",
+        "summary-payment-and-prodigi-flow",
+        "summary-design-correctness-and-print-proof",
+        "summary-testing-and-independent-checks",
+        "summary-token-usage-and-complexity",
+        "summary-isolation-and-production-handoff",
+        "summary-automated-inspection-evidence"
+      ]
+    },
+    {
       "id": "20260906-minimal-inspector-high",
       "runs": [
         {

@@ -36,8 +36,8 @@ test("server-renders the benchmark viewer", async () => {
   assert.equal((html.match(/Full print canvas generated/g) ?? []).length, 7);
 });
 
-test("packages all 35 full-canvas designs, final outputs, and all summaries", async () => {
-  const suiteNames = ["20260906-minimal-inspector-high", "20260906-clean-sheet-high", "20260905-minimal-high", "20260905-beauty-high", "20260905-unserious-high"];
+test("packages reviewed run artifacts, final outputs, and summaries", async () => {
+  const suiteNames = ["20260907-prompt-v2-rerun2-high", "20260906-minimal-inspector-high", "20260906-clean-sheet-high", "20260905-minimal-high", "20260905-beauty-high", "20260905-unserious-high"];
 
   for (const suite of suiteNames) {
     const [designs, finals, summary] = await Promise.all([
@@ -75,15 +75,20 @@ test("packages all 35 full-canvas designs, final outputs, and all summaries", as
 });
 
 for (const [suiteId, missingIcons] of [
+  ["20260907-prompt-v2-rerun2-high", ["astra", "sol", "terra", "luna"]],
+  ["20260907-prompt-v2-rerun-high", ["sol", "terra", "luna"]],
   ["20260906-minimal-inspector-high", ["terra", "luna"]],
   ["20260906-clean-sheet-high", ["astra", "luna", "opus"]],
   ["20260905-unserious-high", ["terra", "luna"]],
   ["20260905-beauty-high", ["terra", "luna"]],
   ["20260905-minimal-high", ["astra", "sol", "terra", "luna", "fable"]],
 ]) {
-test(`archives seven ${suiteId} viewport screenshots and their actual favicon sources`, async () => {
+test(`archives registered ${suiteId} viewport screenshots and their actual favicon sources`, async () => {
   const captures = JSON.parse(await readFile(new URL(`../public/suites/${suiteId}/storefronts.json`, import.meta.url), "utf8"));
-  assert.deepEqual(Object.keys(captures).sort(), ["astra", "fable", "luna", "opus", "sol", "sonnet", "terra"]);
+  const expectedModels = suiteId === "20260907-prompt-v2-rerun-high"
+    ? ["astra", "luna", "sol", "terra"]
+    : ["astra", "fable", "luna", "opus", "sol", "sonnet", "terra"];
+  assert.deepEqual(Object.keys(captures).sort(), expectedModels);
   for (const [model, capture] of Object.entries(captures)) {
     assert.equal(capture.httpStatus, 200);
     assert.ok(Number.isFinite(Date.parse(capture.capturedAt)));

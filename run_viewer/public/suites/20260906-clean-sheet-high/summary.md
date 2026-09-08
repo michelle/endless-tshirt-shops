@@ -60,18 +60,48 @@ of cross-run contamination by themselves.
 
 ## Framework and major technology choices
 
-Every model chose Next.js App Router and React. Astra, Sol, Terra, Luna, Fable,
-and Sonnet use Next 16.3.4; Opus uses Next 15.5.25. All use React 19.
-Astra uses Stripe 18.5, Zod and Sharp; Sol/Terra/Fable/Sonnet use Stripe 22.6.1;
-Opus uses Stripe 18.5. Luna calls Stripe REST directly instead of using the SDK.
+Every model chose Next.js App Router, React 19 and hosted Stripe Checkout. The
+important implementation differences are explicit below.
 
-Astra serves versioned static print PNGs. Sol and Terra serve static generated
-art. Luna serves a fixed PNG even though its page has a live clock. Fable uses
-shared SVG rendering and bundled JetBrains Mono fonts through resvg. Opus
-implements deterministic indexed-PNG rasterization, bitmap lettering, and
-cellular-automaton generation. Sonnet generates static print/mockup PNGs from
-SVG with Sharp. Its font rendering therefore happens during asset generation,
-not on each production request.
+| Model | Web stack | Stripe | Artwork / other major choices |
+| --- | --- | --- | --- |
+| Astra | Next 16.3.4, React 19 | Stripe 18.5 SDK | Zod validation, Sharp, versioned static print PNGs |
+| Sol | Next 16.3.4, React 19 | Stripe 22.6.1 SDK | Static generated artwork |
+| Terra | Next 16.3.4, React 19 | Stripe 22.6.1 SDK | Static generated topographic artwork |
+| Luna | Next 16.3.4, React 19 | Direct Stripe REST calls, no SDK | Fixed print PNG plus a client-side live clock |
+| Fable | Next 16.3.4, React 19 | Stripe 22.6.1 SDK | Shared SVG renderer, resvg, bundled JetBrains Mono fonts |
+| Opus | Next 15.5.25, React 19 | Stripe 18.5 SDK | Deterministic indexed-PNG rasterizer, bitmap lettering and cellular automata |
+| Sonnet | Next 16.3.4, React 19 | Stripe 22.6.1 SDK | SVG-to-PNG static print/mockup generation with Sharp |
+
+Sonnet's font rendering therefore happens during asset generation, not on each
+production request.
+
+**External reference usage.** These counts measure retained evidence of calls
+to third-party reference sources while the model worked, not runtime Stripe or
+Prodigi API traffic and not links merely written into a README or final answer.
+A search call that covered two topics counts once in each topic column, so
+topical counts need not add up to total web-tool calls. “Request” includes a
+retained browser open/find interaction or a direct terminal page fetch; API
+requests used to create or inspect live test objects are excluded.
+
+| Model | Stripe references | Prodigi references | Framework references | Other / coverage limit |
+| --- | --- | --- | --- | --- |
+| Astra | 2 search calls + 1 direct document request | 1 search call + 3 direct documentation/product-page requests | 0 retained third-party calls | 4 web-tool calls total; all completed, plus 2 successful terminal page fetches |
+| Sol | 2 search calls; no attributable document request retained | 3 search calls; no attributable document request retained | 1 Next.js search call | 5 web-tool calls total; 2 completed document interactions lost their source attribution |
+| Terra | 1 search call; no attributable document request retained | 2 search calls; no attributable document request retained | 0 retained third-party calls | 6 web-tool calls total; 3 completed document interactions lost their source attribution |
+| Luna | 1 search call; no attributable document request retained | 2 search calls; no attributable document request retained | 0 retained third-party calls | 3 web-tool calls total; 1 completed document interaction lost its source attribution |
+| Fable | Unknown | Unknown | Unknown | Claude envelope reports 0 built-in web searches and 0 web fetches; terminal/tool history was not retained |
+| Opus | Unknown | Unknown | Unknown | Claude envelope reports 0 built-in web searches and 0 web fetches; terminal/tool history was not retained |
+| Sonnet | Unknown | Unknown | Unknown | Claude envelope reports 0 built-in web searches and 0 web fetches; terminal/tool history was not retained |
+
+The Codex logs also show local reads of OpenAI's Sites execution instructions;
+those are first-party harness references, not third-party Stripe, Prodigi,
+Next.js or React sources, so they are excluded. Every retained Codex web item
+reached a completed tool event, but this old event format did not preserve an
+HTTP outcome for every opened document. Failed or incomplete source retrievals
+therefore cannot be counted more precisely. The Claude zeroes cover only the
+provider's built-in server web tools; they must not be interpreted as zero
+overall external-source use.
 
 ## Stripe integration and payment evidence
 

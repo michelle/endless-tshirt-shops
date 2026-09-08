@@ -47,3 +47,15 @@ test("capture records include files and explicit absence, not optimistic found f
   invalid.runs[0].deployment = "https://wrong-store.example.com";
   await assert.rejects(registeredAssets([invalid], root), /Capture belongs to another deployment/);
 });
+
+test("failed provider runs may archive a final without inventing artwork or a deployment", async () => {
+  const suite = structuredClone(suites.find(s => s.id === "20260907-prompt-v2-rerun-high"));
+  const unavailable = suite.runs.filter(run => !run.deployment);
+  assert.deepEqual(unavailable.map(run => run.id), ["fable", "opus", "sonnet"]);
+  assert.equal(unavailable.filter(run => !run.design).length, 2);
+  await registeredAssets([suite], root);
+
+  const invalid = structuredClone(suite);
+  invalid.runs.find(run => run.id === "opus").width = 1;
+  await assert.rejects(registeredAssets([invalid], root), /Missing artwork must not declare width/);
+});

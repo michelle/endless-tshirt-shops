@@ -60,9 +60,18 @@ test("static Pages viewer supports suite links, history, scoring, and all archiv
     for (const id of ["20260823-serial-high", "20260825-fresh6-high", "20260825-harness6-high", "20260827-harness6-high"]) {
       assert.match(await select.locator(`option[value="${id}"]`).innerText(), / \(legacy\)$/);
     }
-    for (const id of ["20260906-minimal-inspector-high", "20260906-clean-sheet-high", "20260905-beauty-high", "20260905-minimal-high", "20260905-unserious-high"]) {
+    for (const id of ["20260907-prompt-v2-rerun2-high", "20260907-prompt-v2-rerun-high", "20260906-minimal-inspector-high", "20260906-clean-sheet-high", "20260905-beauty-high", "20260905-minimal-high", "20260905-unserious-high"]) {
       assert.doesNotMatch(await select.locator(`option[value="${id}"]`).innerText(), /\(legacy\)/);
     }
+
+    await select.selectOption("20260907-prompt-v2-rerun2-high");
+    await page.waitForFunction(() => document.querySelectorAll(".storefront-thumbnail img").length === 7 &&
+      document.querySelectorAll(".art-canvas img").length === 7 &&
+      [...document.querySelectorAll(".design-card img")].every((image) => image.complete && image.naturalWidth > 0));
+    assert.equal(await page.locator('.design-card .run-status[data-tone="complete"]').count(), 1);
+    assert.equal(await page.locator('.design-card .run-status[data-tone="partial"]').count(), 1);
+    assert.equal(await page.locator('.design-card .run-status[data-tone="failed"]').count(), 5);
+    assert.ok(await page.locator(".summary-section .markdown table").count() > 0);
 
     for (const [suite, expected] of [["20260906-minimal-inspector-high", [2, 1, 4]], ["20260906-clean-sheet-high", [2, 1, 4]], ["20260905-unserious-high", [1, 3, 3]], ["20260905-beauty-high", [2, 1, 4]], ["20260905-minimal-high", [3, 3, 1]]]) {
       await select.selectOption(suite);
@@ -116,11 +125,14 @@ test("static Pages viewer supports suite links, history, scoring, and all archiv
     await page.reload({ waitUntil: "networkidle" });
     assert.equal(await select.inputValue(), "20260905-minimal-high");
     await select.selectOption("20260827-harness6-high");
-    await page.waitForLoadState("networkidle");
+    await page.waitForFunction(() => {
+      const text = document.querySelector(".summary-section")?.textContent ?? "";
+      return text.length > 100 && !text.includes("Loading…");
+    });
     assert.equal(await page.locator(".design-card").count(), 0);
     assert.ok((await page.locator(".summary-section").innerText()).length > 100);
     await page.goto(`${base}?suite=unknown`, { waitUntil: "networkidle" });
-    assert.equal(await select.inputValue(), "20260906-minimal-inspector-high");
+    assert.equal(await select.inputValue(), "20260907-prompt-v2-rerun2-high");
 
     await page.goto(`${base}?suite=20260905-beauty-high&run=opus`, { waitUntil: "networkidle" });
     const dialog = page.getByRole("dialog");
