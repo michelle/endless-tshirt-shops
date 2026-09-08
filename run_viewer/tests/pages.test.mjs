@@ -168,8 +168,12 @@ test("static Pages viewer supports suite links, history, scoring, and all archiv
 
     // Backdrop dismissal uses the same URL/history path as the close button.
     const opener = page.locator(".design-card").filter({ has: page.locator(".model-title").filter({ hasText: "claude-opus-5" }) }).locator("button.storefront-thumbnail");
+    const pageBoundsBeforeDrawer = await page.locator("main").boundingBox();
     await opener.click();
     await dialog.waitFor();
+    const pageBoundsWithDrawer = await page.locator("main").boundingBox();
+    assert.equal(pageBoundsWithDrawer?.x, pageBoundsBeforeDrawer?.x, "Opening a drawer must not shift the underlying page");
+    assert.equal(pageBoundsWithDrawer?.width, pageBoundsBeforeDrawer?.width, "Opening a drawer must not resize the underlying page");
     await dialog.locator("#run-drawer-title").click();
     assert.equal(await dialog.isVisible(), true, "Inside clicks must not dismiss the drawer");
     const bounds = await dialog.boundingBox();

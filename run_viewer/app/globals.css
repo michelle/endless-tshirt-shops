@@ -27,7 +27,11 @@
 
 * { box-sizing: border-box; }
 
-html { scroll-behavior: smooth; }
+html {
+  scroll-behavior: smooth;
+  /* Keep centered page content stationary when a modal drawer locks scrolling. */
+  scrollbar-gutter: stable;
+}
 
 body {
   margin: 0;
