@@ -1,0 +1,58 @@
+@import "tailwindcss";
+
+@theme {
+  --color-paper: #f6f1e7;
+  --color-paper-deep: #ece4d3;
+  --color-ink: #2b2722;
+  --color-ink-soft: #6b6359;
+  --color-moss: #4f6a3c;
+  --color-moss-light: #7f9c5a;
+  --color-blush: #d98aa0;
+  --color-gold: #d9a441;
+  --font-display: var(--font-cormorant), "Cormorant Garamond", Georgia, serif;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+}
+
+html {
+  background: var(--color-paper);
+  color: var(--color-ink);
+}
+
+body {
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+.font-display {
+  font-family: var(--font-display);
+}
+
+.plate svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.paper-grain {
+  background-image:
+    radial-gradient(rgba(43, 39, 34, 0.035) 1px, transparent 1px),
+    radial-gradient(rgba(43, 39, 34, 0.025) 1px, transparent 1px);
+  background-size: 7px 7px, 11px 11px;
+  background-position: 0 0, 3px 5px;
+}
+
+.btn-primary {
+  @apply inline-flex items-center justify-center gap-2 rounded-full bg-ink px-6 py-3 text-sm font-medium text-paper transition hover:bg-moss disabled:cursor-not-allowed disabled:opacity-50;
+}
+
+.btn-secondary {
+  @apply inline-flex items-center justify-center gap-2 rounded-full border border-ink/25 bg-transparent px-5 py-2.5 text-sm font-medium text-ink transition hover:border-ink hover:bg-ink/5;
+}
+
+.field {
+  @apply w-full rounded-lg border border-ink/20 bg-white/70 px-3 py-2.5 text-sm text-ink outline-none transition placeholder:text-ink/35 focus:border-moss focus:ring-2 focus:ring-moss/20;
+}
+
+.label {
+  @apply mb-1.5 block text-xs font-medium uppercase tracking-[0.14em] text-ink-soft;
+}

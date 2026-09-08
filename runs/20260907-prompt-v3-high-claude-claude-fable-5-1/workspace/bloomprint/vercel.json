@@ -1,0 +1,9 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "nextjs",
+  "functions": {
+    "src/app/api/print/[token]/route.ts": { "memory": 1769, "maxDuration": 60 },
+    "src/app/api/stripe/webhook/route.ts": { "maxDuration": 60 },
+    "src/app/api/orders/[sessionId]/route.ts": { "maxDuration": 60 }
+  }
+}
