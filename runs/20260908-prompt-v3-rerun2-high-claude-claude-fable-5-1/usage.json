@@ -1,0 +1,7 @@
+{
+  "input_tokens": 2406,
+  "cache_creation_input_tokens": 182583,
+  "cache_read_input_tokens": 8928028,
+  "output_tokens": 121447,
+  "new_input_tokens": 184989
+}

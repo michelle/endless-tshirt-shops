@@ -1,0 +1,96 @@
+@import "tailwindcss";
+
+@font-face {
+  font-family: "Marcellus";
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/Marcellus-Regular.ttf") format("truetype");
+}
+@font-face {
+  font-family: "Lato";
+  font-weight: 300;
+  font-display: swap;
+  src: url("/fonts/Lato-Light.ttf") format("truetype");
+}
+@font-face {
+  font-family: "Lato";
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/Lato-Regular.ttf") format("truetype");
+}
+@font-face {
+  font-family: "Lato";
+  font-weight: 700;
+  font-display: swap;
+  src: url("/fonts/Lato-Bold.ttf") format("truetype");
+}
+
+:root {
+  --bg: #0a0e1a;
+  --bg-2: #111729;
+  --fg: #ece8df;
+  --muted: #9ea4b5;
+  --line: rgba(236, 232, 223, 0.12);
+  --gold: #d9bc74;
+  --gold-2: #f0d99a;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-bg-2: var(--bg-2);
+  --color-fg: var(--fg);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-gold: var(--gold);
+  --color-gold-2: var(--gold-2);
+  --font-sans: "Lato", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Marcellus", Georgia, serif;
+}
+
+html {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: "Lato", ui-sans-serif, system-ui, sans-serif;
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 100%;
+  background:
+    radial-gradient(1200px 600px at 50% -10%, rgba(217, 188, 116, 0.08), transparent 60%),
+    var(--bg);
+}
+
+.font-display {
+  font-family: "Marcellus", Georgia, serif;
+}
+
+.field {
+  @apply w-full rounded-md border border-line bg-bg-2 px-3 py-2.5 text-fg placeholder:text-muted/60 outline-none transition focus:border-gold/60 focus:ring-2 focus:ring-gold/20;
+  color-scheme: dark;
+}
+
+.label {
+  @apply mb-1.5 block text-xs font-bold uppercase tracking-[0.18em] text-muted;
+}
+
+.btn-primary {
+  @apply inline-flex items-center justify-center gap-2 rounded-md bg-gold px-5 py-3 font-bold text-[#151515] transition hover:bg-gold-2 disabled:cursor-not-allowed disabled:opacity-50;
+}
+
+.chip {
+  @apply rounded-full border border-line px-3 py-1 text-xs text-muted transition hover:border-gold/50 hover:text-fg;
+}
+
+/* Subtle starfield for the hero */
+.starfield {
+  background-image:
+    radial-gradient(1px 1px at 20% 30%, rgba(255, 255, 255, 0.7) 50%, transparent 51%),
+    radial-gradient(1px 1px at 70% 20%, rgba(255, 255, 255, 0.5) 50%, transparent 51%),
+    radial-gradient(1.5px 1.5px at 40% 70%, rgba(255, 255, 255, 0.6) 50%, transparent 51%),
+    radial-gradient(1px 1px at 85% 60%, rgba(255, 255, 255, 0.5) 50%, transparent 51%),
+    radial-gradient(1px 1px at 10% 80%, rgba(255, 255, 255, 0.4) 50%, transparent 51%),
+    radial-gradient(1.5px 1.5px at 55% 45%, rgba(255, 255, 255, 0.7) 50%, transparent 51%),
+    radial-gradient(1px 1px at 30% 10%, rgba(255, 255, 255, 0.5) 50%, transparent 51%),
+    radial-gradient(1px 1px at 92% 85%, rgba(255, 255, 255, 0.6) 50%, transparent 51%);
+}

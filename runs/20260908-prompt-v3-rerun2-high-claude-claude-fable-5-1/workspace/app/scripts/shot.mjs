@@ -1,0 +1,11 @@
+import { chromium } from "playwright";
+const BASE = process.env.BASE_URL ?? "http://localhost:3000";
+const browser = await chromium.launch();
+const page = await browser.newPage({ viewport: { width: 1400, height: 900 } });
+await page.goto(BASE, { waitUntil: "networkidle" });
+await page.waitForTimeout(800);
+await page.screenshot({ path: "/tmp/home-full.png", fullPage: true });
+await page.goto(`${BASE}/#design`, { waitUntil: "networkidle" });
+await page.screenshot({ path: "/tmp/home-design.png" });
+await browser.close();
+console.log("shots done");
