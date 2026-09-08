@@ -1,0 +1,7 @@
+{
+  "framework": "nextjs",
+  "functions": {
+    "api/print-art.ts": { "maxDuration": 15 },
+    "api/stripe-webhook.ts": { "maxDuration": 15 }
+  }
+}
