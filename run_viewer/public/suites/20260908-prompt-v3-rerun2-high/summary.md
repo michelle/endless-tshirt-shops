@@ -18,6 +18,22 @@ Every deployment includes a representative image a customer can encounter. Astra
 
 All seven selected storefronts returned HTTP 200 on 2026-09-08. Isolation checks passed for unique run IDs, Vercel projects, Stripe profile paths, prompt hash, base commit, reasoning effort, enabled paid-run webhook destinations, and cross-run source references. Overall isolation remains `unknown` because several Stripe identities were unavailable and Prodigi is intentionally shared.
 
+## Third-party source and API callouts
+
+Counts come from normalized captured tool events. `S/D/L` means search queries / remote document requests / local reference reads. API calls are classified runtime or command-line interactions, not documentation reads. Coverage is partial and a zero does not establish training-data reliance.
+
+| Model | Stripe S/D/L; API | Prodigi S/D/L; API | Framework S/D/L; API |
+| --- | --- | --- | --- |
+| Astra | 5/3/2; 7 | 2/0/0; 6 | 0/0/0; 1 |
+| Sol | 1/0/3; 3 | 7/0/1; 5 | 0/0/0; 0 |
+| Terra | 0/0/0; 0 | 7/0/0; 4 | 0/0/0; 0 |
+| Luna | 1/0/0; 0 | 5/0/0; 4 | 0/0/0; 0 |
+| Fable | 0/0/1; 9 | 0/0/0; 13 | 0/0/3; 2 |
+| Opus | 0/0/0; 8 | 0/0/0; 18 | 0/0/0; 1 |
+| Sonnet | 0/0/0; 5 | 0/0/0; 7 | 0/0/0; 0 |
+
+A returned result proves capture, not usefulness or comprehension. API counts describe observed interactions, not whether the final integration was correct. The Sonnet row represents the successful attempt selected by the viewer; its two provider-limited attempts remain separately preserved in the automated evidence below.
+
 ## Audit notes
 
 Astra's publication initially stopped because its generated `.env.example` used provider-shaped dummy Stripe placeholders. Only those synthetic placeholders were renamed, the mandatory scanner passed, and the original attempt was published without rerunning the model.

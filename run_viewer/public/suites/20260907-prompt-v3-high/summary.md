@@ -18,6 +18,22 @@ Every successful run now includes a representative image a customer encounters. 
 
 All storefront screenshots were captured from the deployed sites on 2026-09-08 with HTTP 200 responses. Isolation checks passed for distinct run IDs, Vercel projects/origins, profile paths, prompt hash, base commit, and reasoning effort. Overall isolation remains `unknown` because five Stripe identities were unavailable and the Prodigi sandbox is intentionally shared.
 
+## Third-party source and API callouts
+
+Counts come from normalized captured tool events. `S/D/L` means search queries / remote document requests / local reference reads. API calls are classified runtime or command-line interactions, not documentation reads. Coverage is partial and a zero does not establish training-data reliance.
+
+| Model | Stripe S/D/L; API | Prodigi S/D/L; API | Framework S/D/L; API |
+| --- | --- | --- | --- |
+| Astra | 2/0/1; 0 | 5/1/0; 2 | 0/0/1; 0 |
+| Sol | 1/0/2; 0 | 3/1/3; 4 | 1/0/0; 0 |
+| Terra | 2/0/0; 0 | 7/0/0; 3 | 0/0/0; 0 |
+| Luna | 0/0/1; 0 | 2/0/0; 1 | 0/0/0; 0 |
+| Fable | 0/0/1; 3 | 0/0/0; 6 | 0/0/0; 2 |
+| Opus | 0/0/0; 10 | 0/1/0; 21 | 0/0/0; 0 |
+| Sonnet | 0/0/0; 3 | 2/4/0; 10 | 0/0/0; 0 |
+
+A returned result proves capture, not usefulness or comprehension. API counts describe observed interactions, not whether the final integration was correct.
+
 ## Audit note
 
 The mandatory public-artifact scanner initially rejected Astra and Fable because generated test fixtures contained provider-shaped dummy secret strings. Only those synthetic fixture literals were renamed, the scanner was rerun, and the exact attempt artifacts were then published without rerunning either model. Astra's deployment URL was also normalized to remove trailing prose punctuation; the runner now performs that normalization automatically.
