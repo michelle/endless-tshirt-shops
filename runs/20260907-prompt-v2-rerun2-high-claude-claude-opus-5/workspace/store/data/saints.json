@@ -1,0 +1,90 @@
+[
+  {
+    "slug": "st-vera-of-the-unread-inbox",
+    "name": "St. Vera of the Unread Inbox",
+    "plateName": "St. Vera",
+    "epithet": "of the Unread Inbox",
+    "relic": "inbox",
+    "invocation": ["Invoked at 4:57 on a Friday,", "when the number will not go down."],
+    "blurb": "Vera kept the ledger of every message she meant to answer. She is depicted holding the envelope that multiplies, and is the patron of anyone who has declared inbox bankruptcy and quietly filed for it again.",
+    "feastDay": "Feast day: the 2nd of never",
+    "order": 1
+  },
+  {
+    "slug": "st-odile-of-the-last-two-percent",
+    "name": "St. Odile of the Last Two Percent",
+    "plateName": "St. Odile",
+    "epithet": "of the Last Two Percent",
+    "relic": "battery",
+    "invocation": ["Invoked in the departure lounge,", "the charger being in the other bag."],
+    "blurb": "Odile walked forty days across the airport and her phone did not die until the very last gate. Carry her when the boarding pass is the only thing between you and the desk.",
+    "feastDay": "Feast day: whenever you find a plug",
+    "order": 2
+  },
+  {
+    "slug": "st-bartholomew-of-the-buttered-side-down",
+    "name": "St. Bartholomew of the Buttered Side Down",
+    "plateName": "St. Bartholomew",
+    "epithet": "of the Buttered Side Down",
+    "relic": "toast",
+    "invocation": ["Invoked upon the kitchen floor,", "one second after breakfast."],
+    "blurb": "Bartholomew was martyred by gravity at approximately eight in the morning. He is shown with the falling toast, and is petitioned by all who have watched something small and important rotate exactly once.",
+    "feastDay": "Feast day: every morning, briefly",
+    "order": 3
+  },
+  {
+    "slug": "st-junia-of-the-unpaired-sock",
+    "name": "St. Junia of the Unpaired Sock",
+    "plateName": "St. Junia",
+    "epithet": "of the Unpaired Sock",
+    "relic": "sock",
+    "invocation": ["Invoked at the bottom of the basket,", "where the other one is not."],
+    "blurb": "Junia searched every drum of every machine and found only one of each. Hers is the quiet patience of a household where nothing is lost, exactly, and nothing can be found.",
+    "feastDay": "Feast day: laundry day",
+    "order": 4
+  },
+  {
+    "slug": "st-cassian-of-the-reply-all",
+    "name": "St. Cassian of the Reply-All",
+    "plateName": "St. Cassian",
+    "epithet": "of the Reply-All",
+    "relic": "replyall",
+    "invocation": ["Invoked four-tenths of a second", "after the message has gone."],
+    "blurb": "Cassian meant it for one person. Four hundred and eleven received it. He is the patron of the cold flush, the undo window, and the sentence you would give a year of your life to recall.",
+    "feastDay": "Feast day: observed in silence",
+    "order": 5
+  },
+  {
+    "slug": "st-marguerite-of-the-spinning-wheel",
+    "name": "St. Marguerite of the Spinning Wheel",
+    "plateName": "St. Marguerite",
+    "epithet": "of the Spinning Wheel",
+    "relic": "wheel",
+    "invocation": ["Invoked before the frozen window,", "the document having not been saved."],
+    "blurb": "Marguerite watched the wheel turn for three days and did not force-quit. She is the patron of the unsaved draft, the beachball, and all who still believe the application will come back.",
+    "feastDay": "Feast day: not responding",
+    "order": 6
+  },
+  {
+    "slug": "st-aldous-of-the-forgotten-password",
+    "name": "St. Aldous of the Forgotten Password",
+    "plateName": "St. Aldous",
+    "epithet": "of the Forgotten Password",
+    "relic": "padlock",
+    "invocation": ["Invoked at the eighth attempt,", "the account now being locked."],
+    "blurb": "Aldous knew the answer to his security question and it was no longer true. He guards the padlock of asterisks and intercedes for everyone who has reset a password to the one they were already using.",
+    "feastDay": "Feast day: try again in 30 minutes",
+    "order": 7
+  },
+  {
+    "slug": "st-fenwick-of-the-untraceable-smell",
+    "name": "St. Fenwick of the Untraceable Smell",
+    "plateName": "St. Fenwick",
+    "epithet": "of the Untraceable Smell",
+    "relic": "smell",
+    "invocation": ["Invoked on the third day of searching,", "the fridge having been emptied twice."],
+    "blurb": "Fenwick removed every shelf, sniffed every jar, and never found it. He is depicted with the open refrigerator, and is the patron of a house where something has happened somewhere.",
+    "feastDay": "Feast day: it's gone now, isn't it",
+    "order": 8
+  }
+]

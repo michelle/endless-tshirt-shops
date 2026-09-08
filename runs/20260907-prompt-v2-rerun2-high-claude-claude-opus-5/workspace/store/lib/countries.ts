@@ -1,0 +1,22 @@
+/** Destinations the Gildan 64000 variant ships to; the quote API is the final word. */
+export const COUNTRIES: { code: string; name: string }[] = [
+  { code: "US", name: "United States" }, { code: "GB", name: "United Kingdom" },
+  { code: "CA", name: "Canada" }, { code: "AU", name: "Australia" },
+  { code: "NZ", name: "New Zealand" }, { code: "IE", name: "Ireland" },
+  { code: "DE", name: "Germany" }, { code: "FR", name: "France" },
+  { code: "ES", name: "Spain" }, { code: "IT", name: "Italy" },
+  { code: "NL", name: "Netherlands" }, { code: "BE", name: "Belgium" },
+  { code: "AT", name: "Austria" }, { code: "CH", name: "Switzerland" },
+  { code: "DK", name: "Denmark" }, { code: "SE", name: "Sweden" },
+  { code: "NO", name: "Norway" }, { code: "FI", name: "Finland" },
+  { code: "PL", name: "Poland" }, { code: "PT", name: "Portugal" },
+  { code: "CZ", name: "Czechia" }, { code: "HU", name: "Hungary" },
+  { code: "RO", name: "Romania" }, { code: "GR", name: "Greece" },
+  { code: "JP", name: "Japan" }, { code: "SG", name: "Singapore" },
+  { code: "HK", name: "Hong Kong" }, { code: "KR", name: "South Korea" },
+  { code: "MX", name: "Mexico" }, { code: "BR", name: "Brazil" },
+  { code: "CL", name: "Chile" }, { code: "AR", name: "Argentina" },
+  { code: "ZA", name: "South Africa" }, { code: "AE", name: "United Arab Emirates" },
+  { code: "IL", name: "Israel" }, { code: "IN", name: "India" },
+  { code: "TR", name: "Türkiye" },
+];
