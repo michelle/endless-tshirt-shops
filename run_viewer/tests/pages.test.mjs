@@ -133,7 +133,7 @@ test("static Pages viewer supports suite links, history, scoring, and all archiv
     assert.equal(await page.locator(".design-card").count(), 0);
     assert.ok((await page.locator(".summary-section").innerText()).length > 100);
     await page.goto(`${base}?suite=unknown`, { waitUntil: "networkidle" });
-    assert.equal(await select.inputValue(), "20260907-prompt-v2-rerun2-high");
+    assert.equal(await select.inputValue(), "20260907-prompt-v3-high");
 
     await page.goto(`${base}?suite=20260905-beauty-high&run=opus`, { waitUntil: "networkidle" });
     const dialog = page.getByRole("dialog");

@@ -17,6 +17,7 @@ import { changeTheme, readTheme, subscribeTheme } from "./theme";
 const pickerSuites = suites
   .filter((candidate) => candidate.runs.length > 0)
   .sort((left, right) => Number(Boolean(left.incomplete)) - Number(Boolean(right.incomplete)));
+const defaultSuite = pickerSuites[0] ?? suites[0]!;
 
 function ignoreShortcut(event: KeyboardEvent) {
   const target = event.target;
@@ -149,7 +150,7 @@ export default function Viewer() {
   const navigation = useSyncExternalStore(subscribeToNavigation, navigationFromUrl, () => "");
   const [search, hash = ""] = navigation.split("#");
   const params = new URLSearchParams(search);
-  const suiteId = params.get("suite") ?? suites[0].id;
+  const suiteId = params.get("suite") ?? defaultSuite.id;
   const [background, setBackground] = useState("#30363d");
   const theme = useSyncExternalStore(subscribeTheme, readTheme, () => "light");
   const [promptNavigation, setPromptNavigation] = useState<string | null>(null);
@@ -162,7 +163,7 @@ export default function Viewer() {
   const promptContent = useRef<HTMLDivElement>(null);
 
   const suite = useMemo(
-    () => suites.find((candidate) => candidate.id === suiteId) ?? suites[0],
+    () => suites.find((candidate) => candidate.id === suiteId) ?? defaultSuite,
     [suiteId],
   );
   const selectedRun = suite.runs.find((run) => run.id === selectedRunId);

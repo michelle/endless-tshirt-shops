@@ -14,6 +14,80 @@ const unverified = (reason: string): Check => ({ result: "unverified", reason })
 // Audit judgments from each suite's summary.md plus inspection of archived art.
 // These are benchmark checks, not a live health check or launch certification.
 export const assessments: Record<string, Record<string, Assessment>> = {
+  "20260907-prompt-v3-rerun-high": {
+    astra: {
+      artwork: unverified("The deployed customizer and full-resolution print route passed tests, but no exact customer-order source was archived for visual review."),
+      checkout: fail("The isolated Stripe profile had no test key, so checkout intentionally blocked and no customer payment completed."),
+      prodigi: unverified("Product and shipping quotes were checked, but no paid application fulfillment reached a Prodigi order."),
+    },
+    sol: {
+      artwork: unverified("The live topographic customizer and signed 4680×5790 renderer exist, but no exact fulfilled customer design was archived."),
+      checkout: fail("Stripe credentials were unavailable; no genuine paid Checkout Session was completed."),
+      prodigi: unverified("Paid-webhook fulfillment is implemented, but no payment-linked application order demonstrated it."),
+    },
+    terra: {
+      artwork: unverified("The deployed cosmic customizer renders personalized art, but no exact customer-order print source was recovered for review."),
+      checkout: fail("Checkout fails closed because the isolated Stripe credentials were absent; no payment completed."),
+      prodigi: unverified("The catalog variant was validated, but the paid application path never submitted an attributable order."),
+    },
+    luna: {
+      artwork: unverified("The phrase/name/badge customizer deployed, but no exact paid customer print asset was available for independent review."),
+      checkout: fail("Payments were not connected in the isolated profile, so no end-to-end Stripe checkout occurred."),
+      prodigi: unverified("Webhook fulfillment code exists, but no paid customer order established successful application delivery."),
+    },
+    fable: {
+      artwork: pass("The reviewed 4677×5881 transparent Orrery print is coherent and legible; physical scale and DTG output still require sampling."),
+      checkout: pass("Two genuine Stripe test Checkout Sessions reached paid through the deployed app and linked to fulfillment."),
+      prodigi: pass("Both paid Sessions linked to Prodigi orders whose assets completed; the live route's later bytes differ from Prodigi's stored hash, so reproducibility needs investigation."),
+    },
+    opus: {
+      artwork: unverified("The provider limit stopped a partial build before any reviewed customer artwork or deployment was produced."),
+      checkout: unverified("The provider limit stopped the run before a deployable or testable checkout existed."),
+      prodigi: unverified("Partial integration source exists, but there is no deployed customer flow or attributable order."),
+    },
+    sonnet: {
+      artwork: unverified("The provider returned its session-limit message before producing a workspace or artwork."),
+      checkout: unverified("No checkout implementation or payment evidence was produced before the provider limit."),
+      prodigi: unverified("No Prodigi implementation or fulfillment evidence was produced before the provider limit."),
+    },
+  },
+  "20260907-prompt-v3-high": {
+    astra: {
+      artwork: unverified("Automated print-route checks passed, but no exact paid customer-order artwork was archived for independent visual review."),
+      checkout: fail("The isolated Stripe profile had no test key, so checkout safely blocked and no real payment completed."),
+      prodigi: unverified("Paid-only fulfillment and idempotency tests exist, but no paid application order reached Prodigi."),
+    },
+    sol: {
+      artwork: unverified("The deterministic high-resolution renderer is deployed, but no exact fulfilled customer source was archived for review."),
+      checkout: fail("Stripe credentials were unavailable, leaving all customer payment behavior unexecuted."),
+      prodigi: unverified("Signed asset and webhook code exists, but no paid app order verified delivery and garment mapping."),
+    },
+    terra: {
+      artwork: unverified("The personalized 2490×3510 design path is live, but no exact customer-order asset was recovered for independent review."),
+      checkout: fail("Checkout intentionally reports missing Stripe configuration and no genuine payment completed."),
+      prodigi: unverified("A product variant was validated, but the paid application fulfillment path was not exercised."),
+    },
+    luna: {
+      artwork: unverified("The signal-map preview is deployed, but no exact paid customer print source was archived for visual and scale review."),
+      checkout: fail("The missing isolated Stripe credentials prevent checkout; no genuine paid Session exists."),
+      prodigi: unverified("Idempotent webhook fulfillment is implemented, but no paid application order demonstrated it."),
+    },
+    fable: {
+      artwork: unverified("Bloomprint generated a print-ready direct sandbox asset, but no paid customer-order source was established for this audit."),
+      checkout: fail("The isolated Stripe profile was empty, so the deployed checkout stayed disabled and no payment occurred."),
+      prodigi: unverified("A direct sandbox asset check completed, but it bypassed a paid customer Checkout Session."),
+    },
+    opus: {
+      artwork: pass("The exact paid-order source is a detailed 4680×5790 transparent naturalist plate designed for the selected black garment."),
+      checkout: pass("Two genuine $48 Stripe test Checkout Sessions reached paid through the deployed application."),
+      prodigi: pass("Both paid Sessions linked to distinct orders; selected black/XL order ord_1171012 fetched an exact MD5-matched source and completed asset preparation."),
+    },
+    sonnet: {
+      artwork: pass("The exact paid front source is a coherent 3000×3750 transparent generative circuit; edge placement needs physical sample validation."),
+      checkout: pass("A genuine Stripe test Checkout Session reached paid through the deployed customizer."),
+      prodigi: pass("Paid order ord_1171015 fetched the exact MD5-matched front design plus its back mark; both assets completed."),
+    },
+  },
   "20260907-prompt-v2-rerun2-high": {
     astra: {
       artwork: unverified("The transparent outdoor illustration is coherent, but the 1024×1536 source needs a higher-resolution master and physical-scale validation."),
@@ -279,7 +353,7 @@ export function rateRun(suiteId: string, runId: string) {
   const assessment = assessments[suiteId]?.[runId];
   const checks = criteria.map((criterion) => ({
     ...criterion,
-    ...(["20260906-clean-sheet-high", "20260907-prompt-v2-high", "20260907-prompt-v2-rerun-high", "20260907-prompt-v2-rerun2-high"].includes(suiteId) && criterion.id === "artwork" ? {
+    ...(["20260906-clean-sheet-high", "20260907-prompt-v2-high", "20260907-prompt-v2-rerun-high", "20260907-prompt-v2-rerun2-high", "20260907-prompt-v3-high", "20260907-prompt-v3-rerun-high"].includes(suiteId) && criterion.id === "artwork" ? {
       label: "Printable theme design",
       definition: "A coherent theme design legible at shirt scale with suitable raster detail. This prompt allows graphics and intentional colored panels; opacity is disclosed, not automatically failed. Physical samples remain unverified.",
     } : {}),

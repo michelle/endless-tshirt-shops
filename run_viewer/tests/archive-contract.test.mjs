@@ -34,7 +34,10 @@ test("a missing final or image fails even when every existing file is valid", as
       const dir = `/suites/${suite.id}/runs/missing-run`;
       suite.runs[0].finalOutput = `${dir}/final.md`;
       suite.runs[0].design = `${dir}/design.png`;
-    } else suite.runs[0].design = suite.runs[0].design.replace(/[^/]+$/, "paid-design.png");
+    } else {
+      const run = suite.runs.find(candidate => candidate.design);
+      run.design = run.design.replace(/[^/]+$/, "paid-design.png");
+    }
     await assert.rejects(registeredAssets([suite], root), /Missing registered asset/);
   }
 });

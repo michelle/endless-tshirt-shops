@@ -4,6 +4,8 @@ import { assessments, rateRun } from "../app/ratings.ts";
 
 test("every reviewed run has three explicit checks, reasons, and the strict color", () => {
   const expected = {
+    "20260907-prompt-v3-rerun-high": [0, 0, 0, 0, 3, 0, 0],
+    "20260907-prompt-v3-high": [0, 0, 0, 0, 0, 3, 3],
     "20260906-minimal-inspector-high": [0, 0, 1, 2, 3, 3, 1],
     "20260906-clean-sheet-high": [3, 1, 1, 1, 3, 2, 1],
     "20260905-unserious-high": [2, 0, 0, 0, 3, 2, 2],
@@ -23,8 +25,9 @@ test("every reviewed run has three explicit checks, reasons, and the strict colo
   }
 });
 
-test("clean-sheet uses its own theme criterion without weakening timestamp-only suites", () => {
+test("theme prompts use their own artwork criterion without weakening timestamp-only suites", () => {
   assert.equal(rateRun("20260906-clean-sheet-high", "sonnet").checks[0].label, "Printable theme design");
+  assert.equal(rateRun("20260907-prompt-v3-high", "sonnet").checks[0].label, "Printable theme design");
   for (const suite of ["20260905-minimal-high", "20260905-beauty-high", "20260905-unserious-high"]) {
     assert.equal(rateRun(suite, "sonnet").checks[0].label, "Timestamp-only print");
     assert.equal(rateRun(suite, "sonnet").checks[0].result, "fail");
