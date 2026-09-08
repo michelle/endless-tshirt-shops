@@ -114,5 +114,27 @@
     "deviceScaleFactor": 1,
     "colorScheme": "light",
     "timezone": "America/Los_Angeles"
+  },
+  "sonnet": {
+    "screenshot": "/suites/20260908-prompt-v3-rerun2-high/runs/20260908-prompt-v3-rerun2-high-claude-claude-sonnet-5/storefront.png",
+    "favicon": {
+      "path": "/suites/20260908-prompt-v3-rerun2-high/runs/20260908-prompt-v3-rerun2-high-claude-claude-sonnet-5/favicon.ico",
+      "source": "https://benchmark-20260908-prompt-v3-rerun2-six.vercel.app/favicon.ico?favicon.3fpu2ql9ns1a0.ico",
+      "mime": "image/x-icon"
+    },
+    "faviconStatus": "found",
+    "socialPreview": null,
+    "socialPreviewStatus": "missing",
+    "url": "https://benchmark-20260908-prompt-v3-rerun2-six.vercel.app/",
+    "title": "Skyprint — Your night sky, on a shirt",
+    "width": 1440,
+    "height": 900,
+    "capturedAt": "2026-09-08T20:07:09.571Z",
+    "httpStatus": 200,
+    "errors": [],
+    "browser": "151.0.7922.34",
+    "deviceScaleFactor": 1,
+    "colorScheme": "light",
+    "timezone": "America/Los_Angeles"
   }
 }

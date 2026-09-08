@@ -1,6 +1,6 @@
 # Prompt v3 — second rerun
 
-All seven model slots ran serially at high reasoning with adapter memory disabled. Six produced deployed storefronts. Sonnet built for twelve minutes before the provider session limit ended the attempt, so its partial workspace is retained as a failure rather than silently omitted.
+All seven model slots ran serially at high reasoning with adapter memory disabled. The original Sonnet run and its first retry hit the provider session limit; after the account upgrade, a second retry succeeded. The viewer now uses that successful immutable retry while all nine attempt artifacts remain archived.
 
 ## Reviewed outcome
 
@@ -12,11 +12,11 @@ All seven model slots ran serially at high reasoning with adapter memory disable
 | gpt-5.6-luna | Signal Bloom | Deployed; payment blocked | Stripe unavailable; no attributable Prodigi order |
 | claude-fable-5-1 | Under These Stars | Paid E2E with reliability warning | Four paid Sessions linked to orders; one asset completed and three reported errors |
 | claude-opus-5 | The Isle of You | Paid E2E | Three paid Sessions linked to three completed Prodigi assets |
-| claude-sonnet-5 | Partial custom store | Provider limit | No deployment, payment, customer artwork, or attributable order |
+| claude-sonnet-5 | Skyprint | Paid E2E with reliability warning | Four succeeded PaymentIntents; three linked completed Prodigi assets, one earlier paid attempt remained unfulfilled |
 
-Every successful deployment includes a representative image a customer can encounter. Astra, Fable, and Opus use exact paid-order sources whose MD5 hashes match Prodigi. Sol uses its exact live default SVG. Terra and Luna use verbatim live shirt previews because their separate fulfillment assets were not reached by a paid flow. These preview examples demonstrate the visible customer experience but are not payment or print-delivery proof.
+Every deployment includes a representative image a customer can encounter. Astra, Fable, Opus, and Sonnet use exact paid-order sources whose MD5 hashes match Prodigi. Sol uses its exact live default SVG. Terra and Luna use verbatim live shirt previews because their separate fulfillment assets were not reached by a paid flow. These preview examples demonstrate the visible customer experience but are not payment or print-delivery proof.
 
-All six storefront screenshots returned HTTP 200 on 2026-09-08. Isolation checks passed for unique run IDs, Vercel projects, Stripe profile paths, prompt hash, base commit, reasoning effort, enabled paid-run webhook destinations, and cross-run source references. Overall isolation remains `unknown` because several Stripe identities were unavailable and Prodigi is intentionally shared.
+All seven selected storefronts returned HTTP 200 on 2026-09-08. Isolation checks passed for unique run IDs, Vercel projects, Stripe profile paths, prompt hash, base commit, reasoning effort, enabled paid-run webhook destinations, and cross-run source references. Overall isolation remains `unknown` because several Stripe identities were unavailable and Prodigi is intentionally shared.
 
 ## Audit notes
 
@@ -24,14 +24,16 @@ Astra's publication initially stopped because its generated `.env.example` used 
 
 Fable's publication stopped because its workspace contained a real local Stripe listener secret. That file was removed from public artifacts and retained only in the ignored private quarantine before the mandatory scanner passed. The model was not rerun. The first resume used tooling commit `1e9a34ac`; the second resume used `d3884b6e`, whose viewer-only layout change did not alter adapters or runner behavior. Every model still used the pinned base commit `1e9a34ac`, prompt hash `30868370…10f99`, high reasoning, and explicitly disabled memory.
 
+Sonnet's first retry was rejected immediately by the same session limit. Attempt 3 ran after the account upgrade and completed in 1,496 seconds as immutable artifact commit `d76c3996`. It used the same pinned prompt, base commit, high reasoning, and explicitly disabled memory. Four genuine Stripe test PaymentIntents succeeded. Three link to completed Prodigi orders; the selected navy-blue/XL order `ord_1171112` fetched the archived 1600×2000 opaque PNG with an exact MD5 match. One earlier succeeded PaymentIntent remained `pending` without a linked Prodigi order, while a declined PaymentIntent produced no order. The enabled webhook targets the selected deployment. These observations support the completed path but also expose a reliability gap.
+
 ## Production handoff
 
-Daymark and The Isle of You have the strongest observed commerce paths. Under These Stars also completed one full paid fulfillment, but its three earlier paid-order asset failures need root-cause work before launch. All paid stores still require live credentials, tax and shipping validation, durable fulfillment state, customer communications, monitoring, and physical samples. The payment-blocked stores require a genuine Stripe test checkout and exact fulfillment-artwork audit before their commerce flows can pass.
+Daymark and The Isle of You have the strongest observed commerce paths. Skyprint and Under These Stars each completed paid fulfillment but have reliability warnings that need root-cause work before launch. Skyprint also needs a higher-resolution print master; its exact paid source is 1600×2000 with 72 DPI metadata. All paid stores still require live credentials, tax and shipping validation, durable fulfillment state, customer communications, monitoring, and physical samples. The payment-blocked stores require a genuine Stripe test checkout and exact fulfillment-artwork audit before their commerce flows can pass.
 
 <!-- run-inspector:v1:start -->
 ## Automated inspection evidence
 
-Snapshot: 2026-09-08T17:22:12.960Z. Suite: `20260908-prompt-v3-rerun2-high`. Artifact ref: `33680d111edac5aa123fcd22ecfe27ee4f3d29bc`. Inspector: `1.0.0`.
+Snapshot: 2026-09-08T20:04:44.159Z. Suite: `20260908-prompt-v3-rerun2-high`. Artifact ref: `d76c3996995c1597085aed975a1bae55a15466b1`. Inspector: `1.0.0`.
 
 This is generated evidence, not a reviewed pass/fail rating. Searches do not prove reading or training-data reliance; paid Stripe objects do not prove the customer checkout flow. Live observations are later snapshots, not historical run-time evidence.
 
@@ -46,6 +48,8 @@ This is generated evidence, not a reviewed pass/fail rating. Searches do not pro
 | claude-fable-5-1 | succeeded | 2089 | @resvg/resvg-js@^2.6.2, next@16.3.4, react@19.2.8, react-dom@19.2.8, stripe@^22.6.1 | 28 / 1912 | 3 / 119 |
 | claude-opus-5 | succeeded | 2827 | @resvg/resvg-wasm@^2.6.2, next@^16.3.4, react@19.1.0, react-dom@19.1.0, stripe@^18.5.0 | 18 / 2261 | 4 / 60 |
 | claude-sonnet-5 | failed | 720 | next@15.5.25, react@^18.3.1, react-dom@^18.3.1, @resvg/resvg-js@^2.6.2, stripe@^16.12.0 | 4 / 248 | 0 / 0 |
+| claude-sonnet-5 | failed | 2 |  | 0 / 0 | 0 / 0 |
+| claude-sonnet-5 | succeeded | 1496 | @stripe/react-stripe-js@^6.9.0, @stripe/stripe-js@^9.15.0, next@16.3.4, react@19.2.8, react-dom@19.2.8, stripe@^22.6.1 | 22 / 1843 | 0 / 0 |
 
 ### Documentation-use evidence
 
@@ -74,6 +78,12 @@ Search counts are individual query requests. Reference requests/reads count tool
 | claude-sonnet-5 | stripe | observed_partial | 0 | 0 | 0 | 0 |
 | claude-sonnet-5 | prodigi | observed_partial | 1 | 4 | 0 | 4 |
 | claude-sonnet-5 | framework | observed_partial | 0 | 0 | 0 | 0 |
+| claude-sonnet-5 | stripe | unknown | unknown | unknown | unknown | unknown |
+| claude-sonnet-5 | prodigi | unknown | unknown | unknown | unknown | unknown |
+| claude-sonnet-5 | framework | unknown | unknown | unknown | unknown | unknown |
+| claude-sonnet-5 | stripe | observed_partial | 0 | 0 | 0 | 0 |
+| claude-sonnet-5 | prodigi | observed_partial | 0 | 0 | 0 | 0 |
+| claude-sonnet-5 | framework | observed_partial | 0 | 0 | 0 | 0 |
 
 ### Payment and fulfillment observations
 
@@ -86,6 +96,8 @@ Search counts are individual query requests. Reference requests/reads count tool
 | claude-fable-5-1 | Lists complete | 9 / 4 | 4 / 4 | ord_1171080: paid-stripe-object-linked; ord_1171078: paid-stripe-object-linked; ord_1171077: paid-stripe-object-linked; ord_1171073: paid-stripe-object-linked |
 | claude-opus-5 | Lists complete | 14 / 3 | 3 / 3 | ord_1171090: paid-stripe-object-linked; ord_1171086: paid-stripe-object-linked; ord_1171085: paid-stripe-object-linked |
 | claude-sonnet-5 | Lists complete | 0 / 0 | 0 / 0 | None observed; check coverage |
+| claude-sonnet-5 | No test key in saved profile | unknown | unknown | None observed; check coverage |
+| claude-sonnet-5 | Lists complete | 0 / 0 | 5 / 4 | ord_1171115: paid-stripe-object-linked; ord_1171112: paid-stripe-object-linked; ord_1171111: paid-stripe-object-linked |
 
 ### Isolation evidence
 
@@ -124,10 +136,17 @@ Overall: **unknown**. Observed suite only; not proof of absence of all ambient-s
 | profile/account agreement | unknown | 20260908-prompt-v3-rerun2-high-claude-claude-sonnet-5 | Live GET /v1/account versus saved profile identity |
 | webhook destination | unknown | 20260908-prompt-v3-rerun2-high-claude-claude-sonnet-5 | Enabled endpoints must target this deployment; no endpoints is unknown |
 | objects predate run | pass | 20260908-prompt-v3-rerun2-high-claude-claude-sonnet-5 | Objects older than run start (60s tolerance) suggest pre-existing account state |
+| profile/account agreement | unknown | 20260908-prompt-v3-rerun2-high-claude-claude-sonnet-5-attempt-2 | Live GET /v1/account versus saved profile identity |
+| webhook destination | unknown | 20260908-prompt-v3-rerun2-high-claude-claude-sonnet-5-attempt-2 | Enabled endpoints must target this deployment; no endpoints is unknown |
+| objects predate run | unknown | 20260908-prompt-v3-rerun2-high-claude-claude-sonnet-5-attempt-2 | Objects older than run start (60s tolerance) suggest pre-existing account state |
+| profile/account agreement | unknown | 20260908-prompt-v3-rerun2-high-claude-claude-sonnet-5-attempt-3 | Live GET /v1/account versus saved profile identity |
+| webhook destination | pass | 20260908-prompt-v3-rerun2-high-claude-claude-sonnet-5-attempt-3 | Enabled endpoints must target this deployment; no endpoints is unknown |
+| objects predate run | pass | 20260908-prompt-v3-rerun2-high-claude-claude-sonnet-5-attempt-3 | Objects older than run start (60s tolerance) suggest pre-existing account state |
 | cross-run Prodigi receipts | unknown |  | A single order must not be linked to Stripe objects from different runs |
 | cross-run Stripe objects | unknown |  | Repeated object IDs across run profiles |
 | cross-run source references | pass |  | Static source contains another inspected run ID or deployment; review hits before attribution |
 | Prodigi account separation | shared |  | Harness intentionally supplies one shared Prodigi sandbox credential; orders are not account-isolated |
+| source coverage | unknown |  | Some artifacts were excluded or runtime files unavailable |
 
 ### Artwork evidence
 
@@ -138,6 +157,7 @@ No artwork is reconstructed or executed automatically. Reviewed selections prese
 | 20260908-prompt-v3-rerun2-high-codex-gpt-6-astra | paid-order | 2490×3510 | 688671 | [433,407,2258,3175] | true |
 | 20260908-prompt-v3-rerun2-high-claude-claude-fable-5-1 | paid-order | 4665×5844 | 563043 | [602,204,4094,4621] | true |
 | 20260908-prompt-v3-rerun2-high-claude-claude-opus-5 | paid-order | 3120×3860 | 842418 | [0,0,3120,3860] | true |
+| 20260908-prompt-v3-rerun2-high-claude-claude-sonnet-5-attempt-3 | paid-order | 1600×2000 | 3200000 | [0,0,1600,2000] | true |
 
 ### Review required
 

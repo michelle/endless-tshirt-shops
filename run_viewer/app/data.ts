@@ -49,8 +49,7 @@ const models = {
 export const suites: Suite[] = [
   {
     id: "20260908-prompt-v3-rerun2-high",
-    label: "2026-09-08 · Prompt v3 · Second rerun [incomplete]",
-    incomplete: true,
+    label: "2026-09-08 · Prompt v3 · Second rerun",
     summary: "/suites/20260908-prompt-v3-rerun2-high/summary.md",
     prompt: { path: "/suites/20260908-prompt-v3-rerun2-high/prompt.md", file: "prompt-v3.md", revision: "1e9a34acb43bde2a03857309dc46185252f1718d", sha256: "30868370940510cfeb6f8c1da9e0f748ad6ac4f3e1e5e59e3e85adcecc910f99" },
     runs: [
@@ -103,11 +102,12 @@ export const suites: Suite[] = [
         evidence: "Three genuine paid Stripe test Sessions linked to three Prodigi orders whose assets completed. The selected forest-green/L order ord_1171090 is an exact MD5 match for this 3120×3860 personalized sea chart. Artwork reaches the canvas edges, so clipping, scale, and color require physical samples.",
       },
       {
-        id: "sonnet", model: models.sonnet, commit: "33680d11", status: "Provider limit · partial build",
-        deployment: null,
+        id: "sonnet", model: models.sonnet, commit: "d76c3996", status: "Paid E2E · 3 completed assets · reliability warning",
+        deployment: "https://benchmark-20260908-prompt-v3-rerun2-six.vercel.app",
         finalOutput: "/suites/20260908-prompt-v3-rerun2-high/runs/20260908-prompt-v3-rerun2-high-claude-claude-sonnet-5/final.md",
-        design: null, width: null, height: null, alpha: "No reviewed artwork",
-        evidence: "The provider session limit stopped the run after 12 minutes. A partial Next.js, Stripe, and Prodigi workspace was archived, but there is no deployment, completed customer payment, attributable order, or customer-facing artwork to review.",
+        design: "/suites/20260908-prompt-v3-rerun2-high/runs/20260908-prompt-v3-rerun2-high-claude-claude-sonnet-5/design.png",
+        width: 1600, height: 2000, alpha: "Opaque RGBA · exact paid-order source · 72 DPI metadata",
+        evidence: "Four genuine succeeded Stripe PaymentIntents were observed. Three link to Prodigi orders ord_1171111, ord_1171112, and ord_1171115; their assets completed. The selected navy-blue/XL order ord_1171112 exactly MD5-matches this 1600×2000 Skyprint source and its Prodigi thumbnail. One earlier succeeded PaymentIntent remained pending without a linked order, so webhook reliability needs investigation. A declined payment produced no order.",
       },
     ],
   },

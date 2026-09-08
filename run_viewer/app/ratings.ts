@@ -46,9 +46,9 @@ export const assessments: Record<string, Record<string, Assessment>> = {
       prodigi: pass("All three paid Sessions linked to completed Prodigi assets; selected forest-green/L order ord_1171090 exactly matches the archived source."),
     },
     sonnet: {
-      artwork: unverified("The provider session limit stopped the partial build before any deployed customer artwork could be reviewed."),
-      checkout: unverified("No deployable customer checkout or genuine payment completed before the provider limit."),
-      prodigi: unverified("Partial integration source exists, but no deployed fulfillment path or attributable order was produced."),
+      artwork: unverified("The exact paid-order source is a coherent 1600×2000 opaque star chart, but 72 DPI metadata and below-target print resolution need a physical sample and higher-resolution master."),
+      checkout: pass("Four genuine Stripe test PaymentIntents succeeded through the deployed application; a declined PaymentIntent produced no Prodigi order."),
+      prodigi: pass("Three paid PaymentIntents linked to completed Prodigi assets; selected navy-blue/XL order ord_1171112 exactly matches the archived source. One earlier succeeded payment remained unfulfilled, so reliability needs investigation."),
     },
   },
   "20260907-prompt-v3-rerun-high": {
