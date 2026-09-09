@@ -32,24 +32,20 @@ Fresh captures are 1440×900 with no browser errors. Fable and Opus published bo
 
 ## Third-party source and API callouts
 
-Counts are aggregated across the seven selected model slots in each completed suite. Search queries, remote document requests, and bundled/local reference reads come from normalized captured tool events. Coverage is partial: a zero means no event was captured, not that a model relied on training data. Runtime API execution is evaluated separately in the payment and fulfillment findings.
+Counts are aggregated by model across the three completed suites: prompt-v2 second rerun, prompt-v3 original, and prompt-v3 second rerun. Each grouped cell is **search queries / remote document requests / bundled or local reference reads**. Coverage is partial: a zero means no event was captured, not that a model relied on training data. Runtime API execution is evaluated separately in the payment and fulfillment findings.
 
-| Suite | Topic | Search queries | Document requests | Reference reads | Research touches |
-| --- | --- | ---: | ---: | ---: | ---: |
-| Prompt v2 · second rerun | Stripe | 0 | 0 | 2 | 2 |
-| Prompt v2 · second rerun | Prodigi | 22 | 6 | 2 | 30 |
-| Prompt v2 · second rerun | Frameworks | 0 | 1 | 6 | 7 |
-| Prompt v3 · original | Stripe | 5 | 0 | 5 | 10 |
-| Prompt v3 · original | Prodigi | 19 | 7 | 3 | 29 |
-| Prompt v3 · original | Frameworks | 1 | 0 | 1 | 2 |
-| Prompt v3 · second rerun | Stripe | 7 | 3 | 6 | 16 |
-| Prompt v3 · second rerun | Prodigi | 21 | 0 | 1 | 22 |
-| Prompt v3 · second rerun | Frameworks | 0 | 0 | 3 | 3 |
-| **All three** | **Stripe** | **12** | **3** | **13** | **28** |
-| **All three** | **Prodigi** | **62** | **13** | **6** | **81** |
-| **All three** | **Frameworks** | **1** | **1** | **10** | **12** |
+| Model | Stripe (search / docs / refs) | Prodigi (search / docs / refs) | Frameworks (search / docs / refs) | All topics (search / docs / refs) | Research touches |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Astra | 7 / 3 / 3 | 12 / 2 / 1 | 0 / 0 / 3 | 19 / 5 / 7 | 31 |
+| Sol | 2 / 0 / 5 | 15 / 1 / 4 | 1 / 0 / 0 | 18 / 1 / 9 | 28 |
+| Terra | 2 / 0 / 0 | 21 / 0 / 0 | 0 / 0 / 0 | 23 / 0 / 0 | 23 |
+| Luna | 1 / 0 / 1 | 11 / 0 / 0 | 0 / 0 / 0 | 12 / 0 / 1 | 13 |
+| Fable | 0 / 0 / 4 | 0 / 0 / 1 | 0 / 0 / 7 | 0 / 0 / 12 | 12 |
+| Opus | 0 / 0 / 0 | 1 / 4 / 0 | 0 / 0 / 0 | 1 / 4 / 0 | 5 |
+| Sonnet | 0 / 0 / 0 | 2 / 6 / 0 | 0 / 1 / 0 | 2 / 7 / 0 | 9 |
+| **All models** | **12 / 3 / 13** | **62 / 13 / 6** | **1 / 1 / 10** | **75 / 17 / 29** | **121** |
 
-The prompt-v3 second-rerun totals use the successful Sonnet attempt selected by the viewer; its two provider-limit attempts are excluded from this seven-model comparison. A returned result proves capture, not usefulness, comprehension, or integration correctness.
+The prompt-v3 second-rerun contribution uses the successful Sonnet attempt selected by the viewer; its two provider-limit attempts are excluded. A returned result proves capture, not usefulness, comprehension, or integration correctness.
 
 ## Payment and fulfillment
 
