@@ -14,6 +14,43 @@ const unverified = (reason: string): Check => ({ result: "unverified", reason })
 // Audit judgments from each suite's summary.md plus inspection of archived art.
 // These are benchmark checks, not a live health check or launch certification.
 export const assessments: Record<string, Record<string, Assessment>> = {
+  "20260910-prompt-v3-high": {
+    astra: {
+      artwork: unverified("The actual live Joshua Tree print-detail artwork is coherent, but the archived 1116×1402 capture is not the separate tested high-resolution print source."),
+      checkout: fail("The isolated profile had no Stripe test key, so no genuine customer payment completed."),
+      prodigi: unverified("Fulfillment code and tests exist, but no paid application order demonstrated artwork delivery or garment mapping."),
+    },
+    sol: {
+      artwork: unverified("The reviewed MAKE ROOM FOR WONDER image is coherent, but it is a complete shirt mockup rather than an isolated print source."),
+      checkout: fail("The isolated profile had no Stripe test key and no genuine paid checkout was observed."),
+      prodigi: unverified("No attributable paid application order established which artwork or garment mapping reached Prodigi."),
+    },
+    terra: {
+      artwork: pass("The exact 2490×3510 live default print route is a coherent, legible Futurefolk field-guide design suitable for print-scale testing."),
+      checkout: fail("Both observed Stripe Checkout Sessions remained unpaid; the separate direct order bypassed payment."),
+      prodigi: unverified("Direct order ord_1171331 completed with an exact MD5-matched black/M asset, but a standalone sandbox request does not prove the paid application flow."),
+    },
+    luna: {
+      artwork: unverified("The live default Orbital Post artwork is coherent, but the archive is a 990×1266 preview capture rather than the separate 4200×5370 print renderer."),
+      checkout: fail("The isolated profile had no Stripe test key, so no genuine customer payment completed."),
+      prodigi: unverified("No paid application order demonstrated successful artwork delivery or garment mapping."),
+    },
+    fable: {
+      artwork: pass("The exact paid-order source is a coherent 4665×5844 transparent Heartwood ring design; physical scale and color still require sampling."),
+      checkout: pass("Two genuine paid Stripe test Checkout Sessions triggered the deployed application's fulfillment path."),
+      prodigi: pass("Selected order ord_1171350 completed with the intended black/M asset and exact source hash; an earlier paid-linked localhost asset failure still requires reliability work."),
+    },
+    opus: {
+      artwork: pass("The exact paid-order source is a detailed 4665×5844 transparent Flora Personalis botanical plate; physical sampling remains."),
+      checkout: pass("Two genuine paid Stripe test Checkout Sessions completed through the deployed application."),
+      prodigi: pass("Both paid Sessions linked to orders with completed assets; selected maroon/L order ord_1171365 exactly matches the archived source."),
+    },
+    sonnet: {
+      artwork: unverified("The exact 2100×2625 transparent paid-order source is technically coherent, but it visibly contains E2E Test / AUTOMATED RUN and is not launch-ready customer artwork."),
+      checkout: pass("A genuine Stripe test PaymentIntent succeeded through the deployed application and linked to fulfillment."),
+      prodigi: pass("Paid-linked black/M order ord_1171370 completed its asset, and the recovered source manually matched Prodigi's recorded MD5."),
+    },
+  },
   "20260908-prompt-v3-rerun2-high": {
     astra: {
       artwork: pass("The exact paid-order source is a coherent 2490×3510 transparent contour design with 300 DPI metadata; physical sampling remains."),
@@ -390,7 +427,7 @@ export function rateRun(suiteId: string, runId: string) {
   const assessment = assessments[suiteId]?.[runId];
   const checks = criteria.map((criterion) => ({
     ...criterion,
-    ...(["20260906-clean-sheet-high", "20260907-prompt-v2-high", "20260907-prompt-v2-rerun-high", "20260907-prompt-v2-rerun2-high", "20260907-prompt-v3-high", "20260907-prompt-v3-rerun-high", "20260908-prompt-v3-rerun2-high"].includes(suiteId) && criterion.id === "artwork" ? {
+    ...(["20260906-clean-sheet-high", "20260907-prompt-v2-high", "20260907-prompt-v2-rerun-high", "20260907-prompt-v2-rerun2-high", "20260907-prompt-v3-high", "20260907-prompt-v3-rerun-high", "20260908-prompt-v3-rerun2-high", "20260910-prompt-v3-high"].includes(suiteId) && criterion.id === "artwork" ? {
       label: "Printable theme design",
       definition: "A coherent theme design legible at shirt scale with suitable raster detail. This prompt allows graphics and intentional colored panels; opacity is disclosed, not automatically failed. Physical samples remain unverified.",
     } : {}),

@@ -3,6 +3,32 @@
   "note": "Append new published destinations. Do not remove old IDs to make a regression pass; preserve compatibility or add aliases.",
   "suites": [
     {
+      "id": "20260910-prompt-v3-high",
+      "runs": [
+        { "id": "astra", "model": "Codex · gpt-6-astra" },
+        { "id": "sol", "model": "Codex · gpt-5.6-sol" },
+        { "id": "terra", "model": "Codex · gpt-5.6-terra" },
+        { "id": "luna", "model": "Codex · gpt-5.6-luna" },
+        { "id": "fable", "model": "Claude · claude-fable-5-1" },
+        { "id": "opus", "model": "Claude · claude-opus-5" },
+        { "id": "sonnet", "model": "Claude · claude-sonnet-5" }
+      ],
+      "headings": [
+        "summary-prompt-v3-seven-model-high-reasoning-run",
+        "summary-reviewed-outcome",
+        "summary-artwork-and-fulfillment-audit",
+        "summary-audit-limits-and-publication-notes",
+        "summary-production-handoff",
+        "summary-automated-inspection-evidence",
+        "summary-run-and-framework-evidence",
+        "summary-documentation-use-evidence",
+        "summary-payment-and-fulfillment-observations",
+        "summary-isolation-evidence",
+        "summary-artwork-evidence",
+        "summary-review-required"
+      ]
+    },
+    {
       "id": "20260907-prompt-v2-rerun2-high",
       "runs": [
         { "id": "astra", "model": "Codex · gpt-6-astra" },
