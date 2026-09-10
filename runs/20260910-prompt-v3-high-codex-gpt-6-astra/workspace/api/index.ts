@@ -1,0 +1,25 @@
+import express from 'express';
+import sharp from 'sharp';
+import { z } from 'zod';
+import {DesignSchema,artwork,PRICE,SHIPPING} from '../lib/design.js';
+import {readiness,stripe,fulfill,origin,artUrl,designHash,validSignature,quote,isLive,prodigi} from '../lib/commerce.js';
+const app=express();
+app.disable('x-powered-by');
+app.post('/api/webhook',express.raw({type:'application/json',limit:'256kb'}),async(req,res)=>{
+ if(!process.env.STRIPE_WEBHOOK_SECRET){res.status(503).json({error:'Webhook is not configured'});return;}
+ let event;try{event=stripe().webhooks.constructEvent(req.body,req.headers['stripe-signature'] as string,process.env.STRIPE_WEBHOOK_SECRET);}catch{res.status(400).json({error:'Invalid webhook signature'});return;}
+ try{if(['checkout.session.completed','checkout.session.async_payment_succeeded'].includes(event.type)){const s=event.data.object as any;if(s.metadata?.store==='personal-best-v1'&&s.payment_status==='paid')await fulfill(s.id);}res.json({received:true});}catch(e){console.error('Fulfillment failed',e instanceof Error?e.message:'unknown');res.status(500).json({error:'Fulfillment pending; retry required'});}
+});
+app.use(express.json({limit:'8kb'}));
+app.get('/api/config',(_req,res)=>{res.set('Cache-Control','no-store').json({checkoutReady:readiness(),mode:isLive()?'live':'sandbox',price:PRICE,shipping:SHIPPING});});
+app.get('/api/art',async(req,res)=>{try{const p=String(req.query.p||''),sig=String(req.query.sig||'');if(p.length>1500||!validSignature(p,sig)){res.status(403).json({error:'Invalid artwork signature'});return;}const d=DesignSchema.parse(JSON.parse(Buffer.from(p,'base64url').toString()));const png=await sharp(Buffer.from(artwork(d)),{density:300}).resize(4677,5881,{fit:'fill'}).png().withMetadata({density:300}).toBuffer();res.set({'Content-Type':'image/png','Cache-Control':'public, max-age=31536000, immutable'}).send(png);}catch{res.status(400).json({error:'Artwork unavailable'});}});
+app.post('/api/checkout',async(req,res)=>{try{
+ if(!readiness()){res.status(503).json({error:'Checkout is awaiting Stripe setup. Your design is saved on this device; no payment has been taken.'});return;}
+ if(req.headers.origin!==origin()){res.status(403).json({error:'Invalid request origin'});return;}
+ const {design,requestId}=z.object({design:DesignSchema,requestId:z.string().uuid()}).strict().parse(req.body);
+ await quote(design);
+ const s=await stripe().checkout.sessions.create({mode:'payment',payment_method_types:['card'],shipping_address_collection:{allowed_countries:['US']},phone_number_collection:{enabled:true},billing_address_collection:'required',line_items:[{quantity:1,price_data:{currency:'usd',unit_amount:PRICE,product_data:{name:`Personal Best — ${design.place}`,description:`White / ${design.size.toUpperCase()} · ${design.club} · ${design.motto} · Est. ${design.year} · ${design.palette} · Pattern ${design.seed}`,images:[artUrl(design)]}}}],shipping_options:[{shipping_rate_data:{type:'fixed_amount',fixed_amount:{amount:SHIPPING,currency:'usd'},display_name:'Standard US shipping'}}],automatic_tax:{enabled:process.env.STRIPE_AUTOMATIC_TAX==='true'},metadata:{store:'personal-best-v1',design:JSON.stringify(design),design_hash:designHash(design)},success_url:`${origin()}/order?session_id={CHECKOUT_SESSION_ID}`,cancel_url:`${origin()}/?canceled=1#studio`,custom_text:{submit:{message:isLive()?'Your personalized shirt is printed after successful payment.':'TEST STORE: use a Stripe test card. No shirt will be shipped.'}}},{idempotencyKey:`pb-${requestId}-${designHash(design)}`});res.json({url:s.url});
+ }catch(e){if(e instanceof z.ZodError){res.status(400).json({error:e.issues[0]?.message||'Invalid design'});return;}console.error('Checkout failed',e instanceof Error?e.message:'unknown');res.status(502).json({error:'Checkout could not be started. No payment was taken. Please try again.'});}});
+app.get('/api/order',async(req,res)=>{res.set('Cache-Control','no-store');const id=String(req.query.session_id||'');if(!/^cs_(test_|live_)?[A-Za-z0-9]{15,200}$/.test(id)){res.status(400).json({error:'Invalid order link'});return;}try{const s:any=await stripe().checkout.sessions.retrieve(id);if(s.metadata?.store!=='personal-best-v1'){res.status(404).json({error:'Order not found'});return;}if(s.payment_status!=='paid'){res.json({payment:s.payment_status,status:'awaiting_payment'});return;}let f;try{f=await fulfill(id);}catch{res.json({payment:'paid',status:'pending',message:'Your payment succeeded. Print submission is being retried. Keep this order link.'});return;}const p=await prodigi(`orders/${f.id}`);const order=p.order;res.json({payment:'paid',status:order?.status?.issues?.length?'needs_attention':f.status,orderId:f.id,stage:order?.status?.stage,design:JSON.parse(s.metadata.design),tracking:(order?.shipments||[]).map((x:any)=>({carrier:x.carrier?.name,number:x.tracking?.number,url:x.tracking?.url})),sandbox:!s.livemode});}catch{res.status(502).json({error:'Unable to retrieve your order. Please retry shortly.'});}});
+app.use('/api',(_req,res)=>{res.status(404).json({error:'Not found'});});
+export default app;
