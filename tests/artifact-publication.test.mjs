@@ -23,3 +23,35 @@ test('archive gate warns on whitespace, preserves bytes, and still blocks secret
   const outside = spawnSync('bash', [gate, 'fixture'], { cwd: os.tmpdir(), encoding: 'utf8' });
   assert.notEqual(outside.status, 0); assert.match(outside.stderr, /scan failed/);
 });
+
+test('workspace source may carry placeholder keys, but never credential-length or provisioned ones', async t => {
+  const dir = await mkdtemp(path.join(os.tmpdir(), 'artifact-gate-ws-')); t.after(() => rm(dir, { recursive: true, force: true }));
+  const git = (...args) => execFileSync('git', ['-C', dir, ...args], { encoding: 'utf8' });
+  git('init', '-q');
+  await mkdir(path.join(dir, 'runs/fixture/workspace/tests'), { recursive: true });
+  await mkdir(path.join(dir, '.benchmark-secrets/stripe'), { recursive: true });
+  const src = path.join(dir, 'runs/fixture/workspace/tests/commerce.test.ts');
+  const check = () => spawnSync('bash', [gate, 'fixture'], { cwd: dir, encoding: 'utf8' });
+  const stage = async body => { await writeFile(src, body); git('add', '.'); };
+
+  // Obvious placeholders in generated source must not fail a paid run closed.
+  for (const placeholder of ['sk_test_not_real', 'whsec_test_only', 'pk_test_dummy']) {
+    await stage(`process.env.K = '${placeholder}';\n`);
+    const allowed = check();
+    assert.equal(allowed.status, 0, `placeholder rejected in workspace: ${placeholder}\n${allowed.stderr}`);
+  }
+  // Credential-length values are still refused wherever they appear.
+  for (const real of [`sk_test_51${'A'.repeat(97)}`, `rkcs_test_51${'B'.repeat(95)}`, `whsec_${'C'.repeat(32)}`]) {
+    await stage(`process.env.K = '${real}';\n`);
+    const denied = check();
+    assert.notEqual(denied.status, 0, `credential-length key admitted: ${real.slice(0, 12)}`);
+    assert.ok(!denied.stderr.includes(real));
+  }
+  // A key this run actually provisioned is refused by value, whatever its shape.
+  await writeFile(path.join(dir, '.benchmark-secrets/stripe/fixture.toml'),
+    "[default]\ntest_mode_api_key = 'rkcs_test_shortbutreal'\n");
+  await stage("process.env.K = 'rkcs_test_shortbutreal';\n");
+  const provisioned = check();
+  assert.notEqual(provisioned.status, 0, 'provisioned key was not matched by value');
+  assert.ok(!provisioned.stderr.includes('rkcs_test_shortbutreal'));
+});
