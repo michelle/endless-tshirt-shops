@@ -1,0 +1,96 @@
+@import "tailwindcss";
+
+@font-face {
+  font-family: "Cormorant Garamond";
+  src: url("/fonts/CormorantGaramond-Medium.ttf") format("truetype");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Cormorant Garamond";
+  src: url("/fonts/CormorantGaramond-MediumItalic.ttf") format("truetype");
+  font-weight: 500;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Space Mono";
+  src: url("/fonts/SpaceMono-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@theme inline {
+  --color-night: #0b0c12;
+  --color-ink: #14151c;
+  --color-panel: #15171f;
+  --color-line: #262933;
+  --color-mist: #9aa0ad;
+  --color-fog: #d7dae2;
+  --color-star: #f5f1e6;
+  --color-gold: #e6c887;
+  --font-display: "Cormorant Garamond", Georgia, serif;
+  --font-mono: "Space Mono", ui-monospace, monospace;
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+}
+
+html {
+  background: var(--color-night);
+  color: var(--color-fog);
+  color-scheme: dark;
+}
+
+body {
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+.font-display {
+  font-family: var(--font-display);
+}
+.font-mono {
+  font-family: var(--font-mono);
+}
+
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--color-mist);
+}
+
+.field {
+  @apply w-full rounded-md border border-line bg-ink px-3 py-2 text-sm text-fog outline-none transition;
+}
+.field:focus {
+  border-color: var(--color-gold);
+}
+.field::placeholder {
+  color: #5c6170;
+}
+
+.btn-primary {
+  @apply inline-flex items-center justify-center gap-2 rounded-md bg-star px-5 py-3 text-sm font-medium text-night transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-50;
+}
+.btn-ghost {
+  @apply inline-flex items-center justify-center gap-2 rounded-md border border-line px-5 py-3 text-sm text-fog transition hover:border-mist;
+}
+
+.starfield {
+  background-image:
+    radial-gradient(1px 1px at 20% 30%, rgba(255,255,255,0.5) 50%, transparent 51%),
+    radial-gradient(1px 1px at 70% 20%, rgba(255,255,255,0.4) 50%, transparent 51%),
+    radial-gradient(1.5px 1.5px at 40% 70%, rgba(255,255,255,0.45) 50%, transparent 51%),
+    radial-gradient(1px 1px at 85% 60%, rgba(255,255,255,0.35) 50%, transparent 51%),
+    radial-gradient(1px 1px at 10% 80%, rgba(255,255,255,0.3) 50%, transparent 51%),
+    radial-gradient(1.5px 1.5px at 60% 90%, rgba(255,255,255,0.35) 50%, transparent 51%);
+}
+
+.sky-svg svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
