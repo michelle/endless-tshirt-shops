@@ -25,8 +25,22 @@ export function commitsToCheck(repo, updates) {
 }
 
 export function snapshotViewer(repo, commit, destination) {
-  const archive = execFileSync("git", ["-C", repo, "archive", "--format=tar", commit, "run_viewer"], { maxBuffer: 100 * 1024 * 1024 });
-  execFileSync("tar", ["-xf", "-", "-C", destination], { input: archive });
+  // Stream git archive straight into tar. Buffering the whole tree in memory
+  // put a hard ceiling on the archive: at 102 MB the viewer outgrew a 100 MB
+  // maxBuffer and pushes failed with ENOBUFS, which reads like a hook fault
+  // rather than a size limit. A pipe has no such ceiling to outgrow.
+  // pipefail is required, not stylistic: without it the pipeline reports tar's
+  // status, so a failing git archive would extract nothing and still exit 0,
+  // letting the gate validate an empty snapshot.
+  const result = spawnSync(
+    "/bin/bash",
+    ["-c", 'set -o pipefail; git -C "$1" archive --format=tar "$2" run_viewer | tar -xf - -C "$3"', "bash", repo, commit, destination],
+    { stdio: ["ignore", "ignore", "pipe"], encoding: "utf8" },
+  );
+  if (result.error) throw result.error;
+  if (result.status !== 0) {
+    throw new Error(`Viewer snapshot failed (exit ${result.status}): ${(result.stderr || "").trim() || "no stderr"}`);
+  }
 }
 
 export function validatePush(repo, updates) {

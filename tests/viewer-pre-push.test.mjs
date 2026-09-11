@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
-import { mkdtempSync, mkdirSync, writeFileSync, existsSync, rmSync } from "node:fs";
+import { mkdtempSync, mkdirSync, writeFileSync, existsSync, rmSync, statSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import test from "node:test";
@@ -34,4 +34,27 @@ test("pre-push tests pushed commits, ignores artifact/deletion refs, and cannot 
     assert.ok(!existsSync(path.join(snapshot, "run_viewer/missing.md")), "Local untracked summary must not hide a broken pushed snapshot");
     assert.ok(existsSync(path.join(repo, "run_viewer/missing.md")), "User changes must be preserved");
   } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+test("snapshotViewer streams rather than buffering, and reports failures clearly", () => {
+  const repo = mkdtempSync(path.join(tmpdir(), "viewer-pre-push-stream-"));
+  const git = (...args) => execFileSync("git", ["-C", repo, ...args], { encoding: "utf8" }).trim();
+  git("init", "-q");
+  git("config", "user.email", "t@example.com");
+  git("config", "user.name", "t");
+  mkdirSync(path.join(repo, "run_viewer/public"), { recursive: true });
+  // Comfortably past the 100 MB maxBuffer that previously made pushes fail
+  // with ENOBUFS once the archived viewer crossed it.
+  writeFileSync(path.join(repo, "run_viewer/public/big.bin"), Buffer.alloc(120 * 1024 * 1024, 7));
+  writeFileSync(path.join(repo, "run_viewer/package.json"), '{"scripts":{"predeploy":"true"}}');
+  git("add", "-A");
+  git("commit", "-qm", "big");
+  const head = git("rev-parse", "HEAD");
+  const destination = mkdtempSync(path.join(tmpdir(), "viewer-pre-push-out-"));
+  snapshotViewer(repo, head, destination);
+  assert.equal(statSync(path.join(destination, "run_viewer/public/big.bin")).size, 120 * 1024 * 1024);
+
+  assert.throws(() => snapshotViewer(repo, "definitely-not-a-commit", destination), /Viewer snapshot failed/);
+  rmSync(repo, { recursive: true, force: true });
+  rmSync(destination, { recursive: true, force: true });
 });
