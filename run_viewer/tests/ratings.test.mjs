@@ -37,6 +37,16 @@ test("theme prompts use their own artwork criterion without weakening timestamp-
   }
 });
 
+test("20260911-prompt-v3-high is staged but unaudited, so nothing passes yet", () => {
+  for (const model of ["astra", "sol", "terra", "luna", "fable", "opus", "sonnet"]) {
+    const rating = rateRun("20260911-prompt-v3-high", model);
+    assert.equal(rating.passed, 0, `20260911/${model} scored before audit`);
+    assert.ok(rating.checks.every((check) => check.result === "unverified"));
+  }
+  // Theme prompt, so the artwork criterion must not be the timestamp-only one.
+  assert.equal(rateRun("20260911-prompt-v3-high", "fable").checks[0].label, "Printable theme design");
+});
+
 test("future unreviewed runs never silently pass", () => {
   const rating = rateRun("future-suite", "new-model");
   assert.equal(rating.passed, 0);

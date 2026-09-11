@@ -427,7 +427,7 @@ export function rateRun(suiteId: string, runId: string) {
   const assessment = assessments[suiteId]?.[runId];
   const checks = criteria.map((criterion) => ({
     ...criterion,
-    ...(["20260906-clean-sheet-high", "20260907-prompt-v2-high", "20260907-prompt-v2-rerun-high", "20260907-prompt-v2-rerun2-high", "20260907-prompt-v3-high", "20260907-prompt-v3-rerun-high", "20260908-prompt-v3-rerun2-high", "20260910-prompt-v3-high"].includes(suiteId) && criterion.id === "artwork" ? {
+    ...(["20260906-clean-sheet-high", "20260907-prompt-v2-high", "20260907-prompt-v2-rerun-high", "20260907-prompt-v2-rerun2-high", "20260907-prompt-v3-high", "20260907-prompt-v3-rerun-high", "20260908-prompt-v3-rerun2-high", "20260910-prompt-v3-high", "20260911-prompt-v3-high"].includes(suiteId) && criterion.id === "artwork" ? {
       label: "Printable theme design",
       definition: "A coherent theme design legible at shirt scale with suitable raster detail. This prompt allows graphics and intentional colored panels; opacity is disclosed, not automatically failed. Physical samples remain unverified.",
     } : {}),

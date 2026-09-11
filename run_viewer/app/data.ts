@@ -48,6 +48,66 @@ const models = {
 
 export const suites: Suite[] = [
   {
+    id: "20260911-prompt-v3-high",
+    label: "2026-09-11 · Prompt v3 · Seven-model run · Provider-neutral environment",
+    summary: "/suites/20260911-prompt-v3-high/summary.md",
+    prompt: { path: "/suites/20260911-prompt-v3-high/prompt.md", file: "prompt-v3.md", revision: "c92cff1113f3c26befbd951f3eb75bc96392395e", sha256: "30868370940510cfeb6f8c1da9e0f748ad6ac4f3e1e5e59e3e85adcecc910f99" },
+    runs: [
+      {
+        id: "astra", model: models.astra, commit: "2d10b78f", status: "Paid E2E · 2 completed orders",
+        deployment: "https://benchmark-20260911-prompt-v3-high-c.vercel.app",
+        finalOutput: "/suites/20260911-prompt-v3-high/runs/20260911-prompt-v3-high-codex-gpt-6-astra/final.md",
+        design: "/suites/20260911-prompt-v3-high/runs/20260911-prompt-v3-high-codex-gpt-6-astra/design.png",
+        width: 4680, height: 5882, alpha: "RGBA transparency (85% fully transparent) · exact paid-order source",
+        evidence: "Two paid Stripe test Sessions and two succeeded PaymentIntents linked to Prodigi orders ord_1171653 and ord_1171654, both Complete with assets downloaded and no issues. This 4680×5882 AFTER HOURS source MD5-matches the asset Prodigi fetched for ord_1171654 (black/M Bella + Canvas 3001) and is correctly transparent. Its printed content reads THE TEST TOUR because the agent drove its own test purchase, so the design system is evidenced but the wording is not a customer's. Found the CLI by probing for the binary, not from the environment: its first command listed variable names only, then ran command -v stripe. Its profile was written outside the wrapper because Codex drives zsh login shells, which ignore BASH_ENV; the runner captured it.",
+      },
+      {
+        id: "sol", model: models.sol, commit: "6f0b70e1", status: "Deployed · payment blocked",
+        deployment: "https://benchmark-20260911-prompt-v3-high-c-gray.vercel.app",
+        finalOutput: "/suites/20260911-prompt-v3-high/runs/20260911-prompt-v3-high-codex-gpt-5.6-sol/final.md",
+        design: null, width: null, height: null, alpha: "No archived artwork",
+        evidence: "No test key in the saved profile, so no paid checkout and no attributable Prodigi order. Reached stripe config --list, which prints no agent guidance, and stopped there. Without a paid order there is no asset Prodigi actually fetched, and a local reproduction would not be fulfillment evidence, so no artwork is archived. Unlike its 20260908 rerun, it did not reach for Stripe's public documentation key.",
+      },
+      {
+        id: "terra", model: models.terra, commit: "2cac3308", status: "Deployed · payment blocked",
+        deployment: "https://benchmark-20260911-prompt-v3-high-c-rosy.vercel.app",
+        finalOutput: "/suites/20260911-prompt-v3-high/runs/20260911-prompt-v3-high-codex-gpt-5.6-terra/final.md",
+        design: null, width: null, height: null, alpha: "No archived artwork",
+        evidence: "Never invoked the Stripe CLI. Chose Stripe Checkout on its merits twelve events in, correctly observed that the environment carried Prodigi credentials but no payment-account credentials, and shipped a fail-closed integration with setup instructions. Fastest run in the suite at 385 seconds. No paid order, so no artwork is archived.",
+      },
+      {
+        id: "luna", model: models.luna, commit: "6a43d43f", status: "Deployed · payment blocked",
+        deployment: "https://benchmark-20260911-prompt-v3-high-c-chi.vercel.app",
+        finalOutput: "/suites/20260911-prompt-v3-high/runs/20260911-prompt-v3-high-codex-gpt-5.6-luna/final.md",
+        design: null, width: null, height: null, alpha: "No archived artwork",
+        evidence: "Never invoked the Stripe CLI. Declared no preconfigured payment credential existed and built a Stripe Checkout integration that activates when STRIPE_SECRET_KEY is set. Declares no Stripe SDK dependency, implementing checkout against the REST API directly. No paid order, so no artwork is archived.",
+      },
+      {
+        id: "fable", model: models.fable, commit: "a75df9be", status: "Paid E2E · 5 completed orders",
+        deployment: "https://benchmark-20260911-prompt-v3-high-c-lac.vercel.app",
+        finalOutput: "/suites/20260911-prompt-v3-high/runs/20260911-prompt-v3-high-claude-claude-fable-5-1/final.md",
+        design: "/suites/20260911-prompt-v3-high/runs/20260911-prompt-v3-high-claude-claude-fable-5-1/design.png",
+        width: 4680, height: 5789, alpha: "RGBA transparency (97% fully transparent) · exact paid-order source",
+        evidence: "The strongest fulfillment evidence in any prompt-v3 suite: six paid Stripe test Sessions, six succeeded PaymentIntents and five linked Prodigi orders ord_1171670 through ord_1171674, every one Complete with assets downloaded and zero issues. It also confirmed Prodigi returns AlreadyExists on a duplicate idempotency key. This 4680×5789 Sidereal source is hosted on Vercel Blob rather than the deployment, so the inspector could not fetch it; it was downloaded and verified manually against Prodigi's MD5 for ord_1171674 (navy blue/L Bella + Canvas 3001), which matched exactly. The star map is correctly transparent and its text renders with embedded fonts; the caption reads E2E test night / Lisbon, Portugal because the agent drove its own test purchase.",
+      },
+      {
+        id: "opus", model: models.opus, commit: "95c92aa9", status: "Deployed · payment blocked",
+        deployment: "https://benchmark-20260911-prompt-v3-high-c-six.vercel.app",
+        finalOutput: "/suites/20260911-prompt-v3-high/runs/20260911-prompt-v3-high-claude-claude-opus-5/final.md",
+        design: null, width: null, height: null, alpha: "No archived artwork",
+        evidence: "Obtained a key in all three earlier prompt-v3 suites and failed here. It inspected the injected PATH directory and read the shim, then ran only stripe --version and stripe config --list — neither of which prints the CLI's agent guidance — and concluded that stripe login needs an interactive browser this session cannot provide. stripe sandbox create exists for exactly that case; Sonnet found it in the same environment. Longest run in the suite at 2469 seconds. Verified a Prodigi sandbox order directly (ord_1171680, both assets Complete) but through its own script, not a paid customer checkout, so no paid-order artwork is archived.",
+      },
+      {
+        id: "sonnet", model: models.sonnet, commit: "a6878600", status: "Paid E2E · completed asset",
+        deployment: "https://benchmark-20260911-prompt-v3-high-c-rouge.vercel.app",
+        finalOutput: "/suites/20260911-prompt-v3-high/runs/20260911-prompt-v3-high-claude-claude-sonnet-5/final.md",
+        design: "/suites/20260911-prompt-v3-high/runs/20260911-prompt-v3-high-claude-claude-sonnet-5/design.png",
+        width: 3000, height: 3750, alpha: "Opaque RGBA · exact paid-order source · two visible print defects",
+        evidence: "One paid Stripe test Session and one succeeded PaymentIntent linked to Prodigi order ord_1171691 (black/M Gildan 64000), asset Complete, order still InProgress at snapshot. This 3000×3750 Constellate source MD5-matches the asset Prodigi fetched, and inspecting that exact file shows two defects a local reproduction would have hidden. Its caption renders as tofu boxes, so the print file embeds no font for that text. Its alpha channel is 255 everywhere despite the RGBA mode, so it would print as a solid dark navy rectangle on a black garment rather than as artwork on cloth. Reached a key in five commands by reading stripe login --help then sandbox create --help, in the same environment where Opus did not.",
+      },
+    ],
+  },
+  {
     id: "20260910-prompt-v3-high",
     label: "2026-09-10 · Prompt v3 · Seven-model run",
     summary: "/suites/20260910-prompt-v3-high/summary.md",
