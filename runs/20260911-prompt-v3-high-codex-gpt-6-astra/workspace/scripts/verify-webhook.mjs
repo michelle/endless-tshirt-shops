@@ -1,0 +1,7 @@
+import fs from 'node:fs';
+import Stripe from 'stripe';
+import {execFileSync} from 'node:child_process';
+const raw=fs.readFileSync('.stripe-provision.log','utf8');const keys=JSON.parse(raw.slice(raw.indexOf('{'),raw.indexOf('}',raw.indexOf('{'))+1));const stripe=new Stripe(keys.secret_key);const {sessionId}=JSON.parse(fs.readFileSync('.stripe-smoke.json','utf8'));
+const s=await stripe.checkout.sessions.retrieve(sessionId);console.log('Before return-page recovery:',JSON.stringify({payment:s.payment_status,prodigiOrderId:s.metadata?.prodigiOrderId,fulfillment:s.metadata?.fulfillment,error:s.metadata?.fulfillmentError}));
+const events=await stripe.events.list({type:'checkout.session.completed',limit:10});const event=events.data.find(e=>e.data.object.id===sessionId);if(!event)throw new Error('No completed event');const endpoints=await stripe.webhookEndpoints.list({limit:100});const endpoint=endpoints.data.find(e=>e.url==='https://benchmark-20260911-prompt-v3-high-c.vercel.app/api/webhooks/stripe');if(!endpoint)throw new Error('Missing webhook');console.log('Webhook:',JSON.stringify({id:endpoint.id,status:endpoint.status,event:event.id}));
+try{execFileSync('stripe',['--project-name',process.env.BENCHMARK_VERCEL_PROJECT,'events','resend',event.id,'--webhook-endpoint',endpoint.id],{stdio:['ignore','pipe','pipe']});console.log('Stripe event resent.')}catch(e){console.log('Resend error:',e.stderr?.toString().slice(-500)||e.message)}

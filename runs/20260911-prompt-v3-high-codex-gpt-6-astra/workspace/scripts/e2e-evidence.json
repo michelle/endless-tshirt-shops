@@ -1,0 +1,49 @@
+{
+  "checkedAt": "2026-09-11T16:17:05.916Z",
+  "sessionId": "cs_test_a1BYj6JCVzGUlAWBElOvj2IB2lqZSDyi6czKnaraTwPC6pvDi2KbX2Dk2B",
+  "payment": "paid",
+  "prodigiOrderId": "ord_1171654",
+  "stage": {
+    "stage": "InProgress",
+    "issues": [],
+    "details": {
+      "downloadAssets": "NotStarted",
+      "printReadyAssetsPrepared": "NotStarted",
+      "allocateProductionLocation": "NotStarted",
+      "inProduction": "NotStarted",
+      "shipping": "NotStarted"
+    }
+  },
+  "items": [
+    {
+      "sku": "GLOBAL-TEE-BC-3001",
+      "attributes": {
+        "color": "black",
+        "size": "m"
+      },
+      "assets": [
+        {
+          "status": "InProgress",
+          "printArea": "front"
+        }
+      ]
+    }
+  ],
+  "automaticStripeWebhookVerified": true,
+  "replayedEvent": "evt_1UEX7f7UduPfUvKnBO2nyWMT",
+  "sameOrderAfterReplay": "ord_1171654",
+  "deployedAsset": {
+    "http": 200,
+    "contentType": "image/png",
+    "width": 4680,
+    "height": 5882,
+    "dpi": 300,
+    "alpha": true
+  },
+  "securityEndpoints": {
+    "forgedWebhook": 400,
+    "unauthenticatedCron": 401,
+    "tamperedAsset": 400
+  },
+  "unitTestsPassed": 12
+}

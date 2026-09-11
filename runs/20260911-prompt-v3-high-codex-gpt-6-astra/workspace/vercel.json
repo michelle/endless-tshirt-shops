@@ -1,0 +1,1 @@
+{"framework":"nextjs","buildCommand":"npm run build","crons":[{"path":"/api/reconcile","schedule":"0 9 * * *"}]}

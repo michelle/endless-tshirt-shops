@@ -1,0 +1,11 @@
+import fs from 'node:fs';
+import {randomUUID} from 'node:crypto';
+import Stripe from 'stripe';
+import {initialDesign} from '../lib/design';
+const raw=fs.readFileSync('.stripe-provision.log','utf8');const provision=JSON.parse(raw.slice(raw.indexOf('{'),raw.indexOf('}',raw.indexOf('{'))+1));const client=new Stripe(provision.secret_key);
+const base='https://benchmark-20260911-prompt-v3-high-c.vercel.app';
+const body={design:{...initialDesign,headline:'THE TEST TOUR'},size:'m',quantity:1,approved:true,requestId:randomUUID()};
+const res=await fetch(base+'/api/checkout',{method:'POST',headers:{origin:base,'Content-Type':'application/json'},body:JSON.stringify(body)});const result=await res.json();if(!res.ok)throw new Error(JSON.stringify(result));const id=result.url.match(/cs_test_[A-Za-z0-9]+/)?.[0];if(!id)throw new Error('No Stripe session ID');const session=await client.checkout.sessions.retrieve(id);const repeat=await fetch(base+'/api/checkout',{method:'POST',headers:{origin:base,'Content-Type':'application/json'},body:JSON.stringify(body)});const again=await repeat.json();if(again.url!==result.url)throw new Error('Duplicate checkout not idempotent');
+const orderUrl=base+'/order?session_id='+id+'&token='+encodeURIComponent(session.metadata!.access);const status=await (await fetch(base+'/api/order?session_id='+id+'&token='+encodeURIComponent(session.metadata!.access))).json();if(status.prodigiOrderId)throw new Error('Unpaid order reached print!');
+fs.writeFileSync('.stripe-smoke.json',JSON.stringify({sessionId:id,checkoutUrl:result.url,orderUrl,requestId:body.requestId},null,2),{mode:0o600});
+console.log(JSON.stringify({sessionId:id,status:session.status,payment:session.payment_status,amount:session.amount_total,currency:session.currency,shipping:session.total_details?.amount_shipping,duplicateCheckout:'same session',unpaidPrintOrder:status.prodigiOrderId}));
