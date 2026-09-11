@@ -68,19 +68,20 @@ test("static Pages viewer supports suite links, history, scoring, and all archiv
     await page.waitForFunction(() => document.querySelectorAll(".storefront-thumbnail img").length === 7 &&
       document.querySelectorAll(".art-canvas img").length === 7 &&
       [...document.querySelectorAll(".design-card img")].every((image) => image.complete && image.naturalWidth > 0));
-    assert.equal(await page.locator('.design-card .run-status[data-tone="complete"]').count(), 1);
-    assert.equal(await page.locator('.design-card .run-status[data-tone="partial"]').count(), 1);
-    assert.equal(await page.locator('.design-card .run-status[data-tone="failed"]').count(), 5);
+    // Scoring is hidden viewer-wide: every card shows its descriptive status and
+    // no pass/fail grade, count or tone colour is rendered anywhere.
+    assert.equal(await page.locator(".design-card .run-status").count(), 7);
+    assert.equal(await page.locator(".design-card .run-status[data-tone]").count(), 0);
+    assert.doesNotMatch(await page.locator(".design-card").first().innerText(), /\b(Pass|Fail|Partial)\b|\d\/3/);
     assert.ok(await page.locator(".summary-section .markdown table").count() > 0);
 
-    for (const [suite, expected] of [["20260906-minimal-inspector-high", [2, 1, 4]], ["20260906-clean-sheet-high", [2, 1, 4]], ["20260905-unserious-high", [1, 3, 3]], ["20260905-beauty-high", [2, 1, 4]], ["20260905-minimal-high", [3, 3, 1]]]) {
+    for (const suite of ["20260906-minimal-inspector-high", "20260906-clean-sheet-high", "20260905-unserious-high", "20260905-beauty-high", "20260905-minimal-high"]) {
       await select.selectOption(suite);
       await page.waitForLoadState("networkidle");
       await page.waitForFunction(() => document.querySelectorAll(".storefront-thumbnail img").length === 7 &&
         [...document.querySelectorAll(".design-card img")].every((image) => image.complete && image.naturalWidth > 0));
-      for (const [i, tone] of ["complete", "partial", "failed"].entries()) {
-        assert.equal(await page.locator(`.design-card .run-status[data-tone="${tone}"]`).count(), expected[i]);
-      }
+      assert.equal(await page.locator(".design-card .run-status").count(), 7);
+      assert.equal(await page.locator(".design-card .run-status[data-tone]").count(), 0);
       assert.ok(await page.locator(".summary-section .markdown table").count() > 0);
       const captures = await page.locator(".storefront-thumbnail img").evaluateAll((images) => images.map((image) => image.getBoundingClientRect().top));
       assert.ok(Math.max(...captures) - Math.min(...captures) < 1, "Screenshots stay vertically aligned");
@@ -98,7 +99,7 @@ test("static Pages viewer supports suite links, history, scoring, and all archiv
         const screenshotLink = dialog.getByRole("link", { name: "Open storefront from screenshot", exact: true });
         assert.equal(await screenshotLink.getAttribute("href"), deployment);
         assert.equal(await screenshotLink.getAttribute("target"), "_blank");
-        assert.equal(await dialog.locator(".rating-checks dt").count(), 3);
+        assert.equal(await dialog.locator(".rating-checks").count(), 0);
         assert.ok(new URL(page.url()).searchParams.get("run"));
         const social = dialog.locator(".social-preview img");
         if (await social.count()) {

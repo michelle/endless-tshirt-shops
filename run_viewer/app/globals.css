@@ -265,6 +265,9 @@ code {
 .drawer-evidence .status-help { margin-bottom: 10px; }
 .drawer-evidence .run-status { font-size: 14px; }
 
+/* Neutral marker. Scoring is hidden viewer-wide, so no tone colours are
+   emitted; a red/amber/green dot would read as a grade that is not being
+   made. Mobile layout still measures this dot's alignment. */
 .run-status::before {
   content: "";
   position: absolute;
@@ -273,18 +276,8 @@ code {
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: #ffd600;
-  box-shadow: 0 0 0 2px #fff5b5;
-}
-
-.run-status[data-tone="failed"]::before {
-  background: #ff2448;
-  box-shadow: 0 0 0 2px #ffe0e6;
-}
-
-.run-status[data-tone="complete"]::before {
-  background: #00cc6a;
-  box-shadow: 0 0 0 2px #d8ffeb;
+  background: var(--border);
+  box-shadow: 0 0 0 2px var(--paper);
 }
 
 .rating-checks { margin: 0 0 12px; font-size: 13px; }

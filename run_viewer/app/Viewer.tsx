@@ -7,7 +7,6 @@ import ReactMarkdown, { type Components } from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { suites, type Storefront } from "./data";
 import { explainStatus } from "./status";
-import { rateRun } from "./ratings";
 import { summaryHeadings } from "./summary-headings";
 import { useDrawerSwipe } from "./use-drawer-swipe";
 import { viewerLink } from "./permalinks";
@@ -49,17 +48,19 @@ function navigateToRun(suiteId: string, runId?: string) {
   window.dispatchEvent(new PopStateEvent("popstate"));
 }
 
-function RunStatus({ status, suiteId, runId }: { status: string; suiteId: string; runId: string }) {
+// Scoring is hidden viewer-wide. The three-check ratings in ratings.ts are
+// retained and still tested, but no pass/fail grade, count or tone colour is
+// rendered: the card states what a run did and leaves the judgement to the
+// reader. Restore by rendering rateRun(suiteId, runId) here again.
+function RunStatus({ status }: { status: string; suiteId: string; runId: string }) {
   const tooltipId = useId();
   const [open, setOpen] = useState(false);
-  const rating = rateRun(suiteId, runId);
   const unavailable = status.startsWith("Provider limit");
   return (
     <div className="status-help" onMouseLeave={() => setOpen(false)}>
       <button
         type="button"
         className="run-status"
-        data-tone={rating.tone}
         aria-describedby={tooltipId}
         aria-expanded={open}
         onClick={() => setOpen(true)}
@@ -74,13 +75,10 @@ function RunStatus({ status, suiteId, runId }: { status: string; suiteId: string
           }
         }}
       >
-        {unavailable ? "Unavailable" : rating.label} · {rating.passed}/3 <span className="status-help-mark" aria-hidden="true">?</span>
+        {unavailable ? "Unavailable" : status} <span className="status-help-mark" aria-hidden="true">?</span>
       </button>
       <div id={tooltipId} role="tooltip" className="status-tooltip" hidden={!open} onMouseLeave={() => setOpen(false)}>
-        {rating.checks.map((check) => (
-          <p key={check.id}><strong>{check.result === "pass" ? "✓" : check.result === "fail" ? "✕" : "?"} {check.label}: {check.result}</strong> — {check.reason}</p>
-        ))}
-        <p>Green = 3/3; yellow = 2/3; red = 0–1/3. Unverified checks do not pass. Sandbox evidence, not physical print or launch certification.</p>
+        <p>Observed evidence, not a rating. Sandbox only: not physical print or launch certification.</p>
         {explainStatus(status).map(({ label, definition }) => (
           <p key={label}><strong>{label}</strong> — {definition}</p>
         ))}
@@ -434,14 +432,6 @@ export default function Viewer() {
               )}
               <section className="drawer-evidence" aria-label="Run details">
                 <RunStatus key={selectedRun.id} status={selectedRun.status} suiteId={suite.id} runId={selectedRun.id} />
-                <dl className="rating-checks" aria-label="Run acceptance checks">
-                  {rateRun(suite.id, selectedRun.id).checks.map((check) => (
-                    <div key={check.id}>
-                      <dt title={check.definition}>{check.label} · {check.result}</dt>
-                      <dd>{check.reason}</dd>
-                    </div>
-                  ))}
-                </dl>
                 <p className="image-meta">{selectedRun.width && selectedRun.height ? `${selectedRun.width} × ${selectedRun.height}px · ` : ""}{selectedRun.alpha} · <code>{selectedRun.commit}</code></p>
                 <p className="evidence">{selectedRun.evidence}</p>
                 <div className="card-links">
