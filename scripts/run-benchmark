@@ -18,8 +18,10 @@ Options:
 The runner requires PRODIGI_API_KEY, Stripe CLI, a clean repository, an origin remote,
 and either timeout or gtimeout. It appends the completed run to
 benchmark-results, then returns to the branch that was checked out when it
-started. Each run receives a separate local Stripe CLI config under
-.benchmark-secrets/stripe/; it is never committed.
+started. Each run receives a private Stripe CLI config in a temporary
+directory holding only that run's profile, archived to .benchmark-secrets/stripe/
+after the agent exits. It is never committed. The agent's environment does not
+name the payment provider the harness has prepared.
 EOF
 }
 
@@ -148,13 +150,17 @@ FINAL_OUTPUT="$RESULT_DIR/final.md"
 METADATA="$RESULT_DIR/metadata.json"
 USAGE_OUTPUT="$RESULT_DIR/usage.json"
 STRIPE_CONFIG_DIR="$REPO_ROOT/.benchmark-secrets/stripe"
-STRIPE_CONFIG="$STRIPE_CONFIG_DIR/$RUN_ID.toml"
+# The agent writes to a private temporary profile and is archived here only
+# after the run, so listing the directory it was handed cannot reach a sibling
+# run's credentials. Earlier runs' archives remain readable to a filesystem
+# search; that needs OS-level isolation, not this.
+STRIPE_ARCHIVE="$STRIPE_CONFIG_DIR/$RUN_ID.toml"
 CAPTURE_DIR="$REPO_ROOT/.benchmark-secrets/transcripts/$RUN_ID"
 GLOBAL_STRIPE_CONFIG=${BENCHMARK_GLOBAL_STRIPE_CONFIG:-"${HOME:?}/.config/stripe/config.toml"}
 [[ $GLOBAL_STRIPE_CONFIG == /* ]] || die "global Stripe config path must be absolute"
 
 [[ ! -e $RESULT_DIR ]] || die "run directory already exists: runs/$RUN_ID"
-[[ ! -e $STRIPE_CONFIG ]] || die "Stripe config already exists for this run: .benchmark-secrets/stripe/$RUN_ID.toml"
+[[ ! -e $STRIPE_ARCHIVE ]] || die "Stripe config already exists for this run: .benchmark-secrets/stripe/$RUN_ID.toml"
 [[ ! -e $CAPTURE_DIR ]] || die "private transcript already exists for this run"
 git show-ref --verify --quiet "refs/heads/$EXECUTION_BRANCH" && die "temporary branch already exists: $EXECUTION_BRANCH"
 git show-ref --verify --quiet "refs/heads/$PUBLISH_BRANCH" && die "temporary branch already exists: $PUBLISH_BRANCH"
@@ -207,8 +213,9 @@ capture_agent_global_stripe_config() {
   # does not; otherwise preserve it separately for diagnosis and recovery.
   if [[ ! -s $STRIPE_CONFIG ]] || { config_has_test_key "$GLOBAL_STRIPE_CONFIG" && ! config_has_test_key "$STRIPE_CONFIG"; }; then
     [[ ! -e $wrapper_config ]] || { note "warning: cannot capture wrapper Stripe config: $wrapper_config exists"; return 1; }
+    [[ ! -e $STRIPE_ARCHIVE ]] || { note "warning: cannot capture Stripe config: $STRIPE_ARCHIVE exists"; return 1; }
     mv -- "$STRIPE_CONFIG" "$wrapper_config"
-    mv -- "$GLOBAL_STRIPE_CONFIG" "$STRIPE_CONFIG"
+    mv -- "$GLOBAL_STRIPE_CONFIG" "$STRIPE_ARCHIVE"
     note "captured Stripe config written outside the wrapper as .benchmark-secrets/stripe/$RUN_ID.toml"
   else
     [[ ! -e $captured ]] || { note "warning: cannot capture global Stripe config: $captured exists"; return 1; }
@@ -217,9 +224,18 @@ capture_agent_global_stripe_config() {
   fi
 }
 
+# Move the run's private profile into the archive. Idempotent: a profile that
+# capture_agent_global_stripe_config already relocated is simply absent.
+archive_run_stripe_config() {
+  [[ -n ${STRIPE_CONFIG-} && -e $STRIPE_CONFIG ]] || return 0
+  [[ ! -e $STRIPE_ARCHIVE ]] || { note "warning: cannot archive Stripe config: $STRIPE_ARCHIVE exists"; return 1; }
+  mv -- "$STRIPE_CONFIG" "$STRIPE_ARCHIVE" || { note "warning: could not archive Stripe config for this run"; return 1; }
+}
+
 restore_global_stripe_config() {
   [[ ${GLOBAL_STRIPE_GUARD_ACTIVE-0} == 1 ]] || return 0
   capture_agent_global_stripe_config || note "warning: could not capture Stripe config created outside the wrapper"
+  archive_run_stripe_config || true
   if [[ ${GLOBAL_STRIPE_ORIGINAL_PRESENT-0} == 1 ]]; then
     if [[ -e $GLOBAL_STRIPE_CONFIG ]]; then
       note "warning: refusing to overwrite Stripe config while restoring; backup remains at $GLOBAL_STRIPE_BACKUP"
@@ -238,6 +254,11 @@ cleanup_runtime() {
   local status=$?
   trap - EXIT
   restore_global_stripe_config || true
+  if archive_run_stripe_config; then
+    [[ -z ${STRIPE_LIVE_DIR-} ]] || rm -rf -- "$STRIPE_LIVE_DIR"
+  else
+    note "warning: leaving unarchived Stripe profile at ${STRIPE_LIVE_DIR-unknown}"
+  fi
   [[ -z ${AGENT_WORKSPACE-} ]] || rm -rf -- "$AGENT_WORKSPACE"
   [[ -z ${STRIPE_SHIM_DIR-} ]] || rm -rf -- "$STRIPE_SHIM_DIR"
   if [[ -n ${GLOBAL_STRIPE_BACKUP_DIR-} && -d $GLOBAL_STRIPE_BACKUP_DIR && ! -e ${GLOBAL_STRIPE_BACKUP-} ]]; then
@@ -255,26 +276,32 @@ SWITCHED_BRANCH=1
 mkdir -p "$WORKSPACE"
 AGENT_WORKSPACE=
 STRIPE_SHIM_DIR=
+STRIPE_LIVE_DIR=
 GLOBAL_STRIPE_BACKUP_DIR=
 GLOBAL_STRIPE_BACKUP=
-GLOBAL_STRIPE_LOCK_DIR="${TMPDIR:-/tmp}/endless-tshirt-benchmark-stripe.lock"
+GLOBAL_STRIPE_LOCK_DIR="${TMPDIR:-/tmp}/endless-tshirt-benchmark-cli.lock"
 GLOBAL_STRIPE_LOCK_HELD=0
 GLOBAL_STRIPE_GUARD_ACTIVE=0
 GLOBAL_STRIPE_ORIGINAL_PRESENT=0
 trap cleanup_runtime EXIT
 AGENT_WORKSPACE=$(mktemp -d "${TMPDIR:-/tmp}/benchmark-workspace.XXXXXX") || die "could not create isolated agent workspace"
-STRIPE_SHIM_DIR=$(mktemp -d "${TMPDIR:-/tmp}/benchmark-stripe-shim.XXXXXX") || die "could not create Stripe CLI shim"
-GLOBAL_STRIPE_BACKUP_DIR=$(mktemp -d "${TMPDIR:-/tmp}/benchmark-stripe-global.XXXXXX") || die "could not create Stripe config backup directory"
+# Temporary directory names reach the agent through PATH and BASH_ENV, so they
+# must not disclose which payment provider the harness has pre-provisioned.
+STRIPE_SHIM_DIR=$(mktemp -d "${TMPDIR:-/tmp}/benchmark-tools.XXXXXX") || die "could not create Stripe CLI shim"
+STRIPE_LIVE_DIR=$(mktemp -d "${TMPDIR:-/tmp}/benchmark-cli-state.XXXXXX") || die "could not create isolated CLI profile directory"
+GLOBAL_STRIPE_BACKUP_DIR=$(mktemp -d "${TMPDIR:-/tmp}/benchmark-cli-global.XXXXXX") || die "could not create Stripe config backup directory"
 chmod 700 "$GLOBAL_STRIPE_BACKUP_DIR"
 GLOBAL_STRIPE_BACKUP="$GLOBAL_STRIPE_BACKUP_DIR/config.toml"
 mkdir -p "$STRIPE_CONFIG_DIR"
 chmod 700 "$REPO_ROOT/.benchmark-secrets" "$STRIPE_CONFIG_DIR"
 umask 077
+chmod 700 "$STRIPE_LIVE_DIR"
+STRIPE_CONFIG="$STRIPE_LIVE_DIR/config.toml"
 : >"$STRIPE_CONFIG"
 chmod 600 "$STRIPE_CONFIG"
 cat >"$STRIPE_SHIM_DIR/stripe" <<EOF
 #!/usr/bin/env bash
-exec "${STRIPE_REAL}" --config "\${BENCHMARK_STRIPE_CONFIG}" "\$@"
+exec "${STRIPE_REAL}" --config "\${BENCHMARK_CLI_STATE}" "\$@"
 EOF
 chmod 700 "$STRIPE_SHIM_DIR/stripe"
 cat >"$STRIPE_SHIM_DIR/bash-env" <<EOF
@@ -300,6 +327,8 @@ LOGIN_SHELL_STRIPE=$(PATH="$STRIPE_SHIM_DIR:$PATH" /bin/bash -lc 'command -v str
 # Credentials must come from the isolated CLI profile, never from the runner's
 # ambient environment.
 unset STRIPE_SECRET_KEY STRIPE_API_KEY STRIPE_PUBLISHABLE_KEY STRIPE_WEBHOOK_SECRET
+# Runner-only override; it names the provider, so it must not reach the agent.
+unset BENCHMARK_GLOBAL_STRIPE_CONFIG
 
 STARTED_AT=$(date -u +%Y-%m-%dT%H:%M:%SZ)
 START_EPOCH=$(date +%s)
@@ -311,8 +340,9 @@ export BENCHMARK_FINAL_OUTPUT="$FINAL_OUTPUT"
 export BENCHMARK_VERCEL_PROJECT="$VERCEL_PROJECT"
 export BENCHMARK_REASONING_EFFORT="$REASONING_EFFORT"
 export BENCHMARK_USAGE_OUTPUT="$USAGE_OUTPUT"
-export BENCHMARK_STRIPE_CONFIG="$STRIPE_CONFIG"
-export BENCHMARK_STRIPE_CONFIG_REF=".benchmark-secrets/stripe/$RUN_ID.toml"
+# Deliberately provider-neutral: the prompt asks the agent to choose a payment
+# provider, so the environment must not name the one the harness has prepared.
+export BENCHMARK_CLI_STATE="$STRIPE_CONFIG"
 export BENCHMARK_CAPTURE_DIR="$CAPTURE_DIR"
 
 set +e

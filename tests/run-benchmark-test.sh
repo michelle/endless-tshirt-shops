@@ -16,6 +16,8 @@ GLOBAL_STRIPE_CONFIG="$TMP_ROOT/global-stripe/config.toml"
 mkdir -p "$REPO" "$BIN" "$BIN_WITHOUT_TIMEOUT" "$(dirname "$GLOBAL_STRIPE_CONFIG")"
 printf 'original global Stripe config\n' >"$GLOBAL_STRIPE_CONFIG"
 export BENCHMARK_GLOBAL_STRIPE_CONFIG="$GLOBAL_STRIPE_CONFIG"
+# Visible to the fake agent so it can assert no sibling run's profile is readable.
+export FAKE_ARCHIVE_DIR="$REPO/.benchmark-secrets/stripe"
 git init -q -b main "$REPO"
 git -C "$REPO" config user.email benchmark-test@example.com
 git -C "$REPO" config user.name benchmark-test
@@ -38,8 +40,8 @@ printf '%s\n' \
   '#!/usr/bin/env bash' \
   'set -euo pipefail' \
   '[[ $1 == --config ]]' \
-  '[[ $2 == "$BENCHMARK_STRIPE_CONFIG" ]]' \
-  'printf "fake Stripe profile\\n" >>"$BENCHMARK_STRIPE_CONFIG"' >"$BIN/stripe"
+  '[[ $2 == "$BENCHMARK_CLI_STATE" ]]' \
+  'printf "fake Stripe profile\\n" >>"$BENCHMARK_CLI_STATE"' >"$BIN/stripe"
 chmod +x "$BIN/stripe"
 
 printf '%s\n' \
@@ -54,8 +56,16 @@ printf '%s\n' \
   '    *) shift ;;' \
   '  esac' \
   'done' \
-  'case $(/bin/bash -lc "command -v stripe") in *benchmark-stripe-shim.*/stripe) ;; *) exit 9 ;; esac' \
+  'case $(/bin/bash -lc "command -v stripe") in *benchmark-tools.*/stripe) ;; *) exit 9 ;; esac' \
   '[[ -z "${STRIPE_SECRET_KEY-}${STRIPE_API_KEY-}${STRIPE_PUBLISHABLE_KEY-}${STRIPE_WEBHOOK_SECRET-}" ]]' \
+  '# the environment must not disclose the pre-provisioned payment provider' \
+  'if env | grep -i "^BENCHMARK_" | grep -qi stripe; then echo "provider name leaked through BENCHMARK_* environment" >&2; exit 10; fi' \
+  'case $PATH$BASH_ENV in *[Ss]tripe*) echo "provider name leaked through PATH/BASH_ENV" >&2; exit 11 ;; esac' \
+  '# the profile handed to the agent must be private: its directory holds only' \
+  '# this run.s config, so dirname cannot walk to another run.s credentials' \
+  'state_dir=$(dirname "$BENCHMARK_CLI_STATE")' \
+  'if [[ $state_dir == "${FAKE_ARCHIVE_DIR-/nonexistent}" ]]; then echo "CLI profile lives in the shared archive" >&2; exit 12; fi' \
+  'if [[ $(find "$state_dir" -type f | wc -l) -ne 1 ]]; then echo "sibling files reachable from the CLI profile directory" >&2; exit 13; fi' \
   'if [[ -n "${FAKE_GLOBAL_STRIPE_PATH:-}" ]]; then mkdir -p "$(dirname "$FAKE_GLOBAL_STRIPE_PATH")"; printf "test_mode_api_key = '\''sk_test_bypass_marker'\''\n" >"$FAKE_GLOBAL_STRIPE_PATH"; fi' \
   '[[ -n "${FAKE_CODEX_SLEEP:-}" ]] && sleep "$FAKE_CODEX_SLEEP"' \
   '[[ -n "${FAKE_ROOT_WRITE_PATH:-}" ]] && printf "outside workspace\n" >"$FAKE_ROOT_WRITE_PATH"' \
