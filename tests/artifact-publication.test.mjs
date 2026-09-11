@@ -15,7 +15,7 @@ test('archive gate warns on whitespace, preserves bytes, and still blocks secret
   const check = env => spawnSync('bash', [gate, 'fixture'], { cwd: dir, env: { ...process.env, ...env }, encoding: 'utf8' });
   const ok = check(); assert.equal(ok.status, 0, ok.stderr); assert.match(ok.stderr, /warning.*whitespace/);
   assert.equal(await readFile(file, 'utf8'), original);
-  for (const secret of ['sk_test_fixture', 'rkcs_test_fixture', 'whsec_fixture', 'pi_fixture_secret_value', 'test_11111111-1111-1111-1111-111111111111', 'arbitrary-injected-provider-key']) {
+  for (const secret of [`sk_test_${'a'.repeat(24)}`, `rkcs_test_${'b'.repeat(24)}`, `whsec_${'c'.repeat(24)}`, `sk_test_${'z'.repeat(24)}`, 'pi_fixture_secret_value', 'test_11111111-1111-1111-1111-111111111111', 'arbitrary-injected-provider-key']) {
     await writeFile(file, original + secret); git('add', '.');
     const denied = check({ PRODIGI_API_KEY: 'arbitrary-injected-provider-key' });
     assert.notEqual(denied.status, 0, `Secret fixture was not rejected: ${secret}`); assert.match(denied.stderr, /secret.*refusing/); assert.ok(!denied.stderr.includes(secret));
@@ -24,28 +24,39 @@ test('archive gate warns on whitespace, preserves bytes, and still blocks secret
   assert.notEqual(outside.status, 0); assert.match(outside.stderr, /scan failed/);
 });
 
-test('workspace source may carry placeholder keys, but never credential-length or provisioned ones', async t => {
+// The 24-character cases are the floor's boundary, chosen because Stripe's own
+// published sample key carries exactly 24 characters after its prefix. That
+// literal is deliberately not reproduced here: push protection rejects it, and
+// a constructed value of the same length exercises the identical edge.
+test('placeholder keys pass anywhere; credential-length and provisioned ones never do', async t => {
   const dir = await mkdtemp(path.join(os.tmpdir(), 'artifact-gate-ws-')); t.after(() => rm(dir, { recursive: true, force: true }));
   const git = (...args) => execFileSync('git', ['-C', dir, ...args], { encoding: 'utf8' });
   git('init', '-q');
   await mkdir(path.join(dir, 'runs/fixture/workspace/tests'), { recursive: true });
   await mkdir(path.join(dir, '.benchmark-secrets/stripe'), { recursive: true });
-  const src = path.join(dir, 'runs/fixture/workspace/tests/commerce.test.ts');
+  const wsSrc = path.join(dir, 'runs/fixture/workspace/tests/commerce.test.ts');
+  const report = path.join(dir, 'runs/fixture/final.md');
   const check = () => spawnSync('bash', [gate, 'fixture'], { cwd: dir, encoding: 'utf8' });
-  const stage = async body => { await writeFile(src, body); git('add', '.'); };
+  const stage = async body => { await writeFile(wsSrc, body); git('add', '.'); };
 
-  // Obvious placeholders in generated source must not fail a paid run closed.
-  for (const placeholder of ['sk_test_not_real', 'whsec_test_only', 'pk_test_dummy']) {
+  // Placeholders are normal in generated source AND in the completion report's
+  // setup instructions. Neither may fail a paid run closed.
+  for (const placeholder of ['sk_test_not_real', 'whsec_test_only', 'pk_test_dummy', 'sk_test_xxx']) {
     await stage(`process.env.K = '${placeholder}';\n`);
-    const allowed = check();
-    assert.equal(allowed.status, 0, `placeholder rejected in workspace: ${placeholder}\n${allowed.stderr}`);
+    assert.equal(check().status, 0, `placeholder rejected in workspace: ${placeholder}`);
+    await writeFile(report, `Run \`./enable-stripe.sh ${placeholder} whsec_xxx\` to switch.\n`); git('add', '.');
+    assert.equal(check().status, 0, `placeholder rejected in report: ${placeholder}`);
+    await rm(report); git('add', '.');
   }
   // Credential-length values are still refused wherever they appear.
-  for (const real of [`sk_test_51${'A'.repeat(97)}`, `rkcs_test_51${'B'.repeat(95)}`, `whsec_${'C'.repeat(32)}`]) {
+  for (const real of [`sk_test_51${'A'.repeat(97)}`, `rkcs_test_51${'B'.repeat(95)}`, `whsec_${'C'.repeat(32)}`, `sk_test_${'z'.repeat(24)}`]) {
     await stage(`process.env.K = '${real}';\n`);
     const denied = check();
     assert.notEqual(denied.status, 0, `credential-length key admitted: ${real.slice(0, 12)}`);
     assert.ok(!denied.stderr.includes(real));
+    await writeFile(report, `key ${real}\n`); git('add', '.');
+    assert.notEqual(check().status, 0, `credential-length key admitted in report: ${real.slice(0, 12)}`);
+    await rm(report); git('add', '.');
   }
   // A key this run actually provisioned is refused by value, whatever its shape.
   await writeFile(path.join(dir, '.benchmark-secrets/stripe/fixture.toml'),

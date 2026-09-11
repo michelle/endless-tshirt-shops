@@ -4,13 +4,12 @@ set -euo pipefail
 RUN_ID=${1:?run ID required}
 [[ $RUN_ID =~ ^[a-zA-Z0-9][a-zA-Z0-9._-]*$ && $RUN_ID != *..* ]] || exit 2
 die() { printf 'error: %s\n' "$*" >&2; exit 2; }
-# Evidence files (final.md, agent.log, events.jsonl, metadata.json) must contain
-# nothing credential-shaped at all. Generated application source under
-# workspace/ is different: placeholder keys in tests and .env examples are
-# normal, so there the structural net requires credential-length values while
-# the by-value checks below stay exact.
-EVIDENCE=("runs/$RUN_ID" ":(exclude)runs/$RUN_ID/workspace")
-WORKSPACE=("runs/$RUN_ID/workspace")
+# Placeholder credentials are normal in both scopes: generated source carries
+# them in tests and .env examples, and the completion report carries them in
+# setup instructions ("run enable-stripe.sh sk_test_xxx"). Scoping the floor to
+# workspace/ only was tried and blocked a second paid run on a documentation
+# line, so the structural net now applies one length floor everywhere and the
+# by-value checks below carry the exactness.
 ALL=("runs/$RUN_ID")
 scan() {
   local -n paths=$1; shift
@@ -37,13 +36,10 @@ for config in ".benchmark-secrets/stripe/$RUN_ID.toml" \
     scan ALL -F -e "$secret"
   done < <(sed -nE "s/^[[:space:]]*[a-z_]*(api_key|pub_key|secret)[[:space:]]*=[[:space:]]*'([^']+)'.*/\2/p" "$config")
 done
-PREFIXED='(sk|pk|rkcs|rk)_(test|live)_[A-Za-z0-9_=-]%s|whsec_[A-Za-z0-9_=-]%s'
-SPECIFIC='(test|live)_[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|(pi|cs)_[A-Za-z0-9_]+_secret_[A-Za-z0-9_]+'
-# shellcheck disable=SC2059
-scan EVIDENCE -E -e "(^|[^[:alnum:]_])($(printf "$PREFIXED" '+' '+')|$SPECIFIC)"
-# Real Stripe keys carry 97+ characters after the prefix; the 24-character floor
-# admits nothing credential-length while letting sk_test_not_real through.
-scan WORKSPACE -E -e "(^|[^[:alnum:]_])($(printf "$PREFIXED" '{24,}' '{24,}')|$SPECIFIC)"
+# Real Stripe keys carry 97+ characters after the prefix, and Stripe's own
+# published demo key carries exactly 24, so the floor still refuses that while
+# letting sk_test_xxx and sk_test_not_real through.
+scan ALL -E -e '(^|[^[:alnum:]_])((sk|pk|rkcs|rk)_(test|live)_[A-Za-z0-9_=-]{24,}|whsec_[A-Za-z0-9_=-]{24,}|(test|live)_[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|(pi|cs)_[A-Za-z0-9_]+_secret_[A-Za-z0-9_]+)'
 # Archive agent output byte-for-byte, including vendor licenses with CRLF or
 # trailing spaces. Formatting is evidence, not a reason to lose a paid run.
 status=0
