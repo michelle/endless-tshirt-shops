@@ -48,6 +48,29 @@ const models = {
 
 export const suites: Suite[] = [
   {
+    id: "20260913-prompt-v3-smoke",
+    label: "2026-09-13 · Prompt v3 · Harness smoke test [incomplete]",
+    incomplete: true,
+    summary: "/suites/20260913-prompt-v3-smoke/summary.md",
+    prompt: { path: "/suites/20260913-prompt-v3-smoke/prompt.md", file: "prompts/prompt-v3.md", revision: "254ec880f3d274c4ecca8589b5d8cb6539469874", sha256: "30868370940510cfeb6f8c1da9e0f748ad6ac4f3e1e5e59e3e85adcecc910f99" },
+    runs: [
+      {
+        id: "terra", model: models.terra, commit: "254ec880", status: "Deployed · payment blocked",
+        deployment: "https://benchmark-20260913-prompt-v3-smoke.vercel.app",
+        finalOutput: "/suites/20260913-prompt-v3-smoke/runs/20260913-prompt-v3-smoke-codex-gpt-5.6-terra/final.md",
+        design: null, width: null, height: null, alpha: "No archived artwork",
+        evidence: "Tiny Triumphs. Never invoked the Stripe CLI, so it had no payment credentials, and shipped a fail-closed checkout that refuses to fulfil without a verified webhook. Deployed and reachable; no payment path exercised and no artwork archived. Unaudited.",
+      },
+      {
+        id: "sonnet", model: models.sonnet, commit: "313fc71b", status: "Paid E2E · 1 completed order",
+        deployment: "https://benchmark-20260913-prompt-v3-smoke-lime.vercel.app",
+        finalOutput: "/suites/20260913-prompt-v3-smoke/runs/20260913-prompt-v3-smoke-claude-claude-sonnet-5/final.md",
+        design: null, width: null, height: null, alpha: "No archived artwork",
+        evidence: "Cipher Tees. Provisioned its own Stripe sandbox through the CLI and reports an end-to-end test: verified webhook signature, paid-only fulfilment, Prodigi order ord_1171949 fetched the art and completed. Print file rendered from the same component tree as the preview. Not independently audited, and no artwork archived.",
+      },
+    ],
+  },
+  {
     id: "20260911-prompt-v3-high",
     label: "2026-09-11 · Prompt v3 · Seven-model run · Provider-neutral environment",
     summary: "/suites/20260911-prompt-v3-high/summary.md",

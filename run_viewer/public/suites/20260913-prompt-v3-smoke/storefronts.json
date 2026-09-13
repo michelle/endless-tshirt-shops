@@ -1,0 +1,42 @@
+{
+  "terra": {
+    "screenshot": "/suites/20260913-prompt-v3-smoke/runs/20260913-prompt-v3-smoke-codex-gpt-5.6-terra/storefront.png",
+    "favicon": {
+      "path": "/suites/20260913-prompt-v3-smoke/runs/20260913-prompt-v3-smoke-codex-gpt-5.6-terra/favicon.ico",
+      "source": "https://benchmark-20260913-prompt-v3-smoke.vercel.app/favicon.ico?favicon.3fpu2ql9ns1a0.ico",
+      "mime": "image/x-icon"
+    },
+    "faviconStatus": "found",
+    "socialPreview": null,
+    "socialPreviewStatus": "missing",
+    "url": "https://benchmark-20260913-prompt-v3-smoke.vercel.app/",
+    "title": "Tiny Triumphs — wear the win",
+    "width": 1440,
+    "height": 900,
+    "capturedAt": "2026-09-13T21:42:37.616Z",
+    "httpStatus": 200,
+    "errors": [],
+    "browser": "151.0.7922.34",
+    "deviceScaleFactor": 1,
+    "colorScheme": "light",
+    "timezone": "America/Los_Angeles"
+  },
+  "sonnet": {
+    "screenshot": "/suites/20260913-prompt-v3-smoke/runs/20260913-prompt-v3-smoke-claude-claude-sonnet-5/storefront.png",
+    "favicon": null,
+    "faviconStatus": "missing",
+    "socialPreview": null,
+    "socialPreviewStatus": "missing",
+    "url": "https://benchmark-20260913-prompt-v3-smoke-lime.vercel.app/",
+    "title": "Cipher Tees — Wear Your Own Code",
+    "width": 1440,
+    "height": 900,
+    "capturedAt": "2026-09-13T21:42:40.796Z",
+    "httpStatus": 200,
+    "errors": [],
+    "browser": "151.0.7922.34",
+    "deviceScaleFactor": 1,
+    "colorScheme": "light",
+    "timezone": "America/Los_Angeles"
+  }
+}

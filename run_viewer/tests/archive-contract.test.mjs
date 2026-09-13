@@ -26,18 +26,20 @@ test("every suite includes its original prompt and rejects missing or changed co
 });
 
 test("a missing final or image fails even when every existing file is valid", async () => {
-  for (const field of ["finalOutput", "design"]) {
-    const suite = structuredClone(suites.find(s => s.runs.length));
-    if (field === "finalOutput") {
-      const dir = `/suites/${suite.id}/runs/missing-run`;
-      suite.runs[0].finalOutput = `${dir}/final.md`;
-      suite.runs[0].design = `${dir}/design.png`;
-    } else {
-      const run = suite.runs.find(candidate => candidate.design);
-      run.design = run.design.replace(/[^/]+$/, "paid-design.png");
-    }
-    await assert.rejects(registeredAssets([suite], root), /Missing registered asset/);
-  }
+  const missingFinal = structuredClone(suites.find(suite => suite.runs.length));
+  const directory = `/suites/${missingFinal.id}/runs/missing-run`;
+  missingFinal.runs[0].finalOutput = `${directory}/final.md`;
+  if (missingFinal.runs[0].design) missingFinal.runs[0].design = `${directory}/design.png`;
+  await assert.rejects(registeredAssets([missingFinal], root), /Missing registered asset/);
+
+  // Select for artwork rather than assuming the first suite with runs has some:
+  // a suite can legitimately register runs with no recovered design at all.
+  const withArtwork = suites.find(suite => suite.runs.some(run => run.design));
+  assert.ok(withArtwork, "No suite registers artwork to exercise this check");
+  const missingArtwork = structuredClone(withArtwork);
+  const run = missingArtwork.runs.find(candidate => candidate.design);
+  run.design = run.design.replace(/[^/]+$/, "paid-design.png");
+  await assert.rejects(registeredAssets([missingArtwork], root), /Missing registered asset/);
 });
 
 test("a capture must belong to the deployment it is registered against", async () => {
