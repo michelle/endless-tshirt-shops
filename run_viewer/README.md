@@ -98,9 +98,9 @@ npm run predeploy
 ```
 
 Lint, permalink and archive-registry contracts, heading tests, a clean static
-build, HTTP asset checks, then browser tests for permalinks, keyboard
-navigation, touch gestures, saved preferences and the capture workflow. The
-Pages workflow runs the same gate. Use `CAPTURE_BROWSER=chrome` for installed Chrome,
+build, HTTP asset checks, then browser tests for permalinks, drawers and
+keyboard navigation, touch gestures, saved preferences and the capture
+workflow. The Pages workflow runs the same gate. Use `CAPTURE_BROWSER=chrome` for installed Chrome,
 or install Chromium once with `npx playwright install chromium`.
 
 Install the local push gate once per clone:

@@ -11,7 +11,7 @@
     "build": "vite build && node scripts/prepare-pages.mjs",
     "preview": "vite preview",
     "lint": "eslint .",
-    "predeploy": "npm run lint && npm run test:contracts && npm run test:links && npm run build && npm run test:release && npm run test:pages && npm run test:keyboard && npm run test:mobile && npm run test:preferences && npm run test:capture",
+    "predeploy": "npm run lint && npm run test:contracts && npm run test:links && npm run build && npm run test:release && npm run test:pages && npm run test:mobile && npm run test:preferences && npm run test:capture",
     "capture": "node --experimental-strip-types scripts/capture-storefronts.mjs",
     "hooks:install": "node ../scripts/install-viewer-hook.mjs",
     "test:contracts": "node --experimental-strip-types --test tests/archive-contract.test.mjs tests/permalink-contract.test.mjs",
@@ -19,7 +19,6 @@
     "test:release": "node --experimental-strip-types --test tests/release.test.mjs",
     "test:pages": "node --test tests/pages.test.mjs",
     "test:mobile": "node --test tests/mobile.test.mjs",
-    "test:keyboard": "node --test tests/keyboard.test.mjs",
     "test:capture": "node --test tests/capture.test.mjs",
     "test:preferences": "node --experimental-strip-types --test tests/preferences.test.mjs"
   },

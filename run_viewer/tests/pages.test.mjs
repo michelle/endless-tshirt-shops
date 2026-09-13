@@ -39,7 +39,7 @@ test("static artifact contains every approved archive file, exact raster bytes, 
   assert.ok(screenshots >= 21);
 });
 
-test("static Pages viewer supports suite links, history, scoring, and all archive assets", async () => {
+test("static Pages viewer supports suite links, history, drawers, and all archive assets", async () => {
   const server = await preview({
     configFile: fileURLToPath(new URL("../vite.config.ts", import.meta.url)),
     preview: { host: "127.0.0.1", port: 0, open: false },
@@ -68,10 +68,9 @@ test("static Pages viewer supports suite links, history, scoring, and all archiv
     await page.waitForFunction(() => document.querySelectorAll(".storefront-thumbnail img").length === 7 &&
       document.querySelectorAll(".art-canvas img").length === 7 &&
       [...document.querySelectorAll(".design-card img")].every((image) => image.complete && image.naturalWidth > 0));
-    // Scoring is hidden viewer-wide: every card shows its descriptive status and
-    // no pass/fail grade, count or tone colour is rendered anywhere.
+    // Each card carries a descriptive status and no grade: scoring was retired
+    // because a pass/fail tally read as a verdict on the model.
     assert.equal(await page.locator(".design-card .run-status").count(), 7);
-    assert.equal(await page.locator(".design-card .run-status[data-tone]").count(), 0);
     assert.doesNotMatch(await page.locator(".design-card").first().innerText(), /\b(Pass|Fail|Partial)\b|\d\/3/);
     assert.ok(await page.locator(".summary-section .markdown table").count() > 0);
 
@@ -81,7 +80,6 @@ test("static Pages viewer supports suite links, history, scoring, and all archiv
       await page.waitForFunction(() => document.querySelectorAll(".storefront-thumbnail img").length === 7 &&
         [...document.querySelectorAll(".design-card img")].every((image) => image.complete && image.naturalWidth > 0));
       assert.equal(await page.locator(".design-card .run-status").count(), 7);
-      assert.equal(await page.locator(".design-card .run-status[data-tone]").count(), 0);
       assert.ok(await page.locator(".summary-section .markdown table").count() > 0);
       const captures = await page.locator(".storefront-thumbnail img").evaluateAll((images) => images.map((image) => image.getBoundingClientRect().top));
       assert.ok(Math.max(...captures) - Math.min(...captures) < 1, "Screenshots stay vertically aligned");
@@ -99,7 +97,6 @@ test("static Pages viewer supports suite links, history, scoring, and all archiv
         const screenshotLink = dialog.getByRole("link", { name: "Open storefront from screenshot", exact: true });
         assert.equal(await screenshotLink.getAttribute("href"), deployment);
         assert.equal(await screenshotLink.getAttribute("target"), "_blank");
-        assert.equal(await dialog.locator(".rating-checks").count(), 0);
         assert.ok(new URL(page.url()).searchParams.get("run"));
         const social = dialog.locator(".social-preview img");
         if (await social.count()) {
@@ -217,5 +214,78 @@ test("static Pages viewer supports suite links, history, scoring, and all archiv
   } finally {
     await browser.close();
     await new Promise((resolve, reject) => server.httpServer.close((error) => error ? reject(error) : resolve()));
+  }
+});
+
+test("drawer keyboard navigation stops at both ends without dropping focus", async () => {
+  const server = await preview({
+    configFile: fileURLToPath(new URL("../vite.config.ts", import.meta.url)),
+    preview: { host: "127.0.0.1", port: 0, open: false },
+  });
+  const browser = await chromium.launch({ headless: true, ...(process.env.CAPTURE_BROWSER === "chrome" ? { channel: "chrome" } : {}) });
+  try {
+    const base = server.resolvedUrls.local[0];
+    const page = await browser.newPage({ viewport: { width: 1280, height: 720 } });
+    const errors = [];
+    page.on("pageerror", (error) => errors.push(error.message));
+    await page.goto(`${base}?suite=20260905-minimal-high`, { waitUntil: "networkidle" });
+
+    // Read the models off the rendered cards, so the walk below follows the
+    // suite's real length instead of a hardcoded count.
+    const models = await page.locator(".design-card .model-title span:not(.missing-favicon)").allInnerTexts();
+    assert.ok(models.length > 2, "Need at least three runs to exercise two boundaries");
+
+    const dialog = page.getByRole("dialog");
+    const title = dialog.locator("#run-drawer-title");
+    const previous = dialog.getByRole("button", { name: "Previous run", exact: true });
+    const next = dialog.getByRole("button", { name: "Next run", exact: true });
+    const content = dialog.locator(".drawer-content");
+
+    for (const [back, forward] of [["h", "l"], ["ArrowLeft", "ArrowRight"]]) {
+      await page.locator(".design-card").first().getByRole("button", { name: /View details/ }).click();
+      await dialog.waitFor();
+      assert.equal(await title.innerText(), models[0]);
+
+      // Both directions move.
+      await page.keyboard.press(forward);
+      assert.equal(await title.innerText(), models[1], `${forward} did not advance`);
+      await page.keyboard.press(back);
+      assert.equal(await title.innerText(), models[0], `${back} did not go back`);
+
+      // At each end the arrow is inert but must stay focused. A native
+      // `disabled` attribute dropped focus onto <body>, ejecting a keyboard
+      // user from the dialog entirely.
+      for (const [key, button, edge] of [[back, previous, models[0]], [forward, next, models.at(-1)]]) {
+        if (edge !== models[0]) for (let step = 1; step < models.length; step++) await page.keyboard.press(forward);
+        assert.equal(await title.innerText(), edge);
+        await button.focus();
+        assert.equal(await button.getAttribute("aria-disabled"), "true");
+        await page.keyboard.press(key);
+        assert.equal(await title.innerText(), edge, "Navigation must not wrap past the boundary");
+        await page.keyboard.press("Enter");
+        assert.equal(await title.innerText(), edge, "Activating an aria-disabled arrow must do nothing");
+        assert.ok(await button.evaluate((element) => element === document.activeElement), "Focus must stay in the dialog");
+      }
+
+      // Stepping away from the boundary resumes rather than sticking.
+      await page.keyboard.press(back);
+      assert.equal(await title.innerText(), models.at(-2));
+
+      // j/k scroll the drawer, never the page underneath it.
+      await content.evaluate((element) => { element.scrollTop = 0; });
+      const pageScroll = await page.evaluate(() => window.scrollY);
+      await page.keyboard.press("j");
+      assert.equal(await content.evaluate((element) => element.scrollTop), 80);
+      assert.equal(await page.evaluate(() => window.scrollY), pageScroll);
+      await page.keyboard.press("k");
+      assert.equal(await content.evaluate((element) => element.scrollTop), 0);
+
+      await page.keyboard.press("Escape");
+      await dialog.waitFor({ state: "hidden" });
+    }
+    assert.deepEqual(errors, []);
+  } finally {
+    await browser.close();
+    await new Promise((resolve) => server.httpServer.close(resolve));
   }
 });

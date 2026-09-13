@@ -294,11 +294,6 @@ code {
   box-shadow: 0 0 0 2px var(--paper);
 }
 
-.rating-checks { margin: 0 0 12px; font-size: 13px; }
-.rating-checks > div { padding: 6px 0; border-bottom: 1px solid var(--border); }
-.rating-checks dt { font-weight: 700; }
-.rating-checks dd { margin: 3px 0 0; line-height: 1.35; color: var(--ink); }
-
 .evidence {
   margin: 8px 0 10px;
   color: var(--ink);
@@ -382,7 +377,6 @@ code {
 .drawer-close[aria-disabled="true"] { color: var(--muted); cursor: default; background: var(--surface); }
 .drawer-content { min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 24px 28px 48px; }
 .drawer-evidence { padding-bottom: 20px; margin-bottom: 24px; border-bottom: 1px solid var(--border); }
-.drawer-status { margin-bottom: 10px; color: var(--ink); font-size: 18px; }
 .drawer-evidence .image-meta, .drawer-evidence .evidence { font-size: 14px; line-height: 1.5; }
 .drawer-evidence code { font-size: 12px; }
 .drawer-evidence .card-links { justify-content: start; flex-wrap: wrap; gap: 10px 24px; margin: 16px 0 0; font-size: 14px; }
