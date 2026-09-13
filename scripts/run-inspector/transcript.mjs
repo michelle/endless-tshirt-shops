@@ -11,10 +11,20 @@ export function records(text) {
   });
   return { records: result, malformed };
 }
+// Keep these prefixes in step with CREDENTIALS in
+// run_viewer/scripts/pages-redaction.mjs, which cannot import from here: the
+// pre-push gate publishes run_viewer/ on its own. This one is the coarser of
+// the two, collapsing everything to one marker and also catching credentials
+// named inline by a header or assignment.
+const CREDENTIALS = /(?:sk|pk|rk|rkcs)_(?:test|live)_[\w=-]+|whsec_[\w=-]+|(?:vercel|vcp)_[\w=-]+|(?:test|live)_[a-f\d-]{36}|(?:pi|cs|seti)_[\w]+_secret_[\w]+/gi;
+const NAMED_CREDENTIALS = /(?:bearer|authorization|api[_-]?key|token|secret|signature)\s*[:=]\s*[^\s,;]+/gi;
+const EMAIL = /[\w.+-]+@[\w.-]+\.[A-Za-z]{2,}/g;
+
 export function safeText(value) {
-  return String(value ?? '').replace(/(?:sk|pk|rkcs|rk)_(?:test|live)_[\w=-]+|whsec_[\w=-]+|(?:test|live)_[a-f\d-]{36}|(?:vercel|vcp)_[\w=-]+|(?:pi|cs)_[\w]+_secret_[\w]+/gi, '[REDACTED]')
-    .replace(/[\w.+-]+@[\w.-]+\.[A-Za-z]{2,}/g, '[EMAIL]')
-    .replace(/(?:bearer|authorization|api[_-]?key|token|secret|signature)\s*[:=]\s*[^\s,;]+/gi, '[REDACTED]');
+  return String(value ?? '')
+    .replace(CREDENTIALS, '[REDACTED]')
+    .replace(EMAIL, '[EMAIL]')
+    .replace(NAMED_CREDENTIALS, '[REDACTED]');
 }
 export function docUrl(value) {
   try {
@@ -31,6 +41,30 @@ export function docUrl(value) {
 const urls = text => [...new Set((String(text).match(/https?:\/\/[^\s"'<>\\]+/g) ?? []).map(docUrl).filter(Boolean))];
 const topics = text => ['stripe', 'prodigi', 'framework'].filter(topic => ({ stripe: /stripe/i, prodigi: /prodigi/i,
   framework: /nextjs|next\.js|next\/dist\/docs|react\.dev|react-dom|vite(?:js)?\.(?:dev|org)|\b(?:react|next|vite)\b/i })[topic].test(text));
+
+// Heuristics for what a tool call was doing. Order matters: the first matching
+// rule wins, and the order is load-bearing, so keep these named patterns and
+// the sequence in `operation` together.
+const WRITES = /apply_patch|\*\*\* (?:Begin|Add|Update)|writeFile|cat\s*>|open\([^\n]*['"]w['"]/;
+const READS = /\b(?:cat|sed|rg|head|Read|Grep)\b/;
+const FETCHES = /curl|wget|fetch\(|urlopen|WebFetch|web\.run|web__run/;
+const BUNDLED_DOCS = /node_modules\/.+(?:docs|types|CHANGELOG)|AGENTS\.md/;
+const SAVED_DOCS = /prodigi-reference|prodigi-page|docs[^\s]*\.(?:html|md)/i;
+const VENDOR_API = /api\.(?:sandbox\.)?prodigi\.com|api\.stripe\.com/;
+
+function operation(call, input) {
+  const command = `${input} ${call.tool}`;
+  // A command that writes a file is not a documentation read, however it looks.
+  const reading = !WRITES.test(input);
+  const localRead = pattern => reading && pattern.test(input) && READS.test(command);
+  if (call.webAction === 'search') return 'search';
+  if (call.kind === 'web_search' && call.documentUrls.length) return 'document_request';
+  if (localRead(BUNDLED_DOCS)) return 'local_reference_read';
+  if (reading && call.documentUrls.length && FETCHES.test(command)) return 'document_request';
+  if (localRead(SAVED_DOCS)) return 'local_reference_read';
+  if (VENDOR_API.test(input)) return 'api_interaction';
+  return 'other';
+}
 
 export function normalize(text, provider) {
   const parsed = records(text); const events = []; const calls = new Map(); let terminal = null; let usage = null;
@@ -67,12 +101,7 @@ export function normalize(text, provider) {
     call.topics = topics(input); call.documentUrls = urls(input); call.resultDocumentUrls = urls(output);
     // Full query text stays private: regex redaction cannot reliably remove arbitrary PII.
     call.queries = (call.queries ?? []).map(q => ({ topics: topics(q), documentUrls: urls(q), sha256: createHash('sha256').update(String(q)).digest('hex') }));
-    const writing = /apply_patch|\*\*\* (?:Begin|Add|Update)|writeFile|cat\s*>|open\([^\n]*['"]w['"]/.test(input);
-    call.operation = call.webAction === 'search' ? 'search' : call.kind === 'web_search' && call.documentUrls.length ? 'document_request'
-      : !writing && /node_modules\/.+(?:docs|types|CHANGELOG)|AGENTS\.md/.test(input) && /\b(?:cat|sed|rg|head|Read|Grep)\b/.test(input + ' ' + call.tool) ? 'local_reference_read'
-      : !writing && call.documentUrls.length && /curl|wget|fetch\(|urlopen|WebFetch|web\.run|web__run/.test(input + ' ' + call.tool) ? 'document_request'
-      : !writing && /prodigi-reference|prodigi-page|docs[^\s]*\.(?:html|md)/i.test(input) && /\b(?:cat|sed|rg|head|Read|Grep)\b/.test(input + ' ' + call.tool) ? 'local_reference_read'
-      : /api\.(?:sandbox\.)?prodigi\.com|api\.stripe\.com/.test(input) ? 'api_interaction' : 'other';
+    call.operation = operation(call, input);
     call.evidence = call.status === 'failed' ? 'failed_attempt' : call.status === 'incomplete' ? 'incomplete_attempt' : output.length ? 'tool_result_available' : 'request_only';
     call.referencePaths = [...new Set(input.match(/node_modules\/(?:next|stripe|react|vite)\/[a-zA-Z0-9_./-]+\.(?:md|ts)/g) ?? [])];
     call.resultCharacters = output.length;
@@ -81,7 +110,18 @@ export function normalize(text, provider) {
   const coverage = { schemaVersion, provider, format: provider === 'claude' && !events.length ? 'result_only_or_no_tools' : 'event_stream', terminalEvent: Boolean(terminal), malformedLines: parsed.malformed,
     capturedRecords: parsed.records.length, toolCalls: events.length, limitations: ['A search or fetch does not prove comprehension or influence.', 'Shell classification is heuristic; mixed write/read commands and dynamic URLs may be missed.',
       ...(provider === 'codex' ? ['Exec web events may omit resolved URLs and result contents.'] : []), ...(!events.length ? ['No tool history available; zero observed calls is not evidence of no documentation use.'] : [])] };
-  if (usage) { usage = Object.fromEntries(Object.entries(usage).filter(([,v]) => Number.isInteger(v))); if (usage.input_tokens != null) usage.new_input_tokens = provider === 'claude' ? usage.input_tokens + (usage.cache_creation_input_tokens ?? 0) : Math.max(0, usage.input_tokens - (usage.cached_input_tokens ?? 0)); }
+  if (usage) {
+    usage = Object.fromEntries(Object.entries(usage).filter(([, value]) => Number.isInteger(value)));
+    // The two providers define input_tokens differently, so the arithmetic has
+    // to differ to mean the same thing: Claude reports uncached input only, and
+    // cache writes are new input on top of it; Codex reports the whole prompt,
+    // cached portion included, so the cache reads come back out.
+    if (usage.input_tokens != null) {
+      usage.new_input_tokens = provider === 'claude'
+        ? usage.input_tokens + (usage.cache_creation_input_tokens ?? 0)
+        : Math.max(0, usage.input_tokens - (usage.cached_input_tokens ?? 0));
+    }
+  }
   return { events, coverage, usage, failed: Boolean(terminal?.is_error || terminal?.type === 'turn.failed'), final: typeof terminal?.result === 'string' ? terminal.result : null };
 }
 export function documentation(events, coverage) {

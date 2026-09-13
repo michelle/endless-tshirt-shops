@@ -6,6 +6,7 @@
 .benchmark-secrets/
 .DS_Store
 
-# Per-run code, final output, redacted log, and metadata are committed for review.
-# Raw execution transcripts may contain credentials and remain local only.
+# Generated code, the agent's report, the filtered event log and metadata are
+# committed for review. Raw execution transcripts can contain credentials and
+# stay local, alongside everything under .benchmark-secrets/.
 runs/*/agent.raw.log

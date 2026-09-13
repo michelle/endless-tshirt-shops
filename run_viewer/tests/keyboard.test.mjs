@@ -1,14 +1,17 @@
 import assert from "node:assert/strict";
+import { fileURLToPath } from "node:url";
 import test from "node:test";
+import { preview } from "vite";
 import { chromium } from "playwright";
 
 test("drawer shortcuts retain focus and reverse direction at either boundary", async () => {
+  const server = await preview({ configFile: fileURLToPath(new URL("../vite.config.ts", import.meta.url)), preview: { host: "127.0.0.1", port: 0, open: false } });
   const browser = await chromium.launch({ headless: true, ...(process.env.CAPTURE_BROWSER === "chrome" ? { channel: "chrome" } : {}) });
   try {
     const page = await browser.newPage({ viewport: { width: 1280, height: 720 } });
     const errors = [];
     page.on("pageerror", (error) => errors.push(error.message));
-    await page.goto(process.env.VIEWER_URL ?? "http://localhost:4173/", { waitUntil: "networkidle" });
+    await page.goto(server.resolvedUrls.local[0], { waitUntil: "networkidle" });
     await page.getByRole("combobox").selectOption("20260905-minimal-high");
     const dialog = page.getByRole("dialog");
     const title = dialog.locator("#run-drawer-title");
@@ -54,5 +57,8 @@ test("drawer shortcuts retain focus and reverse direction at either boundary", a
       await dialog.waitFor({ state: "hidden" });
     }
     assert.deepEqual(errors, []);
-  } finally { await browser.close(); }
+  } finally {
+    await browser.close();
+    await new Promise((resolve) => server.httpServer.close(resolve));
+  }
 });

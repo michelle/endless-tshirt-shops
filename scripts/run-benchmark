@@ -59,10 +59,12 @@ vercel_project_name() {
 }
 
 extract_url() {
-  grep -Eo 'https://[^[:space:]"'"'"'<>]+' "$1" 2>/dev/null |
-    grep -E 'vercel\.app|vercel\.sh' |
-    sed -E 's/[][),.;]+$//' |
-    tail -n 1 || true
+  # Completion reports wrap the URL in Markdown links, bold spans and code
+  # spans, and usually mention a webhook route after the storefront. Matching
+  # only the origin keeps trailing punctuation and route paths out, and the
+  # first mention is the storefront rather than an API path.
+  grep -Eo 'https://[a-z0-9][a-z0-9.-]*\.vercel\.(app|sh)' "$1" 2>/dev/null |
+    head -n 1 || true
 }
 
 assert_no_staged_secrets() {
@@ -145,7 +147,6 @@ VERCEL_PROJECT=$(vercel_project_name "$RUN_ID")
 RESULT_DIR="$REPO_ROOT/runs/$RUN_ID"
 WORKSPACE="$RESULT_DIR/workspace"
 RAW_LOG="$RESULT_DIR/agent.raw.log"
-REDACTED_LOG="$RESULT_DIR/agent.log"
 FINAL_OUTPUT="$RESULT_DIR/final.md"
 METADATA="$RESULT_DIR/metadata.json"
 USAGE_OUTPUT="$RESULT_DIR/usage.json"
@@ -373,14 +374,13 @@ fi
 
 DEPLOYMENT_URL=$(extract_url "$FINAL_OUTPUT")
 USAGE_JSON=null
-if [[ -s $USAGE_OUTPUT ]] && python3 - "$USAGE_OUTPUT" >/dev/null <<'PY'
-import json
-import sys
-value = json.load(open(sys.argv[1], encoding='utf-8'))
-assert value is None or isinstance(value, dict)
-PY
-then
-  USAGE_JSON=$(cat "$USAGE_OUTPUT")
+if [[ -s $USAGE_OUTPUT ]]; then
+  # Compact, so this one-line value nests correctly in the object built below.
+  COMPACT_USAGE=$(node -e '
+    const value = JSON.parse(require("fs").readFileSync(process.argv[1], "utf8"));
+    if (value !== null && (typeof value !== "object" || Array.isArray(value))) process.exit(1);
+    process.stdout.write(JSON.stringify(value));
+  ' "$USAGE_OUTPUT" 2>/dev/null) && USAGE_JSON=$COMPACT_USAGE
 fi
 PROMPT_SHA=$(shasum -a 256 "$BENCHMARK_PROMPT_FILE" | awk '{print $1}')
 git add "$WORKSPACE"

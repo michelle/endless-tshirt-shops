@@ -1,55 +1,62 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { assessments, rateRun } from "../app/ratings.ts";
+import { suites } from "../app/data.ts";
+import { assessments, criteria, rateRun } from "../audit/ratings.ts";
 
-test("every reviewed run has three explicit checks, reasons, and the strict color", () => {
-  const expected = {
-    "20260910-prompt-v3-high": [0, 0, 1, 0, 3, 3, 2],
-    "20260908-prompt-v3-rerun2-high": [3, 1, 0, 0, 3, 3, 2],
-    "20260907-prompt-v3-rerun-high": [0, 1, 1, 0, 3, 0, 0],
-    "20260907-prompt-v3-high": [0, 1, 0, 0, 1, 3, 3],
-    "20260906-minimal-inspector-high": [0, 0, 1, 2, 3, 3, 1],
-    "20260906-clean-sheet-high": [3, 1, 1, 1, 3, 2, 1],
-    "20260905-unserious-high": [2, 0, 0, 0, 3, 2, 2],
-    "20260905-beauty-high": [3, 0, 0, 0, 3, 2, 0],
-    "20260905-minimal-high": [3, 2, 2, 0, 3, 3, 2],
-  };
-  for (const [suite, counts] of Object.entries(expected)) {
-    const models = ["astra", "sol", "terra", "luna", "fable", "opus", "sonnet"];
-    assert.equal(Object.keys(assessments[suite]).length, 7);
-    models.forEach((model, index) => {
-      const rating = rateRun(suite, model);
-      assert.equal(rating.passed, counts[index], `${suite}/${model}`);
-      assert.equal(rating.tone, counts[index] === 3 ? "complete" : counts[index] === 2 ? "partial" : "failed");
-      assert.equal(rating.checks.length, 3);
-      for (const check of rating.checks) assert.ok(check.reason.length > 20);
-    });
+const recorded = Object.entries(assessments).flatMap(([suiteId, runs]) =>
+  Object.entries(runs).map(([runId, assessment]) => ({ suiteId, runId, assessment })),
+);
+
+test("a rating aggregates exactly the checks recorded for that run", () => {
+  for (const { suiteId, runId, assessment } of recorded) {
+    const rating = rateRun(suiteId, runId);
+    const passed = Object.values(assessment).filter((check) => check.result === "pass").length;
+    assert.equal(rating.passed, passed, `${suiteId}/${runId}`);
+    assert.equal(rating.tone, passed === 3 ? "complete" : passed === 2 ? "partial" : "failed");
+    assert.equal(rating.label, passed === 3 ? "Pass" : passed === 2 ? "Partial" : "Fail");
+    assert.deepEqual(rating.checks.map((check) => check.id), criteria.map((criterion) => criterion.id));
   }
 });
 
-test("theme prompts use their own artwork criterion without weakening timestamp-only suites", () => {
-  assert.equal(rateRun("20260906-clean-sheet-high", "sonnet").checks[0].label, "Printable theme design");
-  assert.equal(rateRun("20260910-prompt-v3-high", "sonnet").checks[0].label, "Printable theme design");
-  assert.equal(rateRun("20260907-prompt-v3-high", "sonnet").checks[0].label, "Printable theme design");
-  for (const suite of ["20260905-minimal-high", "20260905-beauty-high", "20260905-unserious-high"]) {
-    assert.equal(rateRun(suite, "sonnet").checks[0].label, "Timestamp-only print");
-    assert.equal(rateRun(suite, "sonnet").checks[0].result, "fail");
+test("every recorded judgement names a real run and fills in all three criteria", () => {
+  for (const { suiteId, runId, assessment } of recorded) {
+    const suite = suites.find((candidate) => candidate.id === suiteId);
+    assert.ok(suite, `Judgement for an unregistered suite: ${suiteId}`);
+    assert.ok(suite.runs.some((run) => run.id === runId), `Judgement for an unregistered run: ${suiteId}/${runId}`);
+    assert.deepEqual(Object.keys(assessment).sort(), criteria.map((criterion) => criterion.id).sort());
+    for (const [id, check] of Object.entries(assessment)) {
+      assert.ok(["pass", "fail", "unverified"].includes(check.result), `${suiteId}/${runId}/${id}: ${check.result}`);
+      assert.ok(check.reason.trim(), `${suiteId}/${runId}/${id} has no reason`);
+    }
   }
 });
 
-test("20260911-prompt-v3-high is staged but unaudited, so nothing passes yet", () => {
-  for (const model of ["astra", "sol", "terra", "luna", "fable", "opus", "sonnet"]) {
-    const rating = rateRun("20260911-prompt-v3-high", model);
-    assert.equal(rating.passed, 0, `20260911/${model} scored before audit`);
-    assert.ok(rating.checks.every((check) => check.result === "unverified"));
+// Which prompts asked for an original theme rather than only a timestamp. This
+// is the independent anchor for themedArtwork: the flag is derived from the task
+// a suite actually ran, so checking it against rateRun alone proves nothing.
+const THEMED_PROMPTS = new Set(["prompt-v2.md", "prompt-v3.md", "prompt-clean-sheet.md"]);
+
+test("themedArtwork agrees with the prompt each suite actually ran", () => {
+  for (const suite of suites) {
+    assert.equal(Boolean(suite.themedArtwork), THEMED_PROMPTS.has(suite.prompt.file),
+      `${suite.id} ran ${suite.prompt.file}`);
   }
-  // Theme prompt, so the artwork criterion must not be the timestamp-only one.
-  assert.equal(rateRun("20260911-prompt-v3-high", "fable").checks[0].label, "Printable theme design");
 });
 
-test("future unreviewed runs never silently pass", () => {
+test("the artwork criterion swaps for themed suites and holds for timestamp suites", () => {
+  const label = (suiteId) => rateRun(suiteId, "sonnet").checks[0].label;
+  const scored = suites.filter((suite) => suite.runs.length);
+  const themed = scored.filter((suite) => THEMED_PROMPTS.has(suite.prompt.file));
+  const timestamp = scored.filter((suite) => !THEMED_PROMPTS.has(suite.prompt.file));
+  assert.ok(themed.length && timestamp.length, "Both prompt styles must be represented");
+  for (const suite of themed) assert.equal(label(suite.id), "Printable theme design", suite.id);
+  for (const suite of timestamp) assert.equal(label(suite.id), "Timestamp-only print", suite.id);
+});
+
+test("runs with no recorded judgement never pass", () => {
   const rating = rateRun("future-suite", "new-model");
   assert.equal(rating.passed, 0);
   assert.equal(rating.tone, "failed");
   assert.ok(rating.checks.every((check) => check.result === "unverified"));
+  assert.ok(rating.checks.every((check) => check.reason.trim()));
 });

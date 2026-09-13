@@ -26,7 +26,6 @@ export const statusDefinitions: Record<string, string> = {
   "Submitted app icon": "The synthetic Prodigi order used the site's 64×64 app icon. The viewer shows that wrong submitted file, not the intended shirt design stored in an unpaid checkout.",
   "Paid E2E": "A real payment completed in Stripe's test environment, and the app sent artwork to Prodigi. E2E means end to end. This does not mean a physical shirt was printed or inspected.",
   "No paid E2E": "No complete customer payment-to-fulfillment flow was verified. Test orders may still exist.",
-  "no paid E2E": "No complete customer payment-to-fulfillment flow was verified. Test orders may still exist.",
   "completed print": "The audit confirmed a Prodigi sandbox order with a completed artwork source. This is API test evidence, not confirmation of a manufactured shirt.",
   "2 completed prints": "The audit confirmed two Prodigi sandbox orders after test payments. No physical shirts were inspected.",
   "locally reproduced design": "The audit ran the app's image-generation code locally with inputs from a recorded unpaid checkout. The customer fulfillment code uses this artwork route, but no paid delivery was verified. A separate command-line smoke test bypassed the app and used a social-preview image; that is not evidence the app would submit the wrong image.",
@@ -38,6 +37,15 @@ export const statusDefinitions: Record<string, string> = {
   "Session design": "The artwork URL was stored in a Stripe Checkout Session, the record for a checkout attempt that remained unpaid. This is intended artwork, not the image sent in the synthetic print test, which used the app icon.",
 };
 
+// Suite reports capitalise the same label inconsistently, so match on case-folded
+// keys rather than carrying a near-duplicate entry per spelling.
+const byLabel = new Map(
+  Object.entries(statusDefinitions).map(([label, definition]) => [label.toLowerCase(), definition]),
+);
+
 export function explainStatus(status: string) {
-  return status.split(" · ").map((label) => ({ label, definition: statusDefinitions[label] ?? label }));
+  return status.split(" · ").map((label) => ({
+    label,
+    definition: byLabel.get(label.toLowerCase()) ?? label,
+  }));
 }

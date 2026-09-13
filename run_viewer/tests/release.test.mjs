@@ -13,7 +13,7 @@ const contract = JSON.parse(await readFile(new URL("./fixtures/permalinks-v1.jso
 test("release serves every registered and archived asset, never a disguised SPA 200", async () => {
   const registered = await registeredAssets(suites, fileURLToPath(new URL("../public/", import.meta.url)));
   const archived = (await readdir(new URL("../public/", import.meta.url), { recursive: true })).filter(isPublishedArchivePath).map(p => `/${p}`);
-  const server = await preview({ configFile: fileURLToPath(new URL("../vite.pages.config.ts", import.meta.url)), preview: { host: "127.0.0.1", port: 0, open: false } });
+  const server = await preview({ configFile: fileURLToPath(new URL("../vite.config.ts", import.meta.url)), preview: { host: "127.0.0.1", port: 0, open: false } });
   try {
     const base = server.resolvedUrls.local[0];
     for (const asset of new Set([...registered, ...archived])) {
@@ -28,7 +28,7 @@ test("release serves every registered and archived asset, never a disguised SPA 
 });
 
 test("every published v1 permalink cold-loads the correct suite, drawer, and summary anchors", async () => {
-  const server = await preview({ configFile: fileURLToPath(new URL("../vite.pages.config.ts", import.meta.url)), preview: { host: "127.0.0.1", port: 0, open: false } });
+  const server = await preview({ configFile: fileURLToPath(new URL("../vite.config.ts", import.meta.url)), preview: { host: "127.0.0.1", port: 0, open: false } });
   let browser;
   try {
     browser = await chromium.launch({ headless: true, ...(process.env.CAPTURE_BROWSER === "chrome" ? { channel: "chrome" } : {}) });

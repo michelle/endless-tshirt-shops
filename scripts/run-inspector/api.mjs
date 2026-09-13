@@ -30,6 +30,8 @@ export async function stripeList(endpoint, key, { fetcher = fetch, maxPages = 10
 }
 export async function collectStripe(file, options = {}) {
   let config; try { config = await readFile(file, 'utf8'); } catch { return { available: false, reason: 'Saved profile unavailable' }; }
+  // The Stripe CLI profile is a flat TOML table, so one regex per field avoids a
+  // dependency. Values may be bare, single-quoted (literal) or double-quoted.
   const field = name => {
     const raw = config.match(new RegExp(`^\\s*${name}\\s*=\\s*(.+)$`, 'm'))?.[1]?.trim();
     if (!raw) return null;

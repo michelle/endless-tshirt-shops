@@ -31,6 +31,8 @@ export type Suite = {
   id: string;
   label: string;
   incomplete?: boolean;
+  /** Prompt asked for an original theme, so artwork is not scored timestamp-only. */
+  themedArtwork?: boolean;
   summary: string;
   prompt: { path: string; file: string; revision: string; sha256: string };
   runs: Run[];
@@ -49,6 +51,7 @@ const models = {
 export const suites: Suite[] = [
   {
     id: "20260911-prompt-v3-high",
+    themedArtwork: true,
     label: "2026-09-11 · Prompt v3 · Seven-model run · Provider-neutral environment",
     summary: "/suites/20260911-prompt-v3-high/summary.md",
     prompt: { path: "/suites/20260911-prompt-v3-high/prompt.md", file: "prompt-v3.md", revision: "c92cff1113f3c26befbd951f3eb75bc96392395e", sha256: "30868370940510cfeb6f8c1da9e0f748ad6ac4f3e1e5e59e3e85adcecc910f99" },
@@ -109,6 +112,7 @@ export const suites: Suite[] = [
   },
   {
     id: "20260910-prompt-v3-high",
+    themedArtwork: true,
     label: "2026-09-10 · Prompt v3 · Seven-model run",
     summary: "/suites/20260910-prompt-v3-high/summary.md",
     prompt: { path: "/suites/20260910-prompt-v3-high/prompt.md", file: "prompt-v3.md", revision: "0630ff8554ccc63f7b8dd9e14e70fbdf824f5d42", sha256: "30868370940510cfeb6f8c1da9e0f748ad6ac4f3e1e5e59e3e85adcecc910f99" },
@@ -173,6 +177,7 @@ export const suites: Suite[] = [
   },
   {
     id: "20260908-prompt-v3-rerun2-high",
+    themedArtwork: true,
     label: "2026-09-08 · Prompt v3 · Second rerun",
     summary: "/suites/20260908-prompt-v3-rerun2-high/summary.md",
     prompt: { path: "/suites/20260908-prompt-v3-rerun2-high/prompt.md", file: "prompt-v3.md", revision: "1e9a34acb43bde2a03857309dc46185252f1718d", sha256: "30868370940510cfeb6f8c1da9e0f748ad6ac4f3e1e5e59e3e85adcecc910f99" },
@@ -237,6 +242,7 @@ export const suites: Suite[] = [
   },
   {
     id: "20260907-prompt-v3-rerun-high",
+    themedArtwork: true,
     label: "2026-09-07 · Prompt v3 · Queued rerun [incomplete]",
     incomplete: true,
     summary: "/suites/20260907-prompt-v3-rerun-high/summary.md",
@@ -300,6 +306,7 @@ export const suites: Suite[] = [
   },
   {
     id: "20260907-prompt-v3-high",
+    themedArtwork: true,
     label: "2026-09-07 · Prompt v3 · Original",
     summary: "/suites/20260907-prompt-v3-high/summary.md",
     prompt: { path: "/suites/20260907-prompt-v3-high/prompt.md", file: "prompt-v3.md", revision: "3442b70e56ceac2d0fe20497f39d23374f04bca9", sha256: "30868370940510cfeb6f8c1da9e0f748ad6ac4f3e1e5e59e3e85adcecc910f99" },
@@ -364,6 +371,7 @@ export const suites: Suite[] = [
   },
   {
     id: "20260907-prompt-v2-rerun2-high",
+    themedArtwork: true,
     label: "2026-09-07 · Prompt v2 · Second rerun",
     summary: "/suites/20260907-prompt-v2-rerun2-high/summary.md",
     prompt: { path: "/suites/20260907-prompt-v2-rerun2-high/prompt.md", file: "prompt-v2.md", revision: "01bb32d2b9201a1caf0eee56f755259c6f1ce183", sha256: "9b6228722b8330ca6d1311de695eb99ec4da2809a92e17be2e7c82a0e13f316b" },
@@ -428,6 +436,7 @@ export const suites: Suite[] = [
   },
   {
     id: "20260907-prompt-v2-rerun-high",
+    themedArtwork: true,
     label: "2026-09-07 · Prompt v2 · First rerun [incomplete]",
     incomplete: true,
     summary: "/suites/20260907-prompt-v2-rerun-high/summary.md",
@@ -490,111 +499,112 @@ export const suites: Suite[] = [
     ],
   },
   {
-    "id": "20260906-minimal-inspector-high",
-    "label": "2026-09-06 · Minimal prompt · Inspector",
-    "summary": "/suites/20260906-minimal-inspector-high/summary.md",
-    "prompt": {
-      "path": "/suites/20260906-minimal-inspector-high/prompt.md",
-      "file": "prompt-minimal.md",
-      "revision": "4bc4cd4b59f6f5bbab4b9df6a26f480d02c0b40d",
-      "sha256": "89e64ebec54ddb8a435fa862928543f5c8a9ef64f34f79acfd80bc87e515b390"
+    id: "20260906-minimal-inspector-high",
+    label: "2026-09-06 · Minimal prompt · Inspector",
+    summary: "/suites/20260906-minimal-inspector-high/summary.md",
+    prompt: {
+      path: "/suites/20260906-minimal-inspector-high/prompt.md",
+      file: "prompt-minimal.md",
+      revision: "4bc4cd4b59f6f5bbab4b9df6a26f480d02c0b40d",
+      sha256: "89e64ebec54ddb8a435fa862928543f5c8a9ef64f34f79acfd80bc87e515b390"
     },
-    "runs": [
+    runs: [
       {
-        "id": "astra",
-        "model": "Codex · gpt-6-astra",
-        "commit": "b38cde9f",
-        "status": "Direct smoke order · isolation failure",
-        "deployment": "https://datetime-20260906-6b537472.vercel.app",
-        "finalOutput": "/suites/20260906-minimal-inspector-high/runs/20260906-minimal-inspector-high-codex-gpt-6-astra/final.md",
-        "design": "/suites/20260906-minimal-inspector-high/runs/20260906-minimal-inspector-high-codex-gpt-6-astra/design.png",
-        "width": 4677,
-        "height": 5881,
-        "alpha": "RGBA transparency · white ink for black shirt",
-        "evidence": "Exact unisex/M test-order source using an unpaid Astra app Session's timestamp input. The raster cuts off the final digits; this is present in the original, not viewer cropping. Standalone paid PaymentIntent and smoke orders do not prove hosted checkout. Astra's Stripe account also contains Terra's webhook; isolation failed. ord_1170757; original MD5 matches Prodigi. GLOBAL-TEE-BC-3001, black/m, front, fitPrintArea. Canvas 4677×5881; 146,180 nontransparent pixels; bounds (1153, 931, 3268, 1154). Full canvas preserved; physical placement/sample unverified."
+        id: "astra",
+        model: "Codex · gpt-6-astra",
+        commit: "b38cde9f",
+        status: "Direct smoke order · isolation failure",
+        deployment: "https://datetime-20260906-6b537472.vercel.app",
+        finalOutput: "/suites/20260906-minimal-inspector-high/runs/20260906-minimal-inspector-high-codex-gpt-6-astra/final.md",
+        design: "/suites/20260906-minimal-inspector-high/runs/20260906-minimal-inspector-high-codex-gpt-6-astra/design.png",
+        width: 4677,
+        height: 5881,
+        alpha: "RGBA transparency · white ink for black shirt",
+        evidence: "Exact unisex/M test-order source using an unpaid Astra app Session's timestamp input. The raster cuts off the final digits; this is present in the original, not viewer cropping. Standalone paid PaymentIntent and smoke orders do not prove hosted checkout. Astra's Stripe account also contains Terra's webhook; isolation failed. ord_1170757; original MD5 matches Prodigi. GLOBAL-TEE-BC-3001, black/m, front, fitPrintArea. Canvas 4677×5881; 146,180 nontransparent pixels; bounds (1153, 931, 3268, 1154). Full canvas preserved; physical placement/sample unverified."
       },
       {
-        "id": "sol",
-        "model": "Codex · gpt-5.6-sol",
-        "commit": "bf3486fc",
-        "status": "Direct smoke order · ineffective print scale",
-        "deployment": "https://benchmark-20260906-minimal-inspecto-inky.vercel.app",
-        "finalOutput": "/suites/20260906-minimal-inspector-high/runs/20260906-minimal-inspector-high-codex-gpt-5.6-sol/final.md",
-        "design": "/suites/20260906-minimal-inspector-high/runs/20260906-minimal-inspector-high-codex-gpt-5.6-sol/design.png",
-        "width": 4665,
-        "height": 5844,
-        "alpha": "RGBA transparency · white ink for black shirt",
-        "evidence": "Exact fitted/M standalone test-order source using the app's signed artwork route, not a paid customer order. The 13-digit timestamp has only 754 nontransparent pixels and a 129×12-pixel bounding box. Both app Sessions remain unpaid; fit/size inputs differ from the same-timestamp unisex/L Session, but renderer draws only the timestamp. ord_1170762; original MD5 matches Prodigi. GLOBAL-TEE-BC-6004, black/m, front, fitPrintArea. Canvas 4665×5844; 754 nontransparent pixels; bounds (2268, 1412, 2397, 1424). Full canvas preserved; physical placement/sample unverified."
+        id: "sol",
+        model: "Codex · gpt-5.6-sol",
+        commit: "bf3486fc",
+        status: "Direct smoke order · ineffective print scale",
+        deployment: "https://benchmark-20260906-minimal-inspecto-inky.vercel.app",
+        finalOutput: "/suites/20260906-minimal-inspector-high/runs/20260906-minimal-inspector-high-codex-gpt-5.6-sol/final.md",
+        design: "/suites/20260906-minimal-inspector-high/runs/20260906-minimal-inspector-high-codex-gpt-5.6-sol/design.png",
+        width: 4665,
+        height: 5844,
+        alpha: "RGBA transparency · white ink for black shirt",
+        evidence: "Exact fitted/M standalone test-order source using the app's signed artwork route, not a paid customer order. The 13-digit timestamp has only 754 nontransparent pixels and a 129×12-pixel bounding box. Both app Sessions remain unpaid; fit/size inputs differ from the same-timestamp unisex/L Session, but renderer draws only the timestamp. ord_1170762; original MD5 matches Prodigi. GLOBAL-TEE-BC-6004, black/m, front, fitPrintArea. Canvas 4665×5844; 754 nontransparent pixels; bounds (2268, 1412, 2397, 1424). Full canvas preserved; physical placement/sample unverified."
       },
       {
-        "id": "terra",
-        "model": "Codex · gpt-5.6-terra",
-        "commit": "b0477cd5",
-        "status": "Direct smoke order · isolation failure",
-        "deployment": "https://benchmark-20260906-minimal-inspecto-plum.vercel.app",
-        "finalOutput": "/suites/20260906-minimal-inspector-high/runs/20260906-minimal-inspector-high-codex-gpt-5.6-terra/final.md",
-        "design": "/suites/20260906-minimal-inspector-high/runs/20260906-minimal-inspector-high-codex-gpt-5.6-terra/design.png",
-        "width": 2480,
-        "height": 3507,
-        "alpha": "RGBA transparency · white ink for black shirt",
-        "evidence": "Exact fitted/M test source, timestamp 1777777777777. Standalone Prodigi submission, not customer checkout proof. Terra's saved Stripe profile has no test key; its storefront webhook appears on Astra's account. Source reads current collected_information first, with a legacy fallback. ord_1170764; original MD5 matches Prodigi. GLOBAL-TEE-GIL-64000L, black/m, front, fillPrintArea. Canvas 2480×3507; 39,646 nontransparent pixels; bounds (695, 1696, 1805, 1821). Full canvas preserved; physical placement/sample unverified."
+        id: "terra",
+        model: "Codex · gpt-5.6-terra",
+        commit: "b0477cd5",
+        status: "Direct smoke order · isolation failure",
+        deployment: "https://benchmark-20260906-minimal-inspecto-plum.vercel.app",
+        finalOutput: "/suites/20260906-minimal-inspector-high/runs/20260906-minimal-inspector-high-codex-gpt-5.6-terra/final.md",
+        design: "/suites/20260906-minimal-inspector-high/runs/20260906-minimal-inspector-high-codex-gpt-5.6-terra/design.png",
+        width: 2480,
+        height: 3507,
+        alpha: "RGBA transparency · white ink for black shirt",
+        evidence: "Exact fitted/M test source, timestamp 1777777777777. Standalone Prodigi submission, not customer checkout proof. Terra's saved Stripe profile has no test key; its storefront webhook appears on Astra's account. Source reads current collected_information first, with a legacy fallback. ord_1170764; original MD5 matches Prodigi. GLOBAL-TEE-GIL-64000L, black/m, front, fillPrintArea. Canvas 2480×3507; 39,646 nontransparent pixels; bounds (695, 1696, 1805, 1821). Full canvas preserved; physical placement/sample unverified."
       },
       {
-        "id": "luna",
-        "model": "Codex · gpt-5.6-luna",
-        "commit": "94cf62bd",
-        "status": "Payment received · extra branding",
-        "deployment": "https://benchmark-20260906-minimal-inspecto-orpin.vercel.app",
-        "finalOutput": "/suites/20260906-minimal-inspector-high/runs/20260906-minimal-inspector-high-codex-gpt-5.6-luna/final.md",
-        "design": "/suites/20260906-minimal-inspector-high/runs/20260906-minimal-inspector-high-codex-gpt-5.6-luna/design.png",
-        "width": 4677,
-        "height": 5787,
-        "alpha": "RGBA transparency · white ink for black shirt",
-        "evidence": "Exact paid fitted/L source. The deployed PNG has only 4,636 nontransparent pixels and includes ISO date, fit, and DATETIME.STORE in addition to the timestamp. Paid app-shaped PaymentIntent links to completed order; independent browser replay remains unverified. ord_1170769; original MD5 matches Prodigi. GLOBAL-TEE-BC-6004, black/l, front, fitPrintArea. Canvas 4677×5787; 4,636 nontransparent pixels; bounds (2014, 2807, 2668, 3459). Full canvas preserved; physical placement/sample unverified."
+        id: "luna",
+        model: "Codex · gpt-5.6-luna",
+        commit: "94cf62bd",
+        status: "Payment received · extra branding",
+        deployment: "https://benchmark-20260906-minimal-inspecto-orpin.vercel.app",
+        finalOutput: "/suites/20260906-minimal-inspector-high/runs/20260906-minimal-inspector-high-codex-gpt-5.6-luna/final.md",
+        design: "/suites/20260906-minimal-inspector-high/runs/20260906-minimal-inspector-high-codex-gpt-5.6-luna/design.png",
+        width: 4677,
+        height: 5787,
+        alpha: "RGBA transparency · white ink for black shirt",
+        evidence: "Exact paid fitted/L source. The deployed PNG has only 4,636 nontransparent pixels and includes ISO date, fit, and DATETIME.STORE in addition to the timestamp. Paid app-shaped PaymentIntent links to completed order; independent browser replay remains unverified. ord_1170769; original MD5 matches Prodigi. GLOBAL-TEE-BC-6004, black/l, front, fitPrintArea. Canvas 4677×5787; 4,636 nontransparent pixels; bounds (2014, 2807, 2668, 3459). Full canvas preserved; physical placement/sample unverified."
       },
       {
-        "id": "fable",
-        "model": "Claude · claude-fable-5-1",
-        "commit": "aaae4f46",
-        "status": "Paid E2E · completed print",
-        "deployment": "https://benchmark-20260906-minimal-inspecto-five.vercel.app",
-        "finalOutput": "/suites/20260906-minimal-inspector-high/runs/20260906-minimal-inspector-high-claude-claude-fable-5-1/final.md",
-        "design": "/suites/20260906-minimal-inspector-high/runs/20260906-minimal-inspector-high-claude-claude-fable-5-1/design.png",
-        "width": 2490,
-        "height": 3510,
-        "alpha": "RGBA transparency · white ink for black shirt",
-        "evidence": "Exact paid unisex/L source. App PaymentIntent receipt, selected variant, and completed Prodigi order agree. Archived browser purchase script and final report support the customer flow; audit did not replay payment. Earlier asset failures remain in the record. ord_1170778; original MD5 matches Prodigi. GLOBAL-TEE-BC-3001, black/l, front, fitPrintArea. Canvas 2490×3510; 88,621 nontransparent pixels; bounds (371, 654, 2118, 806). Full canvas preserved; physical placement/sample unverified."
+        id: "fable",
+        model: "Claude · claude-fable-5-1",
+        commit: "aaae4f46",
+        status: "Paid E2E · completed print",
+        deployment: "https://benchmark-20260906-minimal-inspecto-five.vercel.app",
+        finalOutput: "/suites/20260906-minimal-inspector-high/runs/20260906-minimal-inspector-high-claude-claude-fable-5-1/final.md",
+        design: "/suites/20260906-minimal-inspector-high/runs/20260906-minimal-inspector-high-claude-claude-fable-5-1/design.png",
+        width: 2490,
+        height: 3510,
+        alpha: "RGBA transparency · white ink for black shirt",
+        evidence: "Exact paid unisex/L source. App PaymentIntent receipt, selected variant, and completed Prodigi order agree. Archived browser purchase script and final report support the customer flow; audit did not replay payment. Earlier asset failures remain in the record. ord_1170778; original MD5 matches Prodigi. GLOBAL-TEE-BC-3001, black/l, front, fitPrintArea. Canvas 2490×3510; 88,621 nontransparent pixels; bounds (371, 654, 2118, 806). Full canvas preserved; physical placement/sample unverified."
       },
       {
-        "id": "opus",
-        "model": "Claude · claude-opus-5",
-        "commit": "f13ab70f",
-        "status": "Paid E2E · completed print",
-        "deployment": "https://benchmark-20260906-minimal-inspecto-mu.vercel.app",
-        "finalOutput": "/suites/20260906-minimal-inspector-high/runs/20260906-minimal-inspector-high-claude-claude-opus-5/final.md",
-        "design": "/suites/20260906-minimal-inspector-high/runs/20260906-minimal-inspector-high-claude-claude-opus-5/design.png",
-        "width": 4680,
-        "height": 5790,
-        "alpha": "RGBA transparency · white ink for black shirt",
-        "evidence": "Exact paid fitted/M source. Final app payment links to completed Prodigi order with the intended garment. Body idempotency, manual capture and failure cancellation are implemented; earlier failed-asset tests are not silently discarded. ord_1170792; original MD5 matches Prodigi. GLOBAL-TEE-BC-6004, black/m, front, fitPrintArea. Canvas 4680×5790; 246,242 nontransparent pixels; bounds (1147, 895, 3542, 1117). Full canvas preserved; physical placement/sample unverified."
+        id: "opus",
+        model: "Claude · claude-opus-5",
+        commit: "f13ab70f",
+        status: "Paid E2E · completed print",
+        deployment: "https://benchmark-20260906-minimal-inspecto-mu.vercel.app",
+        finalOutput: "/suites/20260906-minimal-inspector-high/runs/20260906-minimal-inspector-high-claude-claude-opus-5/final.md",
+        design: "/suites/20260906-minimal-inspector-high/runs/20260906-minimal-inspector-high-claude-claude-opus-5/design.png",
+        width: 4680,
+        height: 5790,
+        alpha: "RGBA transparency · white ink for black shirt",
+        evidence: "Exact paid fitted/M source. Final app payment links to completed Prodigi order with the intended garment. Body idempotency, manual capture and failure cancellation are implemented; earlier failed-asset tests are not silently discarded. ord_1170792; original MD5 matches Prodigi. GLOBAL-TEE-BC-6004, black/m, front, fitPrintArea. Canvas 4680×5790; 246,242 nontransparent pixels; bounds (1147, 895, 3542, 1117). Full canvas preserved; physical placement/sample unverified."
       },
       {
-        "id": "sonnet",
-        "model": "Claude · claude-sonnet-5",
-        "commit": "f872593d",
-        "status": "Payment received · duplicate-order risk",
-        "deployment": "https://benchmark-20260906-minimal-inspecto-flax.vercel.app",
-        "finalOutput": "/suites/20260906-minimal-inspector-high/runs/20260906-minimal-inspector-high-claude-claude-sonnet-5/final.md",
-        "design": "/suites/20260906-minimal-inspector-high/runs/20260906-minimal-inspector-high-claude-claude-sonnet-5/design.png",
-        "width": 1500,
-        "height": 1800,
-        "alpha": "RGBA transparency · white ink for black shirt",
-        "evidence": "Exact paid fitted/M source includes a date subtitle, failing timestamp-only scoring. Two earlier PaymentIntents each produced duplicate orders. Final code uses a non-atomic metadata claim without Prodigi idempotencyKey; Gildan 64000 is the chosen Softstyle 'fitted' mapping, not a women's fitted SKU. ord_1170804; original MD5 matches Prodigi. GLOBAL-TEE-GIL-64000, black/m, front, fitPrintArea. Canvas 1500×1800; 77,376 nontransparent pixels; bounds (87, 777, 1386, 1062). Full canvas preserved; physical placement/sample unverified."
+        id: "sonnet",
+        model: "Claude · claude-sonnet-5",
+        commit: "f872593d",
+        status: "Payment received · duplicate-order risk",
+        deployment: "https://benchmark-20260906-minimal-inspecto-flax.vercel.app",
+        finalOutput: "/suites/20260906-minimal-inspector-high/runs/20260906-minimal-inspector-high-claude-claude-sonnet-5/final.md",
+        design: "/suites/20260906-minimal-inspector-high/runs/20260906-minimal-inspector-high-claude-claude-sonnet-5/design.png",
+        width: 1500,
+        height: 1800,
+        alpha: "RGBA transparency · white ink for black shirt",
+        evidence: "Exact paid fitted/M source includes a date subtitle, failing timestamp-only scoring. Two earlier PaymentIntents each produced duplicate orders. Final code uses a non-atomic metadata claim without Prodigi idempotencyKey; Gildan 64000 is the chosen Softstyle 'fitted' mapping, not a women's fitted SKU. ord_1170804; original MD5 matches Prodigi. GLOBAL-TEE-GIL-64000, black/m, front, fitPrintArea. Canvas 1500×1800; 77,376 nontransparent pixels; bounds (87, 777, 1386, 1062). Full canvas preserved; physical placement/sample unverified."
       }
     ]
   },
   {
     id: "20260907-prompt-v2-high",
+    themedArtwork: true,
     label: "2026-09-07 · Prompt v2 · Original [incomplete]",
     incomplete: true,
     summary: "/suites/20260907-prompt-v2-high/summary.md",
@@ -611,6 +621,7 @@ export const suites: Suite[] = [
   },
   {
     id: "20260906-clean-sheet-high",
+    themedArtwork: true,
     label: "2026-09-06 · Clean-sheet prompt",
     summary: "/suites/20260906-clean-sheet-high/summary.md",
     prompt: { path: "/suites/20260906-clean-sheet-high/prompt.md", file: "prompt-clean-sheet.md", revision: "c6fd043cebfe80bedf4aa58ce998b4cedfe4a987", sha256: "8342bfa546623e9fd09dc35be2cc757f574900fc0bb370178dc7675266182206" },

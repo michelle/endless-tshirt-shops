@@ -75,7 +75,11 @@ export async function inspect(opts) {
       const text = await readFile(path.join(root, 'events.jsonl'), 'utf8');
       normalized = { events: text.split('\n').filter(l => l.trim()).map(l => JSON.parse(l)), coverage };
     } else {
-      let transcript = ''; try { transcript = await readFile(path.join(root, 'agent.log'), 'utf8'); } catch { warnings.push(`${run.run_id}: transcript unavailable`); }
+      // Runs published before capture.json existed carry their event log as
+      // agent.log instead; normalize it the same way.
+      let transcript = '';
+      try { transcript = await readFile(path.join(root, 'agent.log'), 'utf8'); }
+      catch { warnings.push(`${run.run_id}: transcript unavailable`); }
       normalized = normalize(transcript, run.adapter);
     }
     if (!normalized.coverage.terminalEvent) warnings.push(`${run.run_id}: no terminal transcript event`);

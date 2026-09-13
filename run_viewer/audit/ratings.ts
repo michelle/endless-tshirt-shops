@@ -1,3 +1,9 @@
+// Audit judgements for published runs. Not part of the rendered viewer: this
+// records which checks each run passed, and nothing imports it but its test.
+// The explicit extension is for Node's type stripping, which the test relies
+// on and which does not resolve extensionless specifiers.
+import { suites } from "../app/data.ts";
+
 export type Check = { result: "pass" | "fail" | "unverified"; reason: string };
 export type Assessment = Record<"artwork" | "checkout" | "prodigi", Check>;
 
@@ -423,14 +429,19 @@ export const assessments: Record<string, Record<string, Assessment>> = {
   },
 };
 
+// Suites whose prompt asked for an original theme swap in this criterion; the
+// suites that carry it are marked `themedArtwork` in data.ts.
+const themeArtwork = {
+  label: "Printable theme design",
+  definition: "A coherent theme design legible at shirt scale with suitable raster detail. This prompt allows graphics and intentional colored panels; opacity is disclosed, not automatically failed. Physical samples remain unverified.",
+};
+
 export function rateRun(suiteId: string, runId: string) {
   const assessment = assessments[suiteId]?.[runId];
+  const themed = suites.find((suite) => suite.id === suiteId)?.themedArtwork ?? false;
   const checks = criteria.map((criterion) => ({
     ...criterion,
-    ...(["20260906-clean-sheet-high", "20260907-prompt-v2-high", "20260907-prompt-v2-rerun-high", "20260907-prompt-v2-rerun2-high", "20260907-prompt-v3-high", "20260907-prompt-v3-rerun-high", "20260908-prompt-v3-rerun2-high", "20260910-prompt-v3-high", "20260911-prompt-v3-high"].includes(suiteId) && criterion.id === "artwork" ? {
-      label: "Printable theme design",
-      definition: "A coherent theme design legible at shirt scale with suitable raster detail. This prompt allows graphics and intentional colored panels; opacity is disclosed, not automatically failed. Physical samples remain unverified.",
-    } : {}),
+    ...(themed && criterion.id === "artwork" ? themeArtwork : {}),
     ...(assessment?.[criterion.id] ?? unverified("No independent audit evidence recorded for this check.")),
   }));
   const passed = checks.filter((check) => check.result === "pass").length;

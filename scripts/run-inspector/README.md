@@ -1,68 +1,102 @@
-# Durable run inspector
+# Run inspector
 
-One entry point replaces repeated transcript parsing, API-list scripts, image-stat scripts and report assembly. It inspects committed artifacts without checking out or executing generated applications. Requires Node 20.11+, Git and tar. Artwork inspection also needs Python 3 and `pip install -r scripts/run-inspector/requirements.txt` (use your usual virtual environment).
+One entry point for auditing a finished suite: transcript parsing, sandbox API
+evidence, image statistics and report assembly. It reads committed artifacts and
+never checks out or executes a generated application.
 
-## Basic workflow
+Needs Node 20.11+, Git and tar; artwork inspection also needs Python 3 with
+`pip install -r requirements.txt`.
 
 ```sh
 git fetch origin benchmark-results
-node scripts/run-inspector/inspect.mjs \
-  --suite 20260906-clean-sheet-high --expected-runs 7
+node scripts/run-inspector/inspect.mjs --suite 20260911-prompt-v3-high --expected-runs 7
 ```
 
-The default ref is `origin/benchmark-results`; `--ref <commit-or-ref>` pins another input. The inspector resolves it once to a commit, validates suite/run identities, and excludes symlinks, submodules and generated dependency directories. `--expected-runs` is optional: omit it or adjust the count for suites with retries.
-
-Default output is a new, private, Git-ignored directory:
+Output goes to a new private, Git-ignored directory:
 
 ```text
 .benchmark-secrets/inspections/<suite>/<timestamp-nonce>/
-  artifacts/runs/<run>/     immutable source/final/transcript snapshot
-  private-snapshot.json    raw API evidence; can contain customer data and signed URLs
-  inspection.json          structured, review-required evidence (schemaVersion 1)
-  summary.generated.md     reusable Markdown evidence section
-  artwork/                 optional exact images, thumbnails and proof.html
-  viewer-stage/            optional captures and import-plan.json
+  artifacts/runs/<run>/    immutable source, report and event snapshot
+  inspection.json          structured evidence (schemaVersion 1), review required
+  summary.generated.md     the same evidence as a reusable Markdown section
+  private-snapshot.json    raw API responses; may hold customer data and signed URLs
+  artwork/                 with --artwork: exact images, thumbnails, proof.html
+  viewer-stage/            with --capture: screenshots and an import plan
 ```
 
-`--output <new-private-directory>` overrides the destination. Existing destinations are rejected; nothing is silently overwritten. Keep the entire directory private. Even the filtered report and viewer staging require human review before publication; archived source and final answers are not PII-sanitized. Raw transcripts and API snapshots have no automatic retention expiry.
+`--ref` pins a different input ref (default `origin/benchmark-results`), and it
+is resolved to a commit once, so a concurrent push cannot change the inspection
+mid-run. `--output` chooses the destination; an existing one is refused, so
+nothing is silently overwritten. `--expected-runs` is optional — omit or adjust
+it for suites with retries. Symlinks, submodules and dependency directories are
+excluded.
 
-## Stripe / Prodigi evidence
+**Keep the whole directory private.** Even the filtered report and the viewer
+staging need human review before publication: archived source and final answers
+are not PII-sanitized, and nothing here expires automatically.
+
+## What it can and cannot tell you
+
+The inspector reports evidence, not verdicts. It does not launch runs, execute
+archived code, create payments or orders, assign ratings, or publish anything.
+Three limits are worth stating up front, because the report repeats them:
+
+- **Missing coverage is `unknown`, never a pass or a zero.** HTTP errors, page
+  limits, missing cursors and absent credentials all produce incomplete
+  coverage. Restricted Stripe keys may deny `/v1/account`, and the profile's own
+  account ID is not a substitute for live identity.
+- **A lookup is not comprehension.** No transcript can show whether an
+  implementation relied on training data, understood a page, or was influenced
+  by a search. Do not turn zero observed searches into that claim.
+- **Live observations are later snapshots.** They are timestamped when
+  collected, and are not proof of what was true while the run executed.
+
+## Payment and fulfillment evidence
 
 ```sh
 node scripts/run-inspector/inspect.mjs --suite SUITE --expected-runs 7 --live
 ```
 
-Uses `.benchmark-secrets/stripe/<run-id>.toml`; override with `--profiles <directory>` when the suite ran in another worktree. Prodigi uses the environment's `PRODIGI_API_KEY`. Only test credentials are accepted. Do not put credentials on the command line or in an artwork plan.
+Queries only fixed Stripe and Prodigi sandbox GET endpoints, using the saved
+profile at `.benchmark-secrets/stripe/<run-id>.toml` (override the directory
+with `--profiles`) and `PRODIGI_API_KEY`. Test credentials only. Never put
+credentials on the command line or in an artwork plan.
 
-Only fixed Stripe and Prodigi sandbox GET endpoints are queried. Stripe sessions, intents, customers, events and webhook endpoints and Prodigi orders are paginated. HTTP errors, page limits, missing cursors and missing credentials produce incomplete coverage, not an empty successful audit. Restricted Stripe keys may deny `/v1/account`; the profile's account ID does not substitute for live identity verification. Later API observations are timestamped and are not historical run-time proof.
+Replay a collected snapshot instead of calling the APIs with
+`--snapshot <file>`; it cannot be combined with `--live`. Prefer
+inspector-produced snapshots over hand-assembled ones.
 
-Replay a previously collected snapshot without API collection:
-
-```sh
-node scripts/run-inspector/inspect.mjs --suite SUITE \
-  --snapshot /private/path/private-snapshot.json
-```
-
-Do not combine `--snapshot` and `--live`. A snapshot must have `schemaVersion: 1`, the matching `suiteId`, `observedAt`, a `runs` map keyed by full run IDs, and the collector's `prodigi` object. Prefer inspector-produced snapshots rather than manually assembling them.
-
-Isolation checks cover shared credentials/account identities, profile paths, Vercel projects/origins, cross-run Stripe objects, foreign webhook origins, state predating run start, cross-linked Prodigi receipts, source references to sibling runs, and matching prompt/base/effort metadata. Missing coverage is unknown. Prodigi is intentionally one shared sandbox account. This detects evidence of contamination within the inspected suite; it cannot prove absence of arbitrary shared ambient state. Source hits are review cues, not automatic conclusions about application behavior.
+Isolation checks cover shared credentials and account identities, profile paths,
+Vercel projects and origins, cross-run Stripe objects, foreign webhook origins,
+state predating the run, cross-linked Prodigi receipts, source references to
+sibling runs, and agreement of prompt, base commit and effort across the suite.
+A demonstrated divergence is a failure even when another run is missing the same
+field. Prodigi is intentionally one shared sandbox account. Source hits are
+review cues, not conclusions about behaviour.
 
 ## Documentation evidence
 
-New adapters save full private incremental JSONL envelopes with sequence, receipt time, stream and native event. Public `events.jsonl` records have schema version 1, call IDs, lifecycle status, evidence sequence, tool classification, topic tags, safe documentation URL paths and hashed query/topic records. Raw commands, arguments, queries and results stay private. `capture.json` states coverage and limitations.
+Public `events.jsonl` records carry call IDs, lifecycle status, tool
+classification, topic tags, allowlisted documentation URL paths and hashed
+queries. Raw commands, arguments, queries and results stay private.
 
-The inspector distinguishes searches, requested documents, local reference reads, API interactions, incomplete calls and failed calls. Search counts are individual query requests; reference counts are tool calls, not unique pages. `tool_result_available` means output was captured, not that it was a useful document. Codex exec web events sometimes omit result bodies and resolved URLs. Shell classification is heuristic and can miss dynamic URLs or mixed write/read commands. Local bundled Next/Stripe guides count as local references, not web lookups.
+Search counts are individual query requests; reference counts are tool calls,
+not unique pages. `tool_result_available` means output was captured, not that it
+was a useful document. Shell classification is heuristic and can miss dynamic
+URLs or mixed read/write commands. Docs bundled in `node_modules` count as local
+references, not web lookups. Codex exec web events sometimes omit result bodies
+and resolved URLs. Old Claude final-result-only logs report `unknown` rather
+than zero.
 
-Old Codex JSON logs can be inspected. Old Claude final-result-only logs cannot establish documentation use; they report unknown. No transcript can prove whether an implementation relied on training data, understood a page, or was influenced by a lookup. Do not turn zero observed searches into that claim.
+## Artwork recovery
 
-## Exact artwork recovery
-
-Create a private JSON array selecting evidence already identified during review:
+Selections are explicit, reviewed, and recorded with their provenance. Write a
+private JSON array:
 
 ```json
 [
-  {"runId":"SUITE-codex-sol", "kind":"paid-order", "orderId":"ord_123", "itemIndex":0, "assetIndex":0},
-  {"runId":"SUITE-claude-sonnet-5", "kind":"direct", "name":"submitted", "orderId":"ord_456"}
+  {"runId": "SUITE-codex-sol", "kind": "paid-order", "orderId": "ord_123", "itemIndex": 0, "assetIndex": 0},
+  {"runId": "SUITE-claude-sonnet-5", "kind": "direct", "name": "submitted", "orderId": "ord_456"}
 ]
 ```
 
@@ -72,29 +106,47 @@ node scripts/run-inspector/inspect.mjs --suite SUITE \
   --artwork /private/path/artwork-plan.json
 ```
 
-Supported `kind` values:
+| `kind` | Requires | Means |
+| --- | --- | --- |
+| `paid-order` | An asset unambiguously linked to one paid Stripe object in this run | The exact bytes Prodigi fetched. **Still review whether the app's checkout produced it** — a synthetic paid object can look convincing. |
+| `hosted-unpaid` | `sessionId` of a real unpaid Session with metadata, plus a reviewed `url` | Intended artwork recorded at checkout; no payment, no fulfillment. |
+| `synthetic` / `direct` | An order ID or reviewed URL | A separate test submission. Defaults to the name `submitted`, never replacing the customer design. |
+| `local` | `file`, a regular image | A reproduction. Not payment or fulfillment evidence; record the steps in the human summary. |
 
-- `paid-order`: an exact Prodigi asset linked unambiguously to a paid Stripe object in this run. **Still review whether the app's customer checkout produced it.** Synthetic paid objects can otherwise look convincing.
-- `hosted-unpaid`: requires `sessionId` of a real unpaid Session with metadata, and a reviewed `url`. Verify that the URL/inputs correspond to that Session; the tool cannot infer application semantics.
-- `synthetic` / `direct`: explicitly separate test submissions. Supply an order ID or reviewed URL. Defaults to `submitted`, never silently replaces the customer design.
-- `local`: requires `file`, a regular image file. Recovery does not execute archived code. Record any reproduction steps in the human summary; this is not payment/fulfillment evidence.
+Downloads are restricted to this run's deployment or the Prodigi thumbnail host,
+reject redirects and known checkout/order/fulfillment routes, and enforce a size
+limit. Review any asset URL before requesting it: a GET cannot guarantee that a
+badly implemented application has no side effects. Artwork fetching and browser
+capture still use the network even with `--snapshot`; omit both for a fully
+offline replay.
 
-`name` may be `design` or `submitted`; duplicate selections are rejected. Downloads only permit this run's deployment or the configured Prodigi thumbnail host, reject redirects and known checkout/order/fulfillment routes, and enforce size limits. Optional artwork fetching and browser capture still use the network even with `--snapshot`; omit both flags for wholly offline replay. Review arbitrary asset URLs before requesting them: GET cannot guarantee a badly implemented application has no side effects.
-
-Original bytes, canvas and alpha are preserved. The report records SHA-256/MD5, dimensions, alpha bounds, pixel counts, exact SKU/print-area/sizing attributes when present, and whether Prodigi's asset hash matches. Thumbnails are separate evidence. `artwork/proof.html` displays originals on a changeable background without modifying them. Neither it nor the inspector invents physical garment positioning: product print-area dimensions and the app's sizing/placement logic still require review. SVGs and unsupported raster formats fail rather than being silently rasterized.
+Original bytes, canvas and alpha are preserved. The report records SHA-256 and
+MD5, dimensions, alpha bounds, pixel counts, SKU and print-area attributes where
+present, and whether Prodigi's asset hash matches. `artwork/proof.html` shows
+the originals on a changeable background without modifying them. Neither it nor
+the inspector infers physical garment placement. Unsupported formats fail rather
+than being silently rasterized.
 
 ## Viewer staging and summary updates
 
-`--capture` reuses the existing viewer screenshot/favicon/social-preview capture implementation. Install its dependencies first (`cd run_viewer && npm ci && npx playwright install chromium`). It captures current storefront homepages with the standard viewport; it never fills checkout forms. Runs without a deployment and failed captures are reported. `CAPTURE_BROWSER=chrome` uses installed Chrome instead.
-
-The private `viewer-stage/public/suites/<suite>/` contains verbatim final answers, selected artwork and capture manifests/assets. `import-plan.json` maps full benchmark IDs to the existing seven short model IDs; retries retain unique full IDs. This is staging only: it does not edit `app/data.ts`, replace existing permalink IDs, invent ratings, or publish anything. Review source URLs, final answers, images, capture errors and privacy before copying selected assets into the viewer. A reviewed summary must also be supplied; no generated evidence-only summary is silently installed as the suite's final audit.
+`--capture` reuses the viewer's own capture code (install its dependencies
+first: `cd run_viewer && npm ci && npx playwright install chromium`). It stages
+verbatim final answers, selected artwork and capture manifests under
+`viewer-stage/`, with an `import-plan.json` mapping full run IDs to the seven
+short viewer IDs. Staging only: it does not edit `app/data.ts`, invent ratings,
+or publish. Review sources, reports, images and privacy before copying anything
+across.
 
 ```sh
 node scripts/run-inspector/inspect.mjs --suite SUITE \
   --update-summary run_viewer/public/suites/SUITE/summary.md
 ```
 
-This explicit flag appends or refreshes only the block between `<!-- run-inspector:v1:start -->` and `<!-- run-inspector:v1:end -->`. It preserves all human-written content outside the block and existing headings. Malformed or duplicate markers abort the update. Keep editorial findings and scoring outside the generated block. Review the diff, then run `cd run_viewer && npm run predeploy` before publishing viewer changes.
+This refreshes only the block between `<!-- run-inspector:v1:start -->` and
+`<!-- run-inspector:v1:end -->`, preserving everything a human wrote outside it.
+Malformed or duplicate markers abort the update. Keep editorial findings and
+scoring outside the generated block. Review the diff, then run
+`cd run_viewer && npm run predeploy` before publishing viewer changes.
 
 ## Tests
 
@@ -103,4 +155,5 @@ node --test tests/run-inspector.test.mjs tests/adapter-capture.test.mjs tests/ru
 bash tests/run-benchmark-test.sh
 ```
 
-These use local fixtures/fake CLIs and mocked API responses. No paid model calls or real orders. Tests cover native stream lifecycle handling, interrupted capture, final-result separation, query privacy, pagination, restricted credentials, isolation failures/unknowns, exact artwork bytes, summary preservation, short viewer IDs, and a complete offline Git-artifact inspection. Existing viewer tests remain responsible for rendered UI, permalink compatibility and predeployment asset availability.
+Local fixtures, fake CLIs and mocked API responses; no paid model calls or real
+orders.

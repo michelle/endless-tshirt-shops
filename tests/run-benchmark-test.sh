@@ -82,6 +82,8 @@ printf '%s\n' \
   "printf '%s\\n' '{\"type\":\"turn.completed\",\"usage\":{\"input_tokens\":11,\"output_tokens\":7,\"total_tokens\":18}}'" \
   'printf "PRODIGI_API_KEY=%s sk_test_abcdefghijklmnop rkcs_test_abcdefghijklmnop https://example.vercel.app\n" "$PRODIGI_API_KEY"' \
   'printf "final report\n" >"$output"' \
+  'printf "Deployed: **[Shop](https://benchmark-fake-store.vercel.app)**\n" >>"$output"' \
+  'printf "Webhook: `https://benchmark-fake-store.vercel.app/api/webhooks/stripe`\n" >>"$output"' \
   'exit "${FAKE_CODEX_EXIT:-0}"' >"$BIN/codex"
 chmod +x "$BIN/codex"
 ln -s "$BIN/codex" "$BIN_WITHOUT_TIMEOUT/codex"
@@ -128,6 +130,15 @@ EXPECTED_PROMPT_SHA=$(shasum -a 256 "$REPO/prompt-beauty.md" | awk '{print $1}')
 [[ $SUCCESS_METADATA == *'"prompt_sha256": "'"$EXPECTED_PROMPT_SHA"'"'* ]] || fail 'selected prompt hash was not recorded'
 [[ $SUCCESS_METADATA == *'"stripe_config_ref": "success"'* ]] || fail 'Stripe config reference was not recorded'
 [[ $SUCCESS_METADATA == *'"stripe_config_path": ".benchmark-secrets/stripe/success.toml"'* ]] || fail 'Stripe config path was not recorded'
+# The report wraps the storefront in a bold Markdown link and names a webhook
+# route after it; neither may reach metadata.
+[[ $SUCCESS_METADATA == *'"deployment_url": "https://benchmark-fake-store.vercel.app"'* ]] || fail 'deployment URL was not reduced to the storefront origin'
+printf '%s' "$SUCCESS_METADATA" | node -e '
+  const metadata = JSON.parse(require("fs").readFileSync(0, "utf8"));
+  if (typeof metadata.usage !== "object" || metadata.usage === null || Array.isArray(metadata.usage)) {
+    throw new Error("usage must nest as a JSON object");
+  }
+' || fail 'metadata.json is not valid JSON with a nested usage object'
 SUCCESS_USAGE=$(git --git-dir="$REMOTE" show benchmark-results:runs/success/usage.json)
 [[ $SUCCESS_USAGE == *'"new_input_tokens": 11'* ]] || fail 'Codex new input usage was not recorded'
 assert test ! -e "$REPO/runs/success"
@@ -143,14 +154,15 @@ fi
 if git -C "$REPO" show-ref --verify --quiet refs/heads/benchmark-run/success; then
   fail 'temporary execution branch was retained after a successful push'
 fi
-LOG=$(git --git-dir="$REMOTE" show benchmark-results:runs/success/agent.log)
-[[ $LOG == *'[REDACTED]'* ]] || fail 'injected secret was not redacted'
+LOG=$(git --git-dir="$REMOTE" show benchmark-results:runs/success/events.jsonl)
 [[ $LOG != *test_11111111-1111-1111-1111-111111111111* ]] || fail 'injected secret leaked into committed log'
 [[ $LOG != *sk_test_* ]] || fail 'Stripe pattern leaked into committed log'
 [[ $LOG != *rkcs_test_* ]] || fail 'restricted Stripe pattern leaked into committed log'
-if git --git-dir="$REMOTE" cat-file -e benchmark-results:runs/success/agent.raw.log 2>/dev/null; then
-  fail 'raw log was committed'
-fi
+for PRIVATE in agent.raw.log agent.log; do
+  if git --git-dir="$REMOTE" cat-file -e "benchmark-results:runs/success/$PRIVATE" 2>/dev/null; then
+    fail "$PRIVATE was committed"
+  fi
+done
 
 (
   cd "$REPO"

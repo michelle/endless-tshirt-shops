@@ -12,7 +12,7 @@ export const models = [
   ['claude', 'claude-fable-5-1'], ['claude', 'claude-opus-5'], ['claude', 'claude-sonnet-5'],
 ];
 export function parseArgs(args) {
-  const options = { repo: process.cwd(), prompt: 'prompt-minimal.md', effort: 'high', timeout: '7200' };
+  const options = { repo: process.cwd(), effort: 'high', timeout: '7200' };
   for (let i = 0; i < args.length; i++) {
     if (args[i] === '--resume') { options.resume = true; continue; }
     const key = { '--repo': 'repo', '--suite': 'suite', '--prompt': 'prompt', '--effort': 'effort', '--timeout': 'timeout' }[args[i]];
@@ -21,6 +21,7 @@ export function parseArgs(args) {
     i++;
   }
   identifier(options.suite);
+  if (!options.prompt) throw new Error('--prompt is required: a default would pin the whole suite to the wrong task');
   if (!['low', 'medium', 'high', 'xhigh', 'max'].includes(options.effort) || !/^[1-9]\d*$/.test(options.timeout)) throw new Error('Invalid effort or timeout');
   return options;
 }
@@ -111,7 +112,7 @@ export async function runSuite(options, dependencies = {}) {
   return { directory, state: progress.state, completed: progress.completed.length };
 }
 if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href) {
-  if (process.argv.includes('--help')) console.log('Usage: node scripts/run-suite.mjs --suite ID [--repo CLEAN_WORKTREE] [--prompt prompt-minimal.md] [--effort high] [--timeout 7200] [--resume]\nResume verifies published attempts and the original base/prompt/effort before skipping them. Requires PRODIGI_API_KEY.');
+  if (process.argv.includes('--help')) console.log('Usage: node scripts/run-suite.mjs --suite ID --prompt FILE [--repo CLEAN_WORKTREE] [--effort high] [--timeout 7200] [--resume]\nResume verifies published attempts and the original base/prompt/effort before skipping them. Requires PRODIGI_API_KEY.');
   else try { console.log(JSON.stringify(await runSuite(parseArgs(process.argv.slice(2))), null, 2)); }
   catch (error) { console.error(error.message); process.exitCode = 1; }
 }

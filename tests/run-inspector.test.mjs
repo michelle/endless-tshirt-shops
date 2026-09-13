@@ -121,6 +121,18 @@ test('isolation detects credential reuse, foreign webhooks, stale objects, and m
   assert.equal(inspectIsolation(runs, partial, { complete: true }, []).checks.find(c => c.name === 'cross-run Stripe objects').state, 'unknown');
 });
 
+test('metadata divergence fails even when another run is missing the field', () => {
+  const effort = (values) => inspectIsolation(
+    runs.map((run, index) => ({ ...run, reasoning_effort: values[index] })), snapshots(), { complete: true }, [],
+  ).checks.find(check => check.name === 'consistent reasoning_effort').state;
+  // Two present values that disagree is a demonstrated finding, so it outranks
+  // the absent value that would otherwise report only missing coverage.
+  assert.equal(effort(['high', '']), 'fail');
+  assert.equal(effort(['high', 'low']), 'fail');
+  assert.equal(effort(['', '']), 'unknown');
+  assert.equal(effort(['high', 'high']), 'pass');
+});
+
 test('order linkage uses exact Stripe IDs and reports cross-run ownership', () => {
   const s = snapshots();
   s.one.lists['checkout/sessions'].data = [{ id: 'cs_test_abc', payment_status: 'paid' }];
@@ -179,6 +191,7 @@ test('end-to-end offline inspector pins artifacts, excludes symlinks, and refres
   const id = 'suite-codex-sol', artifact = path.join(repo, 'runs', id); await mkdir(path.join(artifact, 'workspace'), { recursive: true });
   await writeFile(path.join(artifact, 'metadata.json'), JSON.stringify({ ...runs[0], suite_id: 'suite', run_id: id, adapter: 'codex', model: 'gpt-5.6-sol', status: 'succeeded', deployment_url: 'https://one.vercel.app' }));
   await writeFile(path.join(artifact, 'final.md'), 'Done');
+  // agent.log, not events.jsonl: this fixture is a run published before capture.json existed.
   await writeFile(path.join(artifact, 'agent.log'), '{"type":"turn.completed","usage":{"input_tokens":1}}');
   await writeFile(path.join(artifact, 'workspace', 'app.js'), 'const session = {}; console.log(session.shipping_details);');
   await symlink('/etc/passwd', path.join(artifact, 'workspace', 'outside'));

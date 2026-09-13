@@ -2,29 +2,27 @@
   "name": "benchmark-run-viewer",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "engines": {
     "node": ">=22.13.0"
   },
   "scripts": {
+    "dev": "vite",
+    "build": "vite build && node scripts/prepare-pages.mjs",
+    "preview": "vite preview",
+    "lint": "eslint .",
+    "predeploy": "npm run lint && npm run test:contracts && npm run test:ratings && npm run test:links && npm run build && npm run test:release && npm run test:pages && npm run test:keyboard && npm run test:mobile && npm run test:preferences && npm run test:capture",
     "capture": "node --experimental-strip-types scripts/capture-storefronts.mjs",
-    "test:capture": "node --test tests/capture.test.mjs",
-    "test:keyboard": "node --test tests/keyboard.test.mjs",
+    "hooks:install": "node ../scripts/install-viewer-hook.mjs",
+    "test:contracts": "node --experimental-strip-types --test tests/archive-contract.test.mjs tests/permalink-contract.test.mjs",
     "test:ratings": "node --experimental-strip-types --test tests/ratings.test.mjs",
     "test:links": "node --experimental-strip-types --test tests/summary-headings.test.mjs",
-    "test:contracts": "node --experimental-strip-types --test tests/archive-contract.test.mjs tests/permalink-contract.test.mjs",
     "test:release": "node --experimental-strip-types --test tests/release.test.mjs",
-    "predeploy": "npm run lint && npm run test:contracts && npm run test:ratings && npm run test:links && npm run build:pages && npm run test:release && npm run test:pages && npm run test:mobile && npm run test:preferences",
-    "hooks:install": "node ../scripts/install-viewer-hook.mjs",
-    "dev": "WRANGLER_LOG_PATH=.wrangler/wrangler.log vinext dev",
-    "build": "WRANGLER_LOG_PATH=.wrangler/wrangler.log vinext build",
-    "build:pages": "vite build --config vite.pages.config.ts && node scripts/prepare-pages.mjs",
-    "preview:pages": "vite preview --config vite.pages.config.ts",
     "test:pages": "node --test tests/pages.test.mjs",
     "test:mobile": "node --test tests/mobile.test.mjs",
-    "test:preferences": "node --experimental-strip-types --test tests/preferences.test.mjs",
-    "start": "WRANGLER_LOG_PATH=.wrangler/wrangler.log vinext start",
-    "test": "npm run build && node --test tests/viewer.test.mjs",
-    "lint": "eslint . --ignore-pattern dist --ignore-pattern .next"
+    "test:keyboard": "node --test tests/keyboard.test.mjs",
+    "test:capture": "node --test tests/capture.test.mjs",
+    "test:preferences": "node --experimental-strip-types --test tests/preferences.test.mjs"
   },
   "dependencies": {
     "react": "19.2.6",
@@ -33,28 +31,20 @@
     "remark-gfm": "4.0.1"
   },
   "devDependencies": {
-    "@cloudflare/vite-plugin": "1.37.1",
     "@eslint/js": "9.39.4",
-    "@next/eslint-plugin-next": "16.2.6",
-    "@tailwindcss/postcss": "4.2.1",
     "@types/node": "22.19.19",
     "@types/react": "19.2.14",
     "@types/react-dom": "19.2.3",
     "@vitejs/plugin-react": "6.0.2",
-    "@vitejs/plugin-rsc": "0.5.26",
     "eslint": "9.39.4",
     "eslint-plugin-jsx-a11y": "6.10.2",
     "eslint-plugin-react": "7.37.5",
     "eslint-plugin-react-hooks": "7.1.1",
     "globals": "16.4.0",
     "playwright": "1.62.1",
-    "react-server-dom-webpack": "19.2.6",
     "tailwindcss": "4.2.1",
     "typescript": "5.9.3",
     "typescript-eslint": "8.59.3",
-    "vinext": "1.0.0-beta.2",
-    "vite": "8.0.13",
-    "wrangler": "4.92.0"
-  },
-  "type": "module"
+    "vite": "8.0.13"
+  }
 }

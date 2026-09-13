@@ -14,7 +14,7 @@ async function drag(cdp, from, to, { cancel = false, fingers = 1 } = {}) {
 }
 
 test("mobile drawer swipes preserve native scrolling, links, zoom gestures, and boundaries", async () => {
-  const server = await preview({ configFile: fileURLToPath(new URL("../vite.pages.config.ts", import.meta.url)), preview: { host: "127.0.0.1", port: 0, open: false } });
+  const server = await preview({ configFile: fileURLToPath(new URL("../vite.config.ts", import.meta.url)), preview: { host: "127.0.0.1", port: 0, open: false } });
   const browser = await chromium.launch({ headless: true, ...(process.env.CAPTURE_BROWSER === "chrome" ? { channel: "chrome" } : {}) });
   try {
     const base = server.resolvedUrls.local[0];

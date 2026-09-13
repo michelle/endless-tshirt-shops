@@ -2,8 +2,9 @@ import { access, mkdir, readFile, rename, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { chromium } from "playwright";
+import { viewport } from "./viewport.mjs";
 
-export const viewport = { width: 1440, height: 900 };
+export { viewport };
 const projectRoot = fileURLToPath(new URL("../", import.meta.url));
 
 async function readJson(file, fallback) {
@@ -27,7 +28,8 @@ export function artifactDirectory(root, suite, run) {
   return { publicDir, diskDir: path.join(root, "public", publicDir) };
 }
 
-export function faviconImage(bytes, declaredType = "", maxBytes = 2 * 1024 * 1024) {
+/** Identify an image by its magic bytes; the declared type only settles AVIF. */
+export function imageFormat(bytes, declaredType = "", maxBytes = 2 * 1024 * 1024) {
   if (bytes.length > maxBytes) return null;
   if (bytes.subarray(0, 8).equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]))) return { extension: "png", mime: "image/png" };
   if (bytes.subarray(0, 4).equals(Buffer.from([0, 0, 1, 0]))) return { extension: "ico", mime: "image/x-icon" };
@@ -60,7 +62,7 @@ export async function captureFavicon(page, context, directory) {
         bytes = await response.body();
         mime = (response.headers()["content-type"] ?? "").split(";")[0];
       }
-      const format = faviconImage(bytes, mime);
+      const format = imageFormat(bytes, mime);
       if (!format) { unavailable = true; continue; }
       const name = `favicon.${format.extension}`;
       await writeFile(path.join(directory.diskDir, name), bytes);
@@ -80,7 +82,7 @@ export async function captureSocialPreview(page, context, directory) {
       const response = await context.request.get(source, { timeout: 20000 });
       if (!response.ok()) continue;
       const bytes = await response.body();
-      const format = faviconImage(bytes, (response.headers()["content-type"] ?? "").split(";")[0], 20 * 1024 * 1024);
+      const format = imageFormat(bytes, (response.headers()["content-type"] ?? "").split(";")[0], 20 * 1024 * 1024);
       if (!format) continue;
       const dimensions = await page.evaluate(async ({ base64, mime }) => {
         const image = new Image();

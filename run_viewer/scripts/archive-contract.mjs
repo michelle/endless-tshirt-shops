@@ -3,6 +3,7 @@ import { readFile, lstat } from "node:fs/promises";
 import path from "node:path";
 import { createHash } from "node:crypto";
 import { isPublishedArchivePath } from "./pages-redaction.mjs";
+import { viewport } from "./viewport.mjs";
 
 /** Follow the registry, not directory contents: missing files must fail too. */
 export async function registeredAssets(suites, publicRoot) {
@@ -57,6 +58,15 @@ export async function registeredAssets(suites, publicRoot) {
       assert.equal(new URL(capture.url).href, new URL(run.deployment).href, `Capture belongs to another deployment: ${run.id}`);
       assert.equal(path.posix.dirname(capture.screenshot), directory);
       await add(capture.screenshot);
+      // Read the PNG header rather than trusting the manifest: cross-suite
+      // comparison only holds if every screenshot is the same viewport.
+      const png = await readFile(path.join(publicRoot, capture.screenshot));
+      assert.equal(png.subarray(1, 4).toString(), "PNG", `Screenshot is not a PNG: ${run.id}`);
+      assert.deepEqual(
+        [png.readUInt32BE(16), png.readUInt32BE(20), capture.width, capture.height],
+        [viewport.width, viewport.height, viewport.width, viewport.height],
+        `Screenshot is not a ${viewport.width} × ${viewport.height} capture: ${suite.id}/${run.id}`,
+      );
       for (const key of ["favicon", "socialPreview"]) {
         // Legacy favicon manifests predate explicit status; null meant absent.
         const status = capture[`${key}Status`] ?? (key === "favicon" ? (capture[key] ? "found" : "missing") : undefined);

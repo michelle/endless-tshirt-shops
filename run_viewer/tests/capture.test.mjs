@@ -5,13 +5,13 @@ import os from "node:os";
 import path from "node:path";
 import test from "node:test";
 import { chromium } from "playwright";
-import { artifactDirectory, captureSuite, faviconImage } from "../scripts/capture-storefronts.mjs";
+import { artifactDirectory, captureSuite, imageFormat } from "../scripts/capture-storefronts.mjs";
 
 test("rejects invalid artifact paths and HTML masquerading as an icon", () => {
   assert.throws(() => artifactDirectory("/tmp/viewer", { id: "future" }, { id: "x", finalOutput: "/suites/future/runs/../../escape/final.md" }));
   assert.throws(() => artifactDirectory("/tmp/viewer", { id: "future" }, { id: "x", finalOutput: "/suites/different/runs/x/final.md" }));
-  assert.equal(faviconImage(Buffer.from("<html>not an icon</html>"), "image/png"), null);
-  assert.equal(faviconImage(Buffer.from('<svg xmlns="http://www.w3.org/2000/svg"></svg>')).extension, "svg");
+  assert.equal(imageFormat(Buffer.from("<html>not an icon</html>"), "image/png"), null);
+  assert.equal(imageFormat(Buffer.from('<svg xmlns="http://www.w3.org/2000/svg"></svg>')).extension, "svg");
 });
 
 test("captures arbitrary future suites, resumes, and preserves successful captures on failure", async () => {

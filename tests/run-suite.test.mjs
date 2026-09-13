@@ -17,8 +17,11 @@ async function setup(t) {
   await writeFile(path.join(repo, 'prompt-minimal.md'), 'fixture prompt');
   const old = process.env.PRODIGI_API_KEY; process.env.PRODIGI_API_KEY = 'test_11111111-1111-1111-1111-111111111111';
   t.after(() => { if (old === undefined) delete process.env.PRODIGI_API_KEY; else process.env.PRODIGI_API_KEY = old; });
-  return parseArgs(['--suite', 'fixture-suite', '--repo', repo]);
+  return parseArgs(['--suite', 'fixture-suite', '--repo', repo, '--prompt', 'prompt-minimal.md']);
 }
+test('a suite must name its prompt rather than inherit a default', () => {
+  assert.throws(() => parseArgs(['--suite', 'fixture-suite']), /--prompt is required/);
+});
 test('controller runs all seven serially, continues published model failures, then inspects', async t => {
   const opts = await setup(t), calls = []; let active = false;
   const result = await runSuite(opts, { git, execute: async (command, args) => {

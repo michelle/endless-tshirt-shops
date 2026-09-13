@@ -1,236 +1,157 @@
-# endless tshirt shops
+# Run viewer
 
-A deliberately simple viewer for the beauty, minimal, and unserious benchmark
-suites. The newest imported suite is the default.
+The published archive browser for the benchmark:
+**[michelle.github.io/endless-tshirt-shops](https://michelle.github.io/endless-tshirt-shops/)**
 
-It shows every recovered design for the selected suite at once, includes all 21
-agent final responses, and renders all seven generated suite summaries as rich
-Markdown. The shared artwork background color can be changed to inspect
-transparency without altering image placement.
+One page per suite. It shows every recovered print design at once, each run's
+storefront screenshot, favicon and social preview, the agent's verbatim final
+report, and the suite's audit summary rendered as Markdown. The newest suite
+with recovered runs is the default; older suites that only have a written
+summary are reachable by link. Requires Node.js 22.13+.
 
-All suite reports live at `public/suites/<suite-id>/summary.md`. Suites with
-recovered run artifacts use
-`public/suites/<suite-id>/runs/<run-id>/{final.md,design.*}`. The archive also
-contains the four earlier generated suite reports in the same layout.
-
-Each suite also has a **Show prompt** button opening its archived task prompt
-in a drawer (including legacy suites). Prompts live at
-`public/suites/<suite-id>/prompt.md`; the registry records their original
-filename, source revision and SHA-256. Archive the prompt from that suite's
-recorded base commit, not today's working copy, and verify its hash against run
-metadata. Preserve historical typos and whitespace. The pre-deploy asset
-contract requires a matching prompt for every suite and publishes it with the
-other archive files. Prompt drawers close with Escape, Close or the backdrop;
-j/k scroll inside them without navigating between models.
-
-Markdown has an 88-character maximum measure. Tables scroll horizontally when
-needed and wrap between words rather than splitting model names. **T-shirt
-background** changes only the artwork transparency-check background. **Dark
-mode** changes the viewer's reading colors, including both drawers and tables,
-and saves that preference in browser storage. It never recolors screenshots or
-designs. Light mode remains the default.
-
-The main image represents the customer ordering path. Prefer the asset from an
-actual paid order; otherwise show recorded customer Session artwork or an exact
-deterministic reproduction with its unverified provenance clearly labeled.
-Minimal Sol now shows `paid-design.png`, the exact deployed asset from a user's
-post-run paid order, hash-matched to Prodigi; its earlier local reconstruction
-remains archived but is no longer displayed. This revealed a real production
-rendering defect hidden by local reproduction. Beauty Sonnet shows its unpaid
-Session design. Separate smoke-test assets (Sol's social image and
-Sonnet's icon) remain archived as `submitted.png`, not as substitutes for
-customer-path art. Those tests do not prove that the customer flow submits the
-wrong file. Artwork quality and verified fulfillment are separate checks.
-
-Minimal Sonnet also uses a hash-verified post-run `paid-design.png`. Minimal
-Luna uses `session-design.png` from a later paid checkout's hosted artwork URL,
-clearly labeled not delivered: the shipping-address bug prevented fulfillment.
-Manual follow-up findings appear in the suite report without rewriting the
-original benchmark's payment history.
-
-The beauty, minimal, and unserious suites also include `storefront.png` and, where published,
-`favicon.*` beside each run's artwork. These are fresh 1440 × 900 desktop
-viewport captures of the deployed homepages, not screenshots from the original
-benchmark. `public/suites/<suite-id>/storefronts.json` records the
-capture time, page URL/title, response status, favicon source, and observed
-page errors. The viewer discovers this file by suite ID; no per-suite screenshot
-imports or component changes are required. Absent captures leave artwork and
-reports available. Missing icons and icons that could not be downloaded are
-distinguished. Inline data-URL favicons are archived too.
-
-Run drawers also show archived `social-preview.*` images from the deployed
-page's `og:image` (or `twitter:image` fallback). These are the actual published
-files, not recreated artwork. The manifest records their source, dimensions,
-capture time, and found/missing/unavailable status. A social card is separate
-from the customer's print artwork. New suite captures collect these automatically.
-
-Click a card's screenshot or Details to open the run drawer. The large screenshot
-inside the drawer opens the live storefront in a new tab, as does the storefront link at the top.
-Use Left/Right or h/l
-to navigate within the selected suite; j/k scroll down/up and Escape closes it.
-Clicking the backdrop outside the drawer also closes it; inside clicks and
-drags that start inside do not. Closing preserves the selected suite permalink.
-With the drawer closed, j/k scroll the main page instead.
-On touchscreens, swipe left/right inside the drawer for the next/previous run.
-Only deliberate horizontal swipes navigate; vertical scrolling, pinch zoom,
-screen-edge gestures, text links, controls, and scrollable tables/code remain
-native. Screenshot taps still open the storefront; swiping one changes runs.
-Navigation stops at the first/last model. Touch controls have larger hit areas;
-desktop density and main-page vertical scrolling are unchanged.
-The arrow buttons show navigation shortcuts in their tooltips. Shortcuts ignore
-text inputs, editable content, composition, and modifier keys. Hover
-or focus a status (or tap its question mark) for plain-English definitions.
-
-Ratings use three independent checks: printable timestamp-only art, genuine
-end-to-end test checkout, and working app-to-Prodigi fulfillment with the intended
-asset and garment mapping. Green means 3/3, yellow 2/3, red 0–1/3. Missing evidence
-does not pass, but is labeled `unverified` rather than a demonstrated failure.
-Branding, slogans, illustrations, and decorative graphics fail timestamp-only
-art. Print quality is scored separately from successful asset delivery, so a
-working integration that delivers an undersized image loses the artwork check.
-Hover/focus the rating for reasons, or read all three in the run drawer. These
-are archived sandbox assessments, not current uptime or launch certification.
-Record future audit judgments in `app/ratings.ts`; unreviewed runs default to
-three unverified checks. `npm run test:ratings` verifies the scoring.
-
-## Run locally
-
-Requires Node.js 22.13 or newer.
-
-```bash
+```sh
 npm ci
 npm run dev
 ```
 
-Use `npm run lint` and `npm test` for validation.
+`npm run predeploy` is the gate that must pass before pushing or deploying —
+see [Before publishing](#before-publishing). Deliberately not shown: any
+pass/fail grade. Cards state what a run did and leave the judgement to the
+reader.
 
-Link directly to a suite with `?suite=20260905-beauty-high` or
-`?suite=20260905-minimal-high`. Choosing a suite updates the URL without reloading;
-browser Back/Forward restores the selection. Missing or unknown IDs show the
-default suite. The query works on localhost and under the GitHub Pages subpath.
-Add `&run=sol` (or another short run ID) to open a particular drawer directly.
-Opening and navigating drawers updates the URL; refresh and Back/Forward preserve
-the selected run. The drawer's Copy permalink button copies the direct URL
-and briefly confirms success. If clipboard access fails, copy the browser address.
-Every summary heading is a link with a stable `#summary-…` fragment; copy its
-link address to share that section, including the selected suite.
+## Reading a suite
 
-With the local viewer running, `npm run test:keyboard` checks keyboard navigation,
-focus at the first/last run, and drawer scrolling. Set `VIEWER_URL` if the server
-uses a different URL, and `CAPTURE_BROWSER=chrome` to test with installed Chrome.
-After `npm run build:pages`, `npm run test:mobile` checks phone layouts and
-browser-dispatched touch input, including swipe boundaries, vertical/table
-scrolling, multi-touch, cancellation, and screenshot taps. It also runs before
-automatic Pages deployments. Physical iOS/Android testing is still worthwhile.
+- **Suite picker** selects the suite and records it in the URL.
+- **Show prompt** opens the archived task prompt for that suite.
+- **T-shirt background** recolours only the artwork backdrop, for checking
+  transparency. It never alters image placement or the images themselves.
+- **Dark mode** changes the viewer's reading colours only, never screenshots or
+  designs. Light mode is the default and the choice is saved in browser storage.
+- Click a screenshot or **Details** for the run drawer. Inside: Left/Right or
+  `h`/`l` move between runs, `j`/`k` scroll, Escape or a backdrop click closes.
+  On a touchscreen, a deliberate horizontal swipe changes runs; vertical
+  scrolling, pinch zoom and edge gestures stay native.
+- Hover, focus or tap a status for a plain-English definition of each label.
 
-## Before pushing or deploying
+Link to a suite with `?suite=<suite-id>`, and to an open drawer by adding
+`&run=<short-run-id>`. Every summary heading is a `#summary-…` link. The drawer
+has a **Copy permalink** button. Unknown IDs fall back to the default suite.
 
-Run `npm run predeploy` from `run_viewer` (Node 22.13+). It runs lint, fixed
-permalink compatibility tests, registry-driven archive checks, ratings and
-heading tests, a clean static build, HTTP asset checks, and browser/mobile tests.
-The Pages workflow runs the same gate before uploading a deployment artifact.
-Use `CAPTURE_BROWSER=chrome` for installed Chrome, or install Chromium with
-`npx playwright install chromium` once.
+## What the archive holds
 
-Install the local push gate once per clone:
-
-```bash
-cd run_viewer
-npm run hooks:install
+```text
+public/suites/<suite-id>/
+  summary.md                    the suite's audit write-up
+  prompt.md                     the task prompt, at that suite's base commit
+  storefronts.json              capture manifest, discovered by suite ID
+  runs/<run-id>/
+    final.md                    the agent's report, verbatim
+    design.*                    print artwork, original bytes
+    storefront.png              homepage capture
+    favicon.*, social-preview.* as published by the deployed site
 ```
 
-The installer refuses to overwrite an existing hook configuration. The hook
-checks the **exact commit being pushed** in a temporary directory with clean
-dependencies, not the working tree: an untracked summary cannot hide a missing
-committed file. It blocks branch pushes that change the viewer or its gate if
-validation fails. Deletions, unchanged viewer trees, and `benchmark-results`
-artifact pushes are skipped, so sequential model runs continue normally.
-The hook uses Node 22 through `npx`, and detects installed macOS Chrome. First
-use may download Node/dependencies; missing browser setup or network failures
-fail closed. Git hooks are local and can be bypassed; CI remains the mandatory
-pre-deployment check. No external storefront/payment endpoints are exercised.
+`app/data.ts` is the registry: it lists suites and runs and records each
+prompt's original filename, source revision and SHA-256. The pre-deploy checks
+follow the registry rather than the directory, so a referenced file that is
+missing fails the build.
 
-`tests/fixtures/permalinks-v1.json` freezes published suite IDs, short model IDs,
-and summary fragments. Add new destinations after publishing; never remove old
-entries merely to make a failing test pass. Renamed headings need compatibility
-aliases. Tests cold-load historical URLs and confirm the intended drawer or
-heading, as well as checking the literal `?suite=…&run=…#summary-…` contract.
+Two rules the archive depends on:
 
-Archive validation follows every registry reference, including summary-only
-older suites and each capture manifest. Summary, final output, design,
-screenshot and declared favicon/social files must be nonempty and publishable.
-Explicit missing/unavailable icons or social cards are allowed; a declared file
-that is absent is not. Every published archive file is then fetched from the
-production build: HTTP 404, HTML fallback disguised as HTTP 200, and wrong bytes
-all fail. This checks the release candidate, not availability after a remote
-hosting outage.
+- **Artwork is evidence, so it is never repaired.** Original bytes, canvas,
+  alpha and position are preserved; nothing is cropped, resized, re-encoded or
+  substituted. A run with no trustworthy artwork shows none.
+- **Provenance is labelled, not assumed.** The main image should represent the
+  customer ordering path: preferably the exact asset a paid order sent to
+  Prodigi, otherwise artwork recorded on a real Checkout Session, clearly
+  labelled as undelivered. Separate smoke-test submissions are archived as
+  `submitted.*` and described as test evidence, never as the customer's design.
+  A social card is not print artwork.
+
+Archive the prompt from the suite's recorded base commit, not today's working
+copy, and verify its hash against run metadata. Preserve historical typos.
 
 ## Capture a suite
 
-Write the suite's `summary.md`, final outputs, and recovered artwork before
-registering it so an open local viewer cannot fetch a missing summary. Then
-register the suite and its runs in `app/data.ts`, including public `deployment`
-URLs and `finalOutput` paths under `public/suites/<suite-id>/runs/<run-id>/`.
-Then, from `run_viewer`, run:
+Write `summary.md`, the final reports and any recovered artwork first, then
+register the suite and its runs in `app/data.ts`, then:
 
-```bash
+```sh
 npx playwright install chromium
-npm run capture -- --suite 20260905-minimal-high
+npm run capture -- --suite <suite-id>
 ```
 
-Use `--browser chrome` to use an installed Google Chrome instead. The command
-opens isolated browser contexts with a 1440 × 900 viewport, 1× pixel density,
-light color preference, US English, and America/Los_Angeles timezone. It waits
-for fonts and images (up to ten seconds), captures only the initial viewport,
-and never clicks checkout controls. Dynamic timestamps reflect capture time.
+Captures each registered deployment's initial viewport at 1440 × 900, 1× pixel
+density, light mode, en-US, America/Los_Angeles. It waits for fonts and images,
+never clicks checkout controls, and records capture time, URL, title, HTTP
+status, favicon source and page errors in `storefronts.json`.
 
-Existing captures are preserved by default. Retry failed/missing runs with the
-same command, select one with `--run <run-id>`, or deliberately refresh using
-`--overwrite`. Each successful run updates the manifest atomically.
-Use `--social-only --overwrite` to refresh just social previews without changing
-the original screenshots or favicon capture metadata. Older manifests missing
-social previews are backfilled automatically without recapturing screenshots.
-Navigation failures are recorded in `capture-errors.json`; the command continues with other
-runs and exits nonzero if any capture failed. HTTP error pages are captured with
-their actual response status. Refresh the viewer after capturing (or reselect
-the suite). Existing beauty artifacts are preserved when capturing minimal.
+Existing captures are kept. Retry failures with the same command, target one run
+with `--run <run-id>`, refresh deliberately with `--overwrite`, or refresh only
+social previews with `--social-only --overwrite`. Failures land in
+`capture-errors.json` and exit nonzero. `--browser chrome` uses installed Chrome.
 
-`npm run test:capture` exercises the reusable capture workflow against a local
-fixture suite, including inline icons, missing icons, retries, and failed refreshes.
-It requires Chromium, or `CAPTURE_BROWSER=chrome npm run test:capture` for Chrome.
+## Before publishing
+
+```sh
+npm run predeploy
+```
+
+Lint, permalink and archive-registry contracts, ratings and heading tests, a
+clean static build, HTTP asset checks, then browser tests for permalinks,
+keyboard navigation, touch gestures, saved preferences and the capture
+workflow. The Pages workflow runs the same gate. Use `CAPTURE_BROWSER=chrome` for installed Chrome,
+or install Chromium once with `npx playwright install chromium`.
+
+Install the local push gate once per clone:
+
+```sh
+npm run hooks:install
+```
+
+The hook validates **the exact commit being pushed** in a temporary directory
+with clean dependencies, not the working tree, so an untracked file cannot hide
+a missing committed one. It skips deletions, unchanged viewer trees and
+`benchmark-results` artifact pushes, and refuses to overwrite an existing hook
+configuration. Git hooks are local and bypassable; CI remains the mandatory
+check.
+
+`tests/fixtures/permalinks-v1.json` freezes published suite IDs, short run IDs
+and summary fragments. Add new destinations after publishing; never delete old
+entries to make a failing test pass, and give renamed headings an alias.
 
 ## GitHub Pages
 
-The Pages build is static React: no Worker, API server, or hosting credentials.
-Local development above still works unchanged.
+The published build is static React — no server, no Worker, no hosting
+credentials.
 
-```bash
-npm run build:pages
-npm run preview:pages -- --port 4174
+```sh
+npm run build
+npm run preview -- --port 4174    # http://localhost:4174/endless-tshirt-shops/
 ```
 
-Open `http://localhost:4174/endless-tshirt-shops/`. `VIEWER_BASE_PATH` overrides
-the default `/endless-tshirt-shops/` prefix (use `/` for a custom domain).
-`npm run test:pages` checks redaction, exact image bytes, all three suites, Markdown,
-downloads, and browser asset loading against the built static site.
-Use `CAPTURE_BROWSER=chrome` if testing with installed Chrome.
+`VIEWER_BASE_PATH` overrides the `/endless-tshirt-shops/` prefix (use `/` for a
+custom domain). To enable deployment once, set **Settings → Pages → Build and
+deployment → Source: GitHub Actions**; after that, changes under `run_viewer/`
+on `main` deploy through the workflow's scoped `GITHUB_TOKEN`.
 
-To enable deployment, select **Settings → Pages → Build and deployment → Source:
-GitHub Actions** in the repository. Push this configuration to `main`, or run
-**Deploy benchmark viewer to GitHub Pages** from Actions. Subsequent changes
-under `run_viewer/` on `main` deploy automatically. The workflow uses GitHub's
-standard Pages actions and its scoped `GITHUB_TOKEN`; no custom secret is needed.
-The default URL is `https://michelle.github.io/endless-tshirt-shops/`.
+Only `out/` is uploaded, and only approved archive paths are copied into it —
+raw logs, capture errors and unrelated files are excluded. Text copies are
+**redacted and visibly labelled** when changed: sandbox claim links, payment
+client secrets, signed links, recognised API keys and email addresses are
+removed. The `public/` originals are untouched, and images are copied
+byte-for-byte. This is not a general PII detector, so review new screenshots and
+reports before publishing. Treat Pages as public.
 
-Treat Pages as public unless GitHub explicitly provides private access control
-for this repository. Private repositories require a GitHub plan supporting Pages;
-do not make the repository public just to enable hosting.
+## Notes on the code
 
-Only `out/` is uploaded. Its reports/final responses are **redacted public
-copies**, visibly labeled when changed: sandbox claim links, payment client
-secrets, signed/private links, recognized API keys, and email addresses are
-removed. The original `public/` archive is not modified. Screenshots and raster
-artwork are copied byte-for-byte, preserving alpha and placement. This is not a
-general PII detector: review new screenshots/reports before publishing. Only
-approved archive paths are copied; raw logs, capture errors, local credentials,
-and unrelated repository files are excluded.
+`audit/ratings.ts` records the three-check audit judgement for each run:
+printable artwork, a genuine end-to-end test checkout, and working
+app-to-Prodigi fulfillment, each `pass`, `fail` or `unverified`. It lives
+outside `app/` because the viewer does not render it. The judgements are still
+tested (`npm run test:ratings`), and `Viewer.tsx` says how to display them
+again. Runs with no recorded judgement default to three `unverified` checks, so
+a new suite can never score by accident.
+
+Tailwind is present only for `preflight.css` as a CSS reset; every class in the
+app is hand-written in `app/globals.css`.

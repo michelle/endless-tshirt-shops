@@ -41,7 +41,7 @@ test("static artifact contains every approved archive file, exact raster bytes, 
 
 test("static Pages viewer supports suite links, history, scoring, and all archive assets", async () => {
   const server = await preview({
-    configFile: fileURLToPath(new URL("../vite.pages.config.ts", import.meta.url)),
+    configFile: fileURLToPath(new URL("../vite.config.ts", import.meta.url)),
     preview: { host: "127.0.0.1", port: 0, open: false },
   });
   const browser = await chromium.launch({ headless: true, ...(process.env.CAPTURE_BROWSER === "chrome" ? { channel: "chrome" } : {}) });
