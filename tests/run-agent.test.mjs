@@ -1,23 +1,27 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { mkdtemp, mkdir, writeFile, readFile, stat, rm } from 'node:fs/promises';
+import { existsSync } from 'node:fs';
 import { spawn } from 'node:child_process';
 import path from 'node:path';
 import os from 'node:os';
 const root = path.resolve(import.meta.dirname, '..');
-async function run(provider, events, t, { exit = 0, final = 'Codex final', tail = '', delay = false } = {}) {
-  const dir = await mkdtemp(path.join(os.tmpdir(), 'adapter-capture-')); t.after(() => rm(dir, { recursive: true, force: true }));
+async function run(provider, events, t, { exit = 0, final = 'Codex final', tail = '', delay = false, drop = null } = {}) {
+  const dir = await mkdtemp(path.join(os.tmpdir(), 'run-agent-')); t.after(() => rm(dir, { recursive: true, force: true }));
   await mkdir(path.join(dir, 'bin'));
   const script = `#!${process.execPath}\nconst fs = require('node:fs');\nconst args = process.argv.slice(2);\nfs.writeFileSync(process.env.ARGUMENTS, JSON.stringify(args));\nfs.writeFileSync(process.env.MEMORY_ENV, JSON.stringify({ auto: process.env.CLAUDE_CODE_DISABLE_AUTO_MEMORY, md: process.env.CLAUDE_CODE_DISABLE_CLAUDE_MDS }));\n${provider === 'codex' ? `fs.writeFileSync(args[args.indexOf('--output-last-message') + 1], ${JSON.stringify(final)});` : ''}\nfor (const event of ${JSON.stringify(events)}) process.stdout.write(JSON.stringify(event) + '\\n');\nprocess.stdout.write(${JSON.stringify(tail)});\n${delay ? 'setTimeout(() => process.exit(0), 30000);' : `process.exitCode = ${exit};`}`;
   await writeFile(path.join(dir, 'bin', provider), script, { mode: 0o700 });
   await writeFile(path.join(dir, 'prompt.md'), 'Fixture prompt');
   const env = { ...process.env, PATH: `${dir}/bin:${process.env.PATH}`, ARGUMENTS: `${dir}/args.json`, MEMORY_ENV: `${dir}/memory-env.json`, BENCHMARK_WORKSPACE: dir, BENCHMARK_PROMPT_FILE: `${dir}/prompt.md`, BENCHMARK_MODEL: 'fake', BENCHMARK_REASONING_EFFORT: 'high', BENCHMARK_FINAL_OUTPUT: `${dir}/final.md`, BENCHMARK_USAGE_OUTPUT: `${dir}/usage.json`, BENCHMARK_CAPTURE_DIR: `${dir}/capture` };
-  const child = spawn(process.execPath, [path.join(root, 'scripts/adapters/capture.mjs'), provider], { env });
+  if (drop) delete env[drop];
+  const child = spawn(process.execPath, [path.join(root, 'scripts/run-agent.mjs'), provider], { env });
   let stdout = '', stderr = '';
   child.stdout.on('data', d => { stdout += d; if (delay && stdout.includes('item.started')) child.kill('SIGTERM'); });
   child.stderr.on('data', d => { stderr += d; });
   const code = await new Promise((resolve, reject) => { child.on('error', reject); child.on('close', resolve); });
-  return { dir, env, code, stdout, stderr, capture: (await readFile(`${dir}/capture/transcript.jsonl`, 'utf8')).trim().split('\n').filter(Boolean).map(JSON.parse) };
+  const launched = existsSync(`${dir}/args.json`);
+  const capture = launched ? (await readFile(`${dir}/capture/transcript.jsonl`, 'utf8')).trim().split('\n').filter(Boolean).map(JSON.parse) : [];
+  return { dir, env, code, stdout, stderr, launched, capture };
 }
 
 test('Claude stream capture retains tools privately and writes only terminal result', async t => {
@@ -26,14 +30,24 @@ test('Claude stream capture retains tools privately and writes only terminal res
     { type: 'result', result: 'Answer ✓', usage: { input_tokens: 4, cache_creation_input_tokens: 5, output_tokens: 2 } },
   ], t);
   assert.equal(r.code, 0, r.stderr);
-  assert.equal(await readFile(`${r.dir}/final.md`, 'utf8'), 'Answer ✓\n');
-  assert.equal(JSON.parse(await readFile(`${r.dir}/usage.json`)).new_input_tokens, 9);
   assert.equal(r.capture.length, 2); assert.equal(r.capture[0].sequence, 1); assert.ok(r.capture[0].receivedAt);
+  // finalize-capture.mjs is the sole writer of final.md and usage.json; this
+  // step only records the raw stream and the outcome.
+  for (const artifact of ['final.md', 'usage.json']) {
+    await assert.rejects(readFile(`${r.dir}/${artifact}`), { code: 'ENOENT' }, `run-agent wrote ${artifact}`);
+  }
   assert.equal((await stat(`${r.dir}/capture/transcript.jsonl`)).mode & 0o777, 0o600);
   const args = JSON.parse(await readFile(`${r.dir}/args.json`));
   assert.equal(args[args.indexOf('--output-format') + 1], 'stream-json'); assert.ok(args.includes('--verbose'));
   assert.equal(args[args.indexOf('--effort') + 1], 'high');
   assert.deepEqual(JSON.parse(await readFile(`${r.dir}/memory-env.json`, 'utf8')), { auto: '1', md: '1' });
+});
+
+test('a missing contract variable fails before the CLI is launched', async t => {
+  const r = await run('claude', [{ type: 'result', result: 'ok' }], t, { drop: 'BENCHMARK_MODEL' });
+  assert.notEqual(r.code, 0);
+  assert.match(r.stderr, /BENCHMARK_MODEL is required/);
+  assert.equal(r.launched, false, 'the provider CLI must not run without the full contract');
 });
 
 test('Claude missing or error final returns failure even when CLI exits zero', async t => {
@@ -44,7 +58,7 @@ test('Claude missing or error final returns failure even when CLI exits zero', a
 test('Codex captures final unterminated JSON line and preserves provider exit code', async t => {
   const r = await run('codex', [], t, { exit: 7, tail: JSON.stringify({ type: 'turn.completed', usage: { input_tokens: 20, cached_input_tokens: 8 } }) });
   assert.equal(r.code, 7); assert.equal(r.capture.length, 1);
-  assert.equal(JSON.parse(await readFile(`${r.dir}/usage.json`)).new_input_tokens, 12);
+  // Codex writes its own final answer through --output-last-message.
   assert.equal(await readFile(`${r.dir}/final.md`, 'utf8'), 'Codex final');
   const args = JSON.parse(await readFile(`${r.dir}/args.json`));
   assert.ok(args.includes('--ephemeral'));

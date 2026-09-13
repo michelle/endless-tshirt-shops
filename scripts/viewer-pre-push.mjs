@@ -43,7 +43,7 @@ export function snapshotViewer(repo, commit, destination) {
   }
 }
 
-export function validatePush(repo, updates) {
+function validatePush(repo, updates) {
   for (const commit of commitsToCheck(repo, updates)) {
     const directory = mkdtempSync(path.join(tmpdir(), "viewer-pre-push-"));
     try {

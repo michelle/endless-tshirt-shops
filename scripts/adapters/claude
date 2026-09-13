@@ -1,5 +1,0 @@
-#!/usr/bin/env bash
-set -euo pipefail
-: "${BENCHMARK_WORKSPACE:?}" "${BENCHMARK_PROMPT_FILE:?}" "${BENCHMARK_MODEL:?}"
-: "${BENCHMARK_FINAL_OUTPUT:?}" "${BENCHMARK_USAGE_OUTPUT:?}" "${BENCHMARK_CAPTURE_DIR:?}"
-exec node "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/capture.mjs" claude "$@"

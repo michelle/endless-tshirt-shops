@@ -1,11 +1,17 @@
 import { spawn } from 'node:child_process';
 import { openSync, writeSync, closeSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
-import { normalize } from '../run-inspector/transcript.mjs';
+import { normalize } from './run-inspector/transcript.mjs';
+
+// Launch one provider CLI for one benchmark run, record its raw event stream
+// privately, and report a failure the CLI itself may not have reported.
 const [provider, ...extra] = process.argv.slice(2);
-if (!['codex', 'claude'].includes(provider)) throw new Error('Unknown provider');
-const env = process.env, directory = env.BENCHMARK_CAPTURE_DIR;
-if (!directory) throw new Error('BENCHMARK_CAPTURE_DIR is required');
+if (!['codex', 'claude'].includes(provider)) throw new Error(`Unknown provider: ${provider}`);
+const env = process.env;
+const required = ['BENCHMARK_WORKSPACE', 'BENCHMARK_PROMPT_FILE', 'BENCHMARK_MODEL',
+  'BENCHMARK_FINAL_OUTPUT', 'BENCHMARK_USAGE_OUTPUT', 'BENCHMARK_CAPTURE_DIR'];
+for (const name of required) if (!env[name]) throw new Error(`${name} is required`);
+const directory = env.BENCHMARK_CAPTURE_DIR;
 mkdirSync(directory, { recursive: true, mode: 0o700 });
 const target = path.join(directory, 'transcript.jsonl');
 const fd = openSync(target, 'wx', 0o600); let sequence = 0;
@@ -35,9 +41,10 @@ for (const signal of ['SIGTERM', 'SIGINT']) process.on(signal, () => child.kill(
 child.on('error', () => record('stderr', 'CLI launch failed'));
 child.on('close', (code, signal) => {
   for (const stream of ['stdout', 'stderr']) if (pending[stream]) record(stream, pending[stream]);
-  closeSync(fd); const result = normalize(readFileSync(target, 'utf8'), provider);
-  if (provider === 'claude' && result.final !== null) writeFileSync(env.BENCHMARK_FINAL_OUTPUT, result.final + (result.final.endsWith('\n') ? '' : '\n'), { mode: 0o600 });
-  writeFileSync(env.BENCHMARK_USAGE_OUTPUT, JSON.stringify(result.usage, null, 2) + '\n', { mode: 0o600 });
+  closeSync(fd);
+  // Normalized here only to judge the outcome: run-benchmark then calls
+  // finalize-capture.mjs, which is the single writer of the run's artifacts.
+  const result = normalize(readFileSync(target, 'utf8'), provider);
   writeFileSync(path.join(directory, 'exit.json'), JSON.stringify({ code, signal, capturedRecords: sequence }), { mode: 0o600 });
   process.exitCode = code === 0 && (result.failed || (provider === 'claude' && result.final === null)) ? 1 : code ?? 1;
 });

@@ -4,7 +4,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { hash, regular, identifier } from './common.mjs';
 
-export function imageInfo(file) {
+function imageInfo(file) {
   return JSON.parse(execFileSync('python3', [fileURLToPath(new URL('./image-info.py', import.meta.url)), file], { encoding: 'utf8', maxBuffer: 1000000 }));
 }
 export async function fetchImage(url, allowedHosts, fetcher = fetch) {

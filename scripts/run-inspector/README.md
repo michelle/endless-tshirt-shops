@@ -150,7 +150,7 @@ scoring outside the generated block. Review the diff, then run
 ## Tests
 
 ```sh
-node --test tests/run-inspector.test.mjs tests/adapter-capture.test.mjs tests/run-suite.test.mjs
+node --test tests/run-inspector.test.mjs tests/run-agent.test.mjs tests/run-suite.test.mjs
 bash tests/run-benchmark-test.sh
 ```
 

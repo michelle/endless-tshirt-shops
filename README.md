@@ -131,7 +131,7 @@ reach the archive, this repository, `$HOME` and `/tmp` with an explicit search.
 Treat isolation as advisory; use a dedicated user account or container if it
 matters.
 
-Both adapters run non-interactively with memory features explicitly disabled —
+Both providers run non-interactively with memory features explicitly disabled —
 Codex via `exec --json` with ephemeral sessions, Claude via
 `--output-format stream-json` with session persistence and all `CLAUDE.md`
 loading turned off.
@@ -160,20 +160,33 @@ node --test tests/*.test.mjs
 bash tests/run-benchmark-test.sh
 ```
 
-## Adapter contract
+## Adding a provider
 
-`scripts/adapters/codex` and `scripts/adapters/claude` receive
+`scripts/run-agent.mjs` launches the chosen CLI for one run. It receives
 `BENCHMARK_WORKSPACE`, `BENCHMARK_PROMPT_FILE`, `BENCHMARK_MODEL`,
 `BENCHMARK_FINAL_OUTPUT`, `BENCHMARK_USAGE_OUTPUT`, `BENCHMARK_CAPTURE_DIR`,
 `BENCHMARK_VERCEL_PROJECT`, `BENCHMARK_CLI_STATE` and optionally
-`BENCHMARK_REASONING_EFFORT`. `BENCHMARK_CLI_STATE` is named neutrally on
-purpose, so it does not steer the agent's choice of payment provider.
+`BENCHMARK_REASONING_EFFORT`, and refuses to start if any of the first six is
+missing. `BENCHMARK_CLI_STATE` is named neutrally on purpose, so it does not
+steer the agent's choice of payment provider.
 
-A new adapter must run without prompting, write only the final answer to
-`BENCHMARK_FINAL_OUTPUT`, send everything else to stdout/stderr, keep raw
-records private in the capture directory, and extend the normalizer in
-`scripts/run-inspector/transcript.mjs` with tests before a new event format is
-supported. Do not override the capture-format flags through extra CLI arguments.
+A third provider means editing three places, not adding a plugin:
+
+1. `run-agent.mjs` — the CLI name and the arguments that make it run
+   non-interactively, with memory disabled, emitting a JSON event stream.
+2. `scripts/run-inspector/transcript.mjs` — how to normalize that stream, with
+   tests, before any run in the new format is published.
+3. `scripts/run-benchmark` — the `--adapter` validation.
+
+The CLI must run without prompting, write only its final answer to
+`BENCHMARK_FINAL_OUTPUT`, send everything else to stdout/stderr, and keep raw
+records inside the capture directory. Do not override the capture-format flags
+through extra CLI arguments.
+
+`run-agent.mjs` records the raw stream and decides the run's outcome; it writes
+no public artifacts. `scripts/run-inspector/finalize-capture.mjs` runs
+afterwards and is the sole writer of `final.md`, `events.jsonl`, `capture.json`
+and `usage.json`, so a timed-out or killed CLI still produces them.
 
 ## Comparing fairly
 

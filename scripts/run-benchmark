@@ -121,8 +121,8 @@ git remote get-url origin >/dev/null 2>&1 || die "origin remote is required"
 
 SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 TOOLING_COMMIT=$(git -C "$SCRIPT_DIR" rev-parse HEAD) || die "could not identify runner revision"
-ADAPTER_PATH="$SCRIPT_DIR/adapters/$ADAPTER"
-[[ -x $ADAPTER_PATH ]] || die "adapter is not executable: $ADAPTER_PATH"
+AGENT_RUNNER="$SCRIPT_DIR/run-agent.mjs"
+[[ -f $AGENT_RUNNER ]] || die "agent runner is missing: $AGENT_RUNNER"
 command -v node >/dev/null 2>&1 || die "Node.js 20.11+ is required for transcript capture"
 node -e 'const [major, minor] = process.versions.node.split(".").map(Number); if (major < 20 || (major === 20 && minor < 11)) process.exit(1)' || die "Node.js 20.11+ is required"
 command -v "$ADAPTER" >/dev/null 2>&1 || die "$ADAPTER CLI is not installed or not on PATH"
@@ -347,7 +347,7 @@ export BENCHMARK_CLI_STATE="$STRIPE_CONFIG"
 export BENCHMARK_CAPTURE_DIR="$CAPTURE_DIR"
 
 set +e
-PATH="$STRIPE_SHIM_DIR:$PATH" "$TIMEOUT_COMMAND" "$TIMEOUT_SECONDS" "$ADAPTER_PATH" "${EXTRA_ARGS[@]}" >"$RAW_LOG" 2>&1
+PATH="$STRIPE_SHIM_DIR:$PATH" "$TIMEOUT_COMMAND" "$TIMEOUT_SECONDS" node "$AGENT_RUNNER" "$ADAPTER" "${EXTRA_ARGS[@]}" >"$RAW_LOG" 2>&1
 AGENT_EXIT=$?
 set -e
 restore_global_stripe_config

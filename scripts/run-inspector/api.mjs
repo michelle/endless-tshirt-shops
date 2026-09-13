@@ -1,9 +1,9 @@
 import { readFile } from 'node:fs/promises';
 import { hash } from './common.mjs';
-export const stripeOrigin = 'https://api.stripe.com';
-export const prodigiOrigin = 'https://api.sandbox.prodigi.com';
+const stripeOrigin = 'https://api.stripe.com';
+const prodigiOrigin = 'https://api.sandbox.prodigi.com';
 // The collector only knows GET endpoints. Never call storefront success/status routes.
-export async function getJson(url, headers, fetcher = fetch) {
+async function getJson(url, headers, fetcher = fetch) {
   const u = new URL(url);
   if (![stripeOrigin, prodigiOrigin].includes(u.origin) || u.username || u.password) throw new Error('API origin not allowed');
   let response;
