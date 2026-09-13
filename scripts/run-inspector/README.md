@@ -38,7 +38,7 @@ are not PII-sanitized, and nothing here expires automatically.
 ## What it can and cannot tell you
 
 The inspector reports evidence, not verdicts. It does not launch runs, execute
-archived code, create payments or orders, assign ratings, or publish anything.
+archived code, create payments or orders, score runs, or publish anything.
 Three limits are worth stating up front, because the report repeats them:
 
 - **Missing coverage is `unknown`, never a pass or a zero.** HTTP errors, page
@@ -133,8 +133,7 @@ than being silently rasterized.
 first: `cd run_viewer && npm ci && npx playwright install chromium`). It stages
 verbatim final answers, selected artwork and capture manifests under
 `viewer-stage/`, with an `import-plan.json` mapping full run IDs to the seven
-short viewer IDs. Staging only: it does not edit `app/data.ts`, invent ratings,
-or publish. Review sources, reports, images and privacy before copying anything
+short viewer IDs. Staging only: it does not edit `app/data.ts` or publish. Review sources, reports, images and privacy before copying anything
 across.
 
 ```sh

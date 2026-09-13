@@ -97,10 +97,10 @@ social previews with `--social-only --overwrite`. Failures land in
 npm run predeploy
 ```
 
-Lint, permalink and archive-registry contracts, ratings and heading tests, a
-clean static build, HTTP asset checks, then browser tests for permalinks,
-keyboard navigation, touch gestures, saved preferences and the capture
-workflow. The Pages workflow runs the same gate. Use `CAPTURE_BROWSER=chrome` for installed Chrome,
+Lint, permalink and archive-registry contracts, heading tests, a clean static
+build, HTTP asset checks, then browser tests for permalinks, keyboard
+navigation, touch gestures, saved preferences and the capture workflow. The
+Pages workflow runs the same gate. Use `CAPTURE_BROWSER=chrome` for installed Chrome,
 or install Chromium once with `npx playwright install chromium`.
 
 Install the local push gate once per clone:
@@ -145,13 +145,10 @@ reports before publishing. Treat Pages as public.
 
 ## Notes on the code
 
-`audit/ratings.ts` records the three-check audit judgement for each run:
-printable artwork, a genuine end-to-end test checkout, and working
-app-to-Prodigi fulfillment, each `pass`, `fail` or `unverified`. It lives
-outside `app/` because the viewer does not render it. The judgements are still
-tested (`npm run test:ratings`), and `Viewer.tsx` says how to display them
-again. Runs with no recorded judgement default to three `unverified` checks, so
-a new suite can never score by accident.
+There is no scoring. An earlier version graded each run on three checks and
+coloured the card green, yellow or red; that read as a verdict on the model,
+when what the archive can actually show is evidence. Each card now states what
+a run did, and the suite summary carries the judgement in prose.
 
 Tailwind is present only for `preflight.css` as a CSS reset; every class in the
 app is hand-written in `app/globals.css`.

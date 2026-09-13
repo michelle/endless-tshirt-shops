@@ -12,16 +12,23 @@ Results are directional case studies, not a ranking.
 
 ## Prompts
 
+Every prompt lives in [`prompts/`](prompts). The runner has no default: each
+run names its prompt, and records the path and its SHA-256 in metadata.
+
 | File | Task |
 | --- | --- |
 | `prompt-v3.md` | **Current.** Any original theme, DTG-customised per customer; the agent picks its own payment provider. |
 | `prompt-v2.md` | Any original theme. Predecessor to v3. |
-| `prompt.md` | The original task: rebuild [datetime.store](https://github.com/michelle/datetime.store) with Stripe and Prodigi. Names Stripe explicitly. |
-| `prompt-minimal.md`, `prompt-beauty.md`, `prompt-unserious.md`, `prompt-clean-sheet.md` | Variants of the original, changing one instruction each. |
+| `prompt-minimal.md`, `prompt-beauty.md`, `prompt-unserious.md` | Rebuild [datetime.store](https://github.com/michelle/datetime.store) with Stripe and Prodigi, each changing one instruction. |
+| `prompt-clean-sheet.md` | Any appealing theme, with datetime.store given only as an example. |
 
-`--prompt-file` defaults to `prompt.md`; the selected path and its SHA-256 go
-into run metadata. Only v2 and v3 leave the payment provider to the agent, so
-the provider-neutral environment described below only matters for those.
+Only v2 and v3 leave the payment provider to the agent, so the provider-neutral
+environment described below matters only for those. The earlier prompts name
+Stripe outright.
+
+Suites that ran a since-removed prompt keep their exact archived copy at
+`run_viewer/public/suites/<suite-id>/prompt.md`, hash-checked against the run
+metadata, so historical runs stay reproducible.
 
 ## Setup
 
@@ -47,7 +54,7 @@ scripts/run-benchmark \
   --adapter codex --model gpt-6-astra \
   --suite-id 20260911-prompt-v3-high \
   --run-id 20260911-prompt-v3-high-codex-gpt-6-astra \
-  --prompt-file prompt-v3.md \
+  --prompt-file prompts/prompt-v3.md \
   --reasoning-effort high --timeout 3600
 ```
 
@@ -66,12 +73,13 @@ recorded too. The models compared so far are `gpt-6-astra`, `gpt-5.6-sol`,
 
 ```sh
 node scripts/run-suite.mjs --suite 20260911-prompt-v3-high \
-  --prompt prompt-v3.md --effort high --timeout 7200
+  --prompt prompts/prompt-v3.md --effort high --timeout 7200
 ```
 
 Runs all seven models serially in a dedicated clean worktree, records private
 progress under `.benchmark-secrets/suites/<suite>/`, and invokes the inspector
-at the end. `--prompt` is required, so a suite can never inherit a stale task.
+at the end. Like the runner, it requires `--prompt`: neither tool has a
+default, so a run can never inherit a task nobody chose.
 A model failure does not stop later models; a publication or cleanup failure
 pauses the controller with artifacts preserved. Launch it under a persistent
 process supervisor. Finishing means `awaiting-human-audit`, not a passing score.
@@ -138,7 +146,7 @@ node scripts/run-inspector/inspect.mjs --suite 20260911-prompt-v3-high --expecte
 Offline by default; `--live` adds read-only Stripe and Prodigi sandbox
 observations. It produces a private, review-required evidence report covering
 documentation use, frameworks, source cues and isolation. It does not launch
-runs, execute archived code, create orders, assign ratings or publish anything.
+runs, execute archived code, create orders, score runs or publish anything.
 See [`scripts/run-inspector/README.md`](scripts/run-inspector/README.md) for
 artwork recovery, capture staging and summary updates.
 

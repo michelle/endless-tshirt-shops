@@ -13,6 +13,6 @@
     "resolveJsonModule": true,
     "allowImportingTsExtensions": true
   },
-  "include": ["app/**/*.ts", "app/**/*.tsx", "audit/**/*.ts", "scripts/**/*.mjs", "vite.config.ts"],
+  "include": ["app/**/*.ts", "app/**/*.tsx", "scripts/**/*.mjs", "vite.config.ts"],
   "exclude": ["node_modules"]
 }

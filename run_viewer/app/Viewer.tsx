@@ -48,10 +48,9 @@ function navigateToRun(suiteId: string, runId?: string) {
   window.dispatchEvent(new PopStateEvent("popstate"));
 }
 
-// Scoring is hidden viewer-wide: the card states what a run did and leaves the
-// judgement to the reader. The three-check ratings in audit/ratings.ts are
-// retained and still tested; to show them again, call rateRun(suite.id, run.id)
-// at the call sites below and pass the result in here.
+// A card states what a run did and leaves the judgement to the reader. The
+// earlier pass/fail scoring was retired: a three-check grade read as a verdict
+// on the model, when what the archive can actually show is evidence.
 function RunStatus({ status }: { status: string }) {
   const tooltipId = useId();
   const [open, setOpen] = useState(false);

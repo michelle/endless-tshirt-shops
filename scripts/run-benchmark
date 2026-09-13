@@ -4,12 +4,12 @@ set -uo pipefail
 
 usage() {
   cat <<'EOF'
-Usage: scripts/run-benchmark --adapter codex|claude --model MODEL [options] [-- ADAPTER_ARGS...]
+Usage: scripts/run-benchmark --adapter codex|claude --model MODEL --prompt-file FILE [options] [-- ADAPTER_ARGS...]
 
 Options:
   --run-id ID          Unique, branch-safe run ID (default: UTC timestamp + adapter + model)
   --suite-id ID        Identifier shared by every run in one comparison suite
-  --prompt-file FILE   Repository-contained prompt file (default: prompt.md)
+  --prompt-file FILE   Repository-contained prompt file, e.g. prompts/prompt-v3.md
   --timeout SECONDS    Hard timeout in seconds (default: 3600)
   --reasoning-effort LEVEL
                       Optional provider reasoning level (low, medium, high, xhigh, or max)
@@ -75,7 +75,7 @@ ADAPTER=
 MODEL=
 RUN_ID=
 SUITE_ID=
-PROMPT_FILE_ARG=prompt.md
+PROMPT_FILE_ARG=
 TIMEOUT_SECONDS=3600
 REASONING_EFFORT=
 EXTRA_ARGS=()
@@ -99,7 +99,7 @@ done
 [[ -n $MODEL ]] || die "--model is required"
 [[ $TIMEOUT_SECONDS =~ ^[1-9][0-9]*$ ]] || die "--timeout must be a positive integer"
 [[ -z $REASONING_EFFORT || $REASONING_EFFORT =~ ^(low|medium|high|xhigh|max)$ ]] || die "--reasoning-effort must be low, medium, high, xhigh, or max"
-[[ -n $PROMPT_FILE_ARG ]] || die "--prompt-file must not be empty"
+[[ -n $PROMPT_FILE_ARG ]] || die "--prompt-file is required, e.g. prompts/prompt-v3.md"
 [[ -n ${PRODIGI_API_KEY-} ]] || die "PRODIGI_API_KEY must be set to a Prodigi API key"
 
 REPO_ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || die "run this from inside the benchmark repository"

@@ -21,10 +21,11 @@ export FAKE_ARCHIVE_DIR="$REPO/.benchmark-secrets/stripe"
 git init -q -b main "$REPO"
 git -C "$REPO" config user.email benchmark-test@example.com
 git -C "$REPO" config user.name benchmark-test
-printf 'test prompt\n' >"$REPO/prompt.md"
-printf 'beauty prompt\n' >"$REPO/prompt-beauty.md"
+mkdir -p "$REPO/prompts"
+printf 'test prompt\n' >"$REPO/prompts/prompt.md"
+printf 'beauty prompt\n' >"$REPO/prompts/prompt-beauty.md"
 printf 'runs/*/agent.raw.log\n.benchmark-secrets/\n' >"$REPO/.gitignore"
-git -C "$REPO" add prompt.md prompt-beauty.md .gitignore
+git -C "$REPO" add prompts .gitignore
 git -C "$REPO" commit -qm baseline
 git init -q --bare "$REMOTE"
 git -C "$REPO" remote add origin "$REMOTE"
@@ -106,7 +107,14 @@ run() {
   )
 }
 
-SUCCESS_OUTPUT=$(run success --suite-id beauty-suite --prompt-file prompt-beauty.md)
+(
+  cd "$REPO"
+  PATH="$BIN:$PATH" PRODIGI_API_KEY=test_11111111-1111-1111-1111-111111111111 "$ROOT/scripts/run-benchmark" \
+    --adapter codex --model fake --timeout 5 --run-id no-prompt 2>"$TMP_ROOT/no-prompt.err"
+) && fail 'a run without --prompt-file was accepted'
+grep -q 'prompt-file is required' "$TMP_ROOT/no-prompt.err" || fail 'missing --prompt-file was not reported'
+
+SUCCESS_OUTPUT=$(run success --suite-id beauty-suite --prompt-file prompts/prompt-beauty.md)
 [[ $SUCCESS_OUTPUT == *'agent_summary='* ]] || fail 'agent summary location was not printed'
 [[ $SUCCESS_OUTPUT == *'final report'* ]] || fail 'agent summary contents were not printed'
 assert test "$(git -C "$REPO" branch --show-current)" = main
@@ -125,8 +133,8 @@ SUCCESS_METADATA=$(git --git-dir="$REMOTE" show benchmark-results:runs/success/m
 [[ $SUCCESS_METADATA == *'"vercel_project": "benchmark-success"'* ]] || fail 'Vercel project was not recorded'
 [[ $SUCCESS_METADATA == *'"reasoning_effort": ""'* ]] || fail 'default reasoning effort was not recorded'
 [[ $SUCCESS_METADATA == *'"suite_id": "beauty-suite"'* ]] || fail 'suite ID was not recorded'
-[[ $SUCCESS_METADATA == *'"prompt_file": "prompt-beauty.md"'* ]] || fail 'prompt filename was not recorded'
-EXPECTED_PROMPT_SHA=$(shasum -a 256 "$REPO/prompt-beauty.md" | awk '{print $1}')
+[[ $SUCCESS_METADATA == *'"prompt_file": "prompts/prompt-beauty.md"'* ]] || fail 'prompt filename was not recorded'
+EXPECTED_PROMPT_SHA=$(shasum -a 256 "$REPO/prompts/prompt-beauty.md" | awk '{print $1}')
 [[ $SUCCESS_METADATA == *'"prompt_sha256": "'"$EXPECTED_PROMPT_SHA"'"'* ]] || fail 'selected prompt hash was not recorded'
 [[ $SUCCESS_METADATA == *'"stripe_config_ref": "success"'* ]] || fail 'Stripe config reference was not recorded'
 [[ $SUCCESS_METADATA == *'"stripe_config_path": ".benchmark-secrets/stripe/success.toml"'* ]] || fail 'Stripe config path was not recorded'
@@ -167,7 +175,7 @@ done
 (
   cd "$REPO"
   PATH="$BIN:$PATH" PRODIGI_API_KEY=test_11111111-1111-1111-1111-111111111111 STRIPE_SECRET_KEY=sk_test_ambient FAKE_GLOBAL_STRIPE_PATH="$GLOBAL_STRIPE_CONFIG" "$ROOT/scripts/run-benchmark" \
-    --adapter codex --model fake --timeout 5 --run-id global-bypass
+    --adapter codex --model fake --timeout 5 --run-id global-bypass --prompt-file prompts/prompt.md
 )
 assert test "$(cat "$GLOBAL_STRIPE_CONFIG")" = 'original global Stripe config'
 grep -q 'sk_test_bypass_marker' "$REPO/.benchmark-secrets/stripe/global-bypass.toml" || fail 'bypassed global Stripe config was not captured'
@@ -176,7 +184,7 @@ assert test -e "$REPO/.benchmark-secrets/stripe/global-bypass.wrapper.toml"
 (
   cd "$REPO"
   PATH="$BIN:$PATH" PRODIGI_API_KEY=test_11111111-1111-1111-1111-111111111111 "$ROOT/scripts/run-benchmark" \
-    --adapter claude --model fake --timeout 5 --run-id claude
+    --adapter claude --model fake --timeout 5 --run-id claude --prompt-file prompts/prompt.md
 )
 assert git --git-dir="$REMOTE" show benchmark-results:runs/claude/workspace/claude.txt
 CLAUDE_FINAL=$(git --git-dir="$REMOTE" show benchmark-results:runs/claude/final.md)
@@ -191,7 +199,7 @@ set +e
 (
   cd "$REPO"
   PATH="$BIN_WITHOUT_TIMEOUT:$PATH" PRODIGI_API_KEY=test_11111111-1111-1111-1111-111111111111 FAKE_CODEX_SLEEP=2 "$ROOT/scripts/run-benchmark" \
-    --adapter codex --model fake --timeout 1 --run-id timed-out
+    --adapter codex --model fake --timeout 1 --run-id timed-out --prompt-file prompts/prompt.md
 )
 EXIT_CODE=$?
 set -e
@@ -204,7 +212,7 @@ set +e
 (
   cd "$REPO"
   PATH="$BIN:$PATH" PRODIGI_API_KEY=test_11111111-1111-1111-1111-111111111111 FAKE_CODEX_EXIT=7 "$ROOT/scripts/run-benchmark" \
-    --adapter codex --model fake --timeout 5 --run-id failure
+    --adapter codex --model fake --timeout 5 --run-id failure --prompt-file prompts/prompt.md
 )
 EXIT_CODE=$?
 set -e
@@ -217,7 +225,7 @@ set +e
 (
   cd "$REPO"
   PATH="$BIN:$PATH" PRODIGI_API_KEY=test_11111111-1111-1111-1111-111111111111 "$ROOT/scripts/run-benchmark" \
-    --adapter codex --model fake --timeout 5 --run-id dirty
+    --adapter codex --model fake --timeout 5 --run-id dirty --prompt-file prompts/prompt.md
 )
 EXIT_CODE=$?
 set -e
@@ -241,7 +249,7 @@ set +e
 (
   cd "$REPO"
   PATH="$BIN:$PATH" PRODIGI_API_KEY=test_11111111-1111-1111-1111-111111111111 FAKE_ROOT_WRITE_PATH="$REPO/outside.txt" "$ROOT/scripts/run-benchmark" \
-    --adapter codex --model fake --timeout 5 --run-id outside-write
+    --adapter codex --model fake --timeout 5 --run-id outside-write --prompt-file prompts/prompt.md
 )
 EXIT_CODE=$?
 set -e

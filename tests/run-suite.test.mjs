@@ -8,16 +8,17 @@ import { hash } from '../scripts/run-inspector/common.mjs';
 const git = args => {
   if (args[0] === 'show') {
     const runId = args[1].split('/')[2], model = models.find(([adapter, model]) => runId === `fixture-suite-${adapter}-${model}`);
-    return JSON.stringify({ run_id: runId, suite_id: 'fixture-suite', adapter: model[0], model: model[1], base_commit: 'base', prompt_file: 'prompt-minimal.md', prompt_sha256: hash('fixture prompt'), reasoning_effort: 'high', status: 'succeeded' });
+    return JSON.stringify({ run_id: runId, suite_id: 'fixture-suite', adapter: model[0], model: model[1], base_commit: 'base', prompt_file: 'prompts/prompt-minimal.md', prompt_sha256: hash('fixture prompt'), reasoning_effort: 'high', status: 'succeeded' });
   }
   return args[0] === 'rev-parse' ? 'base' : args[0] === 'branch' ? 'base-branch' : '';
 };
 async function setup(t) {
   const repo = await mkdtemp(path.join(os.tmpdir(), 'suite-controller-')); t.after(() => rm(repo, { recursive: true, force: true }));
-  await writeFile(path.join(repo, 'prompt-minimal.md'), 'fixture prompt');
+  await mkdir(path.join(repo, 'prompts'));
+  await writeFile(path.join(repo, 'prompts/prompt-minimal.md'), 'fixture prompt');
   const old = process.env.PRODIGI_API_KEY; process.env.PRODIGI_API_KEY = 'test_11111111-1111-1111-1111-111111111111';
   t.after(() => { if (old === undefined) delete process.env.PRODIGI_API_KEY; else process.env.PRODIGI_API_KEY = old; });
-  return parseArgs(['--suite', 'fixture-suite', '--repo', repo, '--prompt', 'prompt-minimal.md']);
+  return parseArgs(['--suite', 'fixture-suite', '--repo', repo, '--prompt', 'prompts/prompt-minimal.md']);
 }
 test('a suite must name its prompt rather than inherit a default', () => {
   assert.throws(() => parseArgs(['--suite', 'fixture-suite']), /--prompt is required/);
