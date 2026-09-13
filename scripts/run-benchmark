@@ -68,7 +68,8 @@ extract_url() {
 }
 
 assert_no_staged_secrets() {
-  bash "$SCRIPT_DIR/check-run-artifacts" "$RUN_ID" || die "artifact publication checks failed"
+  ( cd "${1:-$REPO_ROOT}" && bash "$SCRIPT_DIR/check-run-artifacts" "$RUN_ID" ) ||
+    die "artifact publication checks failed"
 }
 
 ADAPTER=
@@ -188,6 +189,14 @@ cleanup_local_run() {
   rm -rf -- "$RESULT_DIR"
 }
 
+# Must happen before the publication branch is deleted: Git refuses to delete a
+# branch that a worktree still has checked out.
+remove_publish_tree() {
+  [[ -n ${PUBLISH_TREE-} && -d $PUBLISH_TREE ]] || return 0
+  git worktree remove --force -- "$PUBLISH_TREE" 2>/dev/null ||
+    { note "warning: leaving publication worktree at $PUBLISH_TREE"; return 1; }
+}
+
 assert_only_run_output_changed() {
   local change unexpected=
   while IFS= read -r change; do
@@ -260,6 +269,7 @@ cleanup_runtime() {
   else
     note "warning: leaving unarchived Stripe profile at ${STRIPE_LIVE_DIR-unknown}"
   fi
+  remove_publish_tree || true
   [[ -z ${AGENT_WORKSPACE-} ]] || rm -rf -- "$AGENT_WORKSPACE"
   [[ -z ${STRIPE_SHIM_DIR-} ]] || rm -rf -- "$STRIPE_SHIM_DIR"
   if [[ -n ${GLOBAL_STRIPE_BACKUP_DIR-} && -d $GLOBAL_STRIPE_BACKUP_DIR && ! -e ${GLOBAL_STRIPE_BACKUP-} ]]; then
@@ -284,6 +294,7 @@ GLOBAL_STRIPE_LOCK_DIR="${TMPDIR:-/tmp}/endless-tshirt-benchmark-cli.lock"
 GLOBAL_STRIPE_LOCK_HELD=0
 GLOBAL_STRIPE_GUARD_ACTIVE=0
 GLOBAL_STRIPE_ORIGINAL_PRESENT=0
+PUBLISH_TREE="${TMPDIR:-/tmp}/benchmark-publish.$RUN_ID.$$"
 trap cleanup_runtime EXIT
 AGENT_WORKSPACE=$(mktemp -d "${TMPDIR:-/tmp}/benchmark-workspace.XXXXXX") || die "could not create isolated agent workspace"
 # Temporary directory names reach the agent through PATH and BASH_ENV, so they
@@ -422,31 +433,35 @@ if ! git commit -m "$COMMIT_MESSAGE" >/dev/null; then
 fi
 EXECUTION_COMMIT=$(git rev-parse HEAD)
 
-git switch --detach "$RESULTS_BASE" >/dev/null || die "could not prepare $RESULTS_BRANCH"
-git switch --create "$PUBLISH_BRANCH" >/dev/null || die "could not create $PUBLISH_BRANCH"
-git checkout "$EXECUTION_COMMIT" -- "runs/$RUN_ID"
-git add "runs/$RUN_ID"
-assert_no_staged_secrets
-if ! git commit -m "$COMMIT_MESSAGE" >/dev/null; then
+# Publish from a throwaway worktree. Switching this checkout to the results
+# branch replaces the tree with one that carries only run artifacts, which
+# deletes the publication gate -- and this script -- while they are still in
+# use. Only suites launched from a separate tooling checkout escaped that.
+git worktree add -q --detach "$PUBLISH_TREE" "$RESULTS_BASE" || die "could not prepare $RESULTS_BRANCH"
+publish() { git -C "$PUBLISH_TREE" "$@"; }
+publish switch -q --create "$PUBLISH_BRANCH" || die "could not create $PUBLISH_BRANCH"
+publish checkout "$EXECUTION_COMMIT" -- "runs/$RUN_ID"
+publish add "runs/$RUN_ID"
+assert_no_staged_secrets "$PUBLISH_TREE"
+if ! publish commit -m "$COMMIT_MESSAGE" >/dev/null; then
   note "results commit failed; generated files remain staged on $PUBLISH_BRANCH"
-  restore_base_branch
   exit 1
 fi
-RESULT_COMMIT=$(git rev-parse HEAD)
+RESULT_COMMIT=$(publish rev-parse HEAD)
 
-if ! git push origin "HEAD:refs/heads/$RESULTS_BRANCH" >/dev/null; then
+if ! publish push origin "HEAD:refs/heads/$RESULTS_BRANCH" >/dev/null; then
   note "$RESULTS_BRANCH changed while this run was executing; rebasing the result once and retrying"
-  if git fetch -q origin "$RESULTS_BRANCH" && git rebase "origin/$RESULTS_BRANCH" >/dev/null && git push origin "HEAD:refs/heads/$RESULTS_BRANCH" >/dev/null; then
-    RESULT_COMMIT=$(git rev-parse HEAD)
+  if publish fetch -q origin "$RESULTS_BRANCH" && publish rebase "origin/$RESULTS_BRANCH" >/dev/null && publish push origin "HEAD:refs/heads/$RESULTS_BRANCH" >/dev/null; then
+    RESULT_COMMIT=$(publish rev-parse HEAD)
   else
     note "push failed; local results commit $RESULT_COMMIT remains on $PUBLISH_BRANCH"
     note "recover with: git switch $PUBLISH_BRANCH && git push origin HEAD:refs/heads/$RESULTS_BRANCH"
-    restore_base_branch
     exit 1
   fi
 fi
 print_agent_summary
 restore_base_branch
+remove_publish_tree
 git branch -D "$EXECUTION_BRANCH" "$PUBLISH_BRANCH" >/dev/null
 cleanup_local_run
 printf 'run=%s status=%s branch=%s commit=%s\n' "$RUN_ID" "$RUN_STATUS" "$RESULTS_BRANCH" "$RESULT_COMMIT"

@@ -258,4 +258,36 @@ assert test "$(git -C "$REPO" branch --show-current)" = main
 assert test -f "$REPO/outside.txt"
 rm "$REPO/outside.txt"
 
+# A run launched from inside the repository, as the README documents, must
+# still publish. Switching this checkout to the results branch used to delete
+# scripts/check-run-artifacts -- and run-benchmark itself -- mid-run, because
+# that branch carries only run artifacts. Every real suite escaped this only by
+# running from a separate tooling checkout.
+INREPO="$TMP_ROOT/in-repo"
+INREPO_REMOTE="$TMP_ROOT/in-repo-remote.git"
+git init -q -b main "$INREPO"
+git -C "$INREPO" config user.email benchmark-test@example.com
+git -C "$INREPO" config user.name benchmark-test
+mkdir -p "$INREPO/prompts" "$INREPO/scripts"
+printf 'test prompt\n' >"$INREPO/prompts/prompt.md"
+cp -R "$ROOT/scripts/." "$INREPO/scripts/"
+printf 'runs/*/agent.raw.log\n.benchmark-secrets/\n' >"$INREPO/.gitignore"
+git -C "$INREPO" add prompts scripts .gitignore
+git -C "$INREPO" commit -qm baseline
+git init -q --bare "$INREPO_REMOTE"
+git -C "$INREPO" remote add origin "$INREPO_REMOTE"
+git -C "$INREPO" push -qu origin main
+RESULTS_BASE_COMMIT=$(git -C "$INREPO" commit-tree "$(git -C "$INREPO" hash-object -t tree /dev/null)" -m 'results base' </dev/null)
+git -C "$INREPO" push -q origin "$RESULTS_BASE_COMMIT:refs/heads/benchmark-results"
+(
+  cd "$INREPO"
+  PATH="$BIN:$PATH" PRODIGI_API_KEY=test_11111111-1111-1111-1111-111111111111 \
+    ./scripts/run-benchmark --adapter codex --model fake --timeout 5 \
+      --run-id in-repo --prompt-file prompts/prompt.md
+) || fail 'a run launched from inside the repository could not publish'
+assert git --git-dir="$INREPO_REMOTE" cat-file -e benchmark-results:runs/in-repo/metadata.json
+assert test "$(git -C "$INREPO" branch --show-current)" = main
+assert test -f "$INREPO/scripts/check-run-artifacts"
+assert test ! -e "$INREPO/runs/in-repo"
+
 printf 'PASS: benchmark runner\n'
