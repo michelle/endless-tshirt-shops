@@ -68,8 +68,8 @@ The runner commits one immutable `runs/<run-id>/` to `benchmark-results`,
 pushes it, and returns to the original branch. Failed and timed-out runs are
 recorded too. The models compared so far are `gpt-6-astra`, `gpt-5.6-sol`,
 `gpt-5.6-terra`, `gpt-5.6-luna`, `claude-fable-5-1`, `claude-opus-5`,
-`claude-sonnet-5` and `kimi-code/kimi-for-coding` — the same list
-`scripts/run-suite.mjs` iterates.
+`claude-sonnet-5`, `kimi-code/kimi-for-coding` and `kimi-code/k3` — the same
+list `scripts/run-suite.mjs` iterates.
 
 ### Run a whole suite
 
@@ -142,7 +142,10 @@ provider config are copied from the operator's home (`KIMI_CODE_HOME` when
 set, else `~/.kimi-code`) so the run can log in, but no session, history or
 memory carries over between runs, and a mid-run token refresh can rewrite
 only the copies. Kimi's stream-json format reports no token usage, so Kimi
-runs publish no `usage.json` and record `"usage": null`.
+runs publish no `usage.json` and record `"usage": null`. Since the CLI has no
+effort flag, Kimi models run at their provider-default effort (`max` for
+`kimi-for-coding`, `high` for `k3`) regardless of `--reasoning-effort`; the
+requested value is still recorded in metadata.
 
 ## Inspect a suite
 
