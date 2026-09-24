@@ -47,6 +47,28 @@ test('Claude captures tool results and terminal answer without exposing raw payl
   assert.doesNotMatch(JSON.stringify(n.events), /Private response|file_path/);
 });
 
+test('Kimi stream-json captures tool calls and the final answer without exposing raw payloads', () => {
+  const n = normalize(jsonl([
+    { role: 'assistant', tool_calls: [{ type: 'function', id: 'call_1', function: { name: 'WebSearch', arguments: '{"query":"stripe checkout alice@example.com"}' } }] },
+    { role: 'tool', tool_call_id: 'call_1', content: 'Private response' },
+    { role: 'assistant', tool_calls: [{ type: 'function', id: 'call_2', function: { name: 'Read', arguments: '{"path":"node_modules/next/dist/docs/app.md"}' } }] },
+    { role: 'tool', tool_call_id: 'call_2', content: 'ok' },
+    { role: 'assistant', content: 'Kimi final only' },
+    { role: 'meta', type: 'system.version', version: '2.1.0' },
+  ]), 'kimi');
+  assert.equal(n.final, 'Kimi final only');
+  assert.equal(n.usage, null);
+  assert.equal(n.failed, false);
+  assert.deepEqual(n.events.map(e => e.evidence), ['tool_result_available', 'tool_result_available']);
+  assert.equal(n.events[0].operation, 'search');
+  assert.equal(n.events[1].operation, 'local_reference_read');
+  assert.equal(n.events[0].queries.length, 1);
+  assert.doesNotMatch(JSON.stringify(n.events), /alice|Private response|"path"/);
+  const empty = normalize(jsonl([{ role: 'meta', type: 'system.version', version: '2.1.0' }]), 'kimi');
+  assert.equal(empty.final, null);
+  assert.match(empty.coverage.limitations.join(' '), /no token usage/);
+});
+
 test('missing history, malformed/partial captures, and error terminal events remain explicit', () => {
   const old = normalize('{"result":"done","usage":{"input_tokens":1}}', 'claude');
   assert.equal(documentation(old.events, old.coverage).stripe.coverage, 'unknown');

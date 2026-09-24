@@ -10,6 +10,7 @@ export const models = [
   ['codex', 'gpt-6-astra'], ['codex', 'gpt-5.6-sol'],
   ['codex', 'gpt-5.6-terra'], ['codex', 'gpt-5.6-luna'],
   ['claude', 'claude-fable-5-1'], ['claude', 'claude-opus-5'], ['claude', 'claude-sonnet-5'],
+  ['kimi', 'kimi-code/kimi-for-coding'],
 ];
 export function parseArgs(args) {
   const options = { repo: process.cwd(), effort: 'high', timeout: '7200' };

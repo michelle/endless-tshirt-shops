@@ -67,7 +67,7 @@ function operation(call, input) {
 }
 
 export function normalize(text, provider) {
-  const parsed = records(text); const events = []; const calls = new Map(); let terminal = null; let usage = null;
+  const parsed = records(text); const events = []; const calls = new Map(); let terminal = null; let usage = null; let kimiFinal = null;
   const push = (r, data) => { const e = { schemaVersion, sequence: r.sequence, receivedAt: r.receivedAt, sourceLine: r.sourceLine, ...data }; events.push(e); return e; };
   for (const r of parsed.records) {
     const e = r.event;
@@ -95,6 +95,27 @@ export function normalize(text, provider) {
         if (call) { call.status = block.is_error ? 'failed' : 'completed'; call._output = typeof block.content === 'string' ? block.content : JSON.stringify(block.content ?? ''); call.completedSequence = r.sequence; }
       }
     }
+    // Kimi print mode (-p --output-format stream-json) writes one OpenAI-style
+    // chat line per event: assistant blocks carrying tool_calls, matching tool
+    // results, and meta envelopes (version, resume hint, step retry). The last
+    // assistant text is the final answer; the format reports no token usage.
+    if (provider === 'kimi') {
+      if (e.role === 'assistant') {
+        for (const block of Array.isArray(e.tool_calls) ? e.tool_calls : []) {
+          if (!block || block.type !== 'function' || block.id == null) continue;
+          const key = block.id; if (calls.has(key)) continue;
+          const name = block.function?.name ?? '';
+          let input = {}; try { input = JSON.parse(block.function?.arguments ?? '{}'); } catch { input = block.function?.arguments ?? ''; }
+          const query = typeof input === 'object' && input !== null && typeof input.query === 'string' ? input.query : null;
+          const call = push(r, { callId: key, tool: name, kind: /WebSearch|WebFetch/.test(name) ? 'web_search' : /Bash|Read|Grep|Glob/.test(name) ? 'command_execution' : 'mcp_tool_call', status: 'incomplete',
+            _input: typeof input === 'string' ? input : JSON.stringify(input ?? {}), _output: '', queries: query ? [query] : [], webAction: /WebSearch/.test(name) ? 'search' : /WebFetch/.test(name) ? 'open' : undefined }); calls.set(key, call);
+        }
+        if (typeof e.content === 'string' && e.content) kimiFinal = e.content;
+      } else if (e.role === 'tool') {
+        const call = calls.get(e.tool_call_id);
+        if (call) { call.status = 'completed'; call._output = typeof e.content === 'string' ? e.content : JSON.stringify(e.content ?? ''); call.completedSequence = r.sequence; }
+      }
+    }
   }
   for (const call of events) {
     const input = call._input; const output = call._output;
@@ -109,7 +130,7 @@ export function normalize(text, provider) {
   }
   const coverage = { schemaVersion, provider, format: provider === 'claude' && !events.length ? 'result_only_or_no_tools' : 'event_stream', terminalEvent: Boolean(terminal), malformedLines: parsed.malformed,
     capturedRecords: parsed.records.length, toolCalls: events.length, limitations: ['A search or fetch does not prove comprehension or influence.', 'Shell classification is heuristic; mixed write/read commands and dynamic URLs may be missed.',
-      ...(provider === 'codex' ? ['Exec web events may omit resolved URLs and result contents.'] : []), ...(!events.length ? ['No tool history available; zero observed calls is not evidence of no documentation use.'] : [])] };
+      ...(provider === 'codex' ? ['Exec web events may omit resolved URLs and result contents.'] : []), ...(provider === 'kimi' ? ['Kimi stream-json reports no token usage, so usage.json is not produced.'] : []), ...(!events.length ? ['No tool history available; zero observed calls is not evidence of no documentation use.'] : [])] };
   if (usage) {
     usage = Object.fromEntries(Object.entries(usage).filter(([, value]) => Number.isInteger(value)));
     // The two providers define input_tokens differently, so the arithmetic has
@@ -122,7 +143,7 @@ export function normalize(text, provider) {
         : Math.max(0, usage.input_tokens - (usage.cached_input_tokens ?? 0));
     }
   }
-  return { events, coverage, usage, failed: Boolean(terminal?.is_error || terminal?.type === 'turn.failed'), final: typeof terminal?.result === 'string' ? terminal.result : null };
+  return { events, coverage, usage, failed: Boolean(terminal?.is_error || terminal?.type === 'turn.failed'), final: provider === 'kimi' ? kimiFinal : typeof terminal?.result === 'string' ? terminal.result : null };
 }
 export function documentation(events, coverage) {
   return Object.fromEntries(['stripe', 'prodigi', 'framework'].map(topic => {
