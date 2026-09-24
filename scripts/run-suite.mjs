@@ -12,6 +12,14 @@ export const models = [
   ['claude', 'claude-fable-5-1'], ['claude', 'claude-opus-5'], ['claude', 'claude-sonnet-5'],
   ['kimi', 'kimi-code/kimi-for-coding'],
 ];
+// run-benchmark sanitizes the --run-id it is given (lowercase; every run of
+// characters outside [a-z0-9._-] becomes one '-'; one leading and trailing
+// '-' stripped). Model aliases such as kimi-code/kimi-for-coding contain '/',
+// so suite run ids must be sanitized here the same way before they are passed
+// down or compared against published metadata.
+export function sanitizeRunId(value) {
+  return value.toLowerCase().replace(/[^a-z0-9._-]+/g, '-').replace(/^-/, '').replace(/-$/, '');
+}
 export function parseArgs(args) {
   const options = { repo: process.cwd(), effort: 'high', timeout: '7200' };
   for (let i = 0; i < args.length; i++) {
@@ -76,7 +84,7 @@ export async function runSuite(options, dependencies = {}) {
       readGit(['fetch', '-q', 'origin', 'benchmark-results']);
       // Validate every recorded attempt before modifying progress or launching anything.
       for (const [index, entry] of saved.completed.entries()) {
-        const [adapter, model] = models[index], runId = `${suite}-${adapter}-${model}`;
+        const [adapter, model] = models[index], runId = sanitizeRunId(`${suite}-${adapter}-${model}`);
         if (entry.runId !== runId || entry.model !== model) throw new Error('Saved attempts are not a unique ordered prefix');
         entry.publication = published(runId, adapter, model);
       }
@@ -91,7 +99,7 @@ export async function runSuite(options, dependencies = {}) {
     await record();
     for (const [adapter, model] of models.slice(progress.completed.length)) {
       assertBase();
-      const runId = `${suite}-${adapter}-${model}`;
+      const runId = sanitizeRunId(`${suite}-${adapter}-${model}`);
       progress.active = runId; await record();
       const startedAt = new Date().toISOString();
       const result = await run(path.join(toolingRoot, 'scripts/run-benchmark'), ['--adapter', adapter, '--model', model, '--suite-id', suite, '--run-id', runId, '--prompt-file', options.prompt, '--reasoning-effort', options.effort, '--timeout', options.timeout], spawnOptions);
