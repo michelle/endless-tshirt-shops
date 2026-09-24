@@ -97,6 +97,34 @@ printf '%s\n' \
   "printf '%s\\n' '{\"type\":\"result\",\"result\":\"claude final report\",\"usage\":{\"input_tokens\":21,\"output_tokens\":13}}'" >"$BIN/claude"
 chmod +x "$BIN/claude"
 
+printf '%s\n' \
+  '#!/usr/bin/env bash' \
+  'set -euo pipefail' \
+  'prompt=' \
+  'while (($#)); do' \
+  '  case $1 in' \
+  '    -p) prompt=$2; shift 2 ;;' \
+  '    -m|--output-format) shift 2 ;;' \
+  '    *) shift ;;' \
+  '  esac' \
+  'done' \
+  '[[ -n $prompt ]]' \
+  '# the harness must isolate Kimi: a fresh home inside the private capture' \
+  '# dir, auth copied from the source home, auto-update off' \
+  'case $KIMI_CODE_HOME in */.benchmark-secrets/transcripts/kimi/kimi-home) ;; *) echo "KIMI_CODE_HOME is not the isolated capture home: ${KIMI_CODE_HOME-unset}" >&2; exit 14 ;; esac' \
+  '[[ $KIMI_CODE_HOME != "$KIMI_SOURCE_HOME" ]]' \
+  '[[ $KIMI_CODE_NO_AUTO_UPDATE == 1 ]]' \
+  '[[ -f $KIMI_CODE_HOME/config.toml && -f $KIMI_CODE_HOME/credentials/fixture.json ]]' \
+  '# the environment must not disclose the pre-provisioned payment provider' \
+  'if env | grep -i "^BENCHMARK_" | grep -qi stripe; then echo "provider name leaked through BENCHMARK_* environment" >&2; exit 10; fi' \
+  'case $PATH$BASH_ENV in *[Ss]tripe*) echo "provider name leaked through PATH/BASH_ENV" >&2; exit 11 ;; esac' \
+  '[[ -z "${STRIPE_SECRET_KEY-}${STRIPE_API_KEY-}${STRIPE_PUBLISHABLE_KEY-}${STRIPE_WEBHOOK_SECRET-}" ]]' \
+  'printf "kimi app\\n" > kimi.txt' \
+  "printf '%s\\n' '{\"role\":\"assistant\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"call_1\",\"function\":{\"name\":\"WebSearch\",\"arguments\":\"{\\\"query\\\":\\\"stripe docs\\\"}\"}}]}'" \
+  "printf '%s\\n' '{\"role\":\"tool\",\"tool_call_id\":\"call_1\",\"content\":\"search results\"}'" \
+  "printf '%s\\n' '{\"role\":\"assistant\",\"content\":\"kimi final report\"}'" >"$BIN/kimi"
+chmod +x "$BIN/kimi"
+
 run() {
   local run_id=$1
   shift
@@ -194,6 +222,31 @@ CLAUDE_USAGE=$(git --git-dir="$REMOTE" show benchmark-results:runs/claude/usage.
 CLAUDE_EVENTS=$(git --git-dir="$REMOTE" show benchmark-results:runs/claude/events.jsonl)
 [[ $CLAUDE_EVENTS == *'"operation":"search"'* ]] || fail 'Claude tool history was not captured'
 [[ $CLAUDE_EVENTS != *'private@example.com'* ]] || fail 'raw query leaked into public events'
+
+mkdir -p "$TMP_ROOT/kimi-source-home/credentials"
+printf 'fixture kimi config\n' >"$TMP_ROOT/kimi-source-home/config.toml"
+printf '{}\n' >"$TMP_ROOT/kimi-source-home/credentials/fixture.json"
+(
+  cd "$REPO"
+  PATH="$BIN:$PATH" PRODIGI_API_KEY=test_11111111-1111-1111-1111-111111111111 \
+    KIMI_CODE_HOME="$TMP_ROOT/kimi-source-home" KIMI_SOURCE_HOME="$TMP_ROOT/kimi-source-home" \
+    "$ROOT/scripts/run-benchmark" \
+    --adapter kimi --model fake --timeout 5 --run-id kimi --prompt-file prompts/prompt.md
+)
+assert git --git-dir="$REMOTE" show benchmark-results:runs/kimi/workspace/kimi.txt
+KIMI_FINAL=$(git --git-dir="$REMOTE" show benchmark-results:runs/kimi/final.md)
+assert test "$KIMI_FINAL" = 'kimi final report'
+KIMI_EVENTS=$(git --git-dir="$REMOTE" show benchmark-results:runs/kimi/events.jsonl)
+[[ $KIMI_EVENTS == *'"operation":"search"'* ]] || fail 'Kimi tool history was not captured'
+KIMI_METADATA=$(git --git-dir="$REMOTE" show benchmark-results:runs/kimi/metadata.json)
+[[ $KIMI_METADATA == *'"adapter": "kimi"'* ]] || fail 'Kimi adapter was not recorded'
+# Kimi stream-json reports no token usage, so usage must record as null and
+# no usage.json may be published.
+[[ $KIMI_METADATA == *'"usage": null'* ]] || fail 'Kimi usage was not recorded as null'
+if git --git-dir="$REMOTE" cat-file -e benchmark-results:runs/kimi/usage.json 2>/dev/null; then
+  fail 'Kimi usage.json was published even though stream-json reports no usage'
+fi
+assert test -s "$REPO/.benchmark-secrets/transcripts/kimi/transcript.jsonl"
 
 set +e
 (

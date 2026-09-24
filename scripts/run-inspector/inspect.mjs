@@ -13,7 +13,7 @@ import { renderReport, updateSummary } from './report.mjs';
 
 export const inspectorVersion = '1.0.0';
 export function viewerRuns(runs, suiteId) {
-  const modelIds = { 'gpt-6-astra': 'astra', 'gpt-5.6-sol': 'sol', 'gpt-5.6-terra': 'terra', 'gpt-5.6-luna': 'luna', 'claude-fable-5-1': 'fable', 'claude-opus-5': 'opus', 'claude-sonnet-5': 'sonnet' };
+  const modelIds = { 'gpt-6-astra': 'astra', 'gpt-5.6-sol': 'sol', 'gpt-5.6-terra': 'terra', 'gpt-5.6-luna': 'luna', 'claude-fable-5-1': 'fable', 'claude-opus-5': 'opus', 'claude-sonnet-5': 'sonnet', 'kimi-code/kimi-for-coding': 'kimi' };
   return runs.filter(r => r.deployment).map(r => ({ id: runs.filter(other => other.model === r.model).length === 1 ? modelIds[r.model] ?? r.id : r.id,
     benchmarkRunId: r.id, deployment: r.deployment, finalOutput: `/suites/${suiteId}/runs/${r.id}/final.md` }));
 }

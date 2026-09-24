@@ -4,7 +4,7 @@ set -uo pipefail
 
 usage() {
   cat <<'EOF'
-Usage: scripts/run-benchmark --adapter codex|claude --model MODEL --prompt-file FILE [options] [-- ADAPTER_ARGS...]
+Usage: scripts/run-benchmark --adapter codex|claude|kimi --model MODEL --prompt-file FILE [options] [-- ADAPTER_ARGS...]
 
 Options:
   --run-id ID          Unique, branch-safe run ID (default: UTC timestamp + adapter + model)
@@ -96,7 +96,7 @@ while (($#)); do
   esac
 done
 
-[[ $ADAPTER == codex || $ADAPTER == claude ]] || die "--adapter must be codex or claude"
+[[ $ADAPTER == codex || $ADAPTER == claude || $ADAPTER == kimi ]] || die "--adapter must be codex, claude or kimi"
 [[ -n $MODEL ]] || die "--model is required"
 [[ $TIMEOUT_SECONDS =~ ^[1-9][0-9]*$ ]] || die "--timeout must be a positive integer"
 [[ -z $REASONING_EFFORT || $REASONING_EFFORT =~ ^(low|medium|high|xhigh|max)$ ]] || die "--reasoning-effort must be low, medium, high, xhigh, or max"

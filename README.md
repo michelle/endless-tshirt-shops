@@ -58,16 +58,18 @@ scripts/run-benchmark \
   --reasoning-effort high --timeout 3600
 ```
 
-`--adapter` is `codex` or `claude`; `--reasoning-effort` is `low`, `medium`,
+`--adapter` is `codex`, `claude` or `kimi`; `--reasoning-effort` is `low`, `medium`,
 `high`, `xhigh` or `max`, and is recorded in metadata (omit it to keep the
-provider default). Arguments after `--` go to the underlying CLI, e.g.
+provider default; Kimi's CLI has no effort flag, so for `kimi` it is recorded
+but not passed on). Arguments after `--` go to the underlying CLI, e.g.
 `-- --max-budget-usd 20`. `--suite-id` groups the runs of one comparison.
 
 The runner commits one immutable `runs/<run-id>/` to `benchmark-results`,
 pushes it, and returns to the original branch. Failed and timed-out runs are
 recorded too. The models compared so far are `gpt-6-astra`, `gpt-5.6-sol`,
-`gpt-5.6-terra`, `gpt-5.6-luna`, `claude-fable-5-1`, `claude-opus-5` and
-`claude-sonnet-5` — the same list `scripts/run-suite.mjs` iterates.
+`gpt-5.6-terra`, `gpt-5.6-luna`, `claude-fable-5-1`, `claude-opus-5`,
+`claude-sonnet-5` and `kimi-code/kimi-for-coding` — the same list
+`scripts/run-suite.mjs` iterates.
 
 ### Run a whole suite
 
@@ -131,10 +133,16 @@ reach the archive, this repository, `$HOME` and `/tmp` with an explicit search.
 Treat isolation as advisory; use a dedicated user account or container if it
 matters.
 
-Both providers run non-interactively with memory features explicitly disabled —
-Codex via `exec --json` with ephemeral sessions, Claude via
+All three providers run non-interactively with memory features explicitly
+disabled — Codex via `exec --json` with ephemeral sessions, Claude via
 `--output-format stream-json` with session persistence and all `CLAUDE.md`
-loading turned off.
+loading turned off, Kimi via `kimi -p --output-format stream-json` with a
+fresh `KIMI_CODE_HOME` inside the run's private capture directory: auth and
+provider config are copied from the operator's home (`KIMI_CODE_HOME` when
+set, else `~/.kimi-code`) so the run can log in, but no session, history or
+memory carries over between runs, and a mid-run token refresh can rewrite
+only the copies. Kimi's stream-json format reports no token usage, so Kimi
+runs publish no `usage.json` and record `"usage": null`.
 
 ## Inspect a suite
 
@@ -170,7 +178,7 @@ bash tests/run-benchmark-test.sh
 missing. `BENCHMARK_CLI_STATE` is named neutrally on purpose, so it does not
 steer the agent's choice of payment provider.
 
-A third provider means editing three places, not adding a plugin:
+Each additional provider means editing three places, not adding a plugin:
 
 1. `run-agent.mjs` — the CLI name and the arguments that make it run
    non-interactively, with memory disabled, emitting a JSON event stream.
