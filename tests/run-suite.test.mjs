@@ -3,13 +3,13 @@ import assert from 'node:assert/strict';
 import { mkdtemp, readFile, rm, writeFile, mkdir } from 'node:fs/promises';
 import path from 'node:path';
 import os from 'node:os';
-import { runSuite, parseArgs, models } from '../scripts/run-suite.mjs';
+import { runSuite, parseArgs, models, sanitizeRunId } from '../scripts/run-suite.mjs';
 import { hash } from '../scripts/run-inspector/common.mjs';
 const git = args => {
   if (args[0] === 'show') {
     // Model aliases may contain '/', so the run id is not at a fixed offset.
     const runId = args[1].match(/runs\/(.+)\/metadata\.json$/)[1];
-    const found = models.find(([adapter, model]) => runId === `fixture-suite-${adapter}-${model}`);
+    const found = models.find(([adapter, model]) => runId === sanitizeRunId(`fixture-suite-${adapter}-${model}`));
     return JSON.stringify({ run_id: runId, suite_id: 'fixture-suite', adapter: found[0], model: found[1], base_commit: 'base', prompt_file: 'prompts/prompt-minimal.md', prompt_sha256: hash('fixture prompt'), reasoning_effort: 'high', status: 'succeeded' });
   }
   return args[0] === 'rev-parse' ? 'base' : args[0] === 'branch' ? 'base-branch' : '';
@@ -24,6 +24,10 @@ async function setup(t) {
 }
 test('a suite must name its prompt rather than inherit a default', () => {
   assert.throws(() => parseArgs(['--suite', 'fixture-suite']), /--prompt is required/);
+});
+test('suite run ids are sanitized exactly like the runner sanitizes --run-id', () => {
+  assert.equal(sanitizeRunId('fixture-suite-kimi-kimi-code/kimi-for-coding'), 'fixture-suite-kimi-kimi-code-kimi-for-coding');
+  assert.equal(sanitizeRunId('Suite_K3.A/B-C'), 'suite_k3.a-b-c');
 });
 test('controller runs every model serially, continues published model failures, then inspects', async t => {
   const opts = await setup(t), calls = []; let active = false;
