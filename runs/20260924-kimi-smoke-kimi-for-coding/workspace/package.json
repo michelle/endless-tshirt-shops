@@ -1,0 +1,16 @@
+{
+  "name": "starstamp",
+  "version": "1.0.0",
+  "private": true,
+  "description": "STARSTAMP - personalized star-map t-shirts. Static storefront + Vercel serverless API: Stripe Checkout payments, Prodigi DTG fulfillment.",
+  "scripts": {
+    "dev": "vercel dev",
+    "deploy": "vercel deploy --prod"
+  },
+  "dependencies": {
+    "@expo-google-fonts/inter": "^0.4.2",
+    "@expo-google-fonts/playfair-display": "^0.4.2",
+    "@napi-rs/canvas": "^1.0.9",
+    "stripe": "^22.6.2"
+  }
+}

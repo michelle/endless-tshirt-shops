@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "provider": "kimi",
+  "format": "event_stream",
+  "terminalEvent": false,
+  "malformedLines": 0,
+  "capturedRecords": 511,
+  "toolCalls": 33,
+  "limitations": [
+    "A search or fetch does not prove comprehension or influence.",
+    "Shell classification is heuristic; mixed write/read commands and dynamic URLs may be missed.",
+    "Kimi stream-json reports no token usage, so usage.json is not produced."
+  ]
+}

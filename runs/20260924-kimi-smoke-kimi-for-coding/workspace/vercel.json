@@ -1,0 +1,26 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "functions": {
+    "api/design.js": { "memory": 1024, "maxDuration": 60 },
+    "api/checkout.js": { "memory": 256, "maxDuration": 15 },
+    "api/webhook.js": { "memory": 256, "maxDuration": 30 },
+    "api/status.js": { "memory": 256, "maxDuration": 15 }
+  },
+  "headers": [
+    {
+      "source": "/api/design(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, s-maxage=31536000, stale-while-revalidate=86400, immutable" }
+      ]
+    },
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" }
+      ]
+    }
+  ]
+}
