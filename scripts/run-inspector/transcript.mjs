@@ -107,8 +107,8 @@ export function normalize(text, provider) {
           const name = block.function?.name ?? '';
           let input = {}; try { input = JSON.parse(block.function?.arguments ?? '{}'); } catch { input = block.function?.arguments ?? ''; }
           const query = typeof input === 'object' && input !== null && typeof input.query === 'string' ? input.query : null;
-          const call = push(r, { callId: key, tool: name, kind: /WebSearch|WebFetch/.test(name) ? 'web_search' : /Bash|Read|Grep|Glob/.test(name) ? 'command_execution' : 'mcp_tool_call', status: 'incomplete',
-            _input: typeof input === 'string' ? input : JSON.stringify(input ?? {}), _output: '', queries: query ? [query] : [], webAction: /WebSearch/.test(name) ? 'search' : /WebFetch/.test(name) ? 'open' : undefined }); calls.set(key, call);
+          const call = push(r, { callId: key, tool: name, kind: /WebSearch|WebFetch|FetchURL/.test(name) ? 'web_search' : /Bash|Read|Grep|Glob/.test(name) ? 'command_execution' : 'mcp_tool_call', status: 'incomplete',
+            _input: typeof input === 'string' ? input : JSON.stringify(input ?? {}), _output: '', queries: query ? [query] : [], webAction: /WebSearch/.test(name) ? 'search' : /WebFetch|FetchURL/.test(name) ? 'open' : undefined }); calls.set(key, call);
         }
         if (typeof e.content === 'string' && e.content) kimiFinal = e.content;
       } else if (e.role === 'tool') {

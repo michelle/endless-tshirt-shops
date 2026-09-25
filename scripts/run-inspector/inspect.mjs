@@ -123,6 +123,6 @@ export async function inspect(opts) {
   return { output, runs: runs.length, isolation: isolation.state, reviewState: report.reviewState };
 }
 if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href) {
-  if (process.argv.includes('--help')) console.log('Usage: node scripts/run-inspector/inspect.mjs --suite ID [--repo PATH] [--ref REF] [--output NEW_PRIVATE_DIR] [--live | --snapshot FILE] [--profiles DIR] [--artwork PRIVATE_PLAN.json] [--capture] [--expected-runs 7] [--update-summary FILE]\nOffline by default. Does not execute archived apps, create payments/orders, publish, or assign ratings.');
+  if (process.argv.includes('--help')) console.log('Usage: node scripts/run-inspector/inspect.mjs --suite ID [--repo PATH] [--ref REF] [--output NEW_PRIVATE_DIR] [--live | --snapshot FILE] [--profiles DIR] [--artwork PRIVATE_PLAN.json] [--capture] [--expected-runs 9] [--update-summary FILE]\nOffline by default. Does not execute archived apps, create payments/orders, publish, or assign ratings.');
   else { try { console.log(JSON.stringify(await inspect(parseArgs(process.argv.slice(2))), null, 2)); } catch (error) { console.error(`Inspection failed: ${error.message}`); process.exitCode = 1; } }
 }

@@ -78,7 +78,7 @@ node scripts/run-suite.mjs --suite 20260911-prompt-v3-high \
   --prompt prompts/prompt-v3.md --effort high --timeout 7200
 ```
 
-Runs all seven models serially in a dedicated clean worktree, records private
+Runs all nine models serially in a dedicated clean worktree, records private
 progress under `.benchmark-secrets/suites/<suite>/`, and invokes the inspector
 at the end. Like the runner, it requires `--prompt`: neither tool has a
 default, so a run can never inherit a task nobody chose.
@@ -151,7 +151,7 @@ requested value is still recorded in metadata.
 
 ```sh
 git fetch origin benchmark-results
-node scripts/run-inspector/inspect.mjs --suite 20260911-prompt-v3-high --expected-runs 7
+node scripts/run-inspector/inspect.mjs --suite 20260911-prompt-v3-high --expected-runs 9
 ```
 
 Offline by default; `--live` adds read-only Stripe and Prodigi sandbox
