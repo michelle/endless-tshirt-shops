@@ -73,6 +73,30 @@ test('Kimi stream-json captures tool calls and the final answer without exposing
   assert.match(empty.coverage.limitations.join(' '), /no token usage/);
 });
 
+test('OpenCode json events capture tool calls, summed usage, and the final answer', () => {
+  const n = normalize(jsonl([
+    { type: 'step_start', part: { type: 'step-start' } },
+    { type: 'tool_use', part: { id: 'call_1', type: 'tool', tool: 'web_search', state: { status: 'completed', input: { query: 'stripe checkout alice@example.com' }, output: 'Private results' } } },
+    { type: 'tool_use', part: { id: 'call_2', type: 'tool', tool: 'read', state: { status: 'error', input: { filePath: 'node_modules/next/dist/docs/app.md' }, output: 'boom' } } },
+    { type: 'step_finish', part: { type: 'step-finish', tokens: { input: 100, output: 10, reasoning: 0, cache: { read: 40, write: 0 } } } },
+    { type: 'step_finish', part: { type: 'step-finish', tokens: { input: 50, output: 5, reasoning: 0, cache: { read: 10, write: 0 } } } },
+    { type: 'text', part: { type: 'text', text: 'OpenCode final only', time: { start: 1, end: 2 } } },
+  ]), 'opencode');
+  assert.equal(n.final, 'OpenCode final only');
+  assert.equal(n.failed, false);
+  assert.equal(n.usage.input_tokens, 150);
+  assert.equal(n.usage.output_tokens, 15);
+  assert.equal(n.usage.cached_input_tokens, 50);
+  assert.equal(n.usage.new_input_tokens, 100);
+  assert.deepEqual(n.events.map(e => e.evidence), ['tool_result_available', 'failed_attempt']);
+  assert.equal(n.events[0].operation, 'search');
+  assert.equal(n.events[1].operation, 'local_reference_read');
+  assert.equal(n.events[1].status, 'failed');
+  assert.doesNotMatch(JSON.stringify(n.events), /alice|Private results|filePath/);
+  assert.equal(normalize(jsonl([{ type: 'error', error: { message: 'x' } }]), 'opencode').failed, true);
+  assert.equal(normalize(jsonl([{ type: 'step_start', part: { type: 'step-start' } }]), 'opencode').final, null);
+});
+
 test('missing history, malformed/partial captures, and error terminal events remain explicit', () => {
   const old = normalize('{"result":"done","usage":{"input_tokens":1}}', 'claude');
   assert.equal(documentation(old.events, old.coverage).stripe.coverage, 'unknown');

@@ -46,7 +46,7 @@ const topics = text => ['stripe', 'prodigi', 'framework'].filter(topic => ({ str
 // rule wins, and the order is load-bearing, so keep these named patterns and
 // the sequence in `operation` together.
 const WRITES = /apply_patch|\*\*\* (?:Begin|Add|Update)|writeFile|cat\s*>|open\([^\n]*['"]w['"]/;
-const READS = /\b(?:cat|sed|rg|head|Read|Grep)\b/;
+const READS = /\b(?:cat|sed|rg|head|read|list|Read|Grep|grep|glob|Glob)\b/;
 const FETCHES = /curl|wget|fetch\(|urlopen|WebFetch|web\.run|web__run/;
 const BUNDLED_DOCS = /node_modules\/.+(?:docs|types|CHANGELOG)|AGENTS\.md/;
 const SAVED_DOCS = /prodigi-reference|prodigi-page|docs[^\s]*\.(?:html|md)/i;
@@ -67,7 +67,7 @@ function operation(call, input) {
 }
 
 export function normalize(text, provider) {
-  const parsed = records(text); const events = []; const calls = new Map(); let terminal = null; let usage = null; let kimiFinal = null;
+  const parsed = records(text); const events = []; const calls = new Map(); let terminal = null; let usage = null; let kimiFinal = null; let opencodeFinal = null;
   const push = (r, data) => { const e = { schemaVersion, sequence: r.sequence, receivedAt: r.receivedAt, sourceLine: r.sourceLine, ...data }; events.push(e); return e; };
   for (const r of parsed.records) {
     const e = r.event;
@@ -116,6 +116,30 @@ export function normalize(text, provider) {
         if (call) { call.status = 'completed'; call._output = typeof e.content === 'string' ? e.content : JSON.stringify(e.content ?? ''); call.completedSequence = r.sequence; }
       }
     }
+    // OpenCode `run --format json` emits one line per finished item:
+    // step_start, tool_use (a tool part in its final completed/error state),
+    // step_finish (carrying per-step token usage), text, and error. A run has
+    // many steps, so usage accumulates across every step_finish.
+    if (provider === 'opencode') {
+      if (e.type === 'tool_use' && e.part?.type === 'tool') {
+        const part = e.part; const key = part.id ?? part.callID ?? part.partID;
+        if (key != null && !calls.has(key)) {
+          const name = part.tool ?? '';
+          const input = part.state?.input;
+          const query = typeof input === 'object' && input !== null && typeof input.query === 'string' ? input.query : null;
+          const call = push(r, { callId: key, tool: name, kind: /web_search|webfetch/i.test(name) ? 'web_search' : /bash|read|grep|glob|list/i.test(name) ? 'command_execution' : 'mcp_tool_call', status: part.state?.status === 'error' ? 'failed' : 'completed',
+            _input: typeof input === 'string' ? input : JSON.stringify(input ?? {}), _output: typeof part.state?.output === 'string' ? part.state.output : JSON.stringify(part.state?.output ?? ''),
+            queries: query ? [query] : [], webAction: /web_search/i.test(name) ? 'search' : /webfetch/i.test(name) ? 'open' : undefined }); calls.set(key, call);
+        }
+      }
+      if (e.type === 'step_finish' && e.part?.tokens) {
+        const tokens = e.part.tokens;
+        usage ??= { input_tokens: 0, output_tokens: 0, cached_input_tokens: 0 };
+        usage.input_tokens += tokens.input ?? 0; usage.output_tokens += tokens.output ?? 0; usage.cached_input_tokens += tokens.cache?.read ?? 0;
+      }
+      if (e.type === 'text' && typeof e.part?.text === 'string' && e.part.text) opencodeFinal = e.part.text;
+      if (e.type === 'error') terminal = { is_error: true };
+    }
   }
   for (const call of events) {
     const input = call._input; const output = call._output;
@@ -143,7 +167,7 @@ export function normalize(text, provider) {
         : Math.max(0, usage.input_tokens - (usage.cached_input_tokens ?? 0));
     }
   }
-  return { events, coverage, usage, failed: Boolean(terminal?.is_error || terminal?.type === 'turn.failed'), final: provider === 'kimi' ? kimiFinal : typeof terminal?.result === 'string' ? terminal.result : null };
+  return { events, coverage, usage, failed: Boolean(terminal?.is_error || terminal?.type === 'turn.failed'), final: provider === 'kimi' ? kimiFinal : provider === 'opencode' ? opencodeFinal : typeof terminal?.result === 'string' ? terminal.result : null };
 }
 export function documentation(events, coverage) {
   return Object.fromEntries(['stripe', 'prodigi', 'framework'].map(topic => {

@@ -58,18 +58,21 @@ scripts/run-benchmark \
   --reasoning-effort high --timeout 3600
 ```
 
-`--adapter` is `codex`, `claude` or `kimi`; `--reasoning-effort` is `low`, `medium`,
+`--adapter` is `codex`, `claude`, `kimi` or `opencode`; `--reasoning-effort` is `low`, `medium`,
 `high`, `xhigh` or `max`, and is recorded in metadata (omit it to keep the
 provider default; Kimi's CLI has no effort flag, so for `kimi` it is recorded
-but not passed on). Arguments after `--` go to the underlying CLI, e.g.
-`-- --max-budget-usd 20`. `--suite-id` groups the runs of one comparison.
+but not passed on, while `opencode` receives it as `--variant` and fails
+loudly if the model does not support it). Arguments after `--` go to the
+underlying CLI, e.g. `-- --max-budget-usd 20`. `--suite-id` groups the runs of
+one comparison.
 
 The runner commits one immutable `runs/<run-id>/` to `benchmark-results`,
 pushes it, and returns to the original branch. Failed and timed-out runs are
 recorded too. The models compared so far are `gpt-6-astra`, `gpt-5.6-sol`,
 `gpt-5.6-terra`, `gpt-5.6-luna`, `claude-fable-5-1`, `claude-opus-5`,
-`claude-sonnet-5`, `kimi-code/kimi-for-coding` and `kimi-code/k3` — the same
-list `scripts/run-suite.mjs` iterates.
+`claude-sonnet-5`, `kimi-code/kimi-for-coding`, `kimi-code/k3`,
+`opencode-go/glm-5.3`, `opencode-go/deepseek-v4-pro` and
+`opencode-go/qwen3.8-max` — the same list `scripts/run-suite.mjs` iterates.
 
 ### Run a whole suite
 
@@ -78,7 +81,7 @@ node scripts/run-suite.mjs --suite 20260911-prompt-v3-high \
   --prompt prompts/prompt-v3.md --effort high --timeout 7200
 ```
 
-Runs all nine models serially in a dedicated clean worktree, records private
+Runs all twelve models serially in a dedicated clean worktree, records private
 progress under `.benchmark-secrets/suites/<suite>/`, and invokes the inspector
 at the end. Like the runner, it requires `--prompt`: neither tool has a
 default, so a run can never inherit a task nobody chose.
@@ -133,7 +136,7 @@ reach the archive, this repository, `$HOME` and `/tmp` with an explicit search.
 Treat isolation as advisory; use a dedicated user account or container if it
 matters.
 
-All three providers run non-interactively with memory features explicitly
+All four harnesses run non-interactively with memory features explicitly
 disabled — Codex via `exec --json` with ephemeral sessions, Claude via
 `--output-format stream-json` with session persistence and all `CLAUDE.md`
 loading turned off, Kimi via `kimi -p --output-format stream-json` with a
@@ -147,11 +150,19 @@ effort flag, Kimi models run at their provider-default effort (`max` for
 `kimi-for-coding`, `high` for `k3`) regardless of `--reasoning-effort`; the
 requested value is still recorded in metadata.
 
+OpenCode (`opencode run --auto --format json -m provider/model`) creates a
+fresh session per run and answers permission asks itself — questions and plan
+transitions are denied outright in non-interactive mode — so it never
+prompts, but it keeps its session records in the operator's global opencode
+state directory rather than the capture directory, the same trust domain as
+the other CLIs' own session stores. Usage comes from every `step_finish`
+event and is summed into `usage.json`.
+
 ## Inspect a suite
 
 ```sh
 git fetch origin benchmark-results
-node scripts/run-inspector/inspect.mjs --suite 20260911-prompt-v3-high --expected-runs 9
+node scripts/run-inspector/inspect.mjs --suite 20260911-prompt-v3-high --expected-runs 12
 ```
 
 Offline by default; `--live` adds read-only Stripe and Prodigi sandbox

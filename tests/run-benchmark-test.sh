@@ -125,6 +125,25 @@ printf '%s\n' \
   "printf '%s\\n' '{\"role\":\"assistant\",\"content\":\"kimi final report\"}'" >"$BIN/kimi"
 chmod +x "$BIN/kimi"
 
+printf '%s\n' \
+  '#!/usr/bin/env bash' \
+  'set -euo pipefail' \
+  'while (($#)); do' \
+  '  case $1 in' \
+  '    -m|--format|--variant) shift 2 ;;' \
+  '    *) shift ;;' \
+  '  esac' \
+  'done' \
+  '# the environment must not disclose the pre-provisioned payment provider' \
+  'if env | grep -i "^BENCHMARK_" | grep -qi stripe; then echo "provider name leaked through BENCHMARK_* environment" >&2; exit 10; fi' \
+  'case $PATH$BASH_ENV in *[Ss]tripe*) echo "provider name leaked through PATH/BASH_ENV" >&2; exit 11 ;; esac' \
+  '[[ -z "${STRIPE_SECRET_KEY-}${STRIPE_API_KEY-}${STRIPE_PUBLISHABLE_KEY-}${STRIPE_WEBHOOK_SECRET-}" ]]' \
+  'printf "opencode app\n" > opencode.txt' \
+  "printf '%s\\n' '{\"type\":\"tool_use\",\"part\":{\"id\":\"call_0\",\"type\":\"tool\",\"tool\":\"web_search\",\"state\":{\"status\":\"completed\",\"input\":{\"query\":\"stripe docs\"},\"output\":\"search results\"}}}'" \
+  "printf '%s\\n' '{\"type\":\"step_finish\",\"part\":{\"type\":\"step-finish\",\"tokens\":{\"input\":30,\"output\":5,\"reasoning\":0,\"cache\":{\"read\":10,\"write\":0}}}}'" \
+  "printf '%s\\n' '{\"type\":\"text\",\"part\":{\"type\":\"text\",\"text\":\"opencode final report\"}}'" >"$BIN/opencode"
+chmod +x "$BIN/opencode"
+
 run() {
   local run_id=$1
   shift
@@ -247,6 +266,20 @@ if git --git-dir="$REMOTE" cat-file -e benchmark-results:runs/kimi/usage.json 2>
   fail 'Kimi usage.json was published even though stream-json reports no usage'
 fi
 assert test -s "$REPO/.benchmark-secrets/transcripts/kimi/transcript.jsonl"
+
+(
+  cd "$REPO"
+  PATH="$BIN:$PATH" PRODIGI_API_KEY=test_11111111-1111-1111-1111-111111111111 "$ROOT/scripts/run-benchmark" \
+    --adapter opencode --model fake --timeout 5 --run-id opencode --prompt-file prompts/prompt.md
+)
+assert git --git-dir="$REMOTE" show benchmark-results:runs/opencode/workspace/opencode.txt
+OPENCODE_FINAL=$(git --git-dir="$REMOTE" show benchmark-results:runs/opencode/final.md)
+assert test "$OPENCODE_FINAL" = 'opencode final report'
+OPENCODE_EVENTS=$(git --git-dir="$REMOTE" show benchmark-results:runs/opencode/events.jsonl)
+[[ $OPENCODE_EVENTS == *'"operation":"search"'* ]] || fail 'OpenCode tool history was not captured'
+OPENCODE_USAGE=$(git --git-dir="$REMOTE" show benchmark-results:runs/opencode/usage.json)
+[[ $OPENCODE_USAGE == *'"new_input_tokens": 20'* ]] || fail 'OpenCode new input usage was not recorded'
+assert test -s "$REPO/.benchmark-secrets/transcripts/opencode/transcript.jsonl"
 
 set +e
 (
