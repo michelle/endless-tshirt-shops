@@ -11,6 +11,7 @@ export const models = [
   ['codex', 'gpt-5.6-terra'], ['codex', 'gpt-5.6-luna'],
   ['claude', 'claude-fable-5-1'], ['claude', 'claude-opus-5'], ['claude', 'claude-sonnet-5'],
   ['kimi', 'kimi-code/kimi-for-coding'], ['kimi', 'kimi-code/k3'],
+  ['opencode', 'opencode-go/glm-5.3'], ['opencode', 'opencode-go/deepseek-v4-pro'], ['opencode', 'opencode-go/qwen3.8-max'],
 ];
 // run-benchmark sanitizes the --run-id it is given (lowercase; every run of
 // characters outside [a-z0-9._-] becomes one '-'; one leading and trailing

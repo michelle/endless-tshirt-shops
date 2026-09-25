@@ -106,6 +106,32 @@ test('Kimi exit zero without an assistant final answer is a failure', async t =>
   assert.notEqual((await run('kimi', [{ role: 'assistant', content: '' }], t)).code, 0);
 });
 
+test('OpenCode json launch maps effort to --variant and keeps final.md to finalize-capture', async t => {
+  const r = await run('opencode', [
+    { type: 'step_start', part: { type: 'step-start' } },
+    { type: 'tool_use', part: { id: 'call_1', type: 'tool', tool: 'bash', state: { status: 'completed', input: { command: 'ls' }, output: 'listed' } } },
+    { type: 'step_finish', part: { type: 'step-finish', tokens: { input: 30, output: 5, reasoning: 0, cache: { read: 10, write: 0 } } } },
+    { type: 'text', part: { type: 'text', text: 'OpenCode final ✓' } },
+  ], t);
+  assert.equal(r.code, 0, r.stderr);
+  assert.equal(r.capture.length, 4);
+  const args = JSON.parse(await readFile(`${r.dir}/args.json`));
+  assert.equal(args[0], 'run');
+  assert.ok(args.includes('--auto'));
+  assert.equal(args[args.indexOf('--format') + 1], 'json');
+  assert.equal(args[args.indexOf('--variant') + 1], 'high');
+  assert.equal(args[args.indexOf('-m') + 1], 'fake');
+  assert.equal(args.at(-1), 'Fixture prompt');
+  // finalize-capture.mjs is the sole writer of final.md and usage.json.
+  for (const artifact of ['final.md', 'usage.json']) {
+    await assert.rejects(readFile(`${r.dir}/${artifact}`), { code: 'ENOENT' }, `run-agent wrote ${artifact}`);
+  }
+});
+
+test('OpenCode exit zero without a text part is a failure', async t => {
+  assert.notEqual((await run('opencode', [{ type: 'step_start', part: { type: 'step-start' } }], t)).code, 0);
+});
+
 test('signal interruption retains partial tool history', async t => {
   const r = await run('codex', [{ type: 'item.started', item: { id: 'x', type: 'web_search', query: 'prodigi docs' } }], t, { delay: true });
   assert.notEqual(r.code, 0); assert.equal(r.capture[0].event.type, 'item.started');
