@@ -1,0 +1,27 @@
+{
+  "name": "skyborn",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Skyborn — the night sky above your moment, printed once, for one person. DTG t-shirts via Stripe Checkout + Prodigi.",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "render": "node scripts/render-sample.mjs"
+  },
+  "dependencies": {
+    "@resvg/resvg-wasm": "^2.6.2",
+    "astronomy-engine": "^2.1.19",
+    "next": "^14.2.35",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "stripe": "^18.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.0",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "esbuild": "^0.24.0",
+    "typescript": "^5.5.4"
+  }
+}
