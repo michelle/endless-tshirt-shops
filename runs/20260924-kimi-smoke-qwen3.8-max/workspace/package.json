@@ -1,0 +1,24 @@
+{
+  "name": "lay-of-the-land",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Custom topographic contour t-shirts, generated from real terrain data and printed on demand.",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@napi-rs/canvas": "^1.0.9",
+    "next": "15.5.26",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.0",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "typescript": "^5.9.0"
+  }
+}
