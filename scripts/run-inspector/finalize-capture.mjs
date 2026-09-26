@@ -14,6 +14,8 @@ const write = (name, text) => writeFileSync(path.join(output, name), text);
 write('capture.json', JSON.stringify(result.coverage, null, 2) + '\n');
 write('events.jsonl', result.events.map(event => JSON.stringify(event) + '\n').join(''));
 if (result.usage) write('usage.json', JSON.stringify(result.usage, null, 2) + '\n');
-if (provider === 'claude' && result.final !== null) {
+// Claude, Kimi and OpenCode deliver their final answer inside the event
+// stream, so the normalized last text becomes final.md here.
+if (['claude', 'kimi', 'opencode'].includes(provider) && result.final !== null) {
   write('final.md', result.final + (result.final.endsWith('\n') ? '' : '\n'));
 }

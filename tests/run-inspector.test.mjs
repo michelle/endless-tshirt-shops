@@ -47,6 +47,58 @@ test('Claude captures tool results and terminal answer without exposing raw payl
   assert.doesNotMatch(JSON.stringify(n.events), /Private response|file_path/);
 });
 
+test('Kimi stream-json captures tool calls and the final answer without exposing raw payloads', () => {
+  const n = normalize(jsonl([
+    { role: 'assistant', tool_calls: [{ type: 'function', id: 'call_1', function: { name: 'WebSearch', arguments: '{"query":"stripe checkout alice@example.com"}' } }] },
+    { role: 'tool', tool_call_id: 'call_1', content: 'Private response' },
+    { role: 'assistant', tool_calls: [{ type: 'function', id: 'call_2', function: { name: 'Read', arguments: '{"path":"node_modules/next/dist/docs/app.md"}' } }] },
+    { role: 'tool', tool_call_id: 'call_2', content: 'ok' },
+    { role: 'assistant', tool_calls: [{ type: 'function', id: 'call_3', function: { name: 'FetchURL', arguments: '{"url":"https://docs.stripe.com/api"}' } }] },
+    { role: 'tool', tool_call_id: 'call_3', content: 'Fetched documentation' },
+    { role: 'assistant', content: 'Kimi final only' },
+    { role: 'meta', type: 'system.version', version: '2.1.0' },
+  ]), 'kimi');
+  assert.equal(n.final, 'Kimi final only');
+  assert.equal(n.usage, null);
+  assert.equal(n.failed, false);
+  assert.deepEqual(n.events.map(e => e.evidence), ['tool_result_available', 'tool_result_available', 'tool_result_available']);
+  assert.equal(n.events[0].operation, 'search');
+  assert.equal(n.events[1].operation, 'local_reference_read');
+  assert.equal(n.events[2].operation, 'document_request');
+  assert.deepEqual(n.events[2].documentUrls, ['https://docs.stripe.com/api']);
+  assert.equal(n.events[0].queries.length, 1);
+  assert.doesNotMatch(JSON.stringify(n.events), /alice|Private response|Fetched documentation|"path"/);
+  const empty = normalize(jsonl([{ role: 'meta', type: 'system.version', version: '2.1.0' }]), 'kimi');
+  assert.equal(empty.final, null);
+  assert.match(empty.coverage.limitations.join(' '), /no token usage/);
+});
+
+test('OpenCode json events capture tool calls, summed usage, and the final answer', () => {
+  const n = normalize(jsonl([
+    { type: 'step_start', part: { type: 'step-start' } },
+    { type: 'tool_use', part: { id: 'call_1', type: 'tool', tool: 'web_search', state: { status: 'completed', input: { query: 'stripe checkout alice@example.com' }, output: 'Private results' } } },
+    { type: 'tool_use', part: { id: 'call_2', type: 'tool', tool: 'read', state: { status: 'error', input: { filePath: 'node_modules/next/dist/docs/app.md' }, output: 'boom' } } },
+    { type: 'step_finish', part: { type: 'step-finish', tokens: { input: 100, output: 10, reasoning: 0, cache: { read: 40, write: 0 } } } },
+    { type: 'step_finish', part: { type: 'step-finish', tokens: { input: 50, output: 5, reasoning: 0, cache: { read: 70, write: 0 } } } },
+    { type: 'text', part: { type: 'text', text: 'OpenCode final only', time: { start: 1, end: 2 } } },
+  ]), 'opencode');
+  assert.equal(n.final, 'OpenCode final only');
+  assert.equal(n.failed, false);
+  assert.equal(n.usage.input_tokens, 150);
+  assert.equal(n.usage.output_tokens, 15);
+  assert.equal(n.usage.cached_input_tokens, 110);
+  // Fresh input is computed per step (60 + 0), not from the summed totals,
+  // where re-counted cache volume would drown it.
+  assert.equal(n.usage.new_input_tokens, 60);
+  assert.deepEqual(n.events.map(e => e.evidence), ['tool_result_available', 'failed_attempt']);
+  assert.equal(n.events[0].operation, 'search');
+  assert.equal(n.events[1].operation, 'local_reference_read');
+  assert.equal(n.events[1].status, 'failed');
+  assert.doesNotMatch(JSON.stringify(n.events), /alice|Private results|filePath/);
+  assert.equal(normalize(jsonl([{ type: 'error', error: { message: 'x' } }]), 'opencode').failed, true);
+  assert.equal(normalize(jsonl([{ type: 'step_start', part: { type: 'step-start' } }]), 'opencode').final, null);
+});
+
 test('missing history, malformed/partial captures, and error terminal events remain explicit', () => {
   const old = normalize('{"result":"done","usage":{"input_tokens":1}}', 'claude');
   assert.equal(documentation(old.events, old.coverage).stripe.coverage, 'unknown');

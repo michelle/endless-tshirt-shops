@@ -9,7 +9,7 @@ Needs Node 20.11+, Git and tar; artwork inspection also needs Python 3 with
 
 ```sh
 git fetch origin benchmark-results
-node scripts/run-inspector/inspect.mjs --suite 20260911-prompt-v3-high --expected-runs 7
+node scripts/run-inspector/inspect.mjs --suite 20260911-prompt-v3-high --expected-runs 12
 ```
 
 Output goes to a new private, Git-ignored directory:
@@ -54,7 +54,7 @@ Three limits are worth stating up front, because the report repeats them:
 ## Payment and fulfillment evidence
 
 ```sh
-node scripts/run-inspector/inspect.mjs --suite SUITE --expected-runs 7 --live
+node scripts/run-inspector/inspect.mjs --suite SUITE --expected-runs 12 --live
 ```
 
 Queries only fixed Stripe and Prodigi sandbox GET endpoints, using the saved
@@ -132,7 +132,7 @@ than being silently rasterized.
 `--capture` reuses the viewer's own capture code (install its dependencies
 first: `cd run_viewer && npm ci && npx playwright install chromium`). It stages
 verbatim final answers, selected artwork and capture manifests under
-`viewer-stage/`, with an `import-plan.json` mapping full run IDs to the seven
+`viewer-stage/`, with an `import-plan.json` mapping full run IDs to the twelve
 short viewer IDs. Staging only: it does not edit `app/data.ts` or publish. Review sources, reports, images and privacy before copying anything
 across.
 

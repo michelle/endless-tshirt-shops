@@ -46,7 +46,7 @@ const topics = text => ['stripe', 'prodigi', 'framework'].filter(topic => ({ str
 // rule wins, and the order is load-bearing, so keep these named patterns and
 // the sequence in `operation` together.
 const WRITES = /apply_patch|\*\*\* (?:Begin|Add|Update)|writeFile|cat\s*>|open\([^\n]*['"]w['"]/;
-const READS = /\b(?:cat|sed|rg|head|Read|Grep)\b/;
+const READS = /\b(?:cat|sed|rg|head|read|list|Read|Grep|grep|glob|Glob)\b/;
 const FETCHES = /curl|wget|fetch\(|urlopen|WebFetch|web\.run|web__run/;
 const BUNDLED_DOCS = /node_modules\/.+(?:docs|types|CHANGELOG)|AGENTS\.md/;
 const SAVED_DOCS = /prodigi-reference|prodigi-page|docs[^\s]*\.(?:html|md)/i;
@@ -67,7 +67,7 @@ function operation(call, input) {
 }
 
 export function normalize(text, provider) {
-  const parsed = records(text); const events = []; const calls = new Map(); let terminal = null; let usage = null;
+  const parsed = records(text); const events = []; const calls = new Map(); let terminal = null; let usage = null; let kimiFinal = null; let opencodeFinal = null; let opencodeNewInput = 0;
   const push = (r, data) => { const e = { schemaVersion, sequence: r.sequence, receivedAt: r.receivedAt, sourceLine: r.sourceLine, ...data }; events.push(e); return e; };
   for (const r of parsed.records) {
     const e = r.event;
@@ -95,6 +95,56 @@ export function normalize(text, provider) {
         if (call) { call.status = block.is_error ? 'failed' : 'completed'; call._output = typeof block.content === 'string' ? block.content : JSON.stringify(block.content ?? ''); call.completedSequence = r.sequence; }
       }
     }
+    // Kimi print mode (-p --output-format stream-json) writes one OpenAI-style
+    // chat line per event: assistant blocks carrying tool_calls, matching tool
+    // results, and meta envelopes (version, resume hint, step retry). The last
+    // assistant text is the final answer; the format reports no token usage.
+    if (provider === 'kimi') {
+      if (e.role === 'assistant') {
+        for (const block of Array.isArray(e.tool_calls) ? e.tool_calls : []) {
+          if (!block || block.type !== 'function' || block.id == null) continue;
+          const key = block.id; if (calls.has(key)) continue;
+          const name = block.function?.name ?? '';
+          let input = {}; try { input = JSON.parse(block.function?.arguments ?? '{}'); } catch { input = block.function?.arguments ?? ''; }
+          const query = typeof input === 'object' && input !== null && typeof input.query === 'string' ? input.query : null;
+          const call = push(r, { callId: key, tool: name, kind: /WebSearch|WebFetch|FetchURL/.test(name) ? 'web_search' : /Bash|Read|Grep|Glob/.test(name) ? 'command_execution' : 'mcp_tool_call', status: 'incomplete',
+            _input: typeof input === 'string' ? input : JSON.stringify(input ?? {}), _output: '', queries: query ? [query] : [], webAction: /WebSearch/.test(name) ? 'search' : /WebFetch|FetchURL/.test(name) ? 'open' : undefined }); calls.set(key, call);
+        }
+        if (typeof e.content === 'string' && e.content) kimiFinal = e.content;
+      } else if (e.role === 'tool') {
+        const call = calls.get(e.tool_call_id);
+        if (call) { call.status = 'completed'; call._output = typeof e.content === 'string' ? e.content : JSON.stringify(e.content ?? ''); call.completedSequence = r.sequence; }
+      }
+    }
+    // OpenCode `run --format json` emits one line per finished item:
+    // step_start, tool_use (a tool part in its final completed/error state),
+    // step_finish (carrying per-step token usage), text, and error. A run has
+    // many steps, so usage accumulates across every step_finish.
+    if (provider === 'opencode') {
+      if (e.type === 'tool_use' && e.part?.type === 'tool') {
+        const part = e.part; const key = part.id ?? part.callID ?? part.partID;
+        if (key != null && !calls.has(key)) {
+          const name = part.tool ?? '';
+          const input = part.state?.input;
+          const query = typeof input === 'object' && input !== null && typeof input.query === 'string' ? input.query : null;
+          const call = push(r, { callId: key, tool: name, kind: /web_search|webfetch/i.test(name) ? 'web_search' : /bash|read|grep|glob|list/i.test(name) ? 'command_execution' : 'mcp_tool_call', status: part.state?.status === 'error' ? 'failed' : 'completed',
+            _input: typeof input === 'string' ? input : JSON.stringify(input ?? {}), _output: typeof part.state?.output === 'string' ? part.state.output : JSON.stringify(part.state?.output ?? ''),
+            queries: query ? [query] : [], webAction: /web_search/i.test(name) ? 'search' : /webfetch/i.test(name) ? 'open' : undefined }); calls.set(key, call);
+        }
+      }
+      if (e.type === 'step_finish' && e.part?.tokens) {
+        const tokens = e.part.tokens;
+        usage ??= { input_tokens: 0, output_tokens: 0, cached_input_tokens: 0 };
+        usage.input_tokens += tokens.input ?? 0; usage.output_tokens += tokens.output ?? 0; usage.cached_input_tokens += tokens.cache?.read ?? 0;
+        // Fresh input is computed per step: each step's cache.read already
+        // covers its cached portion, so summing the totals first and
+        // subtracting afterwards (the single-shot provider arithmetic) would
+        // drown the uncached input under re-counted cache volume.
+        opencodeNewInput += Math.max(0, (tokens.input ?? 0) - (tokens.cache?.read ?? 0));
+      }
+      if (e.type === 'text' && typeof e.part?.text === 'string' && e.part.text) opencodeFinal = e.part.text;
+      if (e.type === 'error') terminal = { is_error: true };
+    }
   }
   for (const call of events) {
     const input = call._input; const output = call._output;
@@ -109,20 +159,23 @@ export function normalize(text, provider) {
   }
   const coverage = { schemaVersion, provider, format: provider === 'claude' && !events.length ? 'result_only_or_no_tools' : 'event_stream', terminalEvent: Boolean(terminal), malformedLines: parsed.malformed,
     capturedRecords: parsed.records.length, toolCalls: events.length, limitations: ['A search or fetch does not prove comprehension or influence.', 'Shell classification is heuristic; mixed write/read commands and dynamic URLs may be missed.',
-      ...(provider === 'codex' ? ['Exec web events may omit resolved URLs and result contents.'] : []), ...(!events.length ? ['No tool history available; zero observed calls is not evidence of no documentation use.'] : [])] };
+      ...(provider === 'codex' ? ['Exec web events may omit resolved URLs and result contents.'] : []), ...(provider === 'kimi' ? ['Kimi stream-json reports no token usage, so usage.json is not produced.'] : []), ...(!events.length ? ['No tool history available; zero observed calls is not evidence of no documentation use.'] : [])] };
   if (usage) {
     usage = Object.fromEntries(Object.entries(usage).filter(([, value]) => Number.isInteger(value)));
-    // The two providers define input_tokens differently, so the arithmetic has
-    // to differ to mean the same thing: Claude reports uncached input only, and
-    // cache writes are new input on top of it; Codex reports the whole prompt,
-    // cached portion included, so the cache reads come back out.
+    // The two single-shot providers define input_tokens differently, so the
+    // arithmetic has to differ to mean the same thing: Claude reports uncached
+    // input only, and cache writes are new input on top of it; Codex reports
+    // the whole prompt, cached portion included, so the cache reads come back
+    // out. OpenCode reports per-step volumes and was handled during
+    // accumulation above.
     if (usage.input_tokens != null) {
       usage.new_input_tokens = provider === 'claude'
         ? usage.input_tokens + (usage.cache_creation_input_tokens ?? 0)
+        : provider === 'opencode' ? opencodeNewInput
         : Math.max(0, usage.input_tokens - (usage.cached_input_tokens ?? 0));
     }
   }
-  return { events, coverage, usage, failed: Boolean(terminal?.is_error || terminal?.type === 'turn.failed'), final: typeof terminal?.result === 'string' ? terminal.result : null };
+  return { events, coverage, usage, failed: Boolean(terminal?.is_error || terminal?.type === 'turn.failed'), final: provider === 'kimi' ? kimiFinal : provider === 'opencode' ? opencodeFinal : typeof terminal?.result === 'string' ? terminal.result : null };
 }
 export function documentation(events, coverage) {
   return Object.fromEntries(['stripe', 'prodigi', 'framework'].map(topic => {

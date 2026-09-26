@@ -3,12 +3,14 @@ import assert from 'node:assert/strict';
 import { mkdtemp, readFile, rm, writeFile, mkdir } from 'node:fs/promises';
 import path from 'node:path';
 import os from 'node:os';
-import { runSuite, parseArgs, models } from '../scripts/run-suite.mjs';
+import { runSuite, parseArgs, models, sanitizeRunId } from '../scripts/run-suite.mjs';
 import { hash } from '../scripts/run-inspector/common.mjs';
 const git = args => {
   if (args[0] === 'show') {
-    const runId = args[1].split('/')[2], model = models.find(([adapter, model]) => runId === `fixture-suite-${adapter}-${model}`);
-    return JSON.stringify({ run_id: runId, suite_id: 'fixture-suite', adapter: model[0], model: model[1], base_commit: 'base', prompt_file: 'prompts/prompt-minimal.md', prompt_sha256: hash('fixture prompt'), reasoning_effort: 'high', status: 'succeeded' });
+    // Model aliases may contain '/', so the run id is not at a fixed offset.
+    const runId = args[1].match(/runs\/(.+)\/metadata\.json$/)[1];
+    const found = models.find(([adapter, model]) => runId === sanitizeRunId(`fixture-suite-${adapter}-${model}`));
+    return JSON.stringify({ run_id: runId, suite_id: 'fixture-suite', adapter: found[0], model: found[1], base_commit: 'base', prompt_file: 'prompts/prompt-minimal.md', prompt_sha256: hash('fixture prompt'), reasoning_effort: 'high', status: 'succeeded' });
   }
   return args[0] === 'rev-parse' ? 'base' : args[0] === 'branch' ? 'base-branch' : '';
 };
@@ -23,17 +25,21 @@ async function setup(t) {
 test('a suite must name its prompt rather than inherit a default', () => {
   assert.throws(() => parseArgs(['--suite', 'fixture-suite']), /--prompt is required/);
 });
-test('controller runs all seven serially, continues published model failures, then inspects', async t => {
+test('suite run ids are sanitized exactly like the runner sanitizes --run-id', () => {
+  assert.equal(sanitizeRunId('fixture-suite-kimi-kimi-code/kimi-for-coding'), 'fixture-suite-kimi-kimi-code-kimi-for-coding');
+  assert.equal(sanitizeRunId('Suite_K3.A/B-C'), 'suite_k3.a-b-c');
+});
+test('controller runs every model serially, continues published model failures, then inspects', async t => {
   const opts = await setup(t), calls = []; let active = false;
   const result = await runSuite(opts, { git, execute: async (command, args) => {
     assert.equal(active, false); active = true; calls.push({ command, args });
     await new Promise(resolve => setTimeout(resolve, 1)); active = false;
     return { code: calls.length === 2 ? 1 : 0, signal: null };
   } });
-  assert.equal(result.completed, 7); assert.equal(result.state, 'awaiting-human-audit');
-  assert.deepEqual(calls.slice(0, 7).map(c => c.args[c.args.indexOf('--model') + 1]), models.map(m => m[1]));
-  assert.ok(calls[7].args.includes('--live'));
-  for (const call of calls.slice(0, 7)) assert.equal(call.args[call.args.indexOf('--reasoning-effort') + 1], 'high');
+  assert.equal(result.completed, models.length); assert.equal(result.state, 'awaiting-human-audit');
+  assert.deepEqual(calls.slice(0, models.length).map(c => c.args[c.args.indexOf('--model') + 1]), models.map(m => m[1]));
+  assert.ok(calls[models.length].args.includes('--live'));
+  for (const call of calls.slice(0, models.length)) assert.equal(call.args[call.args.indexOf('--reasoning-effort') + 1], 'high');
   const progress = JSON.parse(await readFile(path.join(result.directory, 'progress.json')));
   assert.equal(progress.completed[1].exitCode, 1); assert.equal(progress.active, null);
   await assert.rejects(runSuite(opts, { git }), { code: 'EEXIST' });
@@ -54,9 +60,9 @@ async function blocked(t) {
 test('resume verifies recovery and starts at Sol without rerunning Astra', async t => {
   const opts = await blocked(t), calls = [];
   const result = await runSuite(opts, { git, execute: async (cmd, args) => { calls.push({ cmd, args }); return { code: 0, signal: null }; } });
-  assert.equal(calls.length, 7); // six models, then the inspector
-  assert.equal(calls[0].args[calls[0].args.indexOf('--model') + 1], 'gpt-5.6-sol');
-  assert.equal(result.completed, 7);
+  assert.equal(calls.length, models.length); // the unverified remainder, then the inspector
+  assert.equal(calls[0].args[calls[0].args.indexOf('--model') + 1], models[1][1]);
+  assert.equal(result.completed, models.length);
   const p = JSON.parse(await readFile(path.join(result.directory, 'progress.json')));
   assert.equal(p.completed[0].exitCode, 1); // Preserve the original publication failure.
   assert.equal(p.completed[0].publication.modelStatus, 'succeeded');

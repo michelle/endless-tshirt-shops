@@ -58,16 +58,21 @@ scripts/run-benchmark \
   --reasoning-effort high --timeout 3600
 ```
 
-`--adapter` is `codex` or `claude`; `--reasoning-effort` is `low`, `medium`,
+`--adapter` is `codex`, `claude`, `kimi` or `opencode`; `--reasoning-effort` is `low`, `medium`,
 `high`, `xhigh` or `max`, and is recorded in metadata (omit it to keep the
-provider default). Arguments after `--` go to the underlying CLI, e.g.
-`-- --max-budget-usd 20`. `--suite-id` groups the runs of one comparison.
+provider default; Kimi's CLI has no effort flag, so for `kimi` it is recorded
+but not passed on, while `opencode` receives it as `--variant` and fails
+loudly if the model does not support it). Arguments after `--` go to the
+underlying CLI, e.g. `-- --max-budget-usd 20`. `--suite-id` groups the runs of
+one comparison.
 
 The runner commits one immutable `runs/<run-id>/` to `benchmark-results`,
 pushes it, and returns to the original branch. Failed and timed-out runs are
 recorded too. The models compared so far are `gpt-6-astra`, `gpt-5.6-sol`,
-`gpt-5.6-terra`, `gpt-5.6-luna`, `claude-fable-5-1`, `claude-opus-5` and
-`claude-sonnet-5` — the same list `scripts/run-suite.mjs` iterates.
+`gpt-5.6-terra`, `gpt-5.6-luna`, `claude-fable-5-1`, `claude-opus-5`,
+`claude-sonnet-5`, `kimi-code/kimi-for-coding`, `kimi-code/k3`,
+`opencode-go/glm-5.3`, `opencode-go/deepseek-v4-pro` and
+`opencode-go/qwen3.8-max` — the same list `scripts/run-suite.mjs` iterates.
 
 ### Run a whole suite
 
@@ -76,7 +81,7 @@ node scripts/run-suite.mjs --suite 20260911-prompt-v3-high \
   --prompt prompts/prompt-v3.md --effort high --timeout 7200
 ```
 
-Runs all seven models serially in a dedicated clean worktree, records private
+Runs all twelve models serially in a dedicated clean worktree, records private
 progress under `.benchmark-secrets/suites/<suite>/`, and invokes the inspector
 at the end. Like the runner, it requires `--prompt`: neither tool has a
 default, so a run can never inherit a task nobody chose.
@@ -131,16 +136,37 @@ reach the archive, this repository, `$HOME` and `/tmp` with an explicit search.
 Treat isolation as advisory; use a dedicated user account or container if it
 matters.
 
-Both providers run non-interactively with memory features explicitly disabled —
-Codex via `exec --json` with ephemeral sessions, Claude via
+All four harnesses run non-interactively with memory features explicitly
+disabled — Codex via `exec --json` with ephemeral sessions, Claude via
 `--output-format stream-json` with session persistence and all `CLAUDE.md`
-loading turned off.
+loading turned off, Kimi via `kimi -p --output-format stream-json` with a
+fresh `KIMI_CODE_HOME` inside the run's private capture directory: auth and
+provider config are copied from the operator's home (`KIMI_CODE_HOME` when
+set, else `~/.kimi-code`) so the run can log in, but no session, history or
+memory carries over between runs, and a mid-run token refresh can rewrite
+only the copies. Kimi's stream-json format reports no token usage, so Kimi
+runs publish no `usage.json` and record `"usage": null`. Since the CLI has no
+effort flag, Kimi models run at their provider-default effort (`max` for
+`kimi-for-coding`, `high` for `k3`) regardless of `--reasoning-effort`; the
+requested value is still recorded in metadata.
+
+OpenCode (`opencode run --auto --format json -m provider/model`) creates a
+fresh session per run and answers permission asks itself — questions and plan
+transitions are denied outright in non-interactive mode — so it never
+prompts, but it keeps its session records in the operator's global opencode
+state directory rather than the capture directory, the same trust domain as
+the other CLIs' own session stores. Usage comes from every `step_finish`
+event and is summed into `usage.json`, with fresh input computed per step so
+re-counted cache volume does not drown it. One sharp edge: `opencode run`
+exits non-zero when *any* `session.error` fired during the run — including a
+transient stream hiccup the agent recovered from — so a run can record
+`failed` even with a complete, deployed deliverable in `final.md`.
 
 ## Inspect a suite
 
 ```sh
 git fetch origin benchmark-results
-node scripts/run-inspector/inspect.mjs --suite 20260911-prompt-v3-high --expected-runs 7
+node scripts/run-inspector/inspect.mjs --suite 20260911-prompt-v3-high --expected-runs 12
 ```
 
 Offline by default; `--live` adds read-only Stripe and Prodigi sandbox
@@ -170,7 +196,7 @@ bash tests/run-benchmark-test.sh
 missing. `BENCHMARK_CLI_STATE` is named neutrally on purpose, so it does not
 steer the agent's choice of payment provider.
 
-A third provider means editing three places, not adding a plugin:
+Each additional provider means editing three places, not adding a plugin:
 
 1. `run-agent.mjs` — the CLI name and the arguments that make it run
    non-interactively, with memory disabled, emitting a JSON event stream.
