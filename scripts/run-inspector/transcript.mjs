@@ -67,7 +67,7 @@ function operation(call, input) {
 }
 
 export function normalize(text, provider) {
-  const parsed = records(text); const events = []; const calls = new Map(); let terminal = null; let usage = null; let kimiFinal = null; let opencodeFinal = null;
+  const parsed = records(text); const events = []; const calls = new Map(); let terminal = null; let usage = null; let kimiFinal = null; let opencodeFinal = null; let opencodeNewInput = 0;
   const push = (r, data) => { const e = { schemaVersion, sequence: r.sequence, receivedAt: r.receivedAt, sourceLine: r.sourceLine, ...data }; events.push(e); return e; };
   for (const r of parsed.records) {
     const e = r.event;
@@ -136,6 +136,11 @@ export function normalize(text, provider) {
         const tokens = e.part.tokens;
         usage ??= { input_tokens: 0, output_tokens: 0, cached_input_tokens: 0 };
         usage.input_tokens += tokens.input ?? 0; usage.output_tokens += tokens.output ?? 0; usage.cached_input_tokens += tokens.cache?.read ?? 0;
+        // Fresh input is computed per step: each step's cache.read already
+        // covers its cached portion, so summing the totals first and
+        // subtracting afterwards (the single-shot provider arithmetic) would
+        // drown the uncached input under re-counted cache volume.
+        opencodeNewInput += Math.max(0, (tokens.input ?? 0) - (tokens.cache?.read ?? 0));
       }
       if (e.type === 'text' && typeof e.part?.text === 'string' && e.part.text) opencodeFinal = e.part.text;
       if (e.type === 'error') terminal = { is_error: true };
@@ -157,13 +162,16 @@ export function normalize(text, provider) {
       ...(provider === 'codex' ? ['Exec web events may omit resolved URLs and result contents.'] : []), ...(provider === 'kimi' ? ['Kimi stream-json reports no token usage, so usage.json is not produced.'] : []), ...(!events.length ? ['No tool history available; zero observed calls is not evidence of no documentation use.'] : [])] };
   if (usage) {
     usage = Object.fromEntries(Object.entries(usage).filter(([, value]) => Number.isInteger(value)));
-    // The two providers define input_tokens differently, so the arithmetic has
-    // to differ to mean the same thing: Claude reports uncached input only, and
-    // cache writes are new input on top of it; Codex reports the whole prompt,
-    // cached portion included, so the cache reads come back out.
+    // The two single-shot providers define input_tokens differently, so the
+    // arithmetic has to differ to mean the same thing: Claude reports uncached
+    // input only, and cache writes are new input on top of it; Codex reports
+    // the whole prompt, cached portion included, so the cache reads come back
+    // out. OpenCode reports per-step volumes and was handled during
+    // accumulation above.
     if (usage.input_tokens != null) {
       usage.new_input_tokens = provider === 'claude'
         ? usage.input_tokens + (usage.cache_creation_input_tokens ?? 0)
+        : provider === 'opencode' ? opencodeNewInput
         : Math.max(0, usage.input_tokens - (usage.cached_input_tokens ?? 0));
     }
   }

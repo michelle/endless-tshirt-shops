@@ -156,7 +156,11 @@ transitions are denied outright in non-interactive mode — so it never
 prompts, but it keeps its session records in the operator's global opencode
 state directory rather than the capture directory, the same trust domain as
 the other CLIs' own session stores. Usage comes from every `step_finish`
-event and is summed into `usage.json`.
+event and is summed into `usage.json`, with fresh input computed per step so
+re-counted cache volume does not drown it. One sharp edge: `opencode run`
+exits non-zero when *any* `session.error` fired during the run — including a
+transient stream hiccup the agent recovered from — so a run can record
+`failed` even with a complete, deployed deliverable in `final.md`.
 
 ## Inspect a suite
 
