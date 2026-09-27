@@ -130,7 +130,9 @@ printf '%s\n' \
   'set -euo pipefail' \
   'while (($#)); do' \
   '  case $1 in' \
-  '    -m|--format|--variant) shift 2 ;;' \
+  '    -m|--format) shift 2 ;;' \
+  '    # the real CLI has no effort flag and exits 1 on an unrecognized one' \
+  '    --variant|--effort) echo "Unrecognized flag: $1 in command opencode run" >&2; exit 1 ;;' \
   '    *) shift ;;' \
   '  esac' \
   'done' \
@@ -270,8 +272,13 @@ assert test -s "$REPO/.benchmark-secrets/transcripts/kimi/transcript.jsonl"
 (
   cd "$REPO"
   PATH="$BIN:$PATH" PRODIGI_API_KEY=test_11111111-1111-1111-1111-111111111111 "$ROOT/scripts/run-benchmark" \
-    --adapter opencode --model fake --timeout 5 --run-id opencode --prompt-file prompts/prompt.md
+    --adapter opencode --model fake --timeout 5 --run-id opencode --prompt-file prompts/prompt.md \
+    --reasoning-effort high
 )
+# The effort must reach metadata without becoming a CLI flag: the fake opencode
+# exits 1 on --variant, as the real one does, so a flag regression fails here.
+OPENCODE_METADATA=$(git --git-dir="$REMOTE" show benchmark-results:runs/opencode/metadata.json)
+[[ $OPENCODE_METADATA == *'"reasoning_effort": "high"'* ]] || fail 'OpenCode effort was not recorded in metadata'
 assert git --git-dir="$REMOTE" show benchmark-results:runs/opencode/workspace/opencode.txt
 OPENCODE_FINAL=$(git --git-dir="$REMOTE" show benchmark-results:runs/opencode/final.md)
 assert test "$OPENCODE_FINAL" = 'opencode final report'

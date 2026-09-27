@@ -43,6 +43,24 @@ shape. Also required: Node.js 20.11+ (the viewer in `run_viewer/` needs 22.13+),
 Git, an `origin` remote, and `timeout`/`gtimeout`. The inspector additionally
 needs Python 3 with Pillow.
 
+Every provider CLI must be runnable as a bare command, since `run-agent.mjs`
+spawns it by name: a CLI installed outside `PATH`, such as Kimi Code's
+`~/.kimi-code/bin/kimi`, needs a symlink or a `PATH` entry or its runs die at
+launch.
+
+### Preflight
+
+```sh
+node scripts/preflight-clis.mjs            # resolve CLIs, check every alias
+node scripts/preflight-clis.mjs --route    # also confirm each alias routes
+```
+
+The tests run against fake CLIs, so they cannot catch a renamed flag, a binary
+missing from `PATH`, a retired model alias, an absent variant or a region the
+account cannot reach. Run the preflight before a suite: `--route` spends one
+two-word completion per alias, which is nothing against an hour-long run, and
+is the only way to confirm an alias and its variant actually resolve.
+
 Run this only in an isolated environment, with test-only credentials.
 
 ## Run one model
@@ -60,19 +78,26 @@ scripts/run-benchmark \
 
 `--adapter` is `codex`, `claude`, `kimi` or `opencode`; `--reasoning-effort` is `low`, `medium`,
 `high`, `xhigh` or `max`, and is recorded in metadata (omit it to keep the
-provider default; Kimi's CLI has no effort flag, so for `kimi` it is recorded
-but not passed on, while `opencode` receives it as `--variant` and fails
-loudly if the model does not support it). Arguments after `--` go to the
-underlying CLI, e.g. `-- --max-budget-usd 20`. `--suite-id` groups the runs of
-one comparison.
+provider default). Neither the Kimi nor the OpenCode CLI has an effort flag, so
+for those two it is recorded but never passed on. OpenCode instead carries
+effort as a variant inside the model alias — `opencode/glm-5.3#high` — and only
+some models publish one, so `--reasoning-effort` and an OpenCode alias's
+variant are set independently and can disagree; the alias is what actually ran.
+Arguments after `--` go to the underlying CLI, e.g. `-- --max-budget-usd 20`.
+`--suite-id` groups the runs of one comparison.
 
 The runner commits one immutable `runs/<run-id>/` to `benchmark-results`,
 pushes it, and returns to the original branch. Failed and timed-out runs are
 recorded too. The models compared so far are `gpt-6-astra`, `gpt-5.6-sol`,
 `gpt-5.6-terra`, `gpt-5.6-luna`, `claude-fable-5-1`, `claude-opus-5`,
 `claude-sonnet-5`, `kimi-code/kimi-for-coding`, `kimi-code/k3`,
-`opencode-go/glm-5.3`, `opencode-go/deepseek-v4-pro` and
-`opencode-go/qwen3.8-max` — the same list `scripts/run-suite.mjs` iterates.
+`opencode/glm-5.3#high`, `opencode/deepseek-v4-pro#high` and
+`opencode/qwen3.8-max` — the same list `scripts/run-suite.mjs` iterates.
+
+OpenCode's `opencode-go/*` aliases reach the same models but require Global
+regions on the workspace's OpenCode Console privacy settings; without that they
+fail with `provider.invalid-request` on the first request, so the plain
+`opencode/*` aliases are what the suite uses.
 
 ### Run a whole suite
 
@@ -150,14 +175,16 @@ effort flag, Kimi models run at their provider-default effort (`max` for
 `kimi-for-coding`, `high` for `k3`) regardless of `--reasoning-effort`; the
 requested value is still recorded in metadata.
 
-OpenCode (`opencode run --auto --format json -m provider/model`) creates a
+OpenCode (`opencode run --auto --format json -m provider/model[#variant]`) creates a
 fresh session per run and answers permission asks itself — questions and plan
 transitions are denied outright in non-interactive mode — so it never
 prompts, but it keeps its session records in the operator's global opencode
 state directory rather than the capture directory, the same trust domain as
 the other CLIs' own session stores. Usage comes from every `step_finish`
 event and is summed into `usage.json`, with fresh input computed per step so
-re-counted cache volume does not drown it. One sharp edge: `opencode run`
+re-counted cache volume does not drown it. Some models emit no `step_finish` at
+all, and those runs publish no `usage.json` the way Kimi runs do not. One sharp
+edge: `opencode run`
 exits non-zero when *any* `session.error` fired during the run — including a
 transient stream hiccup the agent recovered from — so a run can record
 `failed` even with a complete, deployed deliverable in `final.md`.
@@ -196,13 +223,16 @@ bash tests/run-benchmark-test.sh
 missing. `BENCHMARK_CLI_STATE` is named neutrally on purpose, so it does not
 steer the agent's choice of payment provider.
 
-Each additional provider means editing three places, not adding a plugin:
+Each additional provider means editing four places, not adding a plugin:
 
 1. `run-agent.mjs` — the CLI name and the arguments that make it run
    non-interactively, with memory disabled, emitting a JSON event stream.
 2. `scripts/run-inspector/transcript.mjs` — how to normalize that stream, with
    tests, before any run in the new format is published.
 3. `scripts/run-benchmark` — the `--adapter` validation.
+4. `scripts/preflight-clis.mjs` — its version probe, the command that lists its
+   aliases if it has one, and the routing arguments, which must mirror the
+   launch arguments in `run-agent.mjs` or the preflight stops being evidence.
 
 The CLI must run without prompting, write only its final answer to
 `BENCHMARK_FINAL_OUTPUT`, send everything else to stdout/stderr, and keep raw
