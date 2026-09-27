@@ -6,18 +6,21 @@ import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { git, identifier, hash } from './run-inspector/common.mjs';
 
+// The open-weights comparison. OpenCode aliases carry the reasoning effort as a
+// variant suffix, since the CLI has no effort flag, and only some models publish
+// one: glm-5.3, deepseek-v4-pro and the GPT-6 pair accept #high, while
+// qwen3.8-max, minimax-m3 and kimi-k3 have no variants and run at their provider
+// default. The opencode-go provider reaches the same models but needs Global
+// regions enabled on the workspace, so the plain opencode aliases are used.
+// scripts/preflight-clis.mjs probes every alias here before a suite launches.
+//
+// kimi-code/k3 and opencode/kimi-k3 are the same weights on two harnesses: the
+// pair is the control that separates scaffold effect from model effect.
 export const models = [
-  ['codex', 'gpt-6-astra'], ['codex', 'gpt-5.6-sol'],
-  ['codex', 'gpt-5.6-terra'], ['codex', 'gpt-5.6-luna'],
-  ['claude', 'claude-fable-5-1'], ['claude', 'claude-opus-5'], ['claude', 'claude-sonnet-5'],
   ['kimi', 'kimi-code/kimi-for-coding'], ['kimi', 'kimi-code/k3'],
-  // OpenCode aliases carry the reasoning effort as a variant suffix, since the
-  // CLI has no effort flag. Only some models publish variants: glm-5.3 and
-  // deepseek-v4-pro accept #high, while qwen3.8-max has none and runs at its
-  // provider default. scripts/preflight-clis.mjs probes every alias here.
-  // The opencode-go provider needs Global regions enabled on the workspace;
-  // these plain opencode aliases serve the same models without that.
-  ['opencode', 'opencode/glm-5.3#high'], ['opencode', 'opencode/deepseek-v4-pro#high'], ['opencode', 'opencode/qwen3.8-max'],
+  ['opencode', 'opencode/glm-5.3#high'], ['opencode', 'opencode/deepseek-v4-pro#high'],
+  ['opencode', 'opencode/qwen3.8-max'], ['opencode', 'opencode/minimax-m3'],
+  ['opencode', 'opencode/kimi-k3'],
 ];
 // run-benchmark sanitizes the --run-id it is given (lowercase; every run of
 // characters outside [a-z0-9._-] becomes one '-'; one leading and trailing

@@ -88,11 +88,18 @@ Arguments after `--` go to the underlying CLI, e.g. `-- --max-budget-usd 20`.
 
 The runner commits one immutable `runs/<run-id>/` to `benchmark-results`,
 pushes it, and returns to the original branch. Failed and timed-out runs are
-recorded too. The models compared so far are `gpt-6-astra`, `gpt-5.6-sol`,
-`gpt-5.6-terra`, `gpt-5.6-luna`, `claude-fable-5-1`, `claude-opus-5`,
-`claude-sonnet-5`, `kimi-code/kimi-for-coding`, `kimi-code/k3`,
-`opencode/glm-5.3#high`, `opencode/deepseek-v4-pro#high` and
-`opencode/qwen3.8-max` — the same list `scripts/run-suite.mjs` iterates.
+recorded too. Earlier suites compared `gpt-6-astra`, `gpt-5.6-sol`,
+`gpt-5.6-terra`, `gpt-5.6-luna`, `claude-fable-5-1`, `claude-opus-5` and
+`claude-sonnet-5`; those runs stay published on `benchmark-results`.
+
+`scripts/run-suite.mjs` now iterates the open-weights comparison:
+`kimi-code/kimi-for-coding`, `kimi-code/k3`, `opencode/glm-5.3#high`,
+`opencode/deepseek-v4-pro#high`, `opencode/qwen3.8-max`,
+`opencode/minimax-m3` and `opencode/kimi-k3`. That list is the suite's
+definition, so `--resume` verifies against it: freeze it before a launch and
+change it only between suites. `kimi-code/k3` and `opencode/kimi-k3` are the
+same weights on two harnesses — the pair is the control that separates
+scaffold effect from model effect.
 
 OpenCode's `opencode-go/*` aliases reach the same models but require Global
 regions on the workspace's OpenCode Console privacy settings; without that they
@@ -102,16 +109,19 @@ fail with `provider.invalid-request` on the first request, so the plain
 ### Run a whole suite
 
 ```sh
-node scripts/run-suite.mjs --suite 20260911-prompt-v3-high \
+node scripts/run-suite.mjs --suite 20260927-openweights-high \
   --prompt prompts/prompt-v3.md --effort high --timeout 7200
 ```
 
-Runs all twelve models serially in a dedicated clean worktree, records private
+Runs every model in the list serially in a dedicated clean worktree, records private
 progress under `.benchmark-secrets/suites/<suite>/`, and invokes the inspector
 at the end. Like the runner, it requires `--prompt`: neither tool has a
 default, so a run can never inherit a task nobody chose.
 A model failure does not stop later models; a publication or cleanup failure
-pauses the controller with artifacts preserved. Launch it under a persistent
+pauses the controller with artifacts preserved. A credential an agent copied
+into its workspace no longer causes that pause: `scripts/redact-run-secrets.mjs`
+replaces the values this run provisioned before the gate sees them (see
+Redaction below). Launch it under a persistent
 process supervisor. Finishing means `awaiting-human-audit`, not a passing score.
 
 To continue a blocked suite, first recover any completed-but-unpublished
@@ -129,7 +139,7 @@ runs/<run-id>/
   final.md        the agent's completion report
   events.jsonl    normalized tool and web events (no raw inputs or results)
   capture.json    capture coverage, warnings, schema version
-  metadata.json   suite, prompt + hash, model, effort, usage, tree hashes, status, timing, URL
+  metadata.json   suite, prompt + hash, model, effort, usage, redactions, tree hashes, status, timing, URL
   usage.json      provider-reported token usage
 ```
 
@@ -140,6 +150,27 @@ tool results. Those stay in a private, permissions-protected transcript at
 customer data: never publish it, and note there is no automatic expiry. Review
 artifacts before republishing them; the staged secret scan guards generated
 source and reports, but it is not a general PII detector.
+
+### Redaction
+
+Agents sometimes copy the payment credentials they were handed into their own
+workspace — `deepseek-v4-pro` wrote both Stripe keys to `.stripe_sk` and
+`.stripe_pk` on its first run here. Publishing those is out of the question, and
+refusing the commit blocks the run and pauses the suite, so
+`scripts/redact-run-secrets.mjs` runs first and replaces the values with
+`REDACTED_BUILD_PLACEHOLDER`. Each original is preserved at
+`.benchmark-secrets/recoveries/<run-id>/<path>.original` (owner-only), and
+`metadata.json` lists every substitution in `redactions`, naming the file and
+which credential it held — so the leak stays visible as a finding about the
+agent rather than becoming a missing run.
+
+It redacts **only values already known to be credentials**: the harness's own
+environment variables and the Stripe profile that run provisioned. It
+deliberately does not act on the structural pattern in
+`scripts/check-run-artifacts`, which is the net for secrets nobody anticipated:
+if that still fires after redaction, publication blocks and a human looks. The
+gate is unchanged and still fails closed. The private raw CLI log keeps its
+original bytes, since it is never published.
 
 ## Run isolation
 
@@ -168,8 +199,17 @@ loading turned off, Kimi via `kimi -p --output-format stream-json` with a
 fresh `KIMI_CODE_HOME` inside the run's private capture directory: auth and
 provider config are copied from the operator's home (`KIMI_CODE_HOME` when
 set, else `~/.kimi-code`) so the run can log in, but no session, history or
-memory carries over between runs, and a mid-run token refresh can rewrite
-only the copies. Kimi's stream-json format reports no token usage, so Kimi
+memory carries over between runs.
+
+Auth is the one deliberate exception, and it is not optional. Kimi refreshes its
+OAuth token mid-run and the provider rotates the refresh token when it does, so
+the copy inside the isolated home becomes the only valid credential. Leaving it
+there breaks the operator's own login — and, because each run copies its
+credentials from that home, every later Kimi run in the suite. `run-agent.mjs`
+therefore writes a refreshed credential back, and only when it carries a
+non-empty refresh token: a failed refresh leaves the fields blank, and promoting
+that would cause the very breakage this prevents. A suite with more than one
+Kimi model depends on this. Kimi's stream-json format reports no token usage, so Kimi
 runs publish no `usage.json` and record `"usage": null`. Since the CLI has no
 effort flag, Kimi models run at their provider-default effort (`max` for
 `kimi-for-coding`, `high` for `k3`) regardless of `--reasoning-effort`; the
@@ -193,7 +233,7 @@ transient stream hiccup the agent recovered from — so a run can record
 
 ```sh
 git fetch origin benchmark-results
-node scripts/run-inspector/inspect.mjs --suite 20260911-prompt-v3-high --expected-runs 12
+node scripts/run-inspector/inspect.mjs --suite 20260927-openweights-high --expected-runs 7
 ```
 
 Offline by default; `--live` adds read-only Stripe and Prodigi sandbox
