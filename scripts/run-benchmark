@@ -131,6 +131,15 @@ STRIPE_REAL=$(command -v stripe) || die "Stripe CLI is not installed or not on P
 TIMEOUT_COMMAND=$(command -v timeout || command -v gtimeout || true)
 [[ -n $TIMEOUT_COMMAND ]] || die "install GNU coreutils (timeout/gtimeout) to enforce --timeout"
 
+# The provider CLI is part of the harness, and its version changes what a model
+# can even be asked to do -- a Codex older than 0.155.0 is refused GPT-6 Sol and
+# Luna outright. Record it, so two runs of the same model are comparable only
+# when this matches, and so a rollout gate is visible in the artifact instead of
+# being something the operator has to remember. Bounded, because an unresponsive
+# CLI must not hang the run before it starts.
+CLI_VERSION=$("$TIMEOUT_COMMAND" 30 "$ADAPTER" --version 2>/dev/null | head -n 1 | tr -d '\r') || CLI_VERSION=
+[[ -n $CLI_VERSION ]] || note "warning: $ADAPTER --version produced nothing; recording an empty cli_version"
+
 if [[ -z $RUN_ID ]]; then
   RUN_ID="$(date -u +%Y%m%dT%H%M%SZ)-$ADAPTER-$(sanitize_id "$MODEL")"
 else
@@ -407,6 +416,7 @@ WORKSPACE_TREE=$(git write-tree)
   printf '  "suite_id": '; json_string "$SUITE_ID"; printf ',\n'
   printf '  "status": '; json_string "$RUN_STATUS"; printf ',\n'
   printf '  "adapter": '; json_string "$ADAPTER"; printf ',\n'
+  printf '  "cli_version": '; json_string "$CLI_VERSION"; printf ',\n'
   printf '  "capture_version": 1,\n'
   printf '  "model": '; json_string "$MODEL"; printf ',\n'
   printf '  "reasoning_effort": '; json_string "$REASONING_EFFORT"; printf ',\n'
