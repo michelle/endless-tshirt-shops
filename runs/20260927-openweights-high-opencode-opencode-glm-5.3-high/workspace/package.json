@@ -1,0 +1,30 @@
+{
+  "name": "under-this-moon",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Custom moon-phase tees: the exact moon over your moment, printed on demand after payment clears.",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "render-preview": "tsx scripts/render-preview.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@resvg/resvg-js": "^2.6.2",
+    "next": "^15.5.4",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "stripe": "^18.5.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.0",
+    "@types/react": "^19.1.0",
+    "@types/react-dom": "^19.1.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.5.4"
+  },
+  "engines": {
+    "node": ">=20.11.0"
+  }
+}
