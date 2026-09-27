@@ -6,10 +6,10 @@ import { spawn } from 'node:child_process';
 import path from 'node:path';
 import os from 'node:os';
 const root = path.resolve(import.meta.dirname, '..');
-async function run(provider, events, t, { exit = 0, final = 'Codex final', tail = '', delay = false, drop = null, model = 'fake' } = {}) {
+async function run(provider, events, t, { exit = 0, final = 'Codex final', tail = '', delay = false, drop = null, model = 'fake', refresh = null } = {}) {
   const dir = await mkdtemp(path.join(os.tmpdir(), 'run-agent-')); t.after(() => rm(dir, { recursive: true, force: true }));
   await mkdir(path.join(dir, 'bin'));
-  const script = `#!${process.execPath}\nconst fs = require('node:fs');\nconst args = process.argv.slice(2);\nfs.writeFileSync(process.env.ARGUMENTS, JSON.stringify(args));\nfs.writeFileSync(process.env.MEMORY_ENV, JSON.stringify({ auto: process.env.CLAUDE_CODE_DISABLE_AUTO_MEMORY, md: process.env.CLAUDE_CODE_DISABLE_CLAUDE_MDS }));\nfs.writeFileSync(process.env.KIMI_ENV_DUMP, JSON.stringify({ home: process.env.KIMI_CODE_HOME, noUpdate: process.env.KIMI_CODE_NO_AUTO_UPDATE }));\n${provider === 'codex' ? `fs.writeFileSync(args[args.indexOf('--output-last-message') + 1], ${JSON.stringify(final)});` : ''}\nfor (const event of ${JSON.stringify(events)}) process.stdout.write(JSON.stringify(event) + '\\n');\nprocess.stdout.write(${JSON.stringify(tail)});\n${delay ? 'setTimeout(() => process.exit(0), 30000);' : `process.exitCode = ${exit};`}`;
+  const script = `#!${process.execPath}\nconst fs = require('node:fs');\nconst args = process.argv.slice(2);\nfs.writeFileSync(process.env.ARGUMENTS, JSON.stringify(args));\nfs.writeFileSync(process.env.MEMORY_ENV, JSON.stringify({ auto: process.env.CLAUDE_CODE_DISABLE_AUTO_MEMORY, md: process.env.CLAUDE_CODE_DISABLE_CLAUDE_MDS }));\nfs.writeFileSync(process.env.KIMI_ENV_DUMP, JSON.stringify({ home: process.env.KIMI_CODE_HOME, noUpdate: process.env.KIMI_CODE_NO_AUTO_UPDATE }));\nif (process.env.KIMI_REFRESH) fs.writeFileSync(process.env.KIMI_CODE_HOME + '/credentials/fixture.json', process.env.KIMI_REFRESH);\n${provider === 'codex' ? `fs.writeFileSync(args[args.indexOf('--output-last-message') + 1], ${JSON.stringify(final)});` : ''}\nfor (const event of ${JSON.stringify(events)}) process.stdout.write(JSON.stringify(event) + '\\n');\nprocess.stdout.write(${JSON.stringify(tail)});\n${delay ? 'setTimeout(() => process.exit(0), 30000);' : `process.exitCode = ${exit};`}`;
   await writeFile(path.join(dir, 'bin', provider), script, { mode: 0o700 });
   await writeFile(path.join(dir, 'prompt.md'), 'Fixture prompt');
   // Kimi runs always get a fixture source home so the test never touches the
@@ -20,7 +20,7 @@ async function run(provider, events, t, { exit = 0, final = 'Codex final', tail 
     await writeFile(path.join(dir, 'kimi-source', 'config.toml'), 'fixture config\n');
     await writeFile(path.join(dir, 'kimi-source', 'credentials', 'fixture.json'), '{}');
   }
-  const env = { ...process.env, PATH: `${dir}/bin:${process.env.PATH}`, ARGUMENTS: `${dir}/args.json`, MEMORY_ENV: `${dir}/memory-env.json`, KIMI_ENV_DUMP: `${dir}/kimi-env.json`, BENCHMARK_WORKSPACE: dir, BENCHMARK_PROMPT_FILE: `${dir}/prompt.md`, BENCHMARK_MODEL: model, BENCHMARK_REASONING_EFFORT: 'high', BENCHMARK_FINAL_OUTPUT: `${dir}/final.md`, BENCHMARK_USAGE_OUTPUT: `${dir}/usage.json`, BENCHMARK_CAPTURE_DIR: `${dir}/capture`, ...(provider === 'kimi' ? { KIMI_CODE_HOME: `${dir}/kimi-source` } : {}) };
+  const env = { ...process.env, PATH: `${dir}/bin:${process.env.PATH}`, ARGUMENTS: `${dir}/args.json`, MEMORY_ENV: `${dir}/memory-env.json`, KIMI_ENV_DUMP: `${dir}/kimi-env.json`, BENCHMARK_WORKSPACE: dir, BENCHMARK_PROMPT_FILE: `${dir}/prompt.md`, BENCHMARK_MODEL: model, BENCHMARK_REASONING_EFFORT: 'high', BENCHMARK_FINAL_OUTPUT: `${dir}/final.md`, BENCHMARK_USAGE_OUTPUT: `${dir}/usage.json`, BENCHMARK_CAPTURE_DIR: `${dir}/capture`, ...(provider === 'kimi' ? { KIMI_CODE_HOME: `${dir}/kimi-source` } : {}), ...(refresh ? { KIMI_REFRESH: refresh } : {}) };
   if (drop) delete env[drop];
   const child = spawn(process.execPath, [path.join(root, 'scripts/run-agent.mjs'), provider], { env });
   let stdout = '', stderr = '';
@@ -99,6 +99,25 @@ test('Kimi stream-json launch keeps final.md to finalize-capture and isolates it
   assert.equal(await readFile(`${childEnv.home}/credentials/fixture.json`, 'utf8'), '{}');
   // ...but sessions and history never carry over between runs.
   assert.equal(existsSync(`${childEnv.home}/sessions`), false);
+});
+
+// The provider rotates the refresh token when the CLI refreshes mid-run, so the
+// copy in the isolated home becomes the only valid one. Without writing it back,
+// the operator's login dies and every later Kimi run in the suite fails.
+test('a refreshed Kimi credential is written back to the operator home', async t => {
+  const refreshed = JSON.stringify({ access_token: 'a'.repeat(32), refresh_token: 'r'.repeat(32), expires_at: 1, scope: 'all', token_type: 'Bearer', expires_in: 3600 });
+  const r = await run('kimi', [{ role: 'assistant', content: 'done' }], t, { refresh: refreshed });
+  assert.equal(r.code, 0, r.stderr);
+  assert.equal(await readFile(`${r.dir}/kimi-source/credentials/fixture.json`, 'utf8'), refreshed);
+});
+
+test('a failed Kimi refresh does not overwrite the operator credential', async t => {
+  // When a refresh fails the CLI blanks the token fields; copying that back is
+  // exactly the breakage the write-back exists to prevent.
+  const stripped = JSON.stringify({ access_token: '', refresh_token: '', expires_at: 1, scope: 'all', token_type: 'Bearer', expires_in: 0 });
+  const r = await run('kimi', [{ role: 'assistant', content: 'done' }], t, { refresh: stripped });
+  assert.equal(r.code, 0, r.stderr);
+  assert.equal(await readFile(`${r.dir}/kimi-source/credentials/fixture.json`, 'utf8'), '{}', 'a blanked credential must not be promoted');
 });
 
 test('Kimi exit zero without an assistant final answer is a failure', async t => {

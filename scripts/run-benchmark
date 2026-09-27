@@ -394,6 +394,11 @@ if [[ -s $USAGE_OUTPUT ]]; then
   ' "$USAGE_OUTPUT" 2>/dev/null) && USAGE_JSON=$COMPACT_USAGE
 fi
 PROMPT_SHA=$(shasum -a 256 "$BENCHMARK_PROMPT_FILE" | awk '{print $1}')
+# Replace credentials this run provisioned before the workspace tree is hashed,
+# so workspace_tree describes what actually publishes. Only known values are
+# touched; check-run-artifacts still fails closed on anything unanticipated.
+REDACTIONS=$(node "$SCRIPT_DIR/redact-run-secrets.mjs" "$RUN_ID") ||
+  die "credential redaction failed; refusing to publish"
 git add "$WORKSPACE"
 WORKSPACE_TREE=$(git write-tree)
 {
@@ -420,6 +425,7 @@ WORKSPACE_TREE=$(git write-tree)
   printf '  "duration_seconds": %s,\n' "$DURATION_SECONDS"
   printf '  "agent_exit_code": %s,\n' "$AGENT_EXIT"
   printf '  "usage": %s,\n' "$USAGE_JSON"
+  printf '  "redactions": %s,\n' "$REDACTIONS"
   printf '  "deployment_url": '; json_string "$DEPLOYMENT_URL"; printf '\n}\n'
 } >"$METADATA"
 

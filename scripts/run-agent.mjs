@@ -1,5 +1,5 @@
 import { spawn } from 'node:child_process';
-import { openSync, writeSync, closeSync, mkdirSync, readFileSync, writeFileSync, existsSync, cpSync } from 'node:fs';
+import { openSync, writeSync, closeSync, mkdirSync, readFileSync, writeFileSync, existsSync, cpSync, readdirSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { normalize } from './run-inspector/transcript.mjs';
@@ -38,14 +38,15 @@ const args = provider === 'claude'
 // A fresh home per run replaces memory-disabled flags: nothing carries over
 // between runs, and the run's sessions and logs stay inside the private
 // capture directory. Auth and provider config are copied from the operator's
-// home (KIMI_CODE_HOME when set, else ~/.kimi-code) so the run can log in;
-// a token refresh mid-run can rewrite only the copies, never the real home.
+// home (KIMI_CODE_HOME when set, else ~/.kimi-code) so the run can log in.
+// Sessions, history and logs never travel back; a refreshed OAuth token does,
+// for the reason syncKimiAuthBack explains.
+const kimiSource = env.KIMI_CODE_HOME ?? path.join(os.homedir(), '.kimi-code');
 function kimiHome() {
   const home = path.join(directory, 'kimi-home');
   mkdirSync(home, { recursive: true, mode: 0o700 });
-  const source = env.KIMI_CODE_HOME ?? path.join(os.homedir(), '.kimi-code');
   for (const name of ['config.toml', 'credentials', 'oauth', 'region', 'device_id']) {
-    const from = path.join(source, name), to = path.join(home, name);
+    const from = path.join(kimiSource, name), to = path.join(home, name);
     if (!existsSync(from) || existsSync(to)) continue;
     // cpSync copies a file or a directory tree; an absent or unreadable auth
     // piece is left for the CLI to report as a missing login.
@@ -53,13 +54,41 @@ function kimiHome() {
   }
   return home;
 }
+// Kimi refreshes its OAuth token mid-run, and the provider rotates the refresh
+// token when it does: the copy in the isolated home becomes the only valid one
+// and the operator's own login stops working -- which also kills every later
+// Kimi run in a suite, since each one copies its credentials from there. So a
+// refreshed token is written back. Only a credential carrying a non-empty
+// refresh token qualifies: when a refresh fails, the CLI leaves the fields
+// empty, and copying that back would break the login this is meant to protect.
+export function usableCredential(text) {
+  try {
+    const value = JSON.parse(text);
+    return typeof value?.refresh_token === 'string' && value.refresh_token.length > 0;
+  } catch { return false; }
+}
+function syncKimiAuthBack(home) {
+  const from = path.join(home, 'credentials'), to = path.join(kimiSource, 'credentials');
+  if (!existsSync(from) || !existsSync(to)) return;
+  for (const entry of readdirSync(from, { withFileTypes: true })) {
+    if (!entry.isFile()) continue;
+    const source = path.join(from, entry.name), target = path.join(to, entry.name);
+    try {
+      const refreshed = readFileSync(source, 'utf8');
+      if (!usableCredential(refreshed)) continue;
+      if (existsSync(target) && readFileSync(target, 'utf8') === refreshed) continue;
+      writeFileSync(target, refreshed, { mode: 0o600 });
+    } catch { /* a credential we cannot read or replace is left as it was */ }
+  }
+}
+let isolatedKimiHome = null;
 const childEnv = provider === 'claude' ? {
   ...env,
   CLAUDE_CODE_DISABLE_AUTO_MEMORY: '1',
   CLAUDE_CODE_DISABLE_CLAUDE_MDS: '1',
 } : provider === 'kimi' ? {
   ...env,
-  KIMI_CODE_HOME: kimiHome(),
+  KIMI_CODE_HOME: isolatedKimiHome = kimiHome(),
   KIMI_CODE_NO_AUTO_UPDATE: '1',
 } : env;
 const child = spawn(provider, args, { cwd: env.BENCHMARK_WORKSPACE, env: childEnv, stdio: ['ignore', 'pipe', 'pipe'] });
@@ -83,6 +112,7 @@ child.on('close', (code, signal) => {
   // Normalized here only to judge the outcome: run-benchmark then calls
   // finalize-capture.mjs, which is the single writer of the run's artifacts.
   const result = normalize(readFileSync(target, 'utf8'), provider);
+  if (isolatedKimiHome) syncKimiAuthBack(isolatedKimiHome);
   writeFileSync(path.join(directory, 'exit.json'), JSON.stringify({ code, signal, capturedRecords: sequence }), { mode: 0o600 });
   // Claude, Kimi and OpenCode deliver their final answer as text in the
   // stream; a zero exit without one means the run produced no report.

@@ -78,6 +78,8 @@ printf '%s\n' \
   'mkdir -p "$workspace/node_modules"' \
   'printf "generated dependency\n" >"$workspace/node_modules/example.js"' \
   'printf "generated app\n" >"$workspace/app.txt"' \
+  '# some agents persist the credentials they were handed into their workspace' \
+  '[[ -n "${FAKE_LEAK_PATH:-}" ]] && printf "PRODIGI=%s\n" "$PRODIGI_API_KEY" >"$workspace/$FAKE_LEAK_PATH"' \
   'mkdir -p "$workspace/public/fonts"; printf "vendor license  \r\nunchanged  \r\n" >"$workspace/public/fonts/OFL.txt"' \
   'printf "formatted CLI output  \n"' \
   "printf '%s\\n' '{\"type\":\"turn.completed\",\"usage\":{\"input_tokens\":11,\"output_tokens\":7,\"total_tokens\":18}}'" \
@@ -287,6 +289,35 @@ OPENCODE_EVENTS=$(git --git-dir="$REMOTE" show benchmark-results:runs/opencode/e
 OPENCODE_USAGE=$(git --git-dir="$REMOTE" show benchmark-results:runs/opencode/usage.json)
 [[ $OPENCODE_USAGE == *'"new_input_tokens": 20'* ]] || fail 'OpenCode new input usage was not recorded'
 assert test -s "$REPO/.benchmark-secrets/transcripts/opencode/transcript.jsonl"
+
+# An agent that writes its provisioned credential into the workspace must still
+# publish, with the value replaced and the substitution recorded -- otherwise one
+# leaky model blocks the whole suite. The structural net in check-run-artifacts
+# stays untouched: it is what still stops a secret the harness never issued.
+LEAKED_KEY=test_11111111-1111-1111-1111-111111111111
+(
+  cd "$REPO"
+  PATH="$BIN:$PATH" PRODIGI_API_KEY=$LEAKED_KEY FAKE_LEAK_PATH=.prodigi_key "$ROOT/scripts/run-benchmark" \
+    --adapter codex --model fake --timeout 5 --run-id leaky --prompt-file prompts/prompt.md
+)
+LEAKY_FILE=$(git --git-dir="$REMOTE" show benchmark-results:runs/leaky/workspace/.prodigi_key)
+[[ $LEAKY_FILE == *REDACTED_BUILD_PLACEHOLDER* ]] || fail 'the provisioned credential was not replaced'
+[[ $LEAKY_FILE != *"$LEAKED_KEY"* ]] || fail 'the provisioned credential was published'
+LEAKY_METADATA=$(git --git-dir="$REMOTE" show benchmark-results:runs/leaky/metadata.json)
+[[ $LEAKY_METADATA == *'"redactions"'*'.prodigi_key'*'PRODIGI_API_KEY'* ]] || fail 'the redaction was not recorded in metadata'
+[[ $LEAKY_METADATA == *'"status": "succeeded"'* ]] || fail 'a redacted run must still publish'
+# The original is preserved privately so the leak stays auditable.
+assert grep -qF "$LEAKED_KEY" "$REPO/.benchmark-secrets/recoveries/leaky/workspace/.prodigi_key.original"
+# Nothing published anywhere in the run carries the credential, report included.
+assert_no_published_secret() {
+  local file
+  for file in $(git --git-dir="$REMOTE" ls-tree -r --name-only benchmark-results -- runs/leaky); do
+    if git --git-dir="$REMOTE" show "benchmark-results:$file" | grep -qF "$LEAKED_KEY"; then
+      fail "published $file still carries the credential"
+    fi
+  done
+}
+assert_no_published_secret
 
 set +e
 (
