@@ -154,3 +154,21 @@ test('a missing run directory is an error, not a silent pass', async t => {
   const { dir } = await fixture(t, {});
   assert.throws(() => redactRun('absent-run', { env: {}, cwd: dir }));
 });
+
+test('a second pass never overwrites an original already preserved', async t => {
+  // A recovery, or a widened policy, re-runs redaction over files this step has
+  // itself rewritten. Preserving again would replace the true original with a
+  // redacted copy and destroy the audit trail.
+  const env = `PRODIGI=${PRODIGI}\nSTRIPE=${SK}\n`;
+  const { dir, runId } = await fixture(t, { 'workspace/.env.local': env });
+  redactRun(runId, { env: { PRODIGI_API_KEY: PRODIGI }, cwd: dir });
+  const preserved = path.join(dir, '.benchmark-secrets', 'recoveries', runId, 'workspace/.env.local.original');
+  assert.equal(await readFile(preserved, 'utf8'), env);
+  // A later pass sees a file this step already rewrote. Whatever it finds, the
+  // original captured the first time must survive untouched.
+  await writeFile(path.join(dir, 'runs', runId, 'workspace/.env.local'), `STRIPE=${PK}\n`);
+  const again = redactRun(runId, { env: {}, cwd: dir });
+  assert.deepEqual(again.map(r => r.path), ['workspace/.env.local']);
+  assert.equal(await readFile(preserved, 'utf8'), env, 'the first-pass original must survive');
+  assert.equal(await read(dir, 'runs', runId, 'workspace/.env.local'), `STRIPE=${PLACEHOLDER}\n`);
+});

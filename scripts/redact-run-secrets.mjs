@@ -27,7 +27,7 @@
 // capture.json would mean the harness itself leaked one -- a bug, not an agent
 // behaviour -- so those are left untouched for check-run-artifacts to block and
 // a human to read. The gate is unchanged and still fails closed there.
-import { readFileSync, writeFileSync, mkdirSync, readdirSync, statSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdirSync, readdirSync, statSync, existsSync } from 'node:fs';
 import path from 'node:path';
 
 export const PLACEHOLDER = 'REDACTED_BUILD_PLACEHOLDER';
@@ -136,7 +136,11 @@ export function redactRun(runId, { env = process.env, cwd = process.cwd() } = {}
     const credentials = [...names].sort();
     const preserved = path.join(recoveries, `${relative}.original`);
     mkdirSync(path.dirname(preserved), { recursive: true, mode: 0o700 });
-    writeFileSync(preserved, original, { mode: 0o600 });
+    // Never overwrite an original already on disk. A second pass -- a recovery,
+    // or a widened policy -- sees a file this step has itself rewritten, so
+    // preserving again would replace the true original with a redacted copy and
+    // destroy the audit trail it exists for.
+    if (!existsSync(preserved)) writeFileSync(preserved, original, { mode: 0o600 });
     writeFileSync(file, text);
     redactions.push({ path: relative, credentials });
   }
