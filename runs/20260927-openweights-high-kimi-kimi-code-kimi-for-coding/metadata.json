@@ -1,0 +1,49 @@
+{
+  "run_id": "20260927-openweights-high-kimi-kimi-code-kimi-for-coding",
+  "suite_id": "20260927-openweights-high",
+  "status": "succeeded",
+  "adapter": "kimi",
+  "cli_version": "2.1.0",
+  "capture_version": 1,
+  "model": "kimi-code/kimi-for-coding",
+  "reasoning_effort": "high",
+  "memory_policy": "explicitly_disabled",
+  "branch": "benchmark-results",
+  "vercel_project": "benchmark-20260927-openweights-high-kimi-kimi-code-kimi-for-coding",
+  "stripe_config_ref": "20260927-openweights-high-kimi-kimi-code-kimi-for-coding",
+  "stripe_config_path": ".benchmark-secrets/stripe/20260927-openweights-high-kimi-kimi-code-kimi-for-coding.toml",
+  "base_commit": "d6e22c4ec05fc53f260d43f591821ff89e823075",
+  "tooling_commit": "d6e22c4ec05fc53f260d43f591821ff89e823075",
+  "prompt_file": "prompts/prompt-v3.md",
+  "prompt_sha256": "30868370940510cfeb6f8c1da9e0f748ad6ac4f3e1e5e59e3e85adcecc910f99",
+  "workspace_tree": "8e7f351e9c81f19bd31ccc0b38e594c2d4888f0e",
+  "started_at": "2026-09-27T20:08:57Z",
+  "finished_at": "2026-09-27T20:37:49Z",
+  "duration_seconds": 1732,
+  "agent_exit_code": 0,
+  "usage": null,
+  "redactions": [
+    {
+      "path": "workspace/.stripe-account",
+      "credentials": [
+        "stripe_publishable_key",
+        "stripe_restricted_key"
+      ]
+    },
+    {
+      "path": "workspace/.stripe-webhook-secret",
+      "credentials": [
+        "stripe_webhook_secret"
+      ]
+    },
+    {
+      "path": "workspace/store/.env.local",
+      "credentials": [
+        "stripe_publishable_key",
+        "stripe_restricted_key",
+        "stripe_webhook_secret"
+      ]
+    }
+  ],
+  "deployment_url": "https://definingme-store.vercel.app"
+}
