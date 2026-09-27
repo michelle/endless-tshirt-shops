@@ -26,10 +26,13 @@ const args = provider === 'claude'
   ? ['--output-format', 'stream-json', '-m', env.BENCHMARK_MODEL, ...extra, '-p', prompt]
   : provider === 'opencode'
   // `run` never prompts: questions and plan transitions are denied in
-  // non-interactive mode and --auto answers permission asks. The reasoning
-  // effort maps to opencode's --variant; models that do not support the
-  // variant fail loudly rather than silently running at another effort.
-  ? ['run', '--auto', '--format', 'json', ...(effort ? ['--variant', effort] : []), '-m', env.BENCHMARK_MODEL, ...extra, prompt]
+  // non-interactive mode and --auto answers permission asks. It has no effort
+  // flag; effort is a variant carried in the model alias itself
+  // (`provider/model#variant`), so BENCHMARK_MODEL is passed through verbatim
+  // and BENCHMARK_REASONING_EFFORT is recorded but never turned into a flag.
+  // An alias naming a variant the model does not have fails loudly with
+  // provider.no-route rather than running at another effort.
+  ? ['run', '--auto', '--format', 'json', '-m', env.BENCHMARK_MODEL, ...extra, prompt]
   : ['exec', '--dangerously-bypass-approvals-and-sandbox', '--skip-git-repo-check', '--ephemeral', '--disable', 'memories', '--disable', 'external_agent_memory_import', '--color', 'never', '--json', '--cd', env.BENCHMARK_WORKSPACE, '--model', env.BENCHMARK_MODEL, '--output-last-message', env.BENCHMARK_FINAL_OUTPUT, ...(effort ? ['--config', `model_reasoning_effort="${effort}"`] : []), ...extra, prompt];
 // Kimi keeps config, credentials, sessions and history in one home directory.
 // A fresh home per run replaces memory-disabled flags: nothing carries over

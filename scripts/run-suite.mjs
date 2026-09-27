@@ -11,7 +11,13 @@ export const models = [
   ['codex', 'gpt-5.6-terra'], ['codex', 'gpt-5.6-luna'],
   ['claude', 'claude-fable-5-1'], ['claude', 'claude-opus-5'], ['claude', 'claude-sonnet-5'],
   ['kimi', 'kimi-code/kimi-for-coding'], ['kimi', 'kimi-code/k3'],
-  ['opencode', 'opencode-go/glm-5.3'], ['opencode', 'opencode-go/deepseek-v4-pro'], ['opencode', 'opencode-go/qwen3.8-max'],
+  // OpenCode aliases carry the reasoning effort as a variant suffix, since the
+  // CLI has no effort flag. Only some models publish variants: glm-5.3 and
+  // deepseek-v4-pro accept #high, while qwen3.8-max has none and runs at its
+  // provider default. scripts/preflight-clis.mjs probes every alias here.
+  // The opencode-go provider needs Global regions enabled on the workspace;
+  // these plain opencode aliases serve the same models without that.
+  ['opencode', 'opencode/glm-5.3#high'], ['opencode', 'opencode/deepseek-v4-pro#high'], ['opencode', 'opencode/qwen3.8-max'],
 ];
 // run-benchmark sanitizes the --run-id it is given (lowercase; every run of
 // characters outside [a-z0-9._-] becomes one '-'; one leading and trailing
