@@ -40,6 +40,7 @@ chmod +x "$BIN/timeout"
 printf '%s\n' \
   '#!/usr/bin/env bash' \
   'set -euo pipefail' \
+  'if [[ ${1-} == --version ]]; then echo "fake-cli 9.9.9"; exit 0; fi' \
   '[[ $1 == --config ]]' \
   '[[ $2 == "$BENCHMARK_CLI_STATE" ]]' \
   'printf "fake Stripe profile\\n" >>"$BENCHMARK_CLI_STATE"' >"$BIN/stripe"
@@ -48,6 +49,7 @@ chmod +x "$BIN/stripe"
 printf '%s\n' \
   '#!/usr/bin/env bash' \
   'set -euo pipefail' \
+  'if [[ ${1-} == --version ]]; then echo "fake-cli 9.9.9"; exit 0; fi' \
   'output=' \
   'workspace=' \
   'while (($#)); do' \
@@ -94,6 +96,7 @@ ln -s "$BIN/codex" "$BIN_WITHOUT_TIMEOUT/codex"
 printf '%s\n' \
   '#!/usr/bin/env bash' \
   'set -euo pipefail' \
+  'if [[ ${1-} == --version ]]; then echo "fake-cli 9.9.9"; exit 0; fi' \
   'printf "claude app\\n" > claude.txt' \
   "printf '%s\\n' '{\"type\":\"assistant\",\"message\":{\"content\":[{\"type\":\"tool_use\",\"id\":\"search1\",\"name\":\"WebSearch\",\"input\":{\"query\":\"stripe docs private@example.com\"}}]}}'" \
   "printf '%s\\n' '{\"type\":\"result\",\"result\":\"claude final report\",\"usage\":{\"input_tokens\":21,\"output_tokens\":13}}'" >"$BIN/claude"
@@ -102,6 +105,7 @@ chmod +x "$BIN/claude"
 printf '%s\n' \
   '#!/usr/bin/env bash' \
   'set -euo pipefail' \
+  'if [[ ${1-} == --version ]]; then echo "fake-cli 9.9.9"; exit 0; fi' \
   'prompt=' \
   'while (($#)); do' \
   '  case $1 in' \
@@ -130,6 +134,7 @@ chmod +x "$BIN/kimi"
 printf '%s\n' \
   '#!/usr/bin/env bash' \
   'set -euo pipefail' \
+  'if [[ ${1-} == --version ]]; then echo "fake-cli 9.9.9"; exit 0; fi' \
   'while (($#)); do' \
   '  case $1 in' \
   '    -m|--format) shift 2 ;;' \
@@ -281,6 +286,10 @@ assert test -s "$REPO/.benchmark-secrets/transcripts/kimi/transcript.jsonl"
 # exits 1 on --variant, as the real one does, so a flag regression fails here.
 OPENCODE_METADATA=$(git --git-dir="$REMOTE" show benchmark-results:runs/opencode/metadata.json)
 [[ $OPENCODE_METADATA == *'"reasoning_effort": "high"'* ]] || fail 'OpenCode effort was not recorded in metadata'
+# The provider CLI version is part of the harness: a Codex below 0.155.0 cannot
+# be asked for GPT-6 Sol or Luna at all, so two runs are comparable only when it
+# matches. It must be recorded without the probe being taken for a run.
+[[ $OPENCODE_METADATA == *'"cli_version": "fake-cli 9.9.9"'* ]] || fail 'the provider CLI version was not recorded in metadata'
 assert git --git-dir="$REMOTE" show benchmark-results:runs/opencode/workspace/opencode.txt
 OPENCODE_FINAL=$(git --git-dir="$REMOTE" show benchmark-results:runs/opencode/final.md)
 assert test "$OPENCODE_FINAL" = 'opencode final report'

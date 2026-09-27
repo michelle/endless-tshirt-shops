@@ -10,11 +10,23 @@
 // itself a finding worth publishing. So the known values are replaced here and
 // the fact of the replacement is recorded in metadata.
 //
-// This redacts ONLY values already known to be credentials: the harness's own
-// environment variables and the Stripe profile this run provisioned. It does
-// not act on check-run-artifacts' structural pattern, which is the net for
-// secrets nobody anticipated -- if that still fires after this step, the gate
-// blocks publication and a human looks, which is the behaviour we want to keep.
+// Two passes, with deliberately different reach:
+//
+//   by value  -- the harness's own environment variables and the Stripe profile
+//                this run provisioned, replaced anywhere in the run directory.
+//   by shape  -- anything matching a payment-credential shape, but only in the
+//                artifacts an agent authors (workspace/ and final.md).
+//
+// The shape pass exists because the credentials that actually leak are minted
+// during the run: `stripe sandbox create` issues its own keys and `stripe listen`
+// its own webhook secret, so they appear in no file the harness wrote and no
+// by-value pass can ever see them.
+//
+// Restricting the shape pass to agent-authored files is what keeps the gate
+// meaningful. A payment-shaped value in metadata.json, events.jsonl or
+// capture.json would mean the harness itself leaked one -- a bug, not an agent
+// behaviour -- so those are left untouched for check-run-artifacts to block and
+// a human to read. The gate is unchanged and still fails closed there.
 import { readFileSync, writeFileSync, mkdirSync, readdirSync, statSync } from 'node:fs';
 import path from 'node:path';
 
@@ -44,6 +56,33 @@ export function knownSecrets({ env = {}, profiles = [] } = {}) {
   // Longest first: a short secret that is a substring of a longer one must not
   // shadow it and leave the longer value's remainder in the file.
   return [...secrets].sort((a, b) => b[0].length - a[0].length).map(([value, name]) => ({ value, name }));
+}
+
+// Payment credentials an agent obtains at runtime -- a sandbox's own keys, a
+// webhook secret from `stripe listen` -- exist in no file the harness wrote, so
+// no by-value pass can see them. They are matched by shape instead, using the
+// same pattern and the same 24-character floor as check-run-artifacts (tuned so
+// placeholders like sk_test_xxx are left alone), and only inside the artifacts an
+// agent writes. Everywhere else -- metadata.json, events.jsonl, capture.json --
+// a payment-shaped value means the harness itself leaked one, so it is left for
+// the gate to block and a human to read.
+const PAYMENT_SHAPE = /(?<![A-Za-z0-9_])(?:(?:sk|pk|rkcs|rk)_(?:test|live)_[A-Za-z0-9_=-]{24,}|whsec_[A-Za-z0-9_=-]{24,}|(?:test|live)_[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|(?:pi|cs)_[A-Za-z0-9_]+_secret_[A-Za-z0-9_]+)/g;
+export function shapeName(token) {
+  if (token.startsWith('whsec_')) return 'stripe_webhook_secret';
+  if (token.startsWith('rkcs_') || token.startsWith('rk_')) return 'stripe_restricted_key';
+  if (token.startsWith('sk_')) return 'stripe_secret_key';
+  if (token.startsWith('pk_')) return 'stripe_publishable_key';
+  if (token.startsWith('pi_') || token.startsWith('cs_')) return 'stripe_client_secret';
+  return 'prodigi_api_key';
+}
+// Only what an agent itself authors is rewritten by shape.
+export function agentAuthored(relative) {
+  return relative === 'final.md' || relative === 'workspace' || relative.startsWith(`workspace${path.sep}`);
+}
+export function redactShapes(text) {
+  const names = new Set();
+  const output = text.replace(PAYMENT_SHAPE, token => { names.add(shapeName(token)); return PLACEHOLDER; });
+  return { text: output, credentials: [...names].sort() };
 }
 
 // Text only: a credential pasted into a binary file would not survive a naive
@@ -79,16 +118,22 @@ export function redactRun(runId, { env = process.env, cwd = process.cwd() } = {}
   }
   const secrets = knownSecrets({ env, profiles });
   const redactions = [];
-  if (!secrets.length) return redactions;
   const recoveries = path.join(cwd, '.benchmark-secrets', 'recoveries', runId);
   for (const file of walk(runDir, runDir)) {
     let original;
     // A file that cannot be read as text is left alone; see redactText.
     try { original = readFileSync(file, 'utf8'); } catch { continue; }
     if (original.includes('\u0000')) continue;
-    const { text, credentials } = redactText(original, secrets);
-    if (text === original) continue;
     const relative = path.relative(runDir, file);
+    const names = new Set();
+    let text = original;
+    for (const pass of [() => redactText(text, secrets), () => agentAuthored(relative) ? redactShapes(text) : { text, credentials: [] }]) {
+      const result = pass();
+      text = result.text;
+      for (const name of result.credentials) names.add(name);
+    }
+    if (text === original) continue;
+    const credentials = [...names].sort();
     const preserved = path.join(recoveries, `${relative}.original`);
     mkdirSync(path.dirname(preserved), { recursive: true, mode: 0o700 });
     writeFileSync(preserved, original, { mode: 0o600 });

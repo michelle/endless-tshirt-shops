@@ -58,13 +58,56 @@ test('environment credentials are redacted and named in the report', async t => 
   assert.equal(await read(dir, 'runs', runId, 'final.md'), `Set PRODIGI_API_KEY=${PLACEHOLDER} to run it.\n`);
 });
 
-test('an unknown secret is left for the publication gate to block', async t => {
-  // The whole point of redacting only known values: a credential the harness
-  // never provisioned must still reach check-run-artifacts and stop the run.
-  const stranger = `sk_live_${'c'.repeat(97)}`;
-  const { dir, runId } = await fixture(t, { 'workspace/leak.ts': `const key = "${stranger}";\n` });
-  assert.deepEqual(redactRun(runId, { env: { PRODIGI_API_KEY: PRODIGI }, cwd: dir }), []);
-  assert.match(await read(dir, 'runs', runId, 'workspace/leak.ts'), /sk_live_c+/);
+test('a runtime-minted credential in the workspace is redacted by shape', async t => {
+  // What actually blocked the first suite run: keys from `stripe sandbox create`
+  // and a webhook secret from `stripe listen`, in no file the harness wrote.
+  const webhook = `whsec_${'e'.repeat(40)}`;
+  const sandbox = `sk_test_${'f'.repeat(97)}`;
+  const { dir, runId } = await fixture(t, {
+    'workspace/.stripe-webhook-secret': `${webhook}\n`,
+    'workspace/.stripe-account': `STRIPE_SECRET_KEY=${sandbox}\n`,
+  });
+  const redactions = redactRun(runId, { env: {}, cwd: dir });
+  assert.deepEqual(redactions, [
+    { path: 'workspace/.stripe-account', credentials: ['stripe_secret_key'] },
+    { path: 'workspace/.stripe-webhook-secret', credentials: ['stripe_webhook_secret'] },
+  ]);
+  assert.equal(await read(dir, 'runs', runId, 'workspace/.stripe-webhook-secret'), `${PLACEHOLDER}\n`);
+  assert.equal(await read(dir, 'runs', runId, 'workspace/.stripe-account'), `STRIPE_SECRET_KEY=${PLACEHOLDER}\n`);
+});
+
+test('the agent report is redacted by shape, harness artifacts are not', async t => {
+  const key = `rkcs_test_${'g'.repeat(97)}`;
+  const { dir, runId } = await fixture(t, {
+    'final.md': `I configured ${key} for you.\n`,
+    // A payment-shaped value here means the harness leaked it: left for the gate.
+    'events.jsonl': `{"tool":"bash","note":"${key}"}\n`,
+    'metadata.json': `{"deployment_url":"${key}"}\n`,
+  });
+  const redactions = redactRun(runId, { env: {}, cwd: dir });
+  assert.deepEqual(redactions.map(r => r.path), ['final.md']);
+  assert.equal(await read(dir, 'runs', runId, 'final.md'), `I configured ${PLACEHOLDER} for you.\n`);
+  // Untouched, so check-run-artifacts still refuses to publish the run.
+  assert.match(await read(dir, 'runs', runId, 'events.jsonl'), /rkcs_test_g+/);
+  assert.match(await read(dir, 'runs', runId, 'metadata.json'), /rkcs_test_g+/);
+});
+
+test('placeholder credentials in generated source survive redaction', async t => {
+  // The 24-character floor is what lets docs and tests keep saying sk_test_xxx;
+  // rewriting those would corrupt the evidence the benchmark is collecting.
+  const { dir, runId } = await fixture(t, {
+    'workspace/README.md': 'Run it with sk_test_xxx or sk_test_not_real.\n',
+    'workspace/env.example': 'STRIPE_SECRET_KEY=sk_test_123\n',
+  });
+  assert.deepEqual(redactRun(runId, { env: {}, cwd: dir }), []);
+  assert.match(await read(dir, 'runs', runId, 'workspace/README.md'), /sk_test_xxx/);
+});
+
+test('a shape match inside a longer identifier is not rewritten', async t => {
+  const { dir, runId } = await fixture(t, {
+    'workspace/notes.md': `prefixed_sk_test_${'h'.repeat(30)} stays whole\n`,
+  });
+  assert.deepEqual(redactRun(runId, { env: {}, cwd: dir }), []);
 });
 
 test('the private raw CLI log keeps its original bytes', async t => {

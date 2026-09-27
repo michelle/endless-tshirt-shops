@@ -86,6 +86,11 @@ variant are set independently and can disagree; the alias is what actually ran.
 Arguments after `--` go to the underlying CLI, e.g. `-- --max-budget-usd 20`.
 `--suite-id` groups the runs of one comparison.
 
+The provider CLI's own version is recorded as `cli_version`, because it is part
+of the harness: a Codex below 0.157.1 is refused `gpt-6-sol` and `gpt-6-luna`
+outright, with an error that blames the ChatGPT account rather than the client
+version. Two runs of the same model are comparable only when this matches.
+
 The runner commits one immutable `runs/<run-id>/` to `benchmark-results`,
 pushes it, and returns to the original branch. Failed and timed-out runs are
 recorded too. Earlier suites compared `gpt-6-astra`, `gpt-5.6-sol`,
@@ -139,7 +144,7 @@ runs/<run-id>/
   final.md        the agent's completion report
   events.jsonl    normalized tool and web events (no raw inputs or results)
   capture.json    capture coverage, warnings, schema version
-  metadata.json   suite, prompt + hash, model, effort, usage, redactions, tree hashes, status, timing, URL
+  metadata.json   suite, prompt + hash, model, effort, CLI version, usage, redactions, tree hashes, status, timing, URL
   usage.json      provider-reported token usage
 ```
 
@@ -153,23 +158,38 @@ source and reports, but it is not a general PII detector.
 
 ### Redaction
 
-Agents sometimes copy the payment credentials they were handed into their own
-workspace — `deepseek-v4-pro` wrote both Stripe keys to `.stripe_sk` and
-`.stripe_pk` on its first run here. Publishing those is out of the question, and
-refusing the commit blocks the run and pauses the suite, so
-`scripts/redact-run-secrets.mjs` runs first and replaces the values with
+Agents copy the payment credentials they were handed into their own workspace
+often enough that it has to be handled, not treated as an exception:
+`deepseek-v4-pro` wrote both Stripe keys to `.stripe_sk` and `.stripe_pk`, and
+`kimi-for-coding` wrote a sandbox key to `.stripe-account` and a webhook secret
+to `.stripe-webhook-secret`. Publishing those is out of the question, and
+refusing the commit blocks the run and pauses the whole suite, so
+`scripts/redact-run-secrets.mjs` runs first and replaces them with
 `REDACTED_BUILD_PLACEHOLDER`. Each original is preserved at
 `.benchmark-secrets/recoveries/<run-id>/<path>.original` (owner-only), and
 `metadata.json` lists every substitution in `redactions`, naming the file and
 which credential it held — so the leak stays visible as a finding about the
 agent rather than becoming a missing run.
 
-It redacts **only values already known to be credentials**: the harness's own
-environment variables and the Stripe profile that run provisioned. It
-deliberately does not act on the structural pattern in
-`scripts/check-run-artifacts`, which is the net for secrets nobody anticipated:
-if that still fires after redaction, publication blocks and a human looks. The
-gate is unchanged and still fails closed. The private raw CLI log keeps its
+It makes two passes with deliberately different reach:
+
+- **By value**, anywhere in the run directory: the harness's own environment
+  variables and the Stripe profile that run provisioned.
+- **By shape**, only in `workspace/` and `final.md`: anything matching a
+  payment-credential shape, using the same pattern and the same 24-character
+  floor as `scripts/check-run-artifacts` — so placeholders like `sk_test_xxx`
+  in generated docs and tests survive untouched.
+
+The shape pass exists because the credentials that actually leak are minted
+during the run: `stripe sandbox create` issues its own keys and `stripe listen`
+its own webhook secret, so they appear in no file the harness wrote and no
+by-value pass can see them.
+
+Restricting the shape pass to agent-authored files is what keeps the gate
+meaningful. A payment-shaped value in `metadata.json`, `events.jsonl` or
+`capture.json` would mean the harness itself leaked one — a bug, not an agent
+behaviour — so those are left for `scripts/check-run-artifacts` to block. The
+gate is unchanged and still fails closed there. The private raw CLI log keeps its
 original bytes, since it is never published.
 
 ## Run isolation
