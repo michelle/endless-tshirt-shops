@@ -24,6 +24,6 @@
   "usage": {"input_tokens":387662,"output_tokens":77464,"cached_input_tokens":11363048,"new_input_tokens":110784},
   "redactions": [],
   "excluded_paths": [],
-  "deployment_url_candidates": [][],
+  "deployment_url_candidates": [],
   "deployment_url": ""
 }
