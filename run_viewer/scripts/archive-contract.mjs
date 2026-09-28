@@ -4,6 +4,24 @@ import path from "node:path";
 import { createHash } from "node:crypto";
 import { isPublishedArchivePath } from "./pages-redaction.mjs";
 import { viewport } from "./viewport.mjs";
+import { execFileSync } from "node:child_process";
+import { fileURLToPath } from "node:url";
+const repoRoot = fileURLToPath(new URL("../../", import.meta.url));
+// A missing object and a missing repository both exit 128, so repo-ness is
+// probed separately rather than inferred from the status. Outside a repository
+// (how the pre-push hook validates an extracted snapshot) or in a shallow clone
+// (how CI checks out), nothing can be disproved, so the revision passes.
+let verifiable;
+function knownCommit(revision) {
+  const git = (args) => execFileSync("git", args, { cwd: repoRoot, encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] });
+  if (verifiable === undefined) {
+    try { git(["rev-parse", "--git-dir"]); verifiable = git(["rev-parse", "--is-shallow-repository"]).trim() !== "true"; }
+    catch { verifiable = false; }
+  }
+  if (!verifiable) return true;
+  try { git(["cat-file", "-e", `${revision}^{commit}`]); return true; } catch { return false; }
+}
+
 
 /** Follow the registry, not directory contents: missing files must fail too. */
 export async function registeredAssets(suites, publicRoot) {
@@ -29,6 +47,11 @@ export async function registeredAssets(suites, publicRoot) {
     const prompt = await readFile(path.join(publicRoot, suite.prompt.path));
     assert.equal(createHash("sha256").update(prompt).digest("hex"), suite.prompt.sha256, `Prompt differs from archived revision: ${suite.id}`);
     assert.match(suite.prompt.revision, /^[a-f0-9]{40}$/);
+    // Shape is not provenance. A 40-hex string that names no commit satisfies the
+    // regex and publishes a revision nobody can check, which is the one claim this
+    // archive exists to make. CI clones shallow, so the objects may be absent
+    // there; where history is present the revision has to resolve.
+    assert.ok(knownCommit(suite.prompt.revision), `Prompt revision is not a commit in this repository: ${suite.id} ${suite.prompt.revision}`);
     if (!suite.runs.length) continue;
     const manifest = `/suites/${suite.id}/storefronts.json`;
     await add(manifest);
