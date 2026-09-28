@@ -1,0 +1,299 @@
+/* Globals for GNOMON — restrained dark-paper aesthetic.
+   We lean on Georgia/serif for things that need to feel engraved, and
+   system mono for the technical "coordinates / UTC" details. */
+
+:root {
+  --ink: #efe7d2;
+  --paper: #0e1f3a;
+  --paper-edge: #1c2c4a;
+  --paper-deep: #050d22;
+  --line: rgba(239, 231, 210, 0.42);
+  --soft: rgba(239, 231, 210, 0.66);
+  --faint: rgba(239, 231, 210, 0.32);
+  --accent: #c29755;
+  --warn: #d76b3a;
+  --good: #66cc8a;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background:
+    radial-gradient(ellipse at top, var(--paper-edge) 0%, var(--paper) 35%, var(--paper-deep) 100%);
+  color: var(--ink);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 17px;
+  line-height: 1.55;
+  min-height: 100vh;
+}
+
+main {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 40px 36px 80px;
+}
+
+.site-banner {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 28px 36px 22px;
+  border-bottom: 1px solid var(--line);
+  background: linear-gradient(180deg, rgba(0,0,0,.25), rgba(0,0,0,0));
+}
+
+.brand {
+  display: flex;
+  gap: 14px;
+  align-items: baseline;
+}
+
+.brand-mark {
+  font-size: 26px;
+  color: var(--accent);
+  transform: translateY(2px);
+}
+
+.brand-name {
+  font-size: 22px;
+  letter-spacing: 9px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.brand-tag {
+  font-style: italic;
+  color: var(--soft);
+  font-size: 14px;
+  letter-spacing: 1px;
+  margin-left: 6px;
+}
+
+.site-banner nav a {
+  color: var(--soft);
+  text-decoration: none;
+  font-size: 13px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 6px 14px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  transition: all .2s ease;
+}
+.site-banner nav a:hover { color: var(--ink); border-color: var(--accent); }
+
+a { color: var(--accent); }
+a:hover { color: #e9c184; }
+
+button { font-family: inherit; }
+
+.site-foot {
+  padding: 28px 36px 32px;
+  border-top: 1px solid var(--line);
+  display: flex;
+  justify-content: space-between;
+  color: var(--faint);
+  font-size: 12px;
+  letter-spacing: 2px;
+}
+
+@media (max-width: 720px) {
+  main { padding: 28px 18px 64px; }
+  .site-banner { flex-direction: column; gap: 14px; align-items: flex-start; }
+  .site-foot { flex-direction: column; gap: 8px; }
+}
+
+.page-head {
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  gap: 64px;
+  align-items: start;
+}
+
+.page-head h1 {
+  font-family: Georgia, serif;
+  font-size: 46px;
+  line-height: 1.12;
+  margin: 0 0 14px;
+  letter-spacing: 0.6px;
+}
+.page-head p.lead {
+  font-size: 19px;
+  color: var(--soft);
+  margin: 0 0 22px;
+  max-width: 560px;
+}
+
+.tagline p {
+  font-style: italic;
+  color: var(--soft);
+  font-size: 16.5px;
+  line-height: 1.65;
+}
+
+.preview-card {
+  background: linear-gradient(160deg, var(--paper-edge), var(--paper-deep));
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 22px;
+  position: sticky;
+  top: 20px;
+}
+
+.preview-stage {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.preview-shirt {
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  background: rgba(0,0,0,.25);
+  padding: 14px;
+}
+
+.preview-image img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 6px;
+}
+
+.preview-meta {
+  font-family: "Courier New", monospace;
+  font-size: 12px;
+  color: var(--soft);
+  letter-spacing: 1.5px;
+}
+
+.form-card {
+  background: rgba(8, 20, 44, 0.55);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 30px 32px 32px;
+}
+
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+@media (max-width: 720px) { .form-grid { grid-template-columns: 1fr; } }
+
+.field { display: flex; flex-direction: column; gap: 6px; }
+.field label {
+  font-size: 11px;
+  letter-spacing: 2.4px;
+  text-transform: uppercase;
+  color: var(--soft);
+}
+.field input,
+.field select {
+  font-family: inherit;
+  font-size: 17px;
+  color: var(--ink);
+  background: rgba(0,0,0,0.3);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 11px 14px;
+  transition: border-color .15s ease;
+}
+.field input:focus,
+.field select:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+@media (max-width: 480px) { .field-row { grid-template-columns: 1fr; } }
+
+.size-row, .color-row { display: flex; flex-wrap: wrap; gap: 8px; }
+
+.swatch {
+  width: 38px; height: 38px; border-radius: 50%; cursor: pointer; border: 1px solid var(--line);
+  display: inline-block; position: relative; transition: transform .12s ease;
+}
+.swatch[data-selected="true"] { transform: scale(1.08); border-color: var(--accent); }
+
+.chip {
+  border: 1px solid var(--line); padding: 8px 14px; border-radius: 999px;
+  letter-spacing: 1.5px; font-size: 12px; background: rgba(0,0,0,.25); color: var(--soft);
+  cursor: pointer; text-transform: uppercase; transition: all .18s ease;
+}
+.chip[data-selected="true"] { background: var(--accent); color: #15110a; border-color: var(--accent); font-weight: 600; }
+
+.city-suggestions {
+  display: flex; gap: 8px; flex-wrap: wrap; margin-top: 6px;
+}
+
+.price-card {
+  margin-top: 32px;
+  padding: 22px 24px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: rgba(0,0,0,.32);
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 18px;
+  align-items: center;
+}
+
+.price-card .total { font-size: 38px; font-weight: 700; letter-spacing: 1px; }
+.price-card .each-line { font-style: italic; color: var(--soft); font-size: 13px; margin-top: 6px; letter-spacing: 1px; }
+
+.pay-btn {
+  border: none; cursor: pointer;
+  background: linear-gradient(180deg, #e9c184, #c29755);
+  color: #1a1206;
+  font-weight: 700;
+  font-size: 16px;
+  letter-spacing: 4px;
+  padding: 16px 28px;
+  border-radius: 10px;
+  text-transform: uppercase;
+  transition: transform .12s ease, box-shadow .15s ease;
+  box-shadow: 0 6px 18px rgba(0,0,0,.4);
+}
+.pay-btn:hover { transform: translateY(-1px); box-shadow: 0 14px 30px rgba(0,0,0,.55); }
+.pay-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
+
+.banner {
+  padding: 14px 18px;
+  border-radius: 10px;
+  margin-bottom: 26px;
+  font-size: 14px;
+  letter-spacing: 0.5px;
+}
+.banner.info { background: rgba(255,255,255,.05); border: 1px solid var(--line); color: var(--soft); }
+.banner.good { background: rgba(102,204,138,.08); border-color: var(--good); color: var(--good); }
+.banner.warn { background: rgba(215,107,58,.10); border-color: var(--warn); color: var(--warn); }
+
+.story {
+  margin-top: 38px;
+  padding-top: 26px;
+  border-top: 1px solid var(--faint);
+  color: var(--soft);
+  font-style: italic;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  font-size: 15px;
+}
+.story strong { color: var(--ink); font-style: normal; display: block; margin-bottom: 6px; letter-spacing: 1.5px; }
+
+@media (max-width: 720px) { .story { grid-template-columns: 1fr; } }
+
+.success-card {
+  background: rgba(8, 20, 44, 0.55);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 36px 40px;
+}
+
+.success-card h1 { font-size: 36px; margin: 0 0 14px; letter-spacing: 1px; }
+.success-card .meta { font-family: "Courier New", monospace; color: var(--soft); font-size: 14px; }
+.status-line { font-family: "Courier New", monospace; font-size: 14px; }
+.status-line .ok { color: var(--good); }
+
+.field label .help { color: var(--faint); text-transform: none; letter-spacing: 0; font-size: 12px; }
