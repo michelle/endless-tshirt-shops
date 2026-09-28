@@ -1,0 +1,8 @@
+{
+  "functions": {
+    "src/app/api/design.png/route.ts": {
+      "memory": 2048,
+      "maxDuration": 60
+    }
+  }
+}
