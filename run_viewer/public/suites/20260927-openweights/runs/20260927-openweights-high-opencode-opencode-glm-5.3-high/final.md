@@ -1,0 +1,1 @@
+Everything is green in production. The last unverified piece is the **paid** path: completing a hosted Stripe Checkout payment, which fires the real webhook into Prodigi. Let me create a test checkout session and see if I can get a human hand for the card entry step.
