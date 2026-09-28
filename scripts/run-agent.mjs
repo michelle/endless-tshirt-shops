@@ -32,7 +32,15 @@ const args = provider === 'claude'
   // and BENCHMARK_REASONING_EFFORT is recorded but never turned into a flag.
   // An alias naming a variant the model does not have fails loudly with
   // provider.no-route rather than running at another effort.
-  ? ['run', '--auto', '--format', 'json', '-m', env.BENCHMARK_MODEL, ...extra, prompt]
+  //
+  // --standalone gives the run a private server instead of the background
+  // service every other opencode process shares. A shared service is reachable
+  // from outside the run -- an unrelated `opencode` command on the machine
+  // proved it during a suite -- and a session it drops surfaces only as
+  // `aborted: Session interrupted: shutdown`, indistinguishable from the agent
+  // giving up. Benchmark runs are supposed to be isolated; this makes the
+  // server isolated too.
+  ? ['run', '--standalone', '--auto', '--format', 'json', '-m', env.BENCHMARK_MODEL, ...extra, prompt]
   : ['exec', '--dangerously-bypass-approvals-and-sandbox', '--skip-git-repo-check', '--ephemeral', '--disable', 'memories', '--disable', 'external_agent_memory_import', '--color', 'never', '--json', '--cd', env.BENCHMARK_WORKSPACE, '--model', env.BENCHMARK_MODEL, '--output-last-message', env.BENCHMARK_FINAL_OUTPUT, ...(effort ? ['--config', `model_reasoning_effort="${effort}"`] : []), ...extra, prompt];
 // Kimi keeps config, credentials, sessions and history in one home directory.
 // A fresh home per run replaces memory-disabled flags: nothing carries over

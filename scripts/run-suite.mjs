@@ -8,17 +8,19 @@ import { git, identifier, hash } from './run-inspector/common.mjs';
 
 // The open-weights comparison. OpenCode aliases carry the reasoning effort as a
 // variant suffix, since the CLI has no effort flag, and only some models publish
-// one: glm-5.3, deepseek-v4-pro and the GPT-6 pair accept #high, while
-// qwen3.8-max, minimax-m3 and kimi-k3 have no variants and run at their provider
-// default. The opencode-go provider reaches the same models but needs Global
-// regions enabled on the workspace, so the plain opencode aliases are used.
+// one: glm-5.3 and the GPT-6 pair accept #high, while qwen3.8-max, minimax-m3
+// and kimi-k3 have no variants and run at their provider default.
+// deepseek-v4-pro publishes #high but its provider rejected it mid-run with
+// "native reasoning control reasoning_effort is not allowed", so it runs bare.
+// The opencode-go provider reaches the same models but needs Global regions
+// enabled on the workspace, so the plain opencode aliases are used.
 // scripts/preflight-clis.mjs probes every alias here before a suite launches.
 //
 // kimi-code/k3 and opencode/kimi-k3 are the same weights on two harnesses: the
 // pair is the control that separates scaffold effect from model effect.
 export const models = [
   ['kimi', 'kimi-code/kimi-for-coding'], ['kimi', 'kimi-code/k3'],
-  ['opencode', 'opencode/glm-5.3#high'], ['opencode', 'opencode/deepseek-v4-pro#high'],
+  ['opencode', 'opencode/glm-5.3#high'], ['opencode', 'opencode/deepseek-v4-pro'],
   ['opencode', 'opencode/qwen3.8-max'], ['opencode', 'opencode/minimax-m3'],
   ['opencode', 'opencode/kimi-k3'],
 ];

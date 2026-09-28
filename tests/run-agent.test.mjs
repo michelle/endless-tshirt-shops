@@ -137,6 +137,9 @@ test('OpenCode json launch passes the model alias verbatim and keeps final.md to
   const args = JSON.parse(await readFile(`${r.dir}/args.json`));
   assert.equal(args[0], 'run');
   assert.ok(args.includes('--auto'));
+  // A private server per run: the shared background service is reachable from
+  // outside the run and drops sessions as an indistinguishable "shutdown".
+  assert.ok(args.includes('--standalone'), 'opencode must not share the background service');
   assert.equal(args[args.indexOf('--format') + 1], 'json');
   // The CLI has no effort flag: effort travels as a variant inside the alias,
   // so a requested effort must never become a flag of its own.

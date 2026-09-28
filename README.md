@@ -106,6 +106,21 @@ change it only between suites. `kimi-code/k3` and `opencode/kimi-k3` are the
 same weights on two harnesses — the pair is the control that separates
 scaffold effect from model effect.
 
+Two generated paths never publish. `scripts/exclude-bulky-artifacts.mjs` keeps
+dependency and build directories, and any single file at or above 90 MB, out of
+the staged tree, recording each one in `metadata.excluded_paths`. The runner
+already strips these when copying the agent workspace, but `minimax-m3` shipped
+no `.gitignore` and its `node_modules` reached the index anyway, where a 109.6 MB
+binary made GitHub refuse the push after the run had been paid for. This is a
+second line of defence at the layer that decides what gets committed.
+
+A run whose stream ends mid-thought leaves no URL in `final.md` even though it
+deployed — `glm-5.3` shipped a working store and published `deployment_url` `""`.
+When the report names none, every `vercel.app` host the private log saw is
+recorded in `deployment_url_candidates`. That is deliberately a list, not a
+guess: agents probe unrelated hosts, one of them a known-nonexistent domain used
+as a control, so picking automatically would publish a confident wrong answer.
+
 OpenCode's `opencode-go/*` aliases reach the same models but require Global
 regions on the workspace's OpenCode Console privacy settings; without that they
 fail with `provider.invalid-request` on the first request, so the plain
@@ -144,7 +159,8 @@ runs/<run-id>/
   final.md        the agent's completion report
   events.jsonl    normalized tool and web events (no raw inputs or results)
   capture.json    capture coverage, warnings, schema version
-  metadata.json   suite, prompt + hash, model, effort, CLI version, usage, redactions, tree hashes, status, timing, URL
+  metadata.json   suite, prompt + hash, model, effort, CLI version, usage, redactions,
+                  excluded paths, tree hashes, status, timing, URL + candidates
   usage.json      provider-reported token usage
 ```
 
@@ -235,12 +251,16 @@ effort flag, Kimi models run at their provider-default effort (`max` for
 `kimi-for-coding`, `high` for `k3`) regardless of `--reasoning-effort`; the
 requested value is still recorded in metadata.
 
-OpenCode (`opencode run --auto --format json -m provider/model[#variant]`) creates a
-fresh session per run and answers permission asks itself — questions and plan
+OpenCode (`opencode run --standalone --auto --format json -m provider/model[#variant]`)
+creates a fresh session per run and answers permission asks itself — questions and plan
 transitions are denied outright in non-interactive mode — so it never
 prompts, but it keeps its session records in the operator's global opencode
 state directory rather than the capture directory, the same trust domain as
-the other CLIs' own session stores. Usage comes from every `step_finish`
+the other CLIs' own session stores. `--standalone` gives each run a private
+server: the shared background service is reachable from any other `opencode`
+command on the machine, and a session it drops surfaces only as
+`aborted: Session interrupted: shutdown`, indistinguishable from the agent
+giving up. Usage comes from every `step_finish`
 event and is summed into `usage.json`, with fresh input computed per step so
 re-counted cache volume does not drown it. Some models emit no `step_finish` at
 all, and those runs publish no `usage.json` the way Kimi runs do not. One sharp
