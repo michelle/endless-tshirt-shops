@@ -1,0 +1,60 @@
+{
+  "opus55": {
+    "screenshot": "/suites/20260928-latest/runs/20260928-latest-high-claude-claude-opus-5-5/storefront.png",
+    "favicon": {
+      "path": "/suites/20260928-latest/runs/20260928-latest-high-claude-claude-opus-5-5/favicon.ico",
+      "source": "https://benchmark-20260928-latest-high-clau.vercel.app/favicon.ico?favicon.3fpu2ql9ns1a0.ico",
+      "mime": "image/x-icon"
+    },
+    "faviconStatus": "found",
+    "socialPreview": null,
+    "socialPreviewStatus": "missing",
+    "url": "https://benchmark-20260928-latest-high-clau.vercel.app/",
+    "title": "SPECIMEN — you are a rare species",
+    "width": 1440,
+    "height": 900,
+    "capturedAt": "2026-09-28T21:30:09.952Z",
+    "httpStatus": 200,
+    "errors": [],
+    "browser": "151.0.7922.34",
+    "deviceScaleFactor": 1,
+    "colorScheme": "light",
+    "timezone": "America/Los_Angeles"
+  },
+  "gsol": {
+    "screenshot": "/suites/20260928-latest/runs/20260928-latest-high-codex-gpt-6-sol/storefront.png",
+    "favicon": null,
+    "faviconStatus": "missing",
+    "socialPreview": null,
+    "socialPreviewStatus": "missing",
+    "url": "https://benchmark-20260928-latest-high-code.vercel.app/",
+    "title": "Nightmark — Wear the moment",
+    "width": 1440,
+    "height": 900,
+    "capturedAt": "2026-09-28T21:30:11.973Z",
+    "httpStatus": 200,
+    "errors": [],
+    "browser": "151.0.7922.34",
+    "deviceScaleFactor": 1,
+    "colorScheme": "light",
+    "timezone": "America/Los_Angeles"
+  },
+  "gluna": {
+    "screenshot": "/suites/20260928-latest/runs/20260928-latest-high-codex-gpt-6-luna/storefront.png",
+    "favicon": null,
+    "faviconStatus": "missing",
+    "socialPreview": null,
+    "socialPreviewStatus": "missing",
+    "url": "https://benchmark-20260928-latest-high-code-silk.vercel.app/",
+    "title": "Night Atlas — Wear your coordinates",
+    "width": 1440,
+    "height": 900,
+    "capturedAt": "2026-09-28T21:30:13.281Z",
+    "httpStatus": 200,
+    "errors": [],
+    "browser": "151.0.7922.34",
+    "deviceScaleFactor": 1,
+    "colorScheme": "light",
+    "timezone": "America/Los_Angeles"
+  }
+}
