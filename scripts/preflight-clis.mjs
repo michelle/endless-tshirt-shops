@@ -75,9 +75,16 @@ for (const adapter of Object.keys(adapters)) {
   console.log(`${adapter.padEnd(9)} ${version.stdout.trim().split('\n')[0] || 'ok'}`);
   if (!adapters[adapter].list) continue;
   const listing = await exec(adapter, adapters[adapter].list, { timeout: 60_000 });
-  // A listing that cannot be read leaves the catalogue unset, which downgrades
-  // its aliases to unverified rather than reporting them as absent.
-  if (listing.code === 0) try { resolved.set(`${adapter}:models`, new Set(adapters[adapter].aliases(listing.stdout))); } catch { /* see above */ }
+  // A listing that cannot be read, or that comes back empty, leaves the
+  // catalogue unset, which downgrades its aliases to unverified rather than
+  // reporting them as absent. `opencode models` has been observed exiting 0
+  // with no output while every alias still routed: trusting that as authority
+  // would fail a whole roster that works.
+  if (listing.code === 0) try {
+    const aliases = adapters[adapter].aliases(listing.stdout);
+    if (aliases.length) resolved.set(`${adapter}:models`, new Set(aliases));
+    else console.log(`${''.padEnd(9)} (${adapter} listed no models; aliases fall back to --route)`);
+  } catch { /* see above */ }
 }
 
 console.log('');
