@@ -1,4 +1,9 @@
 export const statusDefinitions: Record<string, string> = {
+  "unaudited": "No human audit has been performed. The status reflects what the harness recorded and what the agent claimed about its own work, not verified behaviour.",
+  "Deployed": "A storefront URL was recorded for this run. Nothing about payment, fulfilment or correctness is implied.",
+  "Never deployed": "The run finished without shipping a storefront: no deployment URL was recorded, no project exists, and no storefront host appears in the private log.",
+  "Aborted on question": "The agent stopped to ask a human for help with a step it could not complete alone. The harness runs non-interactively and denies questions, so the session ended there.",
+  "URL not captured": "The run deployed, but its report ended mid-sentence and named no URL, so the harness recorded none. The storefront is reachable; the archived metadata understates the run.",
   "Sandbox checkout": "The customer flow created a Prodigi sandbox order without collecting a real payment. Sandbox orders are API test evidence only and are not manufactured or shipped.",
   "Provider limit": "The model adapter stopped because the provider's shared session quota was exhausted. This is an availability failure, not a completed implementation assessment.",
   "partial build": "A workspace contains meaningful implementation work, but the run ended before deployment and end-to-end verification.",
