@@ -67,6 +67,18 @@ extract_url() {
     head -n 1 || true
 }
 
+url_candidates() {
+  # A run whose stream ends mid-thought leaves no URL in final.md even though it
+  # deployed: glm-5.3 shipped a working store and published deployment_url "".
+  # The private raw log still holds every host the agent touched, so they are
+  # recorded as candidates for the audit. Deliberately not a guess -- agents
+  # probe unrelated hosts (one used a known-nonexistent domain as a control), so
+  # picking one automatically would publish the wrong answer with confidence.
+  grep -Eo 'https://[a-z0-9][a-z0-9.-]*\.vercel\.(app|sh)' "$1" 2>/dev/null |
+    sort -u | head -n 20 |
+    node -e 'let s = ""; process.stdin.on("data", d => s += d).on("end", () => process.stdout.write(JSON.stringify(s.split("\n").filter(Boolean))));' 2>/dev/null || printf '[]'
+}
+
 assert_no_staged_secrets() {
   ( cd "${1:-$REPO_ROOT}" && bash "$SCRIPT_DIR/check-run-artifacts" "$RUN_ID" ) ||
     die "artifact publication checks failed"
@@ -393,6 +405,9 @@ if [[ ! -s $FINAL_OUTPUT ]]; then
 fi
 
 DEPLOYMENT_URL=$(extract_url "$FINAL_OUTPUT")
+# Only when the report named none, so a confident answer is never diluted.
+URL_CANDIDATES='[]'
+[[ -n $DEPLOYMENT_URL ]] || URL_CANDIDATES=$(url_candidates "$RAW_LOG")
 USAGE_JSON=null
 if [[ -s $USAGE_OUTPUT ]]; then
   # Compact, so this one-line value nests correctly in the object built below.
@@ -408,7 +423,16 @@ PROMPT_SHA=$(shasum -a 256 "$BENCHMARK_PROMPT_FILE" | awk '{print $1}')
 # touched; check-run-artifacts still fails closed on anything unanticipated.
 REDACTIONS=$(node "$SCRIPT_DIR/redact-run-secrets.mjs" "$RUN_ID") ||
   die "credential redaction failed; refusing to publish"
-git add "$WORKSPACE"
+# Keep dependencies and build output out of the archive. The runner used to rely
+# on the agent writing its own .gitignore; an agent that wrote none staged 289 MB
+# and GitHub refused the push after the run had already been paid for.
+EXCLUSIONS=$(node "$SCRIPT_DIR/exclude-bulky-artifacts.mjs" "$RUN_ID") ||
+  die "could not determine generated paths; refusing to publish"
+EXCLUDE_ARGS=()
+while IFS= read -r -d '' excluded; do
+  EXCLUDE_ARGS+=(":(exclude)$excluded")
+done < <(printf '%s' "$EXCLUSIONS" | node -e 'let s = ""; process.stdin.on("data", d => s += d).on("end", () => { for (const entry of JSON.parse(s)) process.stdout.write(entry.path + "\0"); });')
+git add "$WORKSPACE" ${EXCLUDE_ARGS[@]+"${EXCLUDE_ARGS[@]}"}
 WORKSPACE_TREE=$(git write-tree)
 {
   printf '{\n'
@@ -436,6 +460,8 @@ WORKSPACE_TREE=$(git write-tree)
   printf '  "agent_exit_code": %s,\n' "$AGENT_EXIT"
   printf '  "usage": %s,\n' "$USAGE_JSON"
   printf '  "redactions": %s,\n' "$REDACTIONS"
+  printf '  "excluded_paths": %s,\n' "$EXCLUSIONS"
+  printf '  "deployment_url_candidates": %s,\n' "$URL_CANDIDATES"
   printf '  "deployment_url": '; json_string "$DEPLOYMENT_URL"; printf '\n}\n'
 } >"$METADATA"
 
