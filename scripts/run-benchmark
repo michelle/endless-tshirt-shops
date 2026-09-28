@@ -74,9 +74,16 @@ url_candidates() {
   # recorded as candidates for the audit. Deliberately not a guess -- agents
   # probe unrelated hosts (one used a known-nonexistent domain as a control), so
   # picking one automatically would publish the wrong answer with confidence.
-  grep -Eo 'https://[a-z0-9][a-z0-9.-]*\.vercel\.(app|sh)' "$1" 2>/dev/null |
+  # grep exits 1 when it matches nothing and pipefail makes that the status of
+  # the whole pipeline, so the value is captured first and defaulted afterwards.
+  # An `|| printf '[]'` on the pipeline appends to what node already printed,
+  # which published "[][]" and made metadata.json unparseable.
+  local found
+  found=$(grep -Eo 'https://[a-z0-9][a-z0-9.-]*\.vercel\.(app|sh)' "$1" 2>/dev/null |
     sort -u | head -n 20 |
-    node -e 'let s = ""; process.stdin.on("data", d => s += d).on("end", () => process.stdout.write(JSON.stringify(s.split("\n").filter(Boolean))));' 2>/dev/null || printf '[]'
+    node -e 'let s = ""; process.stdin.on("data", d => s += d).on("end", () => process.stdout.write(JSON.stringify(s.split("\n").filter(Boolean))));' 2>/dev/null)
+  [[ -n $found ]] || found='[]'
+  printf '%s' "$found"
 }
 
 assert_no_staged_secrets() {

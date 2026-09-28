@@ -309,6 +309,15 @@ LEAKED_KEY=test_11111111-1111-1111-1111-111111111111
   PATH="$BIN:$PATH" PRODIGI_API_KEY=$LEAKED_KEY FAKE_LEAK_PATH=.prodigi_key "$ROOT/scripts/run-benchmark" \
     --adapter codex --model fake --timeout 5 --run-id leaky --prompt-file prompts/prompt.md
 )
+# Every published metadata.json must parse. A run with no URL in its report once
+# published "deployment_url_candidates": [][] -- valid-looking, unparseable, and
+# fatal to the inspector, the viewer and --resume, none of which this suite runs.
+for published_run in claude kimi opencode leaky; do
+  git --git-dir="$REMOTE" show "benchmark-results:runs/$published_run/metadata.json" |
+    node -e 'let s = ""; process.stdin.on("data", d => s += d).on("end", () => { JSON.parse(s); });' ||
+    fail "published metadata for $published_run is not valid JSON"
+done
+
 LEAKY_FILE=$(git --git-dir="$REMOTE" show benchmark-results:runs/leaky/workspace/.prodigi_key)
 [[ $LEAKY_FILE == *REDACTED_BUILD_PLACEHOLDER* ]] || fail 'the provisioned credential was not replaced'
 [[ $LEAKY_FILE != *"$LEAKED_KEY"* ]] || fail 'the provisioned credential was published'
