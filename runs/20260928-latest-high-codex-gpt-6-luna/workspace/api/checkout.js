@@ -1,0 +1,14 @@
+const LIMITS={place:28,dedication:36,date:10};
+const clean=(v,n)=>String(v||'').trim().slice(0,n);
+module.exports=async function(req,res){
+ if(req.method!=='POST')return res.status(405).json({error:'Method not allowed.'});
+ if(!process.env.STRIPE_SECRET_KEY)return res.status(503).json({error:'Secure checkout is not configured yet. Please check back soon.'});
+ try{
+  const b=req.body||{};const size=String(b.size||'m').toLowerCase();const allowed=['s','m','l','xl','2xl','3xl'];const colors=['black','navy blue','white','sand','dark heather grey'];
+  const lat=Number(b.lat),lon=Number(b.lon);if(!allowed.includes(size)||!colors.includes(b.color)||!Number.isFinite(lat)||lat < -90||lat>90||!Number.isFinite(lon)||lon < -180||lon>180) return res.status(400).json({error:'Please check your size, color, and coordinates.'});
+  const metadata={design_place:clean(b.place,LIMITS.place),design_note:clean(b.dedication,LIMITS.dedication),design_lat:lat.toFixed(4),design_lon:lon.toFixed(4),design_date:clean(b.date,LIMITS.date),shirt_size:size,shirt_color:b.color,product:'GLOBAL-TEE-GIL-64000'};
+  if(!metadata.design_place||!metadata.design_note||!/^\d{4}-\d{2}-\d{2}$/.test(metadata.design_date))return res.status(400).json({error:'Please complete each personalization field.'});
+  const origin=`https://${req.headers.host}`;const form=new URLSearchParams();form.set('mode','payment');form.set('success_url',origin+'/?success=1&session_id={CHECKOUT_SESSION_ID}');form.set('cancel_url',origin+'/#design');form.set('billing_address_collection','auto');form.set('shipping_address_collection[allowed_countries]','US,CA,GB,AU,NZ,IE,FR,DE,ES,IT,NL,BE,AT,DK,SE,FI,NO,CH,PT');form.set('shipping_options[0][shipping_rate_data][type]','fixed_amount');form.set('shipping_options[0][shipping_rate_data][fixed_amount][amount]','595');form.set('shipping_options[0][shipping_rate_data][fixed_amount][currency]','usd');form.set('shipping_options[0][shipping_rate_data][display_name]','Tracked standard shipping');form.set('line_items[0][quantity]','1');form.set('line_items[0][price_data][currency]','usd');form.set('line_items[0][price_data][unit_amount]','3800');form.set('line_items[0][price_data][product_data][name]','Night Atlas Coordinates Tee');form.set('line_items[0][price_data][product_data][description]',`${metadata.design_place} · ${metadata.design_note} · ${size.toUpperCase()} · ${b.color}`);for(const [k,v] of Object.entries(metadata))form.set(`metadata[${k}]`,v);
+  const r=await fetch('https://api.stripe.com/v1/checkout/sessions',{method:'POST',headers:{Authorization:`Bearer ${process.env.STRIPE_SECRET_KEY}`,'Content-Type':'application/x-www-form-urlencoded'},body:form});const j=await r.json();if(!r.ok)throw new Error(j.error?.message||'Payment provider error.');return res.status(200).json({url:j.url});
+ }catch(e){return res.status(502).json({error:'We could not start checkout. Please try again.'})}
+};

@@ -1,0 +1,7 @@
+{
+  "name": "night-atlas-shirts",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {"build": "node -e \"console.log('Night Atlas ready for Vercel')\""},
+  "dependencies": {"sharp": "^0.34.3"}
+}
