@@ -51,9 +51,42 @@ const models = {
   minimax: "MiniMax · minimax-m3",
   qwen: "Qwen · qwen3.8-max",
   glm: "Z.ai · glm-5.3",
+  opus55: "Claude · claude-opus-5-5",
+  gsol: "OpenAI · gpt-6-sol",
+  gluna: "OpenAI · gpt-6-luna",
 };
 
 export const suites: Suite[] = [
+  {
+    id: "20260928-latest",
+    label: "2026-09-28 · Prompt v3 · Three models released in a fortnight [unaudited]",
+    incomplete: true,
+    summary: "/suites/20260928-latest/summary.md",
+    prompt: { path: "/suites/20260928-latest/prompt.md", file: "prompts/prompt-v3.md", revision: "0ce2dea2ba772e4c485ccc8f89e59260e2ec4dda", sha256: "30868370940510cfeb6f8c1da9e0f748ad6ac4f3e1e5e59e3e85adcecc910f99" },
+    runs: [
+      {
+        id: "opus55", model: models.opus55, commit: "0ce2dea2", status: "Deployed · unaudited",
+        deployment: "https://benchmark-20260928-latest-high-clau.vercel.app",
+        finalOutput: "/suites/20260928-latest/runs/20260928-latest-high-claude-claude-opus-5-5/final.md",
+        design: null, width: null, height: null, alpha: "No archived artwork",
+        evidence: "SPECIMEN. Describe a person or pet and it invents a moth, butterfly or beetle in their honour, as a page from an old field guide: a Latin name built from theirs, habitat, diet, a call, three numbered distinguishing marks. The only run here that found the payment CLI and wired payment-gated fulfilment; 75 files, the most in this suite. Wrote its credentials into two workspace files under .secrets/, replaced before publication and recorded in the run's metadata. Unaudited.",
+      },
+      {
+        id: "gsol", model: models.gsol, commit: "0ce2dea2", status: "Deployed · no payment integration · unaudited",
+        deployment: "https://benchmark-20260928-latest-high-code.vercel.app",
+        finalOutput: "/suites/20260928-latest/runs/20260928-latest-high-codex-gpt-6-sol/final.md",
+        design: null, width: null, height: null, alpha: "No archived artwork",
+        evidence: "Nightmark, a constellation tee personalised by date, place and title. Never found the pre-provisioned payment CLI and says so: the payment button reports setup pending. Shipped a fail-closed checkout that refuses to fulfil without verified payment, which is right given what it believed, but the payment and fulfilment half of the task was not attempted. The 11 minutes is a smaller job, not faster work. Unaudited.",
+      },
+      {
+        id: "gluna", model: models.gluna, commit: "0ce2dea2", status: "Deployed · no payment integration · unaudited",
+        deployment: "https://benchmark-20260928-latest-high-code-silk.vercel.app",
+        finalOutput: "/suites/20260928-latest/runs/20260928-latest-high-codex-gpt-6-luna/final.md",
+        design: null, width: null, height: null, alpha: "No archived artwork",
+        evidence: "Night Atlas, a constellation tee personalised by date, place and dedication. Its report opens by saying Stripe Checkout and a signed payment-gated webhook are implemented; its own Gaps section then concedes checkout cannot accept payment until keys are configured. The code paths exist, the integration does not. Nine files in seven minutes, the smallest run in the benchmark. Unaudited.",
+      },
+    ],
+  },
   {
     id: "20260927-openweights",
     label: "2026-09-27 · Prompt v3 · Seven open-weight models [unaudited]",
