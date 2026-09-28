@@ -1,0 +1,18 @@
+{
+  "id": "we_1UKkYJIB7BLK3BMH1cFfcmwb",
+  "object": "webhook_endpoint",
+  "api_version": null,
+  "application": null,
+  "created": 1790624971,
+  "description": "SPECIMEN store fulfilment",
+  "enabled_events": [
+    "checkout.session.completed",
+    "checkout.session.async_payment_succeeded",
+    "checkout.session.async_payment_failed"
+  ],
+  "livemode": false,
+  "metadata": {},
+  "secret": "REDACTED_BUILD_PLACEHOLDER",
+  "status": "enabled",
+  "url": "https://benchmark-20260928-latest-high-clau.vercel.app/api/webhooks/stripe"
+}
