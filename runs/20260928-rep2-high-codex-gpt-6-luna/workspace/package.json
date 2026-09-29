@@ -1,0 +1,9 @@
+{
+  "name": "somewhere-always-store",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Personalized memory constellation t-shirt store",
+  "dependencies": {
+    "sharp": "^0.34.3"
+  }
+}
