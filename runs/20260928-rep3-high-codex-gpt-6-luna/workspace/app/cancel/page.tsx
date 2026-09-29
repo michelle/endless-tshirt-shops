@@ -1,0 +1,2 @@
+import Link from 'next/link';
+export default function Cancel(){return <main className="result-page"><div className="result-card"><span className="result-star">✧</span><p className="eyebrow">YOUR DESIGN IS STILL HERE</p><h1>No rush.<br/><em>It can wait.</em></h1><p>Your checkout was canceled. Your little garden is still here whenever you’re ready.</p><Link className="buy-button" href="/#customize">RETURN TO YOUR DESIGN <span>↗</span></Link></div></main>}

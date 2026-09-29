@@ -1,0 +1,2 @@
+import Link from 'next/link';
+export default function Success(){return <main className="result-page"><div className="result-card"><span className="result-star">✳</span><p className="eyebrow">PAYMENT RECEIVED</p><h1>Your garden<br/><em>is growing.</em></h1><p>We’ve received your payment. Your personalized print is now being prepared for our print partner.</p><p className="result-small">Stripe will email your receipt. This store does not show production or tracking status yet.</p><Link className="buy-button" href="/">BACK TO THE GARDEN <span>↗</span></Link></div></main>}
