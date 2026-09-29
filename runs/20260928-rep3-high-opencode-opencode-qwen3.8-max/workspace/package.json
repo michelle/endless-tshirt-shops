@@ -1,0 +1,29 @@
+{
+  "name": "starryborn",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Starryborn — wear the sky from the night you were born. Personalised star-chart t-shirts, computed from real astronomy and printed on demand.",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "catalog": "node scripts/build-catalog.mjs"
+  },
+  "dependencies": {
+    "@resvg/resvg-js": "^2.6.2",
+    "luxon": "^3.5.0",
+    "next": "^15.3.3",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "stripe": "^17.7.0",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@types/luxon": "^3.4.2",
+    "@types/node": "^20.17.0",
+    "@types/react": "^19.1.0",
+    "@types/react-dom": "^19.1.0",
+    "typescript": "^5.7.0"
+  }
+}
