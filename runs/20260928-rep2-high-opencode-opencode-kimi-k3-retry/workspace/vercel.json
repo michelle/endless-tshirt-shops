@@ -1,0 +1,7 @@
+{
+  "functions": {
+    "app/api/art/route.js": { "memory": 3008, "maxDuration": 60 },
+    "app/api/webhooks/stripe/route.js": { "maxDuration": 30 },
+    "app/success/page.jsx": { "maxDuration": 30 }
+  }
+}

@@ -1,0 +1,66 @@
+[
+  {
+    "word": "stardust",
+    "palette": "ultraviolet",
+    "name": "Ultraviolet",
+    "edition": "5K33B1",
+    "style": "bloom",
+    "file": "/samples/stardust-ultraviolet.webp"
+  },
+  {
+    "word": "marina",
+    "palette": "glacier",
+    "name": "Glacier",
+    "edition": "K51HZJ",
+    "style": "bloom",
+    "file": "/samples/marina-glacier.webp"
+  },
+  {
+    "word": "ember days",
+    "palette": "ember",
+    "name": "Ember",
+    "edition": "VPGPHM",
+    "style": "tangle",
+    "file": "/samples/ember-days-ember.webp"
+  },
+  {
+    "word": "wildwood",
+    "palette": "moss",
+    "name": "Moss",
+    "edition": "Q03H3E",
+    "style": "current",
+    "file": "/samples/wildwood-moss.webp"
+  },
+  {
+    "word": "golden hour",
+    "palette": "sunset",
+    "name": "Sunset",
+    "edition": "KW3TGV",
+    "style": "tangle",
+    "file": "/samples/golden-hour-sunset.webp"
+  },
+  {
+    "word": "mono",
+    "palette": "signal",
+    "name": "Signal",
+    "edition": "4VRQTY",
+    "style": "bloom",
+    "file": "/samples/mono-signal.webp"
+  },
+  {
+    "word": "fieldnotes",
+    "palette": "paper",
+    "name": "Paper & Ink",
+    "edition": "Z10VPP",
+    "style": "tangle",
+    "file": "/samples/fieldnotes-paper.webp"
+  },
+  {
+    "word": "supernova",
+    "palette": "ultraviolet",
+    "name": "Ultraviolet",
+    "edition": "QB7PJK",
+    "style": "current",
+    "file": "/samples/supernova-ultraviolet.webp"
+  }
+]

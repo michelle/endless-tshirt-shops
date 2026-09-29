@@ -1,0 +1,19 @@
+{
+  "name": "oneofone-studio",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "ONE OF ONE STUDIO — type a word, we grow it into art, printed on exactly one shirt on Earth.",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start"
+  },
+  "dependencies": {
+    "next": "^15.5.4",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
+    "sharp": "^0.34.3",
+    "stripe": "^18.5.0"
+  }
+}
