@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Nightshift — the sky above the moment that mattered</title>
+  <meta name="description" content="A one-of-one tee printed with the night sky exactly as it stood over your place and moment. Every shirt is computed from real star positions and printed on demand." />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <div class="notice hidden" id="cancelledNotice">Checkout cancelled — your design is still here.</div>
+
+  <header class="hero">
+    <div class="wordmark">NIGHTSHIFT</div>
+    <h1>The sky above the moment that mattered.</h1>
+    <p class="lede">
+      Pick a place and a moment — a first meeting, a birth, a last night. We compute the real
+      sky there and then, and print it on demand, directly onto the garment.
+      Every shirt is a one of one.
+    </p>
+  </header>
+
+  <main class="studio">
+    <section class="controls" aria-label="Design your shirt">
+
+      <div class="panel">
+        <h2>The moment</h2>
+        <div class="row">
+          <label>Date <input type="date" id="date" min="1901-01-01" max="2099-12-31" required /></label>
+          <label>Local time <input type="time" id="time" required /></label>
+        </div>
+        <p class="hint" id="timezoneHint">Times are local to the place you choose below.</p>
+      </div>
+
+      <div class="panel">
+        <h2>The place</h2>
+        <div class="search">
+          <input type="search" id="placeSearch" placeholder="Search a city or town — Cape May, Kyoto, Reykjavík…" autocomplete="off" />
+          <ul class="results hidden" id="placeResults"></ul>
+        </div>
+        <p class="hint" id="placeHint">No place chosen yet.</p>
+        <div class="error hidden" id="placeError"></div>
+        <details class="manual">
+          <summary>Enter coordinates manually</summary>
+          <div class="row">
+            <label>Latitude <input type="number" id="latInput" step="0.0001" min="-90" max="90" placeholder="40.713" /></label>
+            <label>Longitude <input type="number" id="lngInput" step="0.0001" min="-180" max="180" placeholder="-74.006" /></label>
+          </div>
+          <label>Place label for the print <input type="text" id="manualLabel" maxlength="60" placeholder="Cape May, New Jersey" /></label>
+          <p class="hint">Manual coordinates assume the place is in the UTC timezone unless it is a known zone.</p>
+        </details>
+      </div>
+
+      <div class="panel">
+        <h2>The words</h2>
+        <label class="full">Title <input type="text" id="title" maxlength="40" value="The night we met" /></label>
+        <p class="hint">Printed under the sky in serif capitals. Keep it short — it has to look good.</p>
+      </div>
+
+      <div class="panel">
+        <h2>The style</h2>
+        <div class="swatches" id="themeSwatches"></div>
+        <div class="toggles">
+          <label class="toggle"><input type="checkbox" id="showMoon" checked /> The Moon, with its real phase</label>
+          <label class="toggle"><input type="checkbox" id="showLines" checked /> Constellation figures</label>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>The shirt</h2>
+        <div class="swatches" id="colorSwatches"></div>
+        <div class="sizes" id="sizeButtons"></div>
+        <div class="row">
+          <label>Quantity
+            <select id="quantity"></select>
+          </label>
+        </div>
+        <p class="hint" id="garmentHint">Bella + Canvas 3001 unisex crew · printed front, direct to garment.</p>
+      </div>
+
+      <div class="panel summary">
+        <div class="line" id="priceLine">Tee $38.00</div>
+        <div class="line muted" id="shippingLine">US shipping $6.50</div>
+        <div class="line total" id="totalLine">Total $44.50</div>
+        <button class="primary" id="toShipping">Continue to shipping →</button>
+      </div>
+
+      <form class="panel shipping hidden" id="shippingPanel" novalidate>
+        <h2>Ship it to</h2>
+        <label class="full">Full name <input type="text" id="shipName" autocomplete="name" maxlength="60" required /></label>
+        <label class="full">Email <input type="email" id="shipEmail" autocomplete="email" maxlength="80" placeholder="you@example.com" required /></label>
+        <label class="full">Address line 1 <input type="text" id="shipLine1" autocomplete="address-line1" maxlength="60" required /></label>
+        <label class="full">Address line 2 <input type="text" id="shipLine2" autocomplete="address-line2" maxlength="40" placeholder="Apartment, unit (optional)" /></label>
+        <div class="row">
+          <label>City <input type="text" id="shipCity" autocomplete="address-level2" maxlength="40" required /></label>
+          <label>State / region <input type="text" id="shipState" autocomplete="address-level1" maxlength="30" placeholder="NJ" /></label>
+        </div>
+        <div class="row">
+          <label>Postal code <input type="text" id="shipZip" autocomplete="postal-code" maxlength="12" required /></label>
+          <label>Country <select id="shipCountry" required></select></label>
+        </div>
+        <button class="primary" type="submit" id="payButton">Pay with card</button>
+        <p class="hint">Checkout and payment are handled by Stripe. The print lab only receives your order after payment succeeds.</p>
+        <div class="error hidden" id="checkoutError"></div>
+      </form>
+    </section>
+
+    <aside class="preview" aria-label="Preview">
+      <div class="garment" id="garmentFrame">
+        <canvas id="previewCanvas" width="1080" height="1440"></canvas>
+      </div>
+      <p class="caption" id="garmentCaption">White Bella + Canvas 3001 · front print, 12 × 16″</p>
+      <p class="skystats" id="skyStats"></p>
+      <div class="works">
+        <h3>How a Nightshift shirt is made</h3>
+        <ol>
+          <li>Your moment and place give one exact instant — stars, constellations and the Moon are computed for it, in your timezone.</li>
+          <li>The sky is drawn once, full size, and you see the very file that will print.</li>
+          <li>After payment, the order goes to a print lab near the recipient and ships directly to you. No two are ever the same.</li>
+        </ol>
+      </div>
+    </aside>
+  </main>
+
+  <footer>
+    <p>Nightshift — a demo store. Sky computed from the HYG star catalogue with the Moon placed by a short lunar theory; printed via the Prodigi Print API; paid for via Stripe. Test data, no real charges or shipments.</p>
+  </footer>
+
+  <script type="module" src="/js/app.js"></script>
+</body>
+</html>

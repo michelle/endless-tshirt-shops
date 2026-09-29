@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Nightshift — your order</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body class="order-page">
+  <header class="hero">
+    <div class="wordmark">NIGHTSHIFT</div>
+    <h1 id="statusTitle">Confirming your order…</h1>
+    <p class="lede" id="statusBody">Checking with the print lab.</p>
+  </header>
+
+  <main class="confirmation">
+    <div class="spinner" id="spinner" aria-hidden="true"></div>
+    <div class="result hidden" id="result">
+      <canvas id="keepsakeCanvas" width="720" height="960"></canvas>
+      <div class="details">
+        <p class="ok" id="okLine">The sky above your moment is on its way.</p>
+        <p class="small">Print lab order <code id="prodigiOrder">—</code></p>
+        <p class="small" id="emailLine"></p>
+        <p class="small muted">
+          Your shirt is printed on demand and ships directly from the lab closest to you.
+          A confirmation sits in your inbox.
+        </p>
+      </div>
+    </div>
+    <div class="error hidden" id="orderError"></div>
+  </main>
+
+  <footer>
+    <p>Nightshift — a demo store. Orders go to the Prodigi sandbox only; no real charges or shipments.</p>
+  </footer>
+
+  <script type="module" src="/js/order.js"></script>
+</body>
+</html>
