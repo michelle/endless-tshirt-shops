@@ -1,0 +1,43 @@
+@import "tailwindcss";
+
+@theme inline {
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-cormorant), ui-serif, Georgia, serif;
+
+  --color-night-950: #05070f;
+  --color-night-900: #0b1026;
+  --color-night-850: #0e1430;
+  --color-night-800: #141a35;
+  --color-night-700: #1e2647;
+  --color-night-600: #2a3460;
+
+  --color-mist-100: #f2f5ff;
+  --color-mist-300: #c3cbe4;
+  --color-mist-500: #8a94b8;
+
+  --color-moonlight: #f6eedd;
+  --color-aurora: #8fb8ff;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--color-night-950);
+  color: var(--color-mist-100);
+  font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+}
+
+/* Decorative twinkling stars for the hero background */
+@keyframes twinkle {
+  0%, 100% { opacity: 0.25; }
+  50% { opacity: 1; }
+}
+
+.star {
+  position: absolute;
+  border-radius: 9999px;
+  background: #eaf2ff;
+  animation: twinkle 4s ease-in-out infinite;
+}
