@@ -1,0 +1,27 @@
+{
+  "name": "4000-fridays",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Custom life-in-weeks DTG t-shirt store: Stripe Checkout + Prodigi fulfilment.",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "preview:print": "node scripts/preview-print.mjs"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.19.43",
+    "@types/react": "^18.3.31",
+    "@types/react-dom": "^18.3.7",
+    "tsx": "^4.19.2",
+    "typescript": "^5.6.3"
+  },
+  "dependencies": {
+    "@resvg/resvg-js": "^2.6.2",
+    "next": "^14.2.35",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "stripe": "^18.5.0"
+  }
+}
