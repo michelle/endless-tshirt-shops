@@ -114,6 +114,12 @@ printf '%s\n' \
   '  *) echo "unexpected Vercel invocation: $*" >&2; exit 2 ;;' \
   'esac' >"$BIN/vercel"
 chmod +x "$BIN/vercel"
+printf '%s\n' \
+  '#!/usr/bin/env bash' \
+  'set -euo pipefail' \
+  '[[ $* == *benchmark-inspection-copy.vercel.app* ]]' \
+  'printf 200' >"$BIN/curl"
+chmod +x "$BIN/curl"
 ln -s "$BIN/codex" "$BIN_WITHOUT_TIMEOUT/codex"
 
 printf '%s\n' \
@@ -259,6 +265,7 @@ PROVIDER_METADATA=$(git --git-dir="$REMOTE" show benchmark-results:runs/provider
 [[ $PROVIDER_METADATA == *'"inspection_deployment_status": "succeeded"'* ]] || fail 'harness inspection deployment was not recorded'
 [[ $PROVIDER_METADATA == *'"inspection_deployment_url": "https://benchmark-inspection-copy.vercel.app"'* ]] || fail 'harness inspection URL was not recorded'
 assert test -s "$REPO/.benchmark-secrets/deployments/provider-choice.log"
+grep -q 'inspection_http_status=200' "$REPO/.benchmark-secrets/deployments/provider-choice.log" || fail 'inspection deployment was not health checked'
 assert test -f "$FAKE_VERCEL_STATE"
 assert test -f "$FAKE_VERCEL_STATE.public"
 LOG=$(git --git-dir="$REMOTE" show benchmark-results:runs/success/events.jsonl)
