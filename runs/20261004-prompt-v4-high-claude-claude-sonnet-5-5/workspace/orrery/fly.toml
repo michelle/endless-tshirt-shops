@@ -1,0 +1,25 @@
+# fly volumes create orrery_data --size 3 ; fly secrets set PRODIGI_API_KEY=... STRIPE_SECRET_KEY=... STRIPE_WEBHOOK_SECRET=... ADMIN_TOKEN=... BASE_URL=https://<app>.fly.dev
+app = "orrery-tees"
+primary_region = "iad"
+
+[build]
+
+[env]
+  PORT = "8080"
+  DATA_DIR = "/data"
+  TRUST_PROXY = "1"
+  PRODIGI_BASE_URL = "https://api.sandbox.prodigi.com/v4.0"
+
+[[mounts]]
+  source = "orrery_data"
+  destination = "/data"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = "off"
+  min_machines_running = 1
+  [[http_service.checks]]
+    path = "/healthz"
+    interval = "30s"
+    timeout = "5s"

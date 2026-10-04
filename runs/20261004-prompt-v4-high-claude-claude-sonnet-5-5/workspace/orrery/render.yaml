@@ -1,0 +1,26 @@
+# Render blueprint. A persistent disk requires a paid instance type.
+services:
+  - type: web
+    name: orrery
+    runtime: docker
+    plan: starter
+    healthCheckPath: /healthz
+    disk:
+      name: orrery-data
+      mountPath: /data
+      sizeGB: 5
+    envVars:
+      - key: BASE_URL
+        sync: false
+      - key: PRODIGI_API_KEY
+        sync: false
+      - key: PRODIGI_BASE_URL
+        value: https://api.sandbox.prodigi.com/v4.0
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
+      - key: ADMIN_TOKEN
+        generateValue: true
+      - key: TRUST_PROXY
+        value: "1"

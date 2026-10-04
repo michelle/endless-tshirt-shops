@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Orrery — Wear the sky from the day that mattered</title>
+<meta name="description" content="A custom t-shirt that shows the exact arrangement of the solar system, and the phase of the moon, on any date you choose. Printed to order, one at a time.">
+<meta property="og:title" content="Orrery — Wear the sky from the day that mattered">
+<meta property="og:description" content="Custom tees showing the real positions of the planets on a date you pick. Birthdays, anniversaries, new arrivals.">
+<meta property="og:image" content="/api/preview.png?date=1969-07-20&name=Apollo&line=One%20small%20step&color=navy&accent=solar&w=900&bg=1">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<div id="demo-banner" class="demo-banner" hidden>Demo mode: checkout is simulated (no real payment). Orders are sent to the Prodigi <b>sandbox</b>, so nothing is printed or shipped.</div>
+<header class="site-header">
+  <a class="brand" href="/" aria-label="Orrery home"><svg viewBox="0 0 32 32" width="26" height="26" aria-hidden="true"><circle cx="16" cy="16" r="3.2" fill="#f5b942"/><circle cx="16" cy="16" r="8" fill="none" stroke="currentColor" stroke-width="1.2" opacity=".6"/><circle cx="16" cy="16" r="13" fill="none" stroke="currentColor" stroke-width="1.2" opacity=".6"/><circle cx="24" cy="10.5" r="1.8" fill="currentColor"/><circle cx="6" cy="21" r="2.4" fill="currentColor"/></svg><span>Orrery</span></a>
+  <nav>
+    <a href="#design">Design yours</a>
+    <a href="#how">How it works</a>
+    <a href="#examples">Examples</a>
+    <a href="#faq">FAQ</a>
+  </nav>
+  <button class="cart-btn" id="cart-open" aria-label="Open cart"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7h12l-1 13H7L6 7Z"/><path d="M9 7a3 3 0 0 1 6 0"/></svg><span>Cart</span><b id="cart-count" hidden>0</b></button>
+</header>
+
+<main>
+<section class="hero">
+  <p class="eyebrow">Printed to order · one shirt, one sky</p>
+  <h1>Wear the sky from <em>the day that mattered.</em></h1>
+  <p class="lede">Pick any date. We calculate where every planet really was, the phase of the moon, and print that exact sky on a soft cotton tee, with a name and a few words only you would choose.</p>
+  <a class="cta" href="#design">Design yours <span aria-hidden="true">→</span></a>
+</section>
+
+<section id="design" class="builder">
+  <div class="stage">
+    <div class="shirt" id="shirt"><div class="shirt-inner">
+      <svg class="tee" viewBox="0 0 600 640" aria-hidden="true">
+        <defs>
+          <linearGradient id="shade" x1="0" x2="1"><stop offset="0" stop-color="#000" stop-opacity=".22"/><stop offset=".22" stop-color="#000" stop-opacity="0"/><stop offset=".78" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".26"/></linearGradient>
+          <linearGradient id="vshade" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".07"/><stop offset=".5" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".14"/></linearGradient>
+        </defs>
+        <path id="tee-body" d="M205 30 L250 22 Q300 64 350 22 L395 30 L522 80 L587 208 L502 242 L468 207 L468 604 Q468 614 458 614 L142 614 Q132 614 132 604 L132 207 L98 242 L13 208 L78 80 Z" fill="#141414" stroke="rgba(255,255,255,.14)" stroke-width="1.2"/>
+        <path d="M205 30 L250 22 Q300 64 350 22 L395 30 L522 80 L587 208 L502 242 L468 207 L468 604 Q468 614 458 614 L142 614 Q132 614 132 604 L132 207 L98 242 L13 208 L78 80 Z" fill="url(#shade)"/>
+        <path d="M205 30 L250 22 Q300 64 350 22 L395 30 L522 80 L587 208 L502 242 L468 207 L468 604 Q468 614 458 614 L142 614 Q132 614 132 604 L132 207 L98 242 L13 208 L78 80 Z" fill="url(#vshade)"/>
+        <path d="M132 207 Q150 120 205 30 M468 207 Q450 120 395 30" fill="none" stroke="#000" stroke-opacity=".22" stroke-width="2"/>
+        <path d="M250 22 Q300 64 350 22 Q300 100 250 22Z" fill="#000" fill-opacity=".28"/>
+        <path d="M250 22 Q300 64 350 22" fill="none" stroke="#fff" stroke-opacity=".18" stroke-width="3"/>
+        <path d="M140 600 H460" stroke="#000" stroke-opacity=".18" stroke-width="2"/>
+      </svg>
+      <img id="art" class="art" alt="Preview of your custom Orrery design" width="264" height="331">
+      </div><div class="art-loading" id="art-loading" hidden>Calculating the sky…</div>
+    </div>
+    <button type="button" class="ghost closeup-btn" id="btn-closeup" aria-pressed="false">Close-up of the print</button>
+    <p class="sky-caption" id="sky-caption" aria-live="polite">&nbsp;</p>
+  </div>
+
+  <form class="controls" id="design-form" novalidate>
+    <h2>Design your sky</h2>
+    <label class="field">
+      <span>The date <small>(birthday, wedding, first day, anything)</small></span>
+      <div class="row">
+        <input type="date" id="f-date" required>
+        <button type="button" class="ghost" id="btn-surprise">Surprise me</button>
+      </div>
+      <em class="err" data-err="date"></em>
+    </label>
+    <label class="field">
+      <span>Name <small>(max 24)</small></span>
+      <input type="text" id="f-name" maxlength="24" placeholder="Amelia Rose" autocomplete="off" required>
+      <em class="err" data-err="name"></em>
+    </label>
+    <label class="field">
+      <span>A few words <small>(optional, max 40)</small></span>
+      <input type="text" id="f-line" maxlength="40" placeholder="Born 7:42 AM · Lisbon" autocomplete="off">
+      <em class="err" data-err="line"></em>
+    </label>
+
+    <fieldset class="field">
+      <legend>Shirt colour: <b id="lbl-color"></b></legend>
+      <div class="swatches" id="sw-color" role="radiogroup" aria-label="Shirt colour"></div>
+    </fieldset>
+    <fieldset class="field">
+      <legend>Ink accent: <b id="lbl-accent"></b></legend>
+      <div class="swatches" id="sw-accent" role="radiogroup" aria-label="Ink accent"></div>
+    </fieldset>
+    <fieldset class="field">
+      <legend>Size <a href="#faq" class="small-link">sizing</a></legend>
+      <div class="sizes" id="sw-size" role="radiogroup" aria-label="Size"></div>
+      <em class="err" data-err="size"></em>
+    </fieldset>
+    <div class="buy-row">
+      <div class="qty" aria-label="Quantity">
+        <button type="button" id="qty-minus" aria-label="Decrease quantity">−</button>
+        <output id="qty-out">1</output>
+        <button type="button" id="qty-plus" aria-label="Increase quantity">+</button>
+      </div>
+      <button type="submit" class="primary" id="btn-add">Add to cart · <span id="price-out">$38</span></button>
+    </div>
+    <p class="fine">Shipping is calculated at checkout. Each shirt is printed after you order, so allow 2–5 days for production plus delivery.</p>
+  </form>
+</section>
+
+<section id="how" class="how">
+  <h2>How it works</h2>
+  <ol>
+    <li><span class="n">1</span><h3>Choose a day</h3><p>Any date from 1800 to 2050. Add a name and a short line: a time, a place, a promise.</p></li>
+    <li><span class="n">2</span><h3>We compute the sky</h3><p>Every planet is placed at its true longitude around the Sun using JPL orbital elements, and the Moon shows its real phase. Earth carries a small <i>you</i> marker.</p></li>
+    <li><span class="n">3</span><h3>Printed just for you</h3><p>Your design is printed directly into the fabric of a soft, ring-spun cotton tee and shipped from a lab near you. No two are alike.</p></li>
+  </ol>
+</section>
+
+<section id="examples" class="examples">
+  <h2>Ideas to steal</h2>
+  <div class="ex-grid" id="ex-grid"></div>
+</section>
+
+<section id="faq" class="faq">
+  <h2>Good to know</h2>
+  <details><summary>How long until it arrives?</summary><p>Shirts are made to order. Production typically takes 2–5 business days, then standard shipping (usually 3–10 business days depending on where you are). You'll get a tracking link on your order page as soon as it ships.</p></details>
+  <details><summary>How accurate is the sky?</summary><p>Planet positions are calculated from NASA/JPL approximate orbital elements and are within about half a degree of the precise ephemeris, far finer than the print can show. The view is looking down on the solar system from above the north pole, with the degree ring showing ecliptic longitude. Positions are computed for noon UTC on your date. Orbit spacing is illustrative, not to scale.</p></details>
+  <details><summary>What's the shirt like?</summary><p>Unisex Gildan Softstyle 64000, 100% ring-spun cotton, a soft, classic fit. If you're between sizes, size up. Chest widths: S 18″, M 20″, L 22″, XL 24″, 2XL 26″.</p></details>
+  <details><summary>Will the print last?</summary><p>It's printed directly into the fibres with water-based inks (DTG). Wash inside out in cool water and tumble dry low or line dry for best results.</p></details>
+  <details><summary>Can I return it?</summary><p>Because every shirt is made specially for you, we can't accept returns for change of mind or wrong size. If something arrives damaged, misprinted or incorrect, contact us within 30 days with a photo and we'll reprint or refund it.</p></details>
+  <details><summary>Which countries do you ship to?</summary><p>Over 100 countries, with the exact list shown at checkout. Shipping is quoted live for your destination. Import duties or local taxes may apply on delivery outside your production region.</p></details>
+</section>
+</main>
+
+<footer class="site-footer">
+  <span>© Orrery. Planet positions via JPL approximate elements. Printed &amp; shipped by Prodigi.</span>
+</footer>
+
+<div class="scrim" id="scrim" hidden></div>
+<aside class="drawer" id="cart" aria-label="Shopping cart" aria-hidden="true" tabindex="-1">
+  <div class="drawer-head"><h2>Your cart</h2><button class="icon" id="cart-close" aria-label="Close cart">×</button></div>
+  <div class="drawer-body">
+    <div id="cart-empty" class="cart-empty">Your cart is empty. <a href="#design" id="cart-empty-link">Design a shirt →</a></div>
+    <ul class="cart-list" id="cart-list"></ul>
+    <form id="checkout-form" class="checkout" novalidate hidden>
+      <h3>Shipping details</h3>
+      <label>Email<input type="email" name="email" autocomplete="email" required></label>
+      <label>Full name<input name="name" autocomplete="name" required></label>
+      <label>Address<input name="line1" autocomplete="address-line1" required></label>
+      <label>Apartment, suite, etc. <small>(optional)</small><input name="line2" autocomplete="address-line2"></label>
+      <div class="two"><label>City<input name="city" autocomplete="address-level2" required></label><label>State / province<input name="state" autocomplete="address-level1"></label></div>
+      <div class="two"><label>Postal code<input name="postalCode" autocomplete="postal-code"></label><label>Country<select name="country" autocomplete="country" id="f-country"></select></label></div>
+      <label>Phone <small>(optional, for the courier)</small><input name="phone" type="tel" autocomplete="tel"></label>
+      <dl class="totals">
+        <div><dt>Subtotal</dt><dd id="t-sub">–</dd></div>
+        <div><dt>Shipping</dt><dd id="t-ship">–</dd></div>
+        <div class="grand"><dt>Total</dt><dd id="t-total">–</dd></div>
+      </dl>
+      <p class="err" id="checkout-err" role="alert"></p>
+      <button class="primary" id="btn-pay" type="submit">Continue to payment</button>
+      <p class="fine" id="pay-note">You'll pay securely on the next page.</p>
+    </form>
+  </div>
+</aside>
+
+<script type="module" src="/app.js"></script>
+</body>
+</html>

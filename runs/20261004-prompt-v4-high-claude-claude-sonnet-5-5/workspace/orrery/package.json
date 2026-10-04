@@ -1,0 +1,23 @@
+{
+  "name": "orrery-tees",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node --test test/"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@resvg/resvg-js": "^2.6.2",
+    "better-sqlite3": "^12.11.1",
+    "express": "^5.2.1",
+    "stripe": "^23.0.0"
+  },
+  "type": "module",
+  "private": true,
+  "engines": {
+    "node": ">=20"
+  }
+}
