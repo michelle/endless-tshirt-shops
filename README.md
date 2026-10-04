@@ -18,6 +18,7 @@ run names its prompt, and records the path and its SHA-256 in metadata.
 | File | Task |
 | --- | --- |
 | `prompt-v3.md` | **Current.** Any original theme, DTG-customised per customer; the agent picks its own payment provider. |
+| `prompt-v3-concept-commit.md` | Prompt v3 plus an immutable concept file required as the first tool action, before environment or account inspection. |
 | `prompt-v2.md` | Any original theme. Predecessor to v3. |
 | `prompt-minimal.md`, `prompt-beauty.md`, `prompt-unserious.md` | Rebuild [datetime.store](https://github.com/michelle/datetime.store) with Stripe and Prodigi, each changing one instruction. |
 | `prompt-clean-sheet.md` | Any appealing theme, with datetime.store given only as an example. |
@@ -150,6 +151,30 @@ the secret scan), restore the worktree to its clean base branch, then add
 `--resume`. Resume re-verifies every skipped run's published metadata against
 the original base, prompt and effort; it never silently reruns a recorded
 attempt. A controller lock rejects concurrent launches.
+
+### Ambient-leakage experiment
+
+`prompts/prompt-v3-concept-commit.md` asks the model to write an immutable
+`concept-commitment.json` as its first tool action, before inspecting files,
+environment variables, the network or provider accounts. Validate the file in
+a completed workspace with:
+
+```sh
+node scripts/check-concept-commitment.mjs runs/<run-id>/workspace
+```
+
+The private raw transcript is still the authority for whether the write really
+was the first tool call. Audit preserved transcripts without printing command
+text or credentials with:
+
+```sh
+node scripts/audit-ambient-leakage.mjs > .benchmark-secrets/ambient-audit.json
+```
+
+The audit reports hashes of suspicious tool inputs and distinguishes references
+to foreign run artifacts from a run's own workspace. A hit proves access, not
+influence; a unique canary copied into the committed concept supplies the
+stronger causal evidence.
 
 ## What a run records
 
