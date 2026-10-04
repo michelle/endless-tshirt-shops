@@ -171,6 +171,10 @@ text or credentials with:
 node scripts/audit-ambient-leakage.mjs > .benchmark-secrets/ambient-audit.json
 ```
 
+The default scan includes transcripts retained inside dedicated suite
+worktrees under `.benchmark-secrets/worktrees/`, plus transcripts and
+recoveries belonging to the main checkout.
+
 The audit reports hashes of suspicious tool inputs and distinguishes references
 to foreign run artifacts from a run's own workspace. A hit proves access, not
 influence; a unique canary copied into the committed concept supplies the

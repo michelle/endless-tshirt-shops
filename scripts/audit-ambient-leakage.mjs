@@ -5,7 +5,10 @@ import path from 'node:path';
 
 const roots = process.argv.slice(2).length
   ? process.argv.slice(2)
-  : ['.benchmark-secrets/transcripts', '.benchmark-secrets/recoveries'];
+  // Suite runs execute from dedicated Git worktrees, so their ignored private
+  // transcripts live under the worktree rather than this checkout's top-level
+  // transcript directory. Include both locations by default.
+  : ['.benchmark-secrets/transcripts', '.benchmark-secrets/recoveries', '.benchmark-secrets/worktrees'];
 
 const secret = /(?:test_[a-f\d-]{36}|(?:sk|rk|rkcs|pk|whsec)_(?:test|live)_[A-Za-z\d_]+)/gi;
 const sha = value => createHash('sha256').update(value).digest('hex').slice(0, 16);
