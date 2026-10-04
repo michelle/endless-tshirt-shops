@@ -1,0 +1,10 @@
+node_modules
+.next
+samples
+scripts
+lib/fonts
+.env.local
+.env*.local
+README.md
+*.log
+.DS_Store
