@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Order confirmed — Under This Sky</title>
+<link href="https://fonts.googleapis.com/css2?family=PT+Serif:ital@0;1&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="brand">UNDER&nbsp;THIS&nbsp;SKY</div>
+</header>
+<main class="confirm">
+  <h1>It's written in the stars.</h1>
+  <p id="msg">Confirming your payment…</p>
+  <div class="status" id="status"></div>
+  <img id="proof" alt="Your star map" style="display:none">
+  <p style="margin-top:22px"><a class="back" href="/">← Design another sky</a></p>
+</main>
+<script>
+(async () => {
+  const id = new URLSearchParams(location.search).get('session_id');
+  const msg = document.getElementById('msg');
+  const status = document.getElementById('status');
+  const proof = document.getElementById('proof');
+  if (!id) { msg.textContent = 'Missing order reference.'; return; }
+  for (let i = 0; i < 20; i++) {
+    try {
+      const r = await fetch(`/api/order-status?session_id=${encodeURIComponent(id)}`);
+      const d = await r.json();
+      if (d.paymentStatus !== 'paid') {
+        msg.textContent = 'Your payment has not completed yet.';
+        status.textContent = d.paymentStatus;
+      } else if (d.fulfillment.status === 'sent_to_print') {
+        msg.textContent = 'Payment received — your shirt is being printed with your sky. You will receive shipping confirmation by email.';
+        status.textContent = 'sent to print ✓';
+        const m = d.design || {};
+        proof.src = `/api/preview?${new URLSearchParams({ when: m.when, lat: m.lat, lon: m.lon, place: m.place, caption: m.caption, color: m.color || 'black' })}`;
+        proof.style.display = 'inline-block';
+        return;
+      } else if (d.fulfillment.status === 'fulfillment_error') {
+        msg.textContent = 'Payment received, but we hit a snag starting the print. We have been notified and will fix it or refund you.';
+        status.textContent = 'print pending';
+        return;
+      } else {
+        msg.textContent = 'Payment received — preparing your print file…';
+        status.textContent = d.fulfillment.status;
+      }
+    } catch (e) {
+      msg.textContent = 'Checking your order…';
+    }
+    await new Promise((r) => setTimeout(r, 2500));
+  }
+  msg.textContent = 'Payment received. Fulfillment is still processing — check your email for confirmation shortly.';
+})();
+</script>
+</body>
+</html>

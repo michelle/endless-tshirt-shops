@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Under This Sky — the exact stars above your moment, on a tee</title>
+<meta name="description" content="A premium tee printed with the real night sky — every star, planet-bright and true — exactly as it stood above your place, on your date.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=PT+Serif:ital@0;1&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="brand">UNDER&nbsp;THIS&nbsp;SKY</div>
+  <div class="tagline">custom star map tees</div>
+</header>
+
+<section class="hero">
+  <h1>The exact sky above <em>your</em> moment.<br>Wear it.</h1>
+  <p class="sub">Give us a date and a place. We compute the real night sky — over a thousand
+  catalogued stars and the true moon phase — and print it on a premium cotton tee,
+  made to order just for you.</p>
+</section>
+
+<main class="customizer">
+
+  <section class="preview-pane">
+    <div class="shirt-stage" id="shirtStage">
+      <img id="previewImg" alt="Your custom star map tee preview" draggable="false">
+      <div class="shirt-size-label" id="shirtSizeLabel"></div>
+    </div>
+    <div class="color-row" id="colorRow">
+      <button class="swatch selected" data-color="black" style="--c:#191919" title="Black"></button>
+      <button class="swatch" data-color="navy blue" style="--c:#1d2b4f" title="Navy"></button>
+      <button class="swatch" data-color="charcoal" style="--c:#3b4149" title="Charcoal"></button>
+    </div>
+  </section>
+
+  <section class="form-pane">
+    <h2>Design yours</h2>
+
+    <label class="field">
+      <span>The moment</span>
+      <input type="date" id="date" value="2022-06-14" max="2026-12-31" min="1950-01-01">
+    </label>
+
+    <label class="field">
+      <span>At what time?</span>
+      <select id="time">
+        <option value="21:00">Evening (9 pm)</option>
+        <option value="23:00" selected>Late night (11 pm)</option>
+        <option value="01:00">After midnight (1 am)</option>
+        <option value="04:00">Before dawn (4 am)</option>
+      </select>
+    </label>
+
+    <div class="field">
+      <span>The place</span>
+      <input type="text" id="place" placeholder="Start typing a city… e.g. Paris" autocomplete="off">
+      <div class="suggestions" id="suggestions"></div>
+    </div>
+
+    <label class="field">
+      <span>Your caption <small>(optional, max 42 chars)</small></span>
+      <input type="text" id="caption" maxlength="42" placeholder="The night we met" value="The night we met">
+    </label>
+
+    <div class="field">
+      <span>Size <small>(unisex Gildan Softstyle)</small></span>
+      <div class="size-row" id="sizeRow">
+        <button data-size="xs">XS</button>
+        <button data-size="s">S</button>
+        <button data-size="m" class="selected">M</button>
+        <button data-size="l">L</button>
+        <button data-size="xl">XL</button>
+        <button data-size="2xl">2XL</button>
+        <button data-size="3xl">3XL</button>
+      </div>
+    </div>
+
+    <div class="buy-box">
+      <div class="price"><span class="amount">$38</span> <span class="ship">· free worldwide shipping</span></div>
+      <button id="buyBtn" class="buy-btn">Make mine</button>
+      <div class="buy-note" id="buyNote">Printed on demand · ships in 3–5 days</div>
+    </div>
+  </section>
+
+</main>
+
+<section class="how">
+  <div><strong>Astronomically real.</strong> 1,018 stars from the Yale bright-star catalogue, projected for your exact coordinates and hour.</div>
+  <div><strong>The moon, too.</strong> Its true phase for your date — crescent, gibbous or full — drawn where it actually stood.</div>
+  <div><strong>Printed to last.</strong> Direct-to-garment print on 100% ring-spun cotton, made only when you order.</div>
+</section>
+
+<footer class="site-footer">
+  <p>Under This Sky · every shirt is one of one · <a href="#" onclick="return false">hello@underthisky.example</a></p>
+</footer>
+
+<script src="/app.js"></script>
+</body>
+</html>

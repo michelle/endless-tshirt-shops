@@ -1,0 +1,16 @@
+{
+  "name": "under-this-sky",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Under This Sky — personalized star map t-shirts, printed on demand",
+  "dependencies": {
+    "@resvg/resvg-js": "^2.6.2",
+    "stripe": "^17.7.0"
+  },
+  "optionalDependencies": {
+    "@resvg/resvg-js-linux-arm64-gnu": "2.6.2"
+  },
+  "devDependencies": {
+    "playwright": "^1.63.0"
+  }
+}

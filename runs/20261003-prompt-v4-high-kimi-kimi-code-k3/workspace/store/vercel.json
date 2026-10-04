@@ -1,0 +1,17 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "functions": {
+    "api/preview.js": {
+      "maxDuration": 60,
+      "includeFiles": "node_modules/@resvg/resvg-js-linux-arm64-gnu/**"
+    },
+    "api/design.js": {
+      "maxDuration": 60,
+      "includeFiles": "node_modules/@resvg/resvg-js-linux-arm64-gnu/**"
+    },
+    "api/health.js": {
+      "includeFiles": "node_modules/@resvg/resvg-js-linux-arm64-gnu/**"
+    }
+  },
+  "cleanUrls": true
+}
