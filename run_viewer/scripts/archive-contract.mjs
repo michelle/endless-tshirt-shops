@@ -60,6 +60,14 @@ export async function registeredAssets(suites, publicRoot) {
     for (const run of suite.runs) {
       assert.ok(!runIds.has(run.id), `Duplicate run ID: ${suite.id}/${run.id}`);
       runIds.add(run.id);
+      if (suite.prompt.file === 'prompts/prompt-v4.md') {
+        assert.ok(run.agentDeployment, `Prompt v4 run must disclose agent deployment outcome: ${run.id}`);
+        assert.ok(run.inspectionDeployment, `Prompt v4 run must disclose harness inspection deployment: ${run.id}`);
+        const expectedView = run.inspectionDeployment.status === 'succeeded'
+          ? run.inspectionDeployment.url
+          : run.agentDeployment.status === 'reported' ? run.agentDeployment.url : null;
+        assert.equal(run.deployment, expectedView, `Prompt v4 capture target must prefer the harness inspection copy: ${run.id}`);
+      }
       const prefix = `/suites/${suite.id}/runs/`;
       assert.ok(run.finalOutput.startsWith(prefix) && run.finalOutput.endsWith("/final.md"));
       const directory = path.posix.dirname(run.finalOutput);

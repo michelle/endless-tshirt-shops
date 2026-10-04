@@ -17,13 +17,14 @@ run names its prompt, and records the path and its SHA-256 in metadata.
 
 | File | Task |
 | --- | --- |
-| `prompt-v3.md` | **Current.** Any original theme, DTG-customised per customer; the agent picks its own payment provider. |
+| `prompt-v4.md` | **Current.** Concept commitment plus provider-neutral deployment: deploying is required, but no hosting service is suggested. |
+| `prompt-v3.md` | Any original theme, DTG-customised per customer; the agent picks its own payment provider and is directed to Vercel. |
 | `prompt-v3-concept-commit.md` | Prompt v3 plus an immutable concept file required as the first tool action, before environment or account inspection. |
 | `prompt-v2.md` | Any original theme. Predecessor to v3. |
 | `prompt-minimal.md`, `prompt-beauty.md`, `prompt-unserious.md` | Rebuild [datetime.store](https://github.com/michelle/datetime.store) with Stripe and Prodigi, each changing one instruction. |
 | `prompt-clean-sheet.md` | Any appealing theme, with datetime.store given only as an example. |
 
-Only v2 and v3 leave the payment provider to the agent, so the provider-neutral
+Only v2, v3 and v4 leave the payment provider to the agent, so the provider-neutral
 environment described below matters only for those. The earlier prompts name
 Stripe outright.
 
@@ -35,12 +36,15 @@ metadata, so historical runs stay reproducible.
 
 ```sh
 brew install stripe/stripe-cli/stripe vercel-cli coreutils   # macOS
-vercel login                                                  # the one interactive step
 export PRODIGI_API_KEY='test_00000000-0000-0000-0000-000000000000'
+export BENCHMARK_VERCEL_TOKEN='token-used-only-after-the-agent-exits'
 ```
 
 `PRODIGI_API_KEY` must be a sandbox key, and the suite controller checks its
-shape. Also required: Node.js 20.11+ (the viewer in `run_viewer/` needs 22.13+),
+shape. Do not run `vercel login` for prompt v4: the agent is meant to encounter
+an unauthenticated CLI and choose its own deployment route. The harness uses
+`BENCHMARK_VERCEL_TOKEN` only for its later inspection copy. Also required:
+Node.js 20.11+ (the viewer in `run_viewer/` needs 22.13+),
 Git, an `origin` remote, and `timeout`/`gtimeout`. The inspector additionally
 needs Python 3 with Pillow.
 
@@ -122,6 +126,15 @@ recorded in `deployment_url_candidates`. That is deliberately a list, not a
 guess: agents probe unrelated hosts, one of them a known-nonexistent domain used
 as a control, so picking automatically would publish a confident wrong answer.
 
+Prompt v4 requires an exact final `DEPLOYMENT_URL:` line, allowing non-Vercel
+hosts to be recorded without guessing from arbitrary URLs in the transcript.
+After the agent exits, the harness can independently deploy the captured source
+to a run-specific Vercel project when `BENCHMARK_VERCEL_TOKEN` is set. The token
+is removed before the agent starts. Metadata records the agent deployment and
+the evaluator-owned inspection deployment separately; the latter never rescues
+the former's benchmark result. `BENCHMARK_VERCEL_SCOPE` is optional. Private
+deployment logs live under `.benchmark-secrets/deployments/`.
+
 OpenCode's `opencode-go/*` aliases reach the same models but require Global
 regions on the workspace's OpenCode Console privacy settings; without that they
 fail with `provider.invalid-request` on the first request, so the plain
@@ -154,7 +167,7 @@ attempt. A controller lock rejects concurrent launches.
 
 ### Ambient-leakage experiment
 
-`prompts/prompt-v3-concept-commit.md` asks the model to write an immutable
+`prompts/prompt-v3-concept-commit.md` and `prompts/prompt-v4.md` ask the model to write an immutable
 `concept-commitment.json` as its first tool action, before inspecting files,
 environment variables, the network or provider accounts. Validate the file in
 a completed workspace with:
@@ -336,10 +349,12 @@ bash tests/run-benchmark-test.sh
 `scripts/run-agent.mjs` launches the chosen CLI for one run. It receives
 `BENCHMARK_WORKSPACE`, `BENCHMARK_PROMPT_FILE`, `BENCHMARK_MODEL`,
 `BENCHMARK_FINAL_OUTPUT`, `BENCHMARK_USAGE_OUTPUT`, `BENCHMARK_CAPTURE_DIR`,
-`BENCHMARK_VERCEL_PROJECT`, `BENCHMARK_CLI_STATE` and optionally
+`BENCHMARK_CLI_STATE` and optionally `BENCHMARK_VERCEL_PROJECT` and
 `BENCHMARK_REASONING_EFFORT`, and refuses to start if any of the first six is
 missing. `BENCHMARK_CLI_STATE` is named neutrally on purpose, so it does not
-steer the agent's choice of payment provider.
+steer the agent's choice of payment provider. `BENCHMARK_VERCEL_PROJECT` is
+present only when the selected prompt explicitly names it; prompt v4 therefore
+gets no Vercel hint from the environment.
 
 Each additional provider means editing four places, not adding a plugin:
 

@@ -300,6 +300,13 @@ code {
   font-size: 13px;
 }
 
+.deployment-evidence {
+  margin: 6px 0;
+  color: var(--muted);
+  font: 12px/1.35 var(--sans);
+}
+.deployment-evidence a { color: var(--accent-ink); }
+
 .card-links {
   display: flex;
   justify-content: space-between;

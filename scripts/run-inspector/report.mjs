@@ -7,7 +7,9 @@ export function renderReport(report) {
   md += `Snapshot: ${cell(report.inspectedAt)}. Suite: \`${cell(report.suiteId)}\`. Artifact ref: \`${cell(report.artifactCommit)}\`. Inspector: \`${cell(report.inspectorVersion)}\`.\n\n`;
   md += 'This is generated evidence, not a reviewed pass/fail rating. Searches do not prove reading or training-data reliance; paid Stripe objects do not prove the customer checkout flow. Live observations are later snapshots, not historical run-time evidence.\n\n';
   md += '### Run and framework evidence\n\n';
-  md += table(['Model', 'Run status', 'Seconds', 'Framework dependencies', 'Runtime files / lines', 'Verification files / lines'], report.runs.map(r => [r.model, r.status, r.durationSeconds,
+  md += table(['Model', 'Run status', 'Agent deployment', 'Harness inspection deployment', 'Seconds', 'Framework dependencies', 'Runtime files / lines', 'Verification files / lines'], report.runs.map(r => [r.model, r.status,
+    r.agent_deployment_status ?? (r.deployment ? 'legacy URL recorded' : 'not recorded'),
+    r.inspection_deployment_status ?? 'not recorded', r.durationSeconds,
     r.source.packages.map(p => Object.entries(p.dependencies).map(([k,v]) => `${k}@${v}`).join(', ')).join('; '), `${r.source.runtimeFiles} / ${r.source.runtimeLines}`, `${r.source.verificationFiles} / ${r.source.verificationLines}`]));
   md += '\n### Documentation-use evidence\n\nSearch counts are individual query requests. Reference requests/reads count tool calls, not unique pages. A returned tool result can be an error page or snippet; it is not proof of successful document retrieval. Raw queries, commands and tool outputs remain private.\n\n';
   md += table(['Model', 'Topic', 'Coverage', 'Search queries', 'Document requests', 'Local reference calls', 'Reference results available'], report.runs.flatMap(r => Object.entries(r.documentation).map(([topic,d]) => [r.model, topic, d.coverage, ...[d.searchQueries, d.documentRequests, d.localReferenceReads, d.referenceResults].map(n => d.coverage === 'unknown' ? 'unknown' : n)])));

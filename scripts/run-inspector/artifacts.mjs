@@ -27,7 +27,10 @@ export async function extractSuite(repo, ref, suite, directory) {
     // Only validated regular blobs; no symlink members or arbitrary checkout hooks.
     const archive = execFileSync('git', ['-C', repo, 'archive', commit, '--', ...files], { maxBuffer: 400 * 1024 * 1024 });
     execFileSync('tar', ['-xf', '-', '-C', directory], { input: archive });
-    runs.push({ ...metadata, deployment: deployment(metadata.deployment_url), artifactCommit: git(repo, ['log', '-1', '--format=%H', commit, '--', `runs/${id}`]).trim() });
+    // Prefer the evaluator-owned copy for reproducible inspection. The agent's
+    // own outcome remains separately recorded and is never upgraded by this.
+    const inspectionTarget = metadata.inspection_deployment_status === 'succeeded' ? metadata.inspection_deployment_url : null;
+    runs.push({ ...metadata, deployment: deployment(inspectionTarget || metadata.deployment_url), artifactCommit: git(repo, ['log', '-1', '--format=%H', commit, '--', `runs/${id}`]).trim() });
   }
   if (!runs.length) throw new Error('No matching suite artifacts found');
   return { commit, runs: runs.sort((a,b) => a.started_at.localeCompare(b.started_at)), skipped };

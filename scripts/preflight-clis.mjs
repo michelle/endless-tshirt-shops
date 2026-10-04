@@ -111,6 +111,11 @@ for (const [adapter, model] of models) {
 }
 
 if (!process.env.PRODIGI_API_KEY) failures.push('PRODIGI_API_KEY is unset; run-benchmark requires a sandbox key');
+if (process.env.BENCHMARK_VERCEL_TOKEN) {
+  const vercel = await exec('vercel', ['--version'], { timeout: 30_000 });
+  if (vercel.code !== 0) failures.push('BENCHMARK_VERCEL_TOKEN is set but the Vercel CLI is not runnable for inspection deployment');
+  else console.log(`vercel    ${vercel.stdout.trim().split('\n')[0] || 'ok'} (harness only)`);
+}
 
 console.log('');
 if (failures.length) {

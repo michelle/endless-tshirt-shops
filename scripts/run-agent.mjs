@@ -104,6 +104,9 @@ const baseChildEnv = {
 delete baseChildEnv.OLDPWD;
 for (const name of ['BENCHMARK_PROMPT_FILE', 'BENCHMARK_FINAL_OUTPUT',
   'BENCHMARK_USAGE_OUTPUT', 'BENCHMARK_CAPTURE_DIR']) delete baseChildEnv[name];
+// Deployment credentials belong to the post-run inspection harness. They must
+// never let the benchmark agent inherit or infer the evaluator's Vercel account.
+for (const name of ['BENCHMARK_VERCEL_TOKEN', 'VERCEL_TOKEN', 'BENCHMARK_VERCEL_SCOPE']) delete baseChildEnv[name];
 const childEnv = provider === 'claude' ? {
   ...baseChildEnv,
   CLAUDE_CODE_DISABLE_AUTO_MEMORY: '1',

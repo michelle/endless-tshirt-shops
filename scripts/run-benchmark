@@ -63,8 +63,17 @@ extract_url() {
   # spans, and usually mention a webhook route after the storefront. Matching
   # only the origin keeps trailing punctuation and route paths out, and the
   # first mention is the storefront rather than an API path.
-  grep -Eo 'https://[a-z0-9][a-z0-9.-]*\.vercel\.(app|sh)' "$1" 2>/dev/null |
-    head -n 1 || true
+  local declared
+  declared=$(sed -nE 's/^DEPLOYMENT_URL:[[:space:]]*(https:\/\/[^[:space:]]+)[[:space:]]*$/\1/p' "$1" 2>/dev/null | head -n 1)
+  if [[ -n $declared ]]; then
+    printf '%s\n' "$declared"
+    return
+  fi
+  # An explicit negative result from prompt v4 must not be overwritten by an
+  # unrelated Vercel documentation or webhook URL elsewhere in the report.
+  grep -qE '^DEPLOYMENT_URL:[[:space:]]*none[[:space:]]*$' "$1" 2>/dev/null && return
+  # Backward compatibility for prompts that predate the structured final line.
+  grep -Eo 'https://[a-z0-9][a-z0-9.-]*\.vercel\.(app|sh)' "$1" 2>/dev/null | head -n 1 || true
 }
 
 url_candidates() {
@@ -121,6 +130,12 @@ done
 [[ -z $REASONING_EFFORT || $REASONING_EFFORT =~ ^(low|medium|high|xhigh|max)$ ]] || die "--reasoning-effort must be low, medium, high, xhigh, or max"
 [[ -n $PROMPT_FILE_ARG ]] || die "--prompt-file is required, e.g. prompts/prompt-v3.md"
 [[ -n ${PRODIGI_API_KEY-} ]] || die "PRODIGI_API_KEY must be set to a Prodigi API key"
+
+# Keep the evaluator credential in a shell variable while removing it from the
+# agent environment. An absent token records a skipped inspection deployment.
+HARNESS_VERCEL_TOKEN=${BENCHMARK_VERCEL_TOKEN-}
+HARNESS_VERCEL_SCOPE=${BENCHMARK_VERCEL_SCOPE-}
+unset BENCHMARK_VERCEL_TOKEN VERCEL_TOKEN BENCHMARK_VERCEL_SCOPE
 
 REPO_ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || die "run this from inside the benchmark repository"
 cd "$REPO_ROOT"
@@ -180,6 +195,7 @@ FINAL_OUTPUT="$RESULT_DIR/final.md"
 METADATA="$RESULT_DIR/metadata.json"
 USAGE_OUTPUT="$RESULT_DIR/usage.json"
 STRIPE_CONFIG_DIR="$REPO_ROOT/.benchmark-secrets/stripe"
+DEPLOYMENT_LOG_DIR="$REPO_ROOT/.benchmark-secrets/deployments"
 # The agent writes to a private temporary profile and is archived here only
 # after the run, so listing the directory it was handed cannot reach a sibling
 # run's credentials. Earlier runs' archives remain readable to a filesystem
@@ -398,7 +414,13 @@ export BENCHMARK_WORKSPACE="$AGENT_WORKSPACE"
 export BENCHMARK_PROMPT_FILE="$AGENT_PROMPT_FILE"
 export BENCHMARK_MODEL="$MODEL"
 export BENCHMARK_FINAL_OUTPUT="$AGENT_FINAL_OUTPUT"
-export BENCHMARK_VERCEL_PROJECT="$VERCEL_PROJECT"
+# Only prompts that explicitly prescribe Vercel receive this hint. Prompt v4
+# deliberately leaves deployment-provider selection to the agent.
+if grep -q '\$BENCHMARK_VERCEL_PROJECT' "$BENCHMARK_PROMPT_FILE"; then
+  export BENCHMARK_VERCEL_PROJECT="$VERCEL_PROJECT"
+else
+  unset BENCHMARK_VERCEL_PROJECT
+fi
 export BENCHMARK_REASONING_EFFORT="$REASONING_EFFORT"
 export BENCHMARK_USAGE_OUTPUT="$AGENT_USAGE_OUTPUT"
 # Deliberately provider-neutral: the prompt asks the agent to choose a payment
@@ -440,9 +462,37 @@ if [[ ! -s $FINAL_OUTPUT ]]; then
 fi
 
 DEPLOYMENT_URL=$(extract_url "$FINAL_OUTPUT")
+AGENT_DEPLOYMENT_STATUS=not_reported
+[[ -n $DEPLOYMENT_URL ]] && AGENT_DEPLOYMENT_STATUS=reported
 # Only when the report named none, so a confident answer is never diluted.
 URL_CANDIDATES='[]'
 [[ -n $DEPLOYMENT_URL ]] || URL_CANDIDATES=$(url_candidates "$RAW_LOG")
+
+# Produce an evaluator-owned copy for visual inspection without changing the
+# agent's deployment result. This runs only after the agent has exited and uses
+# a credential that was never present in its environment.
+INSPECTION_DEPLOYMENT_STATUS=not_configured
+INSPECTION_DEPLOYMENT_URL=
+if [[ -n $HARNESS_VERCEL_TOKEN ]]; then
+  mkdir -p "$DEPLOYMENT_LOG_DIR"
+  chmod 700 "$DEPLOYMENT_LOG_DIR"
+  INSPECTION_LOG="$DEPLOYMENT_LOG_DIR/$RUN_ID.log"
+  INSPECTION_ARGS=(deploy --prod --yes --project "$VERCEL_PROJECT")
+  [[ -z $HARNESS_VERCEL_SCOPE ]] || INSPECTION_ARGS+=(--scope "$HARNESS_VERCEL_SCOPE")
+  set +e
+  (
+    cd "$AGENT_WORKSPACE" || exit 1
+    VERCEL_TOKEN="$HARNESS_VERCEL_TOKEN" "$TIMEOUT_COMMAND" 900 vercel "${INSPECTION_ARGS[@]}"
+  ) >"$INSPECTION_LOG" 2>&1
+  INSPECTION_EXIT=$?
+  set -e
+  if (( INSPECTION_EXIT == 0 )); then
+    INSPECTION_DEPLOYMENT_URL=$(grep -Eo 'https://[a-z0-9][a-z0-9.-]*\.vercel\.(app|sh)' "$INSPECTION_LOG" | tail -n 1 || true)
+    if [[ -n $INSPECTION_DEPLOYMENT_URL ]]; then INSPECTION_DEPLOYMENT_STATUS=succeeded; else INSPECTION_DEPLOYMENT_STATUS=failed; fi
+  else
+    INSPECTION_DEPLOYMENT_STATUS=failed
+  fi
+fi
 USAGE_JSON=null
 if [[ -s $USAGE_OUTPUT ]]; then
   # Compact, so this one-line value nests correctly in the object built below.
@@ -497,6 +547,11 @@ WORKSPACE_TREE=$(git write-tree)
   printf '  "redactions": %s,\n' "$REDACTIONS"
   printf '  "excluded_paths": %s,\n' "$EXCLUSIONS"
   printf '  "deployment_url_candidates": %s,\n' "$URL_CANDIDATES"
+  printf '  "agent_deployment_status": '; json_string "$AGENT_DEPLOYMENT_STATUS"; printf ',\n'
+  printf '  "agent_deployment_url": '; json_string "$DEPLOYMENT_URL"; printf ',\n'
+  printf '  "inspection_deployment_provider": "vercel",\n'
+  printf '  "inspection_deployment_status": '; json_string "$INSPECTION_DEPLOYMENT_STATUS"; printf ',\n'
+  printf '  "inspection_deployment_url": '; json_string "$INSPECTION_DEPLOYMENT_URL"; printf ',\n'
   printf '  "deployment_url": '; json_string "$DEPLOYMENT_URL"; printf '\n}\n'
 } >"$METADATA"
 
@@ -543,6 +598,9 @@ git branch -D "$EXECUTION_BRANCH" "$PUBLISH_BRANCH" >/dev/null
 cleanup_local_run
 printf 'run=%s status=%s branch=%s commit=%s\n' "$RUN_ID" "$RUN_STATUS" "$RESULTS_BRANCH" "$RESULT_COMMIT"
 [[ -n $DEPLOYMENT_URL ]] && printf 'deployment_url=%s\n' "$DEPLOYMENT_URL"
+printf 'agent_deployment_status=%s\n' "$AGENT_DEPLOYMENT_STATUS"
+printf 'inspection_deployment_status=%s\n' "$INSPECTION_DEPLOYMENT_STATUS"
+[[ -n $INSPECTION_DEPLOYMENT_URL ]] && printf 'inspection_deployment_url=%s\n' "$INSPECTION_DEPLOYMENT_URL"
 if [[ $RUN_STATUS != succeeded ]]; then
   (( AGENT_EXIT != 0 )) && exit "$AGENT_EXIT"
   exit 1

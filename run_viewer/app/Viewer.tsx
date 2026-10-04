@@ -5,7 +5,7 @@ import { assetUrl } from "./asset-url";
 import { useCallback, useEffect, useId, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import ReactMarkdown, { type Components } from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { suites, type Storefront } from "./data";
+import { suites, type Run, type Storefront } from "./data";
 import { explainStatus } from "./status";
 import { summaryHeadings } from "./summary-headings";
 import { useDrawerSwipe } from "./use-drawer-swipe";
@@ -88,6 +88,19 @@ function RunStatus({ status }: { status: string }) {
 
 function modelName(model: string) {
   return model.split(" · ").at(-1) ?? model;
+}
+
+function DeploymentEvidence({ run }: { run: Run }) {
+  if (!run.agentDeployment && !run.inspectionDeployment) return null;
+  return (
+    <p className="deployment-evidence">
+      {run.agentDeployment?.status === "reported" && run.agentDeployment.url ? (
+        <>Agent reported a deployment: <a href={run.agentDeployment.url} target="_blank" rel="noreferrer">open original ↗</a></>
+      ) : <>Agent deployment: not observed</>}
+      {run.inspectionDeployment && <> · Harness inspection: {run.inspectionDeployment.status === "succeeded" && run.inspectionDeployment.url ? (
+        <a href={run.inspectionDeployment.url} target="_blank" rel="noreferrer">open {run.inspectionDeployment.provider} copy ↗</a>
+      ) : run.inspectionDeployment.status.replace('_', ' ')}</>}</p>
+  );
 }
 
 function CopyPermalink({ suiteId, runId }: { suiteId: string; runId: string }) {
@@ -312,6 +325,7 @@ export default function Viewer() {
                   <span>{modelName(run.model)}</span>
                 </h3>
                 <RunStatus status={run.status} />
+                <DeploymentEvidence run={run} />
               </div>
 
               <div className="card-content">
@@ -432,6 +446,7 @@ export default function Viewer() {
               )}
               <section className="drawer-evidence" aria-label="Run details">
                 <RunStatus key={selectedRun.id} status={selectedRun.status} />
+                <DeploymentEvidence run={selectedRun} />
                 <p className="image-meta">{selectedRun.width && selectedRun.height ? `${selectedRun.width} × ${selectedRun.height}px · ` : ""}{selectedRun.alpha} · <code>{selectedRun.commit}</code></p>
                 <p className="evidence">{selectedRun.evidence}</p>
                 <div className="card-links">

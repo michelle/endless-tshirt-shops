@@ -25,6 +25,8 @@ export type Run = {
   height: number | null;
   alpha: string;
   evidence: string;
+  agentDeployment?: { status: "reported" | "not_reported"; url: string | null };
+  inspectionDeployment?: { status: "succeeded" | "failed" | "not_configured"; provider: string; url: string | null };
 };
 
 export type Suite = {

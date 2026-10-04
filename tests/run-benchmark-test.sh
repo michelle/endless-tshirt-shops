@@ -22,8 +22,9 @@ git init -q -b main "$REPO"
 git -C "$REPO" config user.email benchmark-test@example.com
 git -C "$REPO" config user.name benchmark-test
 mkdir -p "$REPO/prompts"
-printf 'test prompt\n' >"$REPO/prompts/prompt.md"
-printf 'beauty prompt\n' >"$REPO/prompts/prompt-beauty.md"
+printf 'test prompt using $BENCHMARK_VERCEL_PROJECT\n' >"$REPO/prompts/prompt.md"
+printf 'beauty prompt using $BENCHMARK_VERCEL_PROJECT\n' >"$REPO/prompts/prompt-beauty.md"
+printf 'provider choice prompt\n' >"$REPO/prompts/prompt-v4.md"
 printf 'runs/*/agent.raw.log\n.benchmark-secrets/\n' >"$REPO/.gitignore"
 git -C "$REPO" add prompts .gitignore
 git -C "$REPO" commit -qm baseline
@@ -61,6 +62,7 @@ printf '%s\n' \
   'done' \
   'case $(/bin/bash -lc "command -v stripe") in *benchmark-tools.*/stripe) ;; *) exit 9 ;; esac' \
   '[[ -z "${STRIPE_SECRET_KEY-}${STRIPE_API_KEY-}${STRIPE_PUBLISHABLE_KEY-}${STRIPE_WEBHOOK_SECRET-}" ]]' \
+  '[[ -z "${VERCEL_TOKEN-}${BENCHMARK_VERCEL_TOKEN-}${BENCHMARK_VERCEL_SCOPE-}" ]]' \
   '# the environment must not disclose the pre-provisioned payment provider' \
   'if env | grep -i "^BENCHMARK_" | grep -qi stripe; then echo "provider name leaked through BENCHMARK_* environment" >&2; exit 10; fi' \
   'case $PATH$BASH_ENV in *[Ss]tripe*) echo "provider name leaked through PATH/BASH_ENV" >&2; exit 11 ;; esac' \
@@ -75,7 +77,7 @@ printf '%s\n' \
   'mkdir -p "$workspace"' \
   'git init -q "$workspace"' \
   'stripe sandbox create --non-interactive' \
-  'printf "%s\n" "$BENCHMARK_VERCEL_PROJECT" >"$workspace/vercel-project.txt"' \
+  'printf "%s\n" "${BENCHMARK_VERCEL_PROJECT-}" >"$workspace/vercel-project.txt"' \
   'printf "node_modules\n" >"$workspace/.gitignore"' \
   'mkdir -p "$workspace/node_modules"' \
   'printf "generated dependency\n" >"$workspace/node_modules/example.js"' \
@@ -89,8 +91,16 @@ printf '%s\n' \
   'printf "final report\n" >"$output"' \
   'printf "Deployed: **[Shop](https://benchmark-fake-store.vercel.app)**\n" >>"$output"' \
   'printf "Webhook: `https://benchmark-fake-store.vercel.app/api/webhooks/stripe`\n" >>"$output"' \
+  '[[ -z "${FAKE_DEPLOYMENT_URL:-}" ]] || printf "DEPLOYMENT_URL: %s\n" "$FAKE_DEPLOYMENT_URL" >>"$output"' \
   'exit "${FAKE_CODEX_EXIT:-0}"' >"$BIN/codex"
 chmod +x "$BIN/codex"
+
+printf '%s\n' \
+  '#!/usr/bin/env bash' \
+  'set -euo pipefail' \
+  '[[ ${VERCEL_TOKEN-} == fixture-harness-token ]]' \
+  'printf "https://benchmark-inspection-copy.vercel.app\n"' >"$BIN/vercel"
+chmod +x "$BIN/vercel"
 ln -s "$BIN/codex" "$BIN_WITHOUT_TIMEOUT/codex"
 
 printf '%s\n' \
@@ -197,6 +207,8 @@ EXPECTED_PROMPT_SHA=$(shasum -a 256 "$REPO/prompts/prompt-beauty.md" | awk '{pri
 # The report wraps the storefront in a bold Markdown link and names a webhook
 # route after it; neither may reach metadata.
 [[ $SUCCESS_METADATA == *'"deployment_url": "https://benchmark-fake-store.vercel.app"'* ]] || fail 'deployment URL was not reduced to the storefront origin'
+[[ $SUCCESS_METADATA == *'"agent_deployment_status": "reported"'* ]] || fail 'agent deployment status was not recorded'
+[[ $SUCCESS_METADATA == *'"inspection_deployment_status": "not_configured"'* ]] || fail 'missing inspection credential was not recorded'
 printf '%s' "$SUCCESS_METADATA" | node -e '
   const metadata = JSON.parse(require("fs").readFileSync(0, "utf8"));
   if (typeof metadata.usage !== "object" || metadata.usage === null || Array.isArray(metadata.usage)) {
@@ -218,6 +230,21 @@ fi
 if git -C "$REPO" show-ref --verify --quiet refs/heads/benchmark-run/success; then
   fail 'temporary execution branch was retained after a successful push'
 fi
+
+(
+  cd "$REPO"
+  PATH="$BIN:$PATH" PRODIGI_API_KEY=test_11111111-1111-1111-1111-111111111111 \
+    BENCHMARK_VERCEL_TOKEN=fixture-harness-token FAKE_DEPLOYMENT_URL=https://anonymous-choice.netlify.app \
+    "$ROOT/scripts/run-benchmark" --adapter codex --model fake --timeout 5 \
+      --run-id provider-choice --prompt-file prompts/prompt-v4.md
+)
+PROVIDER_WORKSPACE_PROJECT=$(git --git-dir="$REMOTE" show benchmark-results:runs/provider-choice/workspace/vercel-project.txt)
+assert test -z "$PROVIDER_WORKSPACE_PROJECT"
+PROVIDER_METADATA=$(git --git-dir="$REMOTE" show benchmark-results:runs/provider-choice/metadata.json)
+[[ $PROVIDER_METADATA == *'"agent_deployment_url": "https://anonymous-choice.netlify.app"'* ]] || fail 'provider-neutral deployment URL was not recorded'
+[[ $PROVIDER_METADATA == *'"inspection_deployment_status": "succeeded"'* ]] || fail 'harness inspection deployment was not recorded'
+[[ $PROVIDER_METADATA == *'"inspection_deployment_url": "https://benchmark-inspection-copy.vercel.app"'* ]] || fail 'harness inspection URL was not recorded'
+assert test -s "$REPO/.benchmark-secrets/deployments/provider-choice.log"
 LOG=$(git --git-dir="$REMOTE" show benchmark-results:runs/success/events.jsonl)
 [[ $LOG != *test_11111111-1111-1111-1111-111111111111* ]] || fail 'injected secret leaked into committed log'
 [[ $LOG != *sk_test_* ]] || fail 'Stripe pattern leaked into committed log'
