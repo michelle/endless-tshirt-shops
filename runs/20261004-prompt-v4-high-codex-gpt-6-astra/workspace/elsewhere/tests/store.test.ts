@@ -1,0 +1,30 @@
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
+import { DatabaseSync } from 'node:sqlite';
+import { readFileSync } from 'node:fs';
+import { createHmac } from 'node:crypto';
+import { INITIAL, validateDesign, fingerprint, designSvg } from '../lib/design';
+import { assertPaid, verifyWebhook } from '../lib/payments';
+import { fulfill, configuration } from '../lib/store';
+const originalFetch=globalThis.fetch;
+let database:DatabaseSync, calls=0, payment:any, fail=false;
+function fixture(){
+  database=new DatabaseSync(':memory:');database.exec(readFileSync('drizzle/0000_black_thor.sql','utf8'));
+  const DB={prepare(sql:string){return{bind(...args:any[]){const st=database.prepare(sql);return{first:async()=>st.get(...args),run:async()=>({meta:{changes:Number(st.run(...args).changes)}})};}}}};
+  (globalThis as any).__testEnv={DB,BUCKET:{head:async()=>({size:100})},STRIPE_SECRET_KEY:'sk_test_fixture',STRIPE_WEBHOOK_SECRET:'whsec_fixture',PRODIGI_API_KEY:'fixture',SITE_URL:'https://example.test',STORE_MODE:'sandbox'};
+  database.prepare('INSERT INTO orders (id,token,design,size,amount,session_id,asset_key,asset_token,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?)').run('order-one','token',JSON.stringify(INITIAL),'m',4800,'cs_test_1','prints/master.pdf','asset-token',1,1);
+  payment={id:'cs_test_1',payment_status:'paid',status:'complete',client_reference_id:'order-one',metadata:{order_id:'order-one'},mode:'payment',currency:'usd',amount_total:4800,livemode:false,shipping_details:{name:'Test Customer',address:{line1:'123 Test St',city:'New York',state:'NY',postal_code:'10001',country:'US'}},customer_details:{email:'test@example.com'}};
+  calls=0;fail=false;
+  globalThis.fetch=(async(url:any,init:any)=>{if(String(url).startsWith('https://api.stripe.com/'))return Response.json(payment);if(String(url).includes('api.sandbox.prodigi.com')){calls++;const b=JSON.parse(init.body);assert.equal(b.idempotencyKey,'order-one');assert.equal(b.items[0].attributes.size,'m');assert.equal(b.items[0].assets[0].printArea,'front');assert.match(b.items[0].assets[0].url,/\.pdf$/);if(fail)return Response.json({outcome:'Error'},{status:500});return Response.json({order:{id:'ord_fixture'}});}throw new Error('Unexpected network request');}) as any;
+}
+await test('artwork is deterministic and changes with customer details',()=>{assert.equal(designSvg(INITIAL),designSvg({...INITIAL}));assert.notEqual(fingerprint(INITIAL),fingerprint({...INITIAL,place:'BIG SUR'}));});
+await test('rejects invalid dates, oversized text and SVG injection',()=>{assert.throws(()=>validateDesign({...INITIAL,date:'2024-02-30'}));assert.throws(()=>validateDesign({...INITIAL,place:'A'.repeat(25)}));assert.throws(()=>validateDesign({...INITIAL,place:'<script>'}));assert.throws(()=>validateDesign({...INITIAL,palette:'toString'}));});
+await test('webhooks accept valid signatures, reject forged and expired requests',async()=>{const raw='{"test":true}',now=Date.now(),t=Math.floor(now/1000),s=createHmac('sha256','secret').update(`${t}.${raw}`).digest('hex');assert.equal(await verifyWebhook(raw,`t=${t},v1=${s}`,'secret',now),true);assert.equal(await verifyWebhook(raw,`t=${t},v1=${s}`,'wrong',now),false);assert.equal(await verifyWebhook(raw,`t=${t},v1=${s}`,'secret',now+301000),false);});
+await test('unpaid checkout never contacts Prodigi',async()=>{fixture();payment.payment_status='unpaid';const row:any=await fulfill('order-one');assert.equal(row.status,'awaiting_payment');assert.equal(calls,0);});
+await test('wrong amount, currency, mode or order cannot trigger fulfillment',async()=>{for(const change of [{amount_total:1},{currency:'eur'},{livemode:true},{client_reference_id:'other'}]){fixture();Object.assign(payment,change);await assert.rejects(fulfill('order-one'),/verification/);assert.equal(calls,0);}});
+await test('paid order submits the saved print once; replay is idempotent',async()=>{fixture();const a:any=await fulfill('order-one');const b:any=await fulfill('order-one');assert.equal(a.status,'submitted');assert.equal(b.prodigi_id,'ord_fixture');assert.equal(calls,1);});
+await test('concurrent payment callbacks submit only once',async()=>{fixture();await Promise.allSettled([fulfill('order-one'),fulfill('order-one')]);assert.equal(calls,1);});
+await test('upstream failure persists paid state and can be retried',async()=>{fixture();fail=true;await assert.rejects(fulfill('order-one'));const row:any=database.prepare('SELECT * FROM orders').get();assert.equal(row.status,'fulfillment_pending');assert.equal(row.lease_until,0);fail=false;const result:any=await fulfill('order-one');assert.equal(result.status,'submitted');});
+await test('missing or non-US shipping address blocks the print order',async()=>{fixture();payment.shipping_details.address.country='CA';await assert.rejects(fulfill('order-one'),/address/);assert.equal(calls,0);});
+await test('live mode is gated and cannot use a test payment key',()=>{fixture();const e=(globalThis as any).__testEnv;assert.equal(configuration().ready,true);e.STRIPE_SECRET_KEY='';assert.equal(configuration().ready,false);e.STRIPE_SECRET_KEY='sk_test_fixture';e.STORE_MODE='live';e.PRODUCTION_READY='true';assert.equal(configuration().ready,false);});
+globalThis.fetch=originalFetch;
