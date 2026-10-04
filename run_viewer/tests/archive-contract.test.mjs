@@ -43,7 +43,7 @@ test("a missing final or image fails even when every existing file is valid", as
 });
 
 test("a capture must belong to the deployment it is registered against", async () => {
-  const invalid = structuredClone(suites.find(s => s.runs.length));
+  const invalid = structuredClone(suites.find(s => s.runs.length && s.prompt.file !== "prompts/prompt-v4.md"));
   invalid.runs[0].deployment = "https://wrong-store.example.com";
   await assert.rejects(registeredAssets([invalid], root), /Capture belongs to another deployment/);
 });

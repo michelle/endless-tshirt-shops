@@ -86,7 +86,7 @@ export async function registeredAssets(suites, publicRoot) {
         continue;
       }
       assert.ok(capture, `Missing capture record: ${suite.id}/${run.id}`);
-      assert.equal(new URL(capture.url).href, new URL(run.deployment).href, `Capture belongs to another deployment: ${run.id}`);
+      assert.equal(new URL(capture.requestedUrl ?? capture.url).href, new URL(run.deployment).href, `Capture belongs to another deployment: ${run.id}`);
       assert.equal(path.posix.dirname(capture.screenshot), directory);
       await add(capture.screenshot);
       // Read the PNG header rather than trusting the manifest: cross-suite

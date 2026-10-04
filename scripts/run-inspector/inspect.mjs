@@ -84,7 +84,9 @@ export async function inspect(opts) {
     }
     if (!normalized.coverage.terminalEvent) warnings.push(`${run.run_id}: no terminal transcript event`);
     runs.push({ id: run.run_id, model: run.model, adapter: run.adapter, status: run.status, durationSeconds: run.duration_seconds,
-      deployment: run.deployment, artifactCommit: run.artifactCommit, promptSha256: run.prompt_sha256, usage: run.usage,
+      deployment: run.deployment, agent_deployment_status: run.agent_deployment_status, agent_deployment_url: run.agent_deployment_url,
+      inspection_deployment_status: run.inspection_deployment_status, inspection_deployment_url: run.inspection_deployment_url,
+      artifactCommit: run.artifactCommit, promptSha256: run.prompt_sha256, usage: run.usage,
       capture: normalized.coverage, documentation: documentation(normalized.events, normalized.coverage), toolEvents: normalized.events,
       source: source.results[run.run_id], payments: paymentEvidence(snapshot.runs[run.run_id]) });
   }

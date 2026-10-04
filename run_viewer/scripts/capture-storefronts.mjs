@@ -125,7 +125,7 @@ async function captureRun(browser, root, suite, run, socialOnly = false) {
     const screenshot = `${directory.publicDir}/storefront.png`;
     await page.screenshot({ path: path.join(directory.diskDir, "storefront.pending.png"), fullPage: false, animations: "disabled", timeout: 15000 });
     await rename(path.join(directory.diskDir, "storefront.pending.png"), path.join(directory.diskDir, "storefront.png"));
-    return { screenshot, ...icon, ...social, url: page.url(), title: await page.title(), ...viewport, capturedAt: new Date().toISOString(), httpStatus: response?.status() ?? null, errors, browser: browser.version(), deviceScaleFactor: 1, colorScheme: "light", timezone: "America/Los_Angeles" };
+    return { screenshot, ...icon, ...social, requestedUrl: url.href, url: page.url(), title: await page.title(), ...viewport, capturedAt: new Date().toISOString(), httpStatus: response?.status() ?? null, errors, browser: browser.version(), deviceScaleFactor: 1, colorScheme: "light", timezone: "America/Los_Angeles" };
   } finally { await context.close(); }
 }
 

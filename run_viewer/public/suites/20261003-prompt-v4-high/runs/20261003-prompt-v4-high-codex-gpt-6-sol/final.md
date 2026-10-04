@@ -1,0 +1,7 @@
+[**Somewhere, Always · public store**](https://somewhere-always-custom-tees.hazelcough.chatgpt.site) is deployed. Customers can personalize a shirt with a place, date, and dedication, then see the artwork update on the shirt preview. The print file is sized for the selected Prodigi shirt. I verified the public page, live customization, and a Prodigi sandbox quote.
+
+**Checkout is not active yet.** I integrated Stripe Checkout and a fulfillment flow that checks Stripe’s paid status before submitting an order to Prodigi, but no Stripe credentials were available. The checkout button currently shows a setup message, and I could not run a paid order end to end.
+
+To test it now, open the store and change the design fields, color, and size. To test payment and fulfillment, add a Stripe test secret key and webhook signing secret as `STRIPE_SECRET_KEY` and `STRIPE_WEBHOOK_SECRET`, and point the Stripe webhook to `https://somewhere-always-custom-tees.hazelcough.chatgpt.site/api/stripe-webhook`. Then use [Stripe’s test card](https://docs.stripe.com/testing) and check the resulting order in Prodigi’s sandbox.
+
+Before selling real shirts, switch to live Stripe and Prodigi credentials, confirm taxes and shipping prices, add store policies and support details, and order a physical sample. The current Prodigi integration uses its [sandbox, which does not print or ship orders](https://www.prodigi.com/print-api/docs/reference/).

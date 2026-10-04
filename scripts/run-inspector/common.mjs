@@ -23,6 +23,6 @@ export async function walk(root) {
 }
 export async function regular(file) { const s = await lstat(file); if (!s.isFile() || s.isSymbolicLink()) throw new Error('Expected regular file'); return s; }
 export function deployment(value) {
-  const found = String(value ?? '').match(/https:\/\/[a-zA-Z0-9.-]+\.vercel\.app\b/);
+  const found = String(value ?? '').match(/https:\/\/[a-zA-Z0-9.-]+\.(?:vercel\.(?:app|sh)|netlify\.app|pages\.dev|onrender\.com|fly\.dev|railway\.app|web\.app|firebaseapp\.com|github\.io|surge\.sh|chatgpt\.site)\b/i);
   return found ? new URL(found[0]).origin : null;
 }

@@ -96,6 +96,8 @@ function DeploymentEvidence({ run }: { run: Run }) {
     <p className="deployment-evidence">
       {run.agentDeployment?.status === "reported" && run.agentDeployment.url ? (
         <>Agent reported a deployment: <a href={run.agentDeployment.url} target="_blank" rel="noreferrer">open original ↗</a></>
+      ) : run.agentDeployment?.status === "unusable" ? (
+        <>Agent deployment: reported but unusable{run.agentDeployment.url && <> · <a href={run.agentDeployment.url} target="_blank" rel="noreferrer">open reported URL ↗</a></>}</>
       ) : <>Agent deployment: not observed</>}
       {run.inspectionDeployment && <> · Harness inspection: {run.inspectionDeployment.status === "succeeded" && run.inspectionDeployment.url ? (
         <a href={run.inspectionDeployment.url} target="_blank" rel="noreferrer">open {run.inspectionDeployment.provider} copy ↗</a>

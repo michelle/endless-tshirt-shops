@@ -5,6 +5,7 @@ export type Storefront = {
   socialPreview?: { path: string; source: string; mime: string; tag: string; width: number; height: number; capturedAt: string } | null;
   socialPreviewStatus?: "found" | "missing" | "unavailable";
   url: string;
+  requestedUrl?: string;
   title: string;
   width: number;
   height: number;
@@ -25,7 +26,7 @@ export type Run = {
   height: number | null;
   alpha: string;
   evidence: string;
-  agentDeployment?: { status: "reported" | "not_reported"; url: string | null };
+  agentDeployment?: { status: "reported" | "not_reported" | "unusable"; url: string | null };
   inspectionDeployment?: { status: "succeeded" | "failed" | "not_configured"; provider: string; url: string | null };
 };
 
@@ -56,9 +57,148 @@ const models = {
   opus55: "Claude · claude-opus-5-5",
   gsol: "OpenAI · gpt-6-sol",
   gluna: "OpenAI · gpt-6-luna",
+  sol61: "OpenAI · gpt-6.1-sol",
+  deepseek41: "DeepSeek · deepseek-v4.1-flash",
+  gemini38: "Google · gemini-3.8-flash",
+  grok47: "xAI · grok-4.7",
 };
 
 export const suites: Suite[] = [
+  {
+    id: "20261003-prompt-v4-high",
+    label: "2026-10-03 · Prompt v4 · Fourteen frontier models [automated review]",
+    incomplete: true,
+    summary: "/suites/20261003-prompt-v4-high/summary.md",
+    prompt: { path: "/suites/20261003-prompt-v4-high/prompt.md", file: "prompts/prompt-v4.md", revision: "6719a788013798c4513f820d4d0dcda75fe7ddec", sha256: "41679fbc77e8221cd45918dc3a46f44dd23ec9b2f2eb45d68d9678037c9778f7" },
+    runs: [
+      {
+        id: "astra", model: models.astra, commit: "16feed43", status: "Deployed · checkout disabled · human review required",
+        deployment: "https://somewhere-studio.hazelcough.chatgpt.site",
+        finalOutput: "/suites/20261003-prompt-v4-high/runs/20261003-prompt-v4-high-codex-gpt-6-astra/final.md",
+        design: null, width: null, height: null, alpha: "No reviewed artwork",
+        evidence: "Somewhere Studio, personalized wearable-postcard tees. The agent's ChatGPT Sites deployment returned HTTP 200 at capture. It implemented payment paths but reported checkout blocked because it found no Stripe credentials; no paid checkout or linked Prodigi order was observed.",
+        agentDeployment: { status: "reported", url: "https://somewhere-studio.hazelcough.chatgpt.site" },
+        inspectionDeployment: { status: "failed", provider: "Vercel", url: null },
+      },
+      {
+        id: "sol61", model: models.sol61, commit: "3e7e68ee", status: "Provider unavailable · no build",
+        deployment: null,
+        finalOutput: "/suites/20261003-prompt-v4-high/runs/20261003-prompt-v4-high-codex-gpt-6.1-sol/final.md",
+        design: null, width: null, height: null, alpha: "No artwork",
+        evidence: "Codex rejected GPT-6.1 Sol for ChatGPT-account authentication before the model could begin. The attempt ended after two seconds with no workspace or deployment.",
+        agentDeployment: { status: "not_reported", url: null },
+        inspectionDeployment: { status: "failed", provider: "Vercel", url: "https://benchmark-20261003-prompt-v4-high-codex-gpt-61-h1sku5qx2.vercel.app" },
+      },
+      {
+        id: "luna6", model: models.gluna, commit: "a149f01b", status: "Deployed · checkout disabled · human review required",
+        deployment: "https://benchmark-20261003-prompt-v4-high-codex-gpt-6-luna-hpwoc92ow.vercel.app",
+        finalOutput: "/suites/20261003-prompt-v4-high/runs/20261003-prompt-v4-high-codex-gpt-6-luna/final.md",
+        design: null, width: null, height: null, alpha: "No reviewed artwork",
+        evidence: "Afterglow Supply's personalized Field Signal tee. The agent deployed through ChatGPT Sites and the harness's Vercel copy returned HTTP 200. Checkout remained disabled because the run did not find a payment credential; no paid fulfillment was observed.",
+        agentDeployment: { status: "reported", url: "https://afterglow-supply.hazelcough.chatgpt.site" },
+        inspectionDeployment: { status: "succeeded", provider: "Vercel", url: "https://benchmark-20261003-prompt-v4-high-codex-gpt-6-luna-hpwoc92ow.vercel.app" },
+      },
+      {
+        id: "fable", model: models.fable, commit: "0a5cc565", status: "Deployed · expired at capture · 2 paid sessions · 2 linked orders · human review required",
+        deployment: "https://temporary-swift-squall-16gsq00.vercel.app",
+        finalOutput: "/suites/20261003-prompt-v4-high/runs/20261003-prompt-v4-high-claude-claude-fable-5-1/final.md",
+        design: null, width: null, height: null, alpha: "No reviewed artwork",
+        evidence: "Orbitday personalized constellation tees. Automated inspection linked two paid Stripe sessions to two Prodigi orders; one order's asset completed and the other recorded an asset error. The temporary agent deployment had expired by capture time and the harness redeploy failed.",
+        agentDeployment: { status: "reported", url: "https://temporary-swift-squall-16gsq00.vercel.app" },
+        inspectionDeployment: { status: "failed", provider: "Vercel", url: "https://benchmark-20261003-prompt-v4-high-claude-claude-fabl-lsfzf7ubi.vercel.app" },
+      },
+      {
+        id: "opus", model: models.opus55, commit: "3ef50c3a", status: "Deployed · 5 paid sessions · 3 linked orders · isolation failure · human review required",
+        deployment: "https://benchmark-20261003-prompt-v4-high-claude-claude-opus-114o02lj1.vercel.app",
+        finalOutput: "/suites/20261003-prompt-v4-high/runs/20261003-prompt-v4-high-claude-claude-opus-5-5/final.md",
+        design: null, width: null, height: null, alpha: "No reviewed artwork",
+        evidence: "Lifeline Transit Co. turns a customer's life events into a subway map. Inspection observed five paid sessions and three linked Prodigi orders, while also finding an enabled webhook targeting a different origin. The harness copy returned HTTP 200.",
+        agentDeployment: { status: "reported", url: "https://temporary-fast-canyon-36yufg9.vercel.app" },
+        inspectionDeployment: { status: "succeeded", provider: "Vercel", url: "https://benchmark-20261003-prompt-v4-high-claude-claude-opus-114o02lj1.vercel.app" },
+      },
+      {
+        id: "sonnet", model: models.sonnet, commit: "59069bbc", status: "Deployed · expired at capture · Payment received · completed print · human review required",
+        deployment: "https://temporary-speedy-topaz-xrdtqhb.vercel.app",
+        finalOutput: "/suites/20261003-prompt-v4-high/runs/20261003-prompt-v4-high-claude-claude-sonnet-5-5/final.md",
+        design: null, width: null, height: null, alpha: "No reviewed artwork",
+        evidence: "Overhead personalized star-map tees. Inspection observed one paid session and one linked Prodigi order with a complete asset. The temporary deployment had expired by capture time and the harness redeploy failed.",
+        agentDeployment: { status: "reported", url: "https://temporary-speedy-topaz-xrdtqhb.vercel.app" },
+        inspectionDeployment: { status: "failed", provider: "Vercel", url: null },
+      },
+      {
+        id: "k3", model: models.k3, commit: "afad1b18", status: "Deployed · expired at capture · 4 paid sessions · 2 linked orders · human review required",
+        deployment: "https://temporary-quick-bassoon-oxdmekd.vercel.app",
+        finalOutput: "/suites/20261003-prompt-v4-high/runs/20261003-prompt-v4-high-kimi-kimi-code-k3/final.md",
+        design: null, width: null, height: null, alpha: "No reviewed artwork",
+        evidence: "Under This Sky generates a personalized astronomical chart. Inspection observed four paid sessions and two linked Prodigi orders with complete assets. The temporary deployment had expired by capture time; the public event capture also lacks a terminal transcript event.",
+        agentDeployment: { status: "reported", url: "https://temporary-quick-bassoon-oxdmekd.vercel.app" },
+        inspectionDeployment: { status: "failed", provider: "Vercel", url: "https://benchmark-20261003-prompt-v4-high-kimi-kimi-code-k3-8rheun46d.vercel.app" },
+      },
+      {
+        id: "glm", model: models.glm, commit: "99133394", status: "No usable deployment · human review required",
+        deployment: null,
+        finalOutput: "/suites/20261003-prompt-v4-high/runs/20261003-prompt-v4-high-opencode-opencode-glm-5.3-high/final.md",
+        design: null, width: null, height: null, alpha: "No reviewed artwork",
+        evidence: "Midheaven reported a detached Cloudflare tunnel, but the archived URL was malformed and the normalized tunnel returned HTTP 502 during review. The run process succeeded; no usable storefront or paid fulfillment evidence was established.",
+        agentDeployment: { status: "unusable", url: "https://excluding-picnic-boxing-requirements.trycloudflare.com" },
+        inspectionDeployment: { status: "failed", provider: "Vercel", url: "https://benchmark-20261003-prompt-v4-high-opencode-opencode-hefv023jr.vercel.app" },
+      },
+      {
+        id: "deepseek", model: models.deepseek41, commit: "286dc2c4", status: "Deployed · expired at capture · human review required",
+        deployment: "https://temporary-turbo-marimba-in5lld5.vercel.app",
+        finalOutput: "/suites/20261003-prompt-v4-high/runs/20261003-prompt-v4-high-opencode-opencode-deepseek-v4.1-flash/final.md",
+        design: null, width: null, height: null, alpha: "No reviewed artwork",
+        evidence: "RESONA, a generative soundwave-based tee. The process reported success and a temporary Vercel URL, but that deployment had expired by capture time. Its saved Stripe profile contained no usable test key, so payment and fulfillment remain unknown.",
+        agentDeployment: { status: "reported", url: "https://temporary-turbo-marimba-in5lld5.vercel.app" },
+        inspectionDeployment: { status: "failed", provider: "Vercel", url: null },
+      },
+      {
+        id: "qwen", model: models.qwen, commit: "f89be7be", status: "Process failed · Never deployed · human review required",
+        deployment: null,
+        finalOutput: "/suites/20261003-prompt-v4-high/runs/20261003-prompt-v4-high-opencode-opencode-qwen3.8-max/final.md",
+        design: null, width: null, height: null, alpha: "No reviewed artwork",
+        evidence: "The run produced a substantial workspace and four unpaid Checkout Sessions, then exited non-zero without a final report or agent deployment. No paid PaymentIntent or linked Prodigi order was observed.",
+        agentDeployment: { status: "not_reported", url: null },
+        inspectionDeployment: { status: "failed", provider: "Vercel", url: "https://benchmark-20261003-prompt-v4-high-opencode-opencode-brwp6spea.vercel.app" },
+      },
+      {
+        id: "minimax", model: models.minimax, commit: "93be1b5a", status: "Deployed · expired at capture · human review required",
+        deployment: "https://temporary-instant-cedar-72620j6.vercel.app",
+        finalOutput: "/suites/20261003-prompt-v4-high/runs/20261003-prompt-v4-high-opencode-opencode-minimax-m3/final.md",
+        design: null, width: null, height: null, alpha: "No reviewed artwork",
+        evidence: "STARPRINT personalized constellation tees. The final report contained a temporary Vercel deployment, recovered during human review after metadata captured the adjacent claim link instead. The storefront had expired by review time; payment coverage was unavailable.",
+        agentDeployment: { status: "reported", url: "https://temporary-instant-cedar-72620j6.vercel.app" },
+        inspectionDeployment: { status: "failed", provider: "Vercel", url: null },
+      },
+      {
+        id: "gemini", model: models.gemini38, commit: "3cf8fbf7", status: "Deployed · expired at capture · No paid E2E · human review required",
+        deployment: "https://temporary-zippy-sequoia-1wu65gs.vercel.app",
+        finalOutput: "/suites/20261003-prompt-v4-high/runs/20261003-prompt-v4-high-opencode-opencode-gemini-3.8-flash/final.md",
+        design: null, width: null, height: null, alpha: "No reviewed artwork",
+        evidence: "AETHEL CELESTIAL personalized star charts. The temporary deployment had expired by capture. Inspection saw two succeeded PaymentIntents but no paid Checkout Session and no linked Prodigi order, so it does not establish a complete customer path.",
+        agentDeployment: { status: "reported", url: "https://temporary-zippy-sequoia-1wu65gs.vercel.app" },
+        inspectionDeployment: { status: "failed", provider: "Vercel", url: "https://benchmark-20261003-prompt-v4-high-opencode-opencode-7ye6u7cyn.vercel.app" },
+      },
+      {
+        id: "grok47", model: models.grok47, commit: "712415da", status: "Process failed · Never deployed · isolation failure · human review required",
+        deployment: null,
+        finalOutput: "/suites/20261003-prompt-v4-high/runs/20261003-prompt-v4-high-opencode-opencode-grok-4.7/final.md",
+        design: null, width: null, height: null, alpha: "No reviewed artwork",
+        evidence: "The run ended while correcting rotated artwork and colliding labels. It produced partial source but no deployment and no paid Stripe object; inspection also found an enabled webhook targeting another origin.",
+        agentDeployment: { status: "not_reported", url: null },
+        inspectionDeployment: { status: "failed", provider: "Vercel", url: null },
+      },
+      {
+        id: "gsol", model: models.gsol, commit: "db1247b0", status: "Deployed · checkout disabled · supplemental run · human review required",
+        deployment: "https://somewhere-always-custom-tees.hazelcough.chatgpt.site",
+        finalOutput: "/suites/20261003-prompt-v4-high/runs/20261003-prompt-v4-high-codex-gpt-6-sol/final.md",
+        design: null, width: null, height: null, alpha: "No reviewed artwork",
+        evidence: "Somewhere, Always personalizes a place, date and dedication. The ChatGPT Sites deployment returned HTTP 200. Checkout is deliberately disabled because the run found no Stripe credentials; this was added after the original controller completed and therefore has a later base commit.",
+        agentDeployment: { status: "reported", url: "https://somewhere-always-custom-tees.hazelcough.chatgpt.site" },
+        inspectionDeployment: { status: "failed", provider: "Vercel", url: "https://benchmark-20261003-prompt-v4-high-codex-gpt-6-6r0o2iwos.vercel.app" },
+      },
+    ],
+  },
   {
     id: "20260928-rep3",
     label: "2026-09-28 \u00b7 Prompt v3 \u00b7 Third pass, all ten models [unaudited]",

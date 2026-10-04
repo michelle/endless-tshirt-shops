@@ -1,6 +1,13 @@
 export const statusDefinitions: Record<string, string> = {
   "unaudited": "No human audit has been performed. The status reflects what the harness recorded and what the agent claimed about its own work, not verified behaviour.",
   "Deployed": "A storefront URL was recorded for this run. Nothing about payment, fulfilment or correctness is implied.",
+  "expired at capture": "The agent reported a temporary deployment, but it redirected to the provider's expired-deployment page when the viewer captured it.",
+  "checkout disabled": "The deployed store deliberately refuses checkout because the run did not find usable payment credentials.",
+  "human review required": "Automated evidence has been collected, but the application, commerce flow and print output have not completed human review.",
+  "No usable deployment": "The run reported a URL, but review could not establish a working public storefront at that address.",
+  "Process failed": "The model adapter exited non-zero. Partial source or external objects may still exist and are described separately.",
+  "Provider unavailable": "The requested model was rejected by the provider before it could begin the task.",
+  "supplemental run": "This run was added after the original suite controller completed. It used the same prompt and effort but a later harness commit.",
   "Never deployed": "The run finished without shipping a storefront: no deployment URL was recorded, no project exists, and no storefront host appears in the private log.",
   "Aborted on question": "The agent stopped to ask a human for help with a step it could not complete alone. The harness runs non-interactively and denies questions, so the session ended there.",
   "URL not captured": "The run deployed, but its report ended mid-sentence and named no URL, so the harness recorded none. The storefront is reachable; the archived metadata understates the run.",

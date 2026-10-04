@@ -10,6 +10,7 @@ import { inspectIsolation, linkOrders } from '../scripts/run-inspector/isolation
 import { mergeReport, beginMarker, endMarker } from '../scripts/run-inspector/report.mjs';
 import { parseArgs, inspect, viewerRuns } from '../scripts/run-inspector/inspect.mjs';
 import { fetchImage, recoverArtwork } from '../scripts/run-inspector/artwork.mjs';
+import { deployment } from '../scripts/run-inspector/common.mjs';
 const jsonl = values => values.map(v => JSON.stringify(v)).join('\n');
 const response = body => new Response(JSON.stringify(body), { status: 200 });
 const key = 'test_11111111-1111-1111-1111-111111111111';
@@ -235,13 +236,19 @@ test('viewer staging uses existing short model IDs without conflating retries', 
   assert.deepEqual(viewerRuns([run, { ...run, id: 'suite-codex-sol-retry' }], 'suite').map(r => r.id), ['suite-codex-sol', 'suite-codex-sol-retry']);
 });
 
+test('deployment accepts provider-neutral hosts used by the runner', () => {
+  assert.equal(deployment('Live at https://shop.netlify.app/path'), 'https://shop.netlify.app');
+  assert.equal(deployment('https://somewhere-always.hazelcough.chatgpt.site'), 'https://somewhere-always.hazelcough.chatgpt.site');
+  assert.equal(deployment('https://example.com'), null);
+});
+
 test('end-to-end offline inspector pins artifacts, excludes symlinks, and refreshes only its summary block', async t => {
   const dir = await mkdtemp(path.join(os.tmpdir(), 'inspector-suite-')); t.after(() => rm(dir, { recursive: true, force: true }));
   const repo = path.join(dir, 'repo'); await mkdir(repo);
   const git = (...args) => execFileSync('git', ['-C', repo, ...args], { encoding: 'utf8' }).trim();
   git('init', '-q'); git('config', 'user.name', 'Fixture'); git('config', 'user.email', 'fixture@example.com');
   const id = 'suite-codex-sol', artifact = path.join(repo, 'runs', id); await mkdir(path.join(artifact, 'workspace'), { recursive: true });
-  await writeFile(path.join(artifact, 'metadata.json'), JSON.stringify({ ...runs[0], suite_id: 'suite', run_id: id, adapter: 'codex', model: 'gpt-5.6-sol', status: 'succeeded', deployment_url: 'https://one.vercel.app' }));
+  await writeFile(path.join(artifact, 'metadata.json'), JSON.stringify({ ...runs[0], suite_id: 'suite', run_id: id, adapter: 'codex', model: 'gpt-5.6-sol', status: 'succeeded', deployment_url: 'https://one.vercel.app', agent_deployment_status: 'reported', agent_deployment_url: 'https://one.vercel.app', inspection_deployment_status: 'failed', inspection_deployment_url: 'https://copy.vercel.app' }));
   await writeFile(path.join(artifact, 'final.md'), 'Done');
   // agent.log, not events.jsonl: this fixture is a run published before capture.json existed.
   await writeFile(path.join(artifact, 'agent.log'), '{"type":"turn.completed","usage":{"input_tokens":1}}');
@@ -254,6 +261,8 @@ test('end-to-end offline inspector pins artifacts, excludes symlinks, and refres
   assert.equal(result.runs, 1); assert.equal(result.isolation, 'unknown');
   const report = JSON.parse(await readFile(path.join(output, 'inspection.json')));
   assert.equal(report.artifactCommit, git('rev-parse', 'HEAD'));
+  assert.equal(report.runs[0].agent_deployment_status, 'reported');
+  assert.equal(report.runs[0].inspection_deployment_status, 'failed');
   assert.equal(report.runs[0].source.reviewCues[0].kind, 'legacy-shipping-read');
   await assert.rejects(readFile(path.join(output, 'artifacts', 'runs', id, 'workspace', 'outside')), { code: 'ENOENT' });
   assert.match(await readFile(summary, 'utf8'), /^# Human summary\n\n## Keep this heading/);
