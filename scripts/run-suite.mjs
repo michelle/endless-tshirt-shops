@@ -6,23 +6,21 @@ import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { git, identifier, hash } from './run-inspector/common.mjs';
 
-// The open-weights comparison. OpenCode aliases carry the reasoning effort as a
-// variant suffix, since the CLI has no effort flag, and only some models publish
-// one: glm-5.3 and the GPT-6 pair accept #high, while qwen3.8-max, minimax-m3
-// and kimi-k3 have no variants and run at their provider default.
-// deepseek-v4-pro publishes #high but its provider rejected it mid-run with
-// "native reasoning control reasoning_effort is not allowed", so it runs bare.
+// The current frontier comparison. Native harnesses run first so their account
+// quotas are independent of the six models routed through OpenCode. OpenCode
+// aliases carry reasoning effort as a variant suffix because the CLI has no
+// effort flag. Only GLM publishes the #high variant used here; the other five
+// OpenCode models run at their provider default.
 // The opencode-go provider reaches the same models but needs Global regions
 // enabled on the workspace, so the plain opencode aliases are used.
 // scripts/preflight-clis.mjs probes every alias here before a suite launches.
-//
-// kimi-code/k3 and opencode/kimi-k3 are the same weights on two harnesses: the
-// pair is the control that separates scaffold effect from model effect.
 export const models = [
-  ['kimi', 'kimi-code/kimi-for-coding'], ['kimi', 'kimi-code/k3'],
-  ['opencode', 'opencode/glm-5.3#high'], ['opencode', 'opencode/deepseek-v4-pro'],
+  ['codex', 'gpt-6-astra'], ['codex', 'gpt-6.1-sol'], ['codex', 'gpt-6-luna'],
+  ['claude', 'claude-fable-5-1'], ['claude', 'claude-opus-5-5'], ['claude', 'claude-sonnet-5-5'],
+  ['kimi', 'kimi-code/k3'],
+  ['opencode', 'opencode/glm-5.3#high'], ['opencode', 'opencode/deepseek-v4.1-flash'],
   ['opencode', 'opencode/qwen3.8-max'], ['opencode', 'opencode/minimax-m3'],
-  ['opencode', 'opencode/kimi-k3'],
+  ['opencode', 'opencode/gemini-3.8-flash'], ['opencode', 'opencode/grok-4.7'],
 ];
 // run-benchmark sanitizes the --run-id it is given (lowercase; every run of
 // characters outside [a-z0-9._-] becomes one '-'; one leading and trailing

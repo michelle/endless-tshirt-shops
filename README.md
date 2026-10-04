@@ -102,14 +102,14 @@ recorded too. Earlier suites compared `gpt-6-astra`, `gpt-5.6-sol`,
 `gpt-5.6-terra`, `gpt-5.6-luna`, `claude-fable-5-1`, `claude-opus-5` and
 `claude-sonnet-5`; those runs stay published on `benchmark-results`.
 
-`scripts/run-suite.mjs` now iterates the open-weights comparison:
-`kimi-code/kimi-for-coding`, `kimi-code/k3`, `opencode/glm-5.3#high`,
-`opencode/deepseek-v4-pro#high`, `opencode/qwen3.8-max`,
-`opencode/minimax-m3` and `opencode/kimi-k3`. That list is the suite's
-definition, so `--resume` verifies against it: freeze it before a launch and
-change it only between suites. `kimi-code/k3` and `opencode/kimi-k3` are the
-same weights on two harnesses — the pair is the control that separates
-scaffold effect from model effect.
+`scripts/run-suite.mjs` now iterates a 13-model frontier comparison. It starts
+with the native harnesses (`gpt-6-astra`, `gpt-6.1-sol`, `gpt-6-luna`,
+`claude-fable-5-1`, `claude-opus-5-5`, `claude-sonnet-5-5`, and
+`kimi-code/k3`), then runs the OpenCode-routed models (`glm-5.3#high`,
+`deepseek-v4.1-flash`, `qwen3.8-max`, `minimax-m3`, `gemini-3.8-flash`, and
+`grok-4.7`). That list and order are the suite's definition, so `--resume`
+verifies against them: freeze both before a launch and change them only between
+suites.
 
 Two generated paths never publish. `scripts/exclude-bulky-artifacts.mjs` keeps
 dependency and build directories, and any single file at or above 90 MB, out of
@@ -143,8 +143,8 @@ fail with `provider.invalid-request` on the first request, so the plain
 ### Run a whole suite
 
 ```sh
-node scripts/run-suite.mjs --suite 20260927-openweights-high \
-  --prompt prompts/prompt-v3.md --effort high --timeout 7200
+node scripts/run-suite.mjs --suite 20261003-prompt-v4-high \
+  --prompt prompts/prompt-v4.md --effort high --timeout 7200
 ```
 
 Runs every model in the list serially in a dedicated clean worktree, records private

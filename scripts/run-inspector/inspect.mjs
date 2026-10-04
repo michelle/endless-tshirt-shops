@@ -13,7 +13,7 @@ import { renderReport, updateSummary } from './report.mjs';
 
 export const inspectorVersion = '1.0.0';
 export function viewerRuns(runs, suiteId) {
-  const modelIds = { 'gpt-6-astra': 'astra', 'gpt-5.6-sol': 'sol', 'gpt-5.6-terra': 'terra', 'gpt-5.6-luna': 'luna', 'claude-fable-5-1': 'fable', 'claude-opus-5': 'opus', 'claude-sonnet-5': 'sonnet', 'kimi-code/kimi-for-coding': 'kimi', 'kimi-code/k3': 'k3', 'opencode-go/glm-5.3': 'glm', 'opencode-go/deepseek-v4-pro': 'deepseek', 'opencode-go/qwen3.8-max': 'qwen' };
+  const modelIds = { 'gpt-6-astra': 'astra', 'gpt-6.1-sol': 'sol61', 'gpt-6-luna': 'luna6', 'gpt-5.6-sol': 'sol', 'gpt-5.6-terra': 'terra', 'gpt-5.6-luna': 'luna', 'claude-fable-5-1': 'fable', 'claude-opus-5-5': 'opus', 'claude-sonnet-5-5': 'sonnet', 'claude-opus-5': 'opus5', 'claude-sonnet-5': 'sonnet5', 'kimi-code/kimi-for-coding': 'k28', 'kimi-code/k3': 'k3', 'opencode/glm-5.3#high': 'glm', 'opencode/deepseek-v4.1-flash': 'deepseek', 'opencode/qwen3.8-max': 'qwen', 'opencode/minimax-m3': 'minimax', 'opencode/gemini-3.8-flash': 'gemini', 'opencode/grok-4.7': 'grok', 'opencode-go/glm-5.3': 'glm-go', 'opencode-go/deepseek-v4-pro': 'deepseek-v4', 'opencode-go/qwen3.8-max': 'qwen-go' };
   return runs.filter(r => r.deployment).map(r => ({ id: runs.filter(other => other.model === r.model).length === 1 ? modelIds[r.model] ?? r.id : r.id,
     benchmarkRunId: r.id, deployment: r.deployment, finalOutput: `/suites/${suiteId}/runs/${r.id}/final.md` }));
 }

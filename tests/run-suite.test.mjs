@@ -5,6 +5,20 @@ import path from 'node:path';
 import os from 'node:os';
 import { runSuite, parseArgs, models, sanitizeRunId } from '../scripts/run-suite.mjs';
 import { hash } from '../scripts/run-inspector/common.mjs';
+test('frontier roster runs native harnesses before OpenCode', () => {
+  assert.equal(models.length, 13);
+  assert.deepEqual(models.map(([adapter]) => adapter), [
+    'codex', 'codex', 'codex', 'claude', 'claude', 'claude', 'kimi',
+    'opencode', 'opencode', 'opencode', 'opencode', 'opencode', 'opencode',
+  ]);
+  assert.deepEqual(models.map(([, model]) => model), [
+    'gpt-6-astra', 'gpt-6.1-sol', 'gpt-6-luna',
+    'claude-fable-5-1', 'claude-opus-5-5', 'claude-sonnet-5-5',
+    'kimi-code/k3', 'opencode/glm-5.3#high', 'opencode/deepseek-v4.1-flash',
+    'opencode/qwen3.8-max', 'opencode/minimax-m3',
+    'opencode/gemini-3.8-flash', 'opencode/grok-4.7',
+  ]);
+});
 const git = args => {
   if (args[0] === 'show') {
     // Model aliases may contain '/', so the run id is not at a fixed offset.
