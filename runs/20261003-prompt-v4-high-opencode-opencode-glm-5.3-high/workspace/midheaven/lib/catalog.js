@@ -1,0 +1,21 @@
+// A small curated set of famous stars (J2000) used for subtle labels on the chart.
+export const FAMOUS = [
+  { name: 'Sirius', ra: 101.287, dec: -16.716, mag: -1.46 },
+  { name: 'Canopus', ra: 95.988, dec: -52.696, mag: -0.74 },
+  { name: 'Arcturus', ra: 213.918, dec: 19.182, mag: -0.05 },
+  { name: 'Vega', ra: 279.235, dec: 38.784, mag: 0.03 },
+  { name: 'Capella', ra: 79.172, dec: 45.998, mag: 0.08 },
+  { name: 'Rigel', ra: 78.634, dec: -8.202, mag: 0.13 },
+  { name: 'Procyon', ra: 114.826, dec: 5.225, mag: 0.34 },
+  { name: 'Achernar', ra: 24.429, dec: -57.237, mag: 0.46 },
+  { name: 'Betelgeuse', ra: 88.793, dec: 7.407, mag: 0.5 },
+  { name: 'Altair', ra: 297.696, dec: 8.868, mag: 0.77 },
+  { name: 'Aldebaran', ra: 68.98, dec: 16.509, mag: 0.85 },
+  { name: 'Spica', ra: 201.298, dec: -11.161, mag: 0.97 },
+  { name: 'Antares', ra: 247.353, dec: -26.432, mag: 1.09 },
+  { name: 'Pollux', ra: 116.329, dec: 28.026, mag: 1.14 },
+  { name: 'Fomalhaut', ra: 344.413, dec: -29.622, mag: 1.16 },
+  { name: 'Deneb', ra: 310.358, dec: 45.28, mag: 1.25 },
+  { name: 'Regulus', ra: 152.093, dec: 11.967, mag: 1.35 },
+  { name: 'Polaris', ra: 37.955, dec: 89.264, mag: 1.98 },
+].sort((a, b) => a.mag - b.mag)
