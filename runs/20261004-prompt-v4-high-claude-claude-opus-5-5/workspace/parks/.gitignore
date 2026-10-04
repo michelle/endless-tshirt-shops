@@ -1,0 +1,6 @@
+.env*
+.stripe-claim-url
+node_modules
+.next
+out
+.vercel
