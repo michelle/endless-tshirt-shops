@@ -1,0 +1,8 @@
+scripts/test-render.ts
+tsconfig.tsbuildinfo
+node_modules/@next/swc-*
+node_modules/typescript
+node_modules/@types
+node_modules/tsx
+node_modules/esbuild
+node_modules/@esbuild
