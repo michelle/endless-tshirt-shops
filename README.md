@@ -134,8 +134,9 @@ is removed before the agent starts. Metadata records the agent deployment and
 the evaluator-owned inspection deployment separately; the latter never rescues
 the former's benchmark result. The harness creates the run-specific project on
 its first deployment and recognizes a sole application nested one directory
-below the agent workspace. `BENCHMARK_VERCEL_SCOPE` is optional. Private
-deployment logs live under `.benchmark-secrets/deployments/`.
+below the agent workspace. Each inspection project has Vercel SSO protection
+disabled so the evaluator can reach it anonymously. `BENCHMARK_VERCEL_SCOPE` is
+optional. Private deployment logs live under `.benchmark-secrets/deployments/`.
 
 OpenCode's `opencode-go/*` aliases reach the same models but require Global
 regions on the workspace's OpenCode Console privacy settings; without that they

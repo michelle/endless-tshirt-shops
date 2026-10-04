@@ -109,7 +109,8 @@ printf '%s\n' \
   'case "${1-} ${2-}" in' \
   '  "project inspect") [[ -f $FAKE_VERCEL_STATE ]] ;;' \
   '  "project add") touch "$FAKE_VERCEL_STATE" ;;' \
-  '  "deploy --prod") [[ -f $FAKE_VERCEL_STATE ]]; printf "https://benchmark-inspection-copy.vercel.app\n" ;;' \
+  '  "project protection") [[ ${3-} == disable && ${5-} == --sso ]]; touch "$FAKE_VERCEL_STATE.public" ;;' \
+  '  "deploy --prod") [[ -f $FAKE_VERCEL_STATE && -f $FAKE_VERCEL_STATE.public ]]; printf "https://benchmark-inspection-copy.vercel.app\n" ;;' \
   '  *) echo "unexpected Vercel invocation: $*" >&2; exit 2 ;;' \
   'esac' >"$BIN/vercel"
 chmod +x "$BIN/vercel"
@@ -259,6 +260,7 @@ PROVIDER_METADATA=$(git --git-dir="$REMOTE" show benchmark-results:runs/provider
 [[ $PROVIDER_METADATA == *'"inspection_deployment_url": "https://benchmark-inspection-copy.vercel.app"'* ]] || fail 'harness inspection URL was not recorded'
 assert test -s "$REPO/.benchmark-secrets/deployments/provider-choice.log"
 assert test -f "$FAKE_VERCEL_STATE"
+assert test -f "$FAKE_VERCEL_STATE.public"
 LOG=$(git --git-dir="$REMOTE" show benchmark-results:runs/success/events.jsonl)
 [[ $LOG != *test_11111111-1111-1111-1111-111111111111* ]] || fail 'injected secret leaked into committed log'
 [[ $LOG != *sk_test_* ]] || fail 'Stripe pattern leaked into committed log'

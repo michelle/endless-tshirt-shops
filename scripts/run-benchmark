@@ -512,6 +512,11 @@ if [[ -n $HARNESS_VERCEL_TOKEN ]]; then
     if ! VERCEL_TOKEN="$HARNESS_VERCEL_TOKEN" "$TIMEOUT_COMMAND" 60 vercel project inspect "$VERCEL_PROJECT" --non-interactive "${VERCEL_SCOPE_ARGS[@]}"; then
       VERCEL_TOKEN="$HARNESS_VERCEL_TOKEN" "$TIMEOUT_COMMAND" 60 vercel project add "$VERCEL_PROJECT" --non-interactive "${VERCEL_SCOPE_ARGS[@]}" || exit 1
     fi
+    # Inspection copies must be anonymously reachable by the evaluator. New
+    # projects can inherit team-level SSO protection even when the deployment
+    # itself succeeds, which otherwise turns the captured URL into a login
+    # redirect and a false-positive "succeeded" status.
+    VERCEL_TOKEN="$HARNESS_VERCEL_TOKEN" "$TIMEOUT_COMMAND" 60 vercel project protection disable "$VERCEL_PROJECT" --sso --non-interactive "${VERCEL_SCOPE_ARGS[@]}" || exit 1
     VERCEL_TOKEN="$HARNESS_VERCEL_TOKEN" "$TIMEOUT_COMMAND" 900 vercel deploy --prod --yes --project "$VERCEL_PROJECT" "${VERCEL_SCOPE_ARGS[@]}"
   ) >"$INSPECTION_LOG" 2>&1
   INSPECTION_EXIT=$?
