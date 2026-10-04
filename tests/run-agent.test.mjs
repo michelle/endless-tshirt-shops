@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtemp, mkdir, writeFile, readFile, stat, rm } from 'node:fs/promises';
+import { mkdtemp, mkdir, writeFile, readFile, stat, rm, realpath } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { spawn } from 'node:child_process';
 import path from 'node:path';
@@ -9,7 +9,7 @@ const root = path.resolve(import.meta.dirname, '..');
 async function run(provider, events, t, { exit = 0, final = 'Codex final', tail = '', delay = false, drop = null, model = 'fake', refresh = null } = {}) {
   const dir = await mkdtemp(path.join(os.tmpdir(), 'run-agent-')); t.after(() => rm(dir, { recursive: true, force: true }));
   await mkdir(path.join(dir, 'bin'));
-  const script = `#!${process.execPath}\nconst fs = require('node:fs');\nconst args = process.argv.slice(2);\nfs.writeFileSync(process.env.ARGUMENTS, JSON.stringify(args));\nfs.writeFileSync(process.env.MEMORY_ENV, JSON.stringify({ auto: process.env.CLAUDE_CODE_DISABLE_AUTO_MEMORY, md: process.env.CLAUDE_CODE_DISABLE_CLAUDE_MDS }));\nfs.writeFileSync(process.env.KIMI_ENV_DUMP, JSON.stringify({ home: process.env.KIMI_CODE_HOME, noUpdate: process.env.KIMI_CODE_NO_AUTO_UPDATE }));\nif (process.env.KIMI_REFRESH) fs.writeFileSync(process.env.KIMI_CODE_HOME + '/credentials/fixture.json', process.env.KIMI_REFRESH);\n${provider === 'codex' ? `fs.writeFileSync(args[args.indexOf('--output-last-message') + 1], ${JSON.stringify(final)});` : ''}\nfor (const event of ${JSON.stringify(events)}) process.stdout.write(JSON.stringify(event) + '\\n');\nprocess.stdout.write(${JSON.stringify(tail)});\n${delay ? 'setTimeout(() => process.exit(0), 30000);' : `process.exitCode = ${exit};`}`;
+  const script = `#!${process.execPath}\nconst fs = require('node:fs');\nconst args = process.argv.slice(2);\nfs.writeFileSync(process.env.ARGUMENTS, JSON.stringify(args));\nfs.writeFileSync(process.env.CHILD_ENV_DUMP, JSON.stringify({ cwd: process.cwd(), pwd: process.env.PWD, initCwd: process.env.INIT_CWD, oldPwd: process.env.OLDPWD, prompt: process.env.BENCHMARK_PROMPT_FILE, final: process.env.BENCHMARK_FINAL_OUTPUT, usage: process.env.BENCHMARK_USAGE_OUTPUT, capture: process.env.BENCHMARK_CAPTURE_DIR }));\nfs.writeFileSync(process.env.MEMORY_ENV, JSON.stringify({ auto: process.env.CLAUDE_CODE_DISABLE_AUTO_MEMORY, md: process.env.CLAUDE_CODE_DISABLE_CLAUDE_MDS }));\nfs.writeFileSync(process.env.KIMI_ENV_DUMP, JSON.stringify({ home: process.env.KIMI_CODE_HOME, noUpdate: process.env.KIMI_CODE_NO_AUTO_UPDATE }));\nif (process.env.KIMI_REFRESH) fs.writeFileSync(process.env.KIMI_CODE_HOME + '/credentials/fixture.json', process.env.KIMI_REFRESH);\n${provider === 'codex' ? `fs.writeFileSync(args[args.indexOf('--output-last-message') + 1], ${JSON.stringify(final)});` : ''}\nfor (const event of ${JSON.stringify(events)}) process.stdout.write(JSON.stringify(event) + '\\n');\nprocess.stdout.write(${JSON.stringify(tail)});\n${delay ? 'setTimeout(() => process.exit(0), 30000);' : `process.exitCode = ${exit};`}`;
   await writeFile(path.join(dir, 'bin', provider), script, { mode: 0o700 });
   await writeFile(path.join(dir, 'prompt.md'), 'Fixture prompt');
   // Kimi runs always get a fixture source home so the test never touches the
@@ -20,7 +20,7 @@ async function run(provider, events, t, { exit = 0, final = 'Codex final', tail 
     await writeFile(path.join(dir, 'kimi-source', 'config.toml'), 'fixture config\n');
     await writeFile(path.join(dir, 'kimi-source', 'credentials', 'fixture.json'), '{}');
   }
-  const env = { ...process.env, PATH: `${dir}/bin:${process.env.PATH}`, ARGUMENTS: `${dir}/args.json`, MEMORY_ENV: `${dir}/memory-env.json`, KIMI_ENV_DUMP: `${dir}/kimi-env.json`, BENCHMARK_WORKSPACE: dir, BENCHMARK_PROMPT_FILE: `${dir}/prompt.md`, BENCHMARK_MODEL: model, BENCHMARK_REASONING_EFFORT: 'high', BENCHMARK_FINAL_OUTPUT: `${dir}/final.md`, BENCHMARK_USAGE_OUTPUT: `${dir}/usage.json`, BENCHMARK_CAPTURE_DIR: `${dir}/capture`, ...(provider === 'kimi' ? { KIMI_CODE_HOME: `${dir}/kimi-source` } : {}), ...(refresh ? { KIMI_REFRESH: refresh } : {}) };
+  const env = { ...process.env, PATH: `${dir}/bin:${process.env.PATH}`, ARGUMENTS: `${dir}/args.json`, CHILD_ENV_DUMP: `${dir}/child-env.json`, MEMORY_ENV: `${dir}/memory-env.json`, KIMI_ENV_DUMP: `${dir}/kimi-env.json`, BENCHMARK_WORKSPACE: dir, BENCHMARK_PROMPT_FILE: `${dir}/prompt.md`, BENCHMARK_MODEL: model, BENCHMARK_REASONING_EFFORT: 'high', BENCHMARK_FINAL_OUTPUT: `${dir}/final.md`, BENCHMARK_USAGE_OUTPUT: `${dir}/usage.json`, BENCHMARK_CAPTURE_DIR: `${dir}/capture`, ...(provider === 'kimi' ? { KIMI_CODE_HOME: `${dir}/kimi-source` } : {}), ...(refresh ? { KIMI_REFRESH: refresh } : {}) };
   if (drop) delete env[drop];
   const child = spawn(process.execPath, [path.join(root, 'scripts/run-agent.mjs'), provider], { env });
   let stdout = '', stderr = '';
@@ -29,8 +29,20 @@ async function run(provider, events, t, { exit = 0, final = 'Codex final', tail 
   const code = await new Promise((resolve, reject) => { child.on('error', reject); child.on('close', resolve); });
   const launched = existsSync(`${dir}/args.json`);
   const capture = launched ? (await readFile(`${dir}/capture/transcript.jsonl`, 'utf8')).trim().split('\n').filter(Boolean).map(JSON.parse) : [];
-  return { dir, env, code, stdout, stderr, launched, capture };
+  const childEnv = launched ? JSON.parse(await readFile(`${dir}/child-env.json`, 'utf8')) : null;
+  return { dir, env, code, stdout, stderr, launched, capture, childEnv };
 }
+
+test('provider process sees only the isolated workspace as its cwd contract', async t => {
+  const r = await run('opencode', [{ type: 'text', part: { type: 'text', text: 'done' } }], t);
+  assert.equal(r.code, 0, r.stderr);
+  const workspace = await realpath(r.dir);
+  assert.deepEqual(r.childEnv, {
+    cwd: workspace,
+    pwd: workspace,
+    initCwd: workspace,
+  });
+});
 
 test('Claude stream capture retains tools privately and writes only terminal result', async t => {
   const r = await run('claude', [

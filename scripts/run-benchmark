@@ -291,6 +291,16 @@ restore_global_stripe_config() {
 cleanup_runtime() {
   local status=$?
   trap - EXIT
+  # Preserve a partial transcript even when the runner is interrupted before
+  # the normal post-run archive step. The agent never receives CAPTURE_DIR.
+  if [[ -n ${AGENT_CAPTURE_DIR-} && -d $AGENT_CAPTURE_DIR && ! -e $CAPTURE_DIR ]]; then
+    mkdir -p "$(dirname "$CAPTURE_DIR")"
+    mv -- "$AGENT_CAPTURE_DIR" "$CAPTURE_DIR" || note "warning: could not archive partial transcript from $AGENT_CAPTURE_DIR"
+  fi
+  if [[ -n ${AGENT_RAW_LOG-} && -f $AGENT_RAW_LOG && ! -e $RAW_LOG ]]; then
+    mkdir -p "$(dirname "$RAW_LOG")"
+    mv -- "$AGENT_RAW_LOG" "$RAW_LOG" || note "warning: could not archive partial raw log from $AGENT_RAW_LOG"
+  fi
   restore_global_stripe_config || true
   if archive_run_stripe_config; then
     [[ -z ${STRIPE_LIVE_DIR-} ]] || rm -rf -- "$STRIPE_LIVE_DIR"
@@ -299,6 +309,7 @@ cleanup_runtime() {
   fi
   remove_publish_tree || true
   [[ -z ${AGENT_WORKSPACE-} ]] || rm -rf -- "$AGENT_WORKSPACE"
+  [[ -z ${AGENT_CONTROL_DIR-} ]] || rm -rf -- "$AGENT_CONTROL_DIR"
   [[ -z ${STRIPE_SHIM_DIR-} ]] || rm -rf -- "$STRIPE_SHIM_DIR"
   if [[ -n ${GLOBAL_STRIPE_BACKUP_DIR-} && -d $GLOBAL_STRIPE_BACKUP_DIR && ! -e ${GLOBAL_STRIPE_BACKUP-} ]]; then
     rm -rf -- "$GLOBAL_STRIPE_BACKUP_DIR"
@@ -312,8 +323,10 @@ cleanup_runtime() {
 SWITCHED_BRANCH=0
 git switch --create "$EXECUTION_BRANCH" "$BASE_COMMIT" >/dev/null || die "could not create $EXECUTION_BRANCH"
 SWITCHED_BRANCH=1
-mkdir -p "$WORKSPACE"
 AGENT_WORKSPACE=
+AGENT_CONTROL_DIR=
+AGENT_CAPTURE_DIR=
+AGENT_RAW_LOG=
 STRIPE_SHIM_DIR=
 STRIPE_LIVE_DIR=
 GLOBAL_STRIPE_BACKUP_DIR=
@@ -325,6 +338,14 @@ GLOBAL_STRIPE_ORIGINAL_PRESENT=0
 PUBLISH_TREE="${TMPDIR:-/tmp}/benchmark-publish.$RUN_ID.$$"
 trap cleanup_runtime EXIT
 AGENT_WORKSPACE=$(mktemp -d "${TMPDIR:-/tmp}/benchmark-workspace.XXXXXX") || die "could not create isolated agent workspace"
+AGENT_CONTROL_DIR=$(mktemp -d "${TMPDIR:-/tmp}/benchmark-control.XXXXXX") || die "could not create isolated agent control directory"
+chmod 700 "$AGENT_CONTROL_DIR"
+AGENT_PROMPT_FILE="$AGENT_CONTROL_DIR/prompt.md"
+AGENT_FINAL_OUTPUT="$AGENT_CONTROL_DIR/final.md"
+AGENT_USAGE_OUTPUT="$AGENT_CONTROL_DIR/usage.json"
+AGENT_CAPTURE_DIR="$AGENT_CONTROL_DIR/capture"
+AGENT_RAW_LOG="$AGENT_CONTROL_DIR/agent.raw.log"
+cp -- "$PROMPT_FILE" "$AGENT_PROMPT_FILE"
 # Temporary directory names reach the agent through PATH and BASH_ENV, so they
 # must not disclose which payment provider the harness has pre-provisioned.
 STRIPE_SHIM_DIR=$(mktemp -d "${TMPDIR:-/tmp}/benchmark-tools.XXXXXX") || die "could not create Stripe CLI shim"
@@ -374,23 +395,30 @@ STARTED_AT=$(date -u +%Y-%m-%dT%H:%M:%SZ)
 START_EPOCH=$(date +%s)
 export BENCHMARK_RUN_ID="$RUN_ID"
 export BENCHMARK_WORKSPACE="$AGENT_WORKSPACE"
-export BENCHMARK_PROMPT_FILE="$PROMPT_FILE"
+export BENCHMARK_PROMPT_FILE="$AGENT_PROMPT_FILE"
 export BENCHMARK_MODEL="$MODEL"
-export BENCHMARK_FINAL_OUTPUT="$FINAL_OUTPUT"
+export BENCHMARK_FINAL_OUTPUT="$AGENT_FINAL_OUTPUT"
 export BENCHMARK_VERCEL_PROJECT="$VERCEL_PROJECT"
 export BENCHMARK_REASONING_EFFORT="$REASONING_EFFORT"
-export BENCHMARK_USAGE_OUTPUT="$USAGE_OUTPUT"
+export BENCHMARK_USAGE_OUTPUT="$AGENT_USAGE_OUTPUT"
 # Deliberately provider-neutral: the prompt asks the agent to choose a payment
 # provider, so the environment must not name the one the harness has prepared.
 export BENCHMARK_CLI_STATE="$STRIPE_CONFIG"
-export BENCHMARK_CAPTURE_DIR="$CAPTURE_DIR"
+export BENCHMARK_CAPTURE_DIR="$AGENT_CAPTURE_DIR"
 
 set +e
-PATH="$STRIPE_SHIM_DIR:$PATH" "$TIMEOUT_COMMAND" "$TIMEOUT_SECONDS" node "$AGENT_RUNNER" "$ADAPTER" "${EXTRA_ARGS[@]}" >"$RAW_LOG" 2>&1
+PATH="$STRIPE_SHIM_DIR:$PATH" "$TIMEOUT_COMMAND" "$TIMEOUT_SECONDS" node "$AGENT_RUNNER" "$ADAPTER" "${EXTRA_ARGS[@]}" >"$AGENT_RAW_LOG" 2>&1
 AGENT_EXIT=$?
 set -e
 restore_global_stripe_config
-node "$SCRIPT_DIR/run-inspector/finalize-capture.mjs" "$ADAPTER" "$CAPTURE_DIR" "$RESULT_DIR" || die "could not finalize transcript capture"
+mkdir -p "$WORKSPACE"
+mv -- "$AGENT_RAW_LOG" "$RAW_LOG" || die "could not archive private raw log"
+node "$SCRIPT_DIR/run-inspector/finalize-capture.mjs" "$ADAPTER" "$AGENT_CAPTURE_DIR" "$RESULT_DIR" || die "could not finalize transcript capture"
+if [[ $ADAPTER == codex && -s $AGENT_FINAL_OUTPUT ]]; then
+  cp -- "$AGENT_FINAL_OUTPUT" "$FINAL_OUTPUT"
+fi
+mkdir -p "$(dirname "$CAPTURE_DIR")"
+mv -- "$AGENT_CAPTURE_DIR" "$CAPTURE_DIR" || die "could not archive private transcript"
 
 tar -C "$AGENT_WORKSPACE" --exclude=.git --exclude=node_modules --exclude=.next --exclude=reference -cf - . | tar -C "$WORKSPACE" -xf -
 if ! assert_only_run_output_changed; then

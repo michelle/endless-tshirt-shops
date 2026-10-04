@@ -235,6 +235,15 @@ original bytes, since it is never published.
 
 ## Run isolation
 
+The provider process starts in a new empty temporary workspace. Its real cwd,
+`PWD`, and `INIT_CWD` all name that directory; runner-only paths for the source
+prompt, transcript capture, final response, and usage data are withheld from
+the provider environment. Those control files live in a second private
+temporary directory. After the provider exits, the harness copies the generated
+workspace into `runs/<run-id>/workspace/`, finalizes the public artifacts, and
+moves the private transcript into `.benchmark-secrets/transcripts/<run-id>/`.
+Interrupted runs archive any partial transcript during cleanup.
+
 Each run gets its own Vercel project (`benchmark-<run-id>`) and its own Stripe
 CLI profile in a private temporary directory, handed over as
 `BENCHMARK_CLI_STATE` and transparently applied to every `stripe` command,

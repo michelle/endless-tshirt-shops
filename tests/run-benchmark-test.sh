@@ -117,7 +117,7 @@ printf '%s\n' \
   '[[ -n $prompt ]]' \
   '# the harness must isolate Kimi: a fresh home inside the private capture' \
   '# dir, auth copied from the source home, auto-update off' \
-  'case $KIMI_CODE_HOME in */.benchmark-secrets/transcripts/kimi/kimi-home) ;; *) echo "KIMI_CODE_HOME is not the isolated capture home: ${KIMI_CODE_HOME-unset}" >&2; exit 14 ;; esac' \
+  'case $KIMI_CODE_HOME in */benchmark-control.*/capture/kimi-home) ;; *) echo "KIMI_CODE_HOME is not the isolated temporary capture home: ${KIMI_CODE_HOME-unset}" >&2; exit 14 ;; esac' \
   '[[ $KIMI_CODE_HOME != "$KIMI_SOURCE_HOME" ]]' \
   '[[ $KIMI_CODE_NO_AUTO_UPDATE == 1 ]]' \
   '[[ -f $KIMI_CODE_HOME/config.toml && -f $KIMI_CODE_HOME/credentials/fixture.json ]]' \

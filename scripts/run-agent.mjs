@@ -1,5 +1,5 @@
 import { spawn } from 'node:child_process';
-import { openSync, writeSync, closeSync, mkdirSync, readFileSync, writeFileSync, existsSync, cpSync, readdirSync } from 'node:fs';
+import { openSync, writeSync, closeSync, mkdirSync, readFileSync, writeFileSync, existsSync, cpSync, readdirSync, realpathSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { normalize } from './run-inspector/transcript.mjs';
@@ -12,6 +12,7 @@ const env = process.env;
 const required = ['BENCHMARK_WORKSPACE', 'BENCHMARK_PROMPT_FILE', 'BENCHMARK_MODEL',
   'BENCHMARK_FINAL_OUTPUT', 'BENCHMARK_USAGE_OUTPUT', 'BENCHMARK_CAPTURE_DIR'];
 for (const name of required) if (!env[name]) throw new Error(`${name} is required`);
+const workspace = realpathSync(env.BENCHMARK_WORKSPACE);
 const directory = env.BENCHMARK_CAPTURE_DIR;
 mkdirSync(directory, { recursive: true, mode: 0o700 });
 const target = path.join(directory, 'transcript.jsonl');
@@ -41,7 +42,7 @@ const args = provider === 'claude'
   // giving up. Benchmark runs are supposed to be isolated; this makes the
   // server isolated too.
   ? ['run', '--standalone', '--auto', '--format', 'json', '-m', env.BENCHMARK_MODEL, ...extra, prompt]
-  : ['exec', '--dangerously-bypass-approvals-and-sandbox', '--skip-git-repo-check', '--ephemeral', '--disable', 'memories', '--disable', 'external_agent_memory_import', '--color', 'never', '--json', '--cd', env.BENCHMARK_WORKSPACE, '--model', env.BENCHMARK_MODEL, '--output-last-message', env.BENCHMARK_FINAL_OUTPUT, ...(effort ? ['--config', `model_reasoning_effort="${effort}"`] : []), ...extra, prompt];
+  : ['exec', '--dangerously-bypass-approvals-and-sandbox', '--skip-git-repo-check', '--ephemeral', '--disable', 'memories', '--disable', 'external_agent_memory_import', '--color', 'never', '--json', '--cd', workspace, '--model', env.BENCHMARK_MODEL, '--output-last-message', env.BENCHMARK_FINAL_OUTPUT, ...(effort ? ['--config', `model_reasoning_effort="${effort}"`] : []), ...extra, prompt];
 // Kimi keeps config, credentials, sessions and history in one home directory.
 // A fresh home per run replaces memory-disabled flags: nothing carries over
 // between runs, and the run's sessions and logs stay inside the private
@@ -90,16 +91,29 @@ function syncKimiAuthBack(home) {
   }
 }
 let isolatedKimiHome = null;
-const childEnv = provider === 'claude' ? {
+// `spawn({ cwd })` changes the process's real cwd but does not rewrite an
+// inherited PWD. OpenCode uses PWD when it creates a project/session, which
+// previously made an otherwise-empty benchmark workspace attach to the host
+// benchmark repository. Keep every conventional cwd hint aligned, and do not
+// expose runner-only paths back into the repository to the model process.
+const baseChildEnv = {
   ...env,
+  PWD: workspace,
+  INIT_CWD: workspace,
+};
+delete baseChildEnv.OLDPWD;
+for (const name of ['BENCHMARK_PROMPT_FILE', 'BENCHMARK_FINAL_OUTPUT',
+  'BENCHMARK_USAGE_OUTPUT', 'BENCHMARK_CAPTURE_DIR']) delete baseChildEnv[name];
+const childEnv = provider === 'claude' ? {
+  ...baseChildEnv,
   CLAUDE_CODE_DISABLE_AUTO_MEMORY: '1',
   CLAUDE_CODE_DISABLE_CLAUDE_MDS: '1',
 } : provider === 'kimi' ? {
-  ...env,
+  ...baseChildEnv,
   KIMI_CODE_HOME: isolatedKimiHome = kimiHome(),
   KIMI_CODE_NO_AUTO_UPDATE: '1',
-} : env;
-const child = spawn(provider, args, { cwd: env.BENCHMARK_WORKSPACE, env: childEnv, stdio: ['ignore', 'pipe', 'pipe'] });
+} : baseChildEnv;
+const child = spawn(provider, args, { cwd: workspace, env: childEnv, stdio: ['ignore', 'pipe', 'pipe'] });
 const pending = { stdout: '', stderr: '' };
 function record(stream, line) {
   let event; try { event = JSON.parse(line); } catch { event = { type: 'diagnostic', text: line }; }
