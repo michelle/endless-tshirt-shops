@@ -104,9 +104,19 @@ const baseChildEnv = {
 delete baseChildEnv.OLDPWD;
 for (const name of ['BENCHMARK_PROMPT_FILE', 'BENCHMARK_FINAL_OUTPUT',
   'BENCHMARK_USAGE_OUTPUT', 'BENCHMARK_CAPTURE_DIR']) delete baseChildEnv[name];
-// Deployment credentials belong to the post-run inspection harness. They must
-// never let the benchmark agent inherit or infer the evaluator's Vercel account.
-for (const name of ['BENCHMARK_VERCEL_TOKEN', 'VERCEL_TOKEN', 'BENCHMARK_VERCEL_SCOPE']) delete baseChildEnv[name];
+// Ambient service credentials belong to the operator or post-run evaluator,
+// not the benchmark agent. Model-provider auth and the task's explicitly
+// supplied Prodigi credential remain available; unrelated deployment/payment
+// accounts must not bias provider selection or permit accidental mutation.
+for (const name of [
+  'BENCHMARK_VERCEL_TOKEN', 'BENCHMARK_VERCEL_SCOPE', 'VERCEL_TOKEN', 'VERCEL_ORG_ID', 'VERCEL_PROJECT_ID',
+  'NETLIFY_AUTH_TOKEN', 'NETLIFY_SITE_ID', 'CLOUDFLARE_API_TOKEN', 'CLOUDFLARE_ACCOUNT_ID',
+  'STRIPE_SECRET_KEY', 'STRIPE_API_KEY', 'STRIPE_PUBLISHABLE_KEY', 'STRIPE_WEBHOOK_SECRET',
+  'PAYPAL_CLIENT_ID', 'PAYPAL_CLIENT_SECRET', 'FIREBASE_TOKEN', 'FLY_API_TOKEN', 'RENDER_API_KEY',
+  'RAILWAY_TOKEN', 'GITHUB_TOKEN', 'GH_TOKEN', 'AWS_ACCESS_KEY_ID', 'AWS_SECRET_ACCESS_KEY',
+  'AWS_SESSION_TOKEN', 'GOOGLE_APPLICATION_CREDENTIALS', 'AZURE_CLIENT_SECRET',
+  'SHOPIFY_CLI_PARTNERS_TOKEN',
+]) delete baseChildEnv[name];
 const childEnv = provider === 'claude' ? {
   ...baseChildEnv,
   CLAUDE_CODE_DISABLE_AUTO_MEMORY: '1',

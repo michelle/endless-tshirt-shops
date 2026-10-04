@@ -5,13 +5,16 @@ import { fileURLToPath } from 'node:url';
 
 const ignored = new Set(['.git', '.next', '.vercel', '.netlify', 'node_modules', 'dist', 'build', 'coverage', 'reference']);
 const frameworkNames = new Set(['next', 'vite', 'astro', '@sveltejs/kit', 'nuxt', 'react-scripts', 'vinext']);
+const conventionalAppNames = new Set(['app', 'frontend', 'site', 'shop', 'store', 'web']);
 
-function directories(root, maxDepth = 4) {
+function directories(root, maxDepth = 6) {
   const found = [];
   function visit(directory, depth) {
     found.push(directory);
     if (depth >= maxDepth) return;
-    for (const entry of readdirSync(directory, { withFileTypes: true })) {
+    let entries;
+    try { entries = readdirSync(directory, { withFileTypes: true }); } catch { return; }
+    for (const entry of entries) {
       if (!entry.isDirectory() || ignored.has(entry.name)) continue;
       visit(path.join(directory, entry.name), depth + 1);
     }
@@ -34,13 +37,17 @@ function candidateScore(root, directory) {
   if (!hasPackage && !hasVercel && !hasIndex) return null;
   const dependencies = { ...(pkg?.dependencies ?? {}), ...(pkg?.devDependencies ?? {}) };
   const scripts = pkg?.scripts ?? {};
-  let score = hasPackage ? 60 : 0;
+  // A package.json alone is weak evidence: benchmark workspaces sometimes
+  // contain repository tooling beside the actual static site. Runnable/build
+  // signals deliberately outweigh a generic root manifest.
+  let score = hasPackage ? 25 : 0;
   if (hasVercel) score += 45;
-  if (hasIndex) score += 30;
-  if (typeof scripts.build === 'string') score += 30;
+  if (hasIndex) score += 55;
+  if (typeof scripts.build === 'string') score += 40;
   if (typeof scripts.start === 'string' || typeof scripts.dev === 'string') score += 10;
-  if ([...frameworkNames].some(name => Object.hasOwn(dependencies, name))) score += 40;
+  if ([...frameworkNames].some(name => Object.hasOwn(dependencies, name))) score += 50;
   for (const marker of ['app', 'pages', 'src', 'api', 'public']) if (existsSync(path.join(directory, marker))) score += 4;
+  if (conventionalAppNames.has(path.basename(directory).toLowerCase())) score += 8;
   const depth = path.relative(root, directory).split(path.sep).filter(Boolean).length;
   return score + Math.min(depth, 4);
 }

@@ -232,6 +232,7 @@ test('local artwork recovery preserves exact canvas bytes and requires provenanc
 test('viewer staging uses existing short model IDs without conflating retries', () => {
   const run = { id: 'suite-codex-sol', model: 'gpt-5.6-sol', deployment: 'https://sol.vercel.app' };
   assert.equal(viewerRuns([run], 'suite')[0].id, 'sol');
+  assert.equal(viewerRuns([{ ...run, model: 'gpt-6-sol' }], 'suite')[0].id, 'gsol');
   assert.equal(viewerRuns([run], 'suite')[0].finalOutput, '/suites/suite/runs/suite-codex-sol/final.md');
   assert.deepEqual(viewerRuns([run, { ...run, id: 'suite-codex-sol-retry' }], 'suite').map(r => r.id), ['suite-codex-sol', 'suite-codex-sol-retry']);
 });

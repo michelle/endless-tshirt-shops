@@ -166,6 +166,8 @@ done
 # agent environment. An absent token records a skipped inspection deployment.
 HARNESS_VERCEL_TOKEN=${BENCHMARK_VERCEL_TOKEN-}
 HARNESS_VERCEL_SCOPE=${BENCHMARK_VERCEL_SCOPE-}
+HARNESS_DEPLOY_PROBE_DELAY_SECONDS=${BENCHMARK_DEPLOY_PROBE_DELAY_SECONDS:-2}
+[[ $HARNESS_DEPLOY_PROBE_DELAY_SECONDS =~ ^[0-9]+([.][0-9]+)?$ ]] || die "BENCHMARK_DEPLOY_PROBE_DELAY_SECONDS must be numeric"
 unset BENCHMARK_VERCEL_TOKEN VERCEL_TOKEN BENCHMARK_VERCEL_SCOPE
 
 REPO_ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || die "run this from inside the benchmark repository"
@@ -418,6 +420,12 @@ cat >"$AGENT_TOOL_DIR/bash-env" <<EOF
 export PATH="${AGENT_PATH}"
 EOF
 chmod 600 "$AGENT_TOOL_DIR/bash-env"
+mkdir -p "$AGENT_TOOL_DIR/zsh"
+for shell_env in .zshenv .zprofile .zlogin .zshrc; do
+  printf 'export PATH=%q\n' "$AGENT_PATH" >"$AGENT_TOOL_DIR/zsh/$shell_env"
+done
+printf 'export PATH=%q\n' "$AGENT_PATH" >"$AGENT_TOOL_DIR/sh-env"
+chmod 600 "$AGENT_TOOL_DIR/zsh/".* "$AGENT_TOOL_DIR/sh-env"
 
 if ! mkdir -- "$GLOBAL_STRIPE_LOCK_DIR" 2>/dev/null; then
   die "another benchmark may be using the global Stripe config (lock: $GLOBAL_STRIPE_LOCK_DIR)"
@@ -431,19 +439,36 @@ if [[ -e $GLOBAL_STRIPE_CONFIG ]]; then
 fi
 
 export BASH_ENV="$AGENT_TOOL_DIR/bash-env"
+export ZDOTDIR="$AGENT_TOOL_DIR/zsh"
+export ENV="$AGENT_TOOL_DIR/sh-env"
 for hidden_cli in vercel netlify stripe wrangler cloudflared flyctl render railway firebase surge heroku gcloud aws az gh shopify; do
-  if PATH="$AGENT_PATH" /bin/bash -lc "command -v $hidden_cli" >/dev/null 2>&1; then
-    die "provider CLI remained visible in isolated agent PATH: $hidden_cli"
-  fi
+  for shell in /bin/bash /bin/zsh /bin/sh; do
+    [[ -x $shell ]] || continue
+    shell_args=(-lc)
+    # POSIX sh has no post-profile noninteractive environment hook. On macOS,
+    # `sh -l` can re-add /etc/paths.d entries after PATH is sanitized. The
+    # harnesses use bash/zsh login shells; cover ordinary sh without claiming
+    # this advisory PATH policy is an OS sandbox against an intentional bypass.
+    [[ $shell != /bin/sh ]] || shell_args=(-c)
+    if PATH="$AGENT_PATH" "$shell" "${shell_args[@]}" "command -v $hidden_cli" >/dev/null 2>&1; then
+      die "provider CLI remained visible in isolated agent PATH for $shell: $hidden_cli"
+    fi
+  done
 done
-PATH="$AGENT_PATH" /bin/bash -lc 'command -v node >/dev/null && command -v npm >/dev/null && command -v curl >/dev/null' ||
-  die "neutral agent tools were lost while isolating provider CLIs"
+for shell in /bin/bash /bin/zsh /bin/sh; do
+  [[ -x $shell ]] || continue
+  shell_args=(-lc)
+  [[ $shell != /bin/sh ]] || shell_args=(-c)
+  PATH="$AGENT_PATH" "$shell" "${shell_args[@]}" 'command -v node >/dev/null && command -v npm >/dev/null && command -v npx >/dev/null && command -v curl >/dev/null' ||
+    die "neutral agent tools were lost while isolating provider CLIs for $shell"
+done
 
 # Credentials must come from the isolated CLI profile, never from the runner's
 # ambient environment.
 unset STRIPE_SECRET_KEY STRIPE_API_KEY STRIPE_PUBLISHABLE_KEY STRIPE_WEBHOOK_SECRET
 # Runner-only override; it names the provider, so it must not reach the agent.
 unset BENCHMARK_GLOBAL_STRIPE_CONFIG
+unset BENCHMARK_DEPLOY_PROBE_DELAY_SECONDS
 
 STARTED_AT=$(date -u +%Y-%m-%dT%H:%M:%SZ)
 START_EPOCH=$(date +%s)
@@ -486,6 +511,12 @@ if ! assert_only_run_output_changed; then
   exit 1
 fi
 
+# Redact before the evaluator deploys anything. The prior ordering protected
+# Git publication but could still upload an agent-written credential to the
+# durable inspection copy.
+REDACTIONS=$(node "$SCRIPT_DIR/redact-run-secrets.mjs" "$RUN_ID") ||
+  die "credential redaction failed; refusing to deploy or publish"
+
 FINISHED_AT=$(date -u +%Y-%m-%dT%H:%M:%SZ)
 DURATION_SECONDS=$(( $(date +%s) - START_EPOCH ))
 RUN_STATUS=succeeded
@@ -517,14 +548,14 @@ if [[ -n $HARNESS_VERCEL_TOKEN ]]; then
   INSPECTION_LOG="$DEPLOYMENT_LOG_DIR/$RUN_ID.log"
   VERCEL_SCOPE_ARGS=()
   [[ -z $HARNESS_VERCEL_SCOPE ]] || VERCEL_SCOPE_ARGS+=(--scope "$HARNESS_VERCEL_SCOPE")
-  INSPECTION_SOURCE=$(inspection_source_root "$AGENT_WORKSPACE" 2>/dev/null || true)
+  INSPECTION_SOURCE=$(inspection_source_root "$WORKSPACE" 2>/dev/null || true)
   if [[ -n $INSPECTION_SOURCE ]]; then
-    INSPECTION_SOURCE_RELATIVE=$(node -e 'const p=require("node:path"); process.stdout.write(p.relative(process.argv[1], process.argv[2]) || ".")' "$AGENT_WORKSPACE" "$INSPECTION_SOURCE")
+    INSPECTION_SOURCE_RELATIVE=$(node -e 'const p=require("node:path"); process.stdout.write(p.relative(process.argv[1], process.argv[2]) || ".")' "$WORKSPACE" "$INSPECTION_SOURCE")
     INSPECTION_STAGE=$(mktemp -d "${TMPDIR:-/tmp}/benchmark-deploy.XXXXXX") || die "could not create inspection staging directory"
     # Deploy from a clean copy. Anonymous provider linkage and cached settings
     # previously contaminated authenticated projects, causing valid builds to
     # report READY while every public URL returned Vercel-level NOT_FOUND.
-    tar -C "$INSPECTION_SOURCE" --exclude=.git --exclude=.vercel --exclude=.netlify --exclude=node_modules --exclude=.next --exclude=reference -cf - . |
+    tar -C "$INSPECTION_SOURCE" --exclude=.git --exclude=.vercel --exclude=.netlify --exclude=node_modules --exclude=.next --exclude=reference --exclude=.env --exclude='.env.*' --exclude='*/.env' --exclude='*/.env.*' -cf - . |
       tar -C "$INSPECTION_STAGE" -xf -
   fi
   set +e
@@ -575,7 +606,7 @@ if [[ -n $HARNESS_VERCEL_TOKEN ]]; then
           break 2
         fi
       done <"$CANDIDATE_FILE"
-      sleep 2
+      sleep "$HARNESS_DEPLOY_PROBE_DELAY_SECONDS"
     done
     [[ -n $INSPECTION_DEPLOYMENT_URL ]] || INSPECTION_DEPLOYMENT_URL=$(head -n 1 "$CANDIDATE_FILE" || true)
     printf 'inspection_http_status=%s\n' "$INSPECTION_HTTP_STATUS" >>"$INSPECTION_LOG"
@@ -597,8 +628,6 @@ PROMPT_SHA=$(shasum -a 256 "$BENCHMARK_PROMPT_FILE" | awk '{print $1}')
 # Replace credentials this run provisioned before the workspace tree is hashed,
 # so workspace_tree describes what actually publishes. Only known values are
 # touched; check-run-artifacts still fails closed on anything unanticipated.
-REDACTIONS=$(node "$SCRIPT_DIR/redact-run-secrets.mjs" "$RUN_ID") ||
-  die "credential redaction failed; refusing to publish"
 # Keep dependencies and build output out of the archive. The runner used to rely
 # on the agent writing its own .gitignore; an agent that wrote none staged 289 MB
 # and GitHub refused the push after the run had already been paid for.

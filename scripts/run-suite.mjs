@@ -15,7 +15,7 @@ import { git, identifier, hash } from './run-inspector/common.mjs';
 // enabled on the workspace, so the plain opencode aliases are used.
 // scripts/preflight-clis.mjs probes every alias here before a suite launches.
 export const models = [
-  ['codex', 'gpt-6-astra'], ['codex', 'gpt-6.1-sol'], ['codex', 'gpt-6-luna'],
+  ['codex', 'gpt-6-astra'], ['codex', 'gpt-6-sol'], ['codex', 'gpt-6-luna'],
   ['claude', 'claude-fable-5-1'], ['claude', 'claude-opus-5-5'], ['claude', 'claude-sonnet-5-5'],
   ['kimi', 'kimi-code/k3'],
   ['opencode', 'opencode/glm-5.3#high'], ['opencode', 'opencode/deepseek-v4.1-flash'],

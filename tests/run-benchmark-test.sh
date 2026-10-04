@@ -15,6 +15,7 @@ BIN_WITHOUT_TIMEOUT="$TMP_ROOT/bin-without-timeout"
 GLOBAL_STRIPE_CONFIG="$TMP_ROOT/global-stripe/config.toml"
 mkdir -p "$REPO" "$BIN" "$BIN_WITHOUT_TIMEOUT" "$(dirname "$GLOBAL_STRIPE_CONFIG")"
 export FAKE_VERCEL_STATE="$TMP_ROOT/fake-vercel-project"
+export FAKE_CURL_STATE="$TMP_ROOT/fake-curl-count"
 printf 'original global Stripe config\n' >"$GLOBAL_STRIPE_CONFIG"
 export BENCHMARK_GLOBAL_STRIPE_CONFIG="$GLOBAL_STRIPE_CONFIG"
 # Visible to the fake agent so it can assert no sibling run's profile is readable.
@@ -61,12 +62,15 @@ printf '%s\n' \
   '    *) shift ;;' \
   '  esac' \
   'done' \
-  'if /bin/bash -lc "command -v stripe" >/dev/null 2>&1; then echo "Stripe CLI was preinstalled for the agent" >&2; exit 9; fi' \
-  'if /bin/bash -lc "command -v vercel" >/dev/null 2>&1; then echo "Vercel CLI was preinstalled for the agent" >&2; exit 15; fi' \
-  'if /bin/bash -lc "command -v cloudflared" >/dev/null 2>&1; then echo "Cloudflare CLI was preinstalled for the agent" >&2; exit 16; fi' \
-  '/bin/bash -lc "command -v npm >/dev/null && command -v npx >/dev/null"' \
+  'for shell in /bin/bash /bin/zsh /bin/sh; do' \
+  '  [[ -x $shell ]] || continue' \
+  '  shell_args=(-lc); [[ $shell != /bin/sh ]] || shell_args=(-c)' \
+  '  for cli in stripe vercel cloudflared; do if "$shell" "${shell_args[@]}" "command -v $cli" >/dev/null 2>&1; then echo "$cli was preinstalled for the agent through $shell" >&2; exit 9; fi; done' \
+  '  "$shell" "${shell_args[@]}" "command -v npm >/dev/null && command -v npx >/dev/null"' \
+  'done' \
   '[[ -z "${STRIPE_SECRET_KEY-}${STRIPE_API_KEY-}${STRIPE_PUBLISHABLE_KEY-}${STRIPE_WEBHOOK_SECRET-}" ]]' \
   '[[ -z "${VERCEL_TOKEN-}${BENCHMARK_VERCEL_TOKEN-}${BENCHMARK_VERCEL_SCOPE-}" ]]' \
+  '[[ -z "${NETLIFY_AUTH_TOKEN-}${CLOUDFLARE_API_TOKEN-}${RENDER_API_KEY-}${RAILWAY_TOKEN-}${GITHUB_TOKEN-}${AWS_ACCESS_KEY_ID-}${PAYPAL_CLIENT_SECRET-}" ]]' \
   '# the environment must not disclose the pre-provisioned payment provider' \
   'if env | grep -i "^BENCHMARK_" | grep -qi stripe; then echo "provider name leaked through BENCHMARK_* environment" >&2; exit 10; fi' \
   'case $PATH$BASH_ENV in *[Ss]tripe*) echo "provider name leaked through PATH/BASH_ENV" >&2; exit 11 ;; esac' \
@@ -85,6 +89,7 @@ printf '%s\n' \
   'app_dir=$workspace' \
   'if [[ -n "${FAKE_NESTED_APP:-}" ]]; then app_dir=$workspace/store; mkdir -p "$app_dir"; printf "{}\n" >"$app_dir/package.json"; fi' \
   '[[ -z "${FAKE_BAD_VERCEL_CONFIG:-}" ]] || printf "{ invalid fixture }\n" >"$app_dir/vercel.json"' \
+  '[[ -z "${FAKE_DOTENV_SECRET:-}" ]] || printf "PRODIGI_API_KEY=%s\n" "$PRODIGI_API_KEY" >"$app_dir/.env"' \
   'printf "%s\n" "${BENCHMARK_VERCEL_PROJECT-}" >"$app_dir/vercel-project.txt"' \
   'printf "node_modules\n" >"$app_dir/.gitignore"' \
   'mkdir -p "$app_dir/node_modules"' \
@@ -115,15 +120,19 @@ printf '%s\n' \
   '  "project inspect") [[ -f $FAKE_VERCEL_STATE ]] ;;' \
   '  "project add") touch "$FAKE_VERCEL_STATE" ;;' \
   '  "project protection") [[ ${3-} == disable && ${5-} == --sso ]]; touch "$FAKE_VERCEL_STATE.public" ;;' \
-  '  "deploy --prod") [[ -f $FAKE_VERCEL_STATE && -f $FAKE_VERCEL_STATE.public ]]; if [[ -n "${FAKE_VERCEL_REJECT_CONFIG:-}" && -f vercel.json ]]; then echo "invalid vercel config" >&2; exit 1; fi; printf "https://benchmark-inspection-copy.vercel.app\n" ;;' \
+  '  "deploy --prod") [[ -f $FAKE_VERCEL_STATE && -f $FAKE_VERCEL_STATE.public ]]; if [[ -n "${FAKE_VERCEL_REJECT_CONFIG:-}" && -f vercel.json ]]; then echo "invalid vercel config" >&2; exit 1; fi; [[ ! -e .env ]]; ! grep -R -q "test_11111111-1111-1111-1111-111111111111" .; printf "Production: https://benchmark-inspection-hash.vercel.app\nAliased: https://benchmark-inspection-copy.vercel.app\n" ;;' \
   '  *) echo "unexpected Vercel invocation: $*" >&2; exit 2 ;;' \
   'esac' >"$BIN/vercel"
 chmod +x "$BIN/vercel"
 printf '%s\n' \
   '#!/usr/bin/env bash' \
   'set -euo pipefail' \
-  '[[ $* == *benchmark-inspection-copy.vercel.app* ]]' \
-  'printf 200' >"$BIN/curl"
+  'url=${!#}' \
+  'if [[ ${FAKE_CURL_MODE:-delayed} == unavailable ]]; then printf 404; exit 0; fi' \
+  'if [[ $url == *benchmark-inspection-hash.vercel.app* ]]; then printf 404; exit 0; fi' \
+  'count=0; [[ ! -f $FAKE_CURL_STATE ]] || count=$(cat "$FAKE_CURL_STATE")' \
+  'count=$((count + 1)); printf "%s\n" "$count" >"$FAKE_CURL_STATE"' \
+  'if (( count == 1 )); then printf 404; else printf 200; fi' >"$BIN/curl"
 chmod +x "$BIN/curl"
 ln -s "$BIN/codex" "$BIN_WITHOUT_TIMEOUT/codex"
 
@@ -192,7 +201,10 @@ run() {
   shift
   (
     cd "$REPO"
-    PATH="$BIN:$PATH" PRODIGI_API_KEY=test_11111111-1111-1111-1111-111111111111 "$ROOT/scripts/run-benchmark" \
+    PATH="$BIN:$PATH" PRODIGI_API_KEY=test_11111111-1111-1111-1111-111111111111 \
+      NETLIFY_AUTH_TOKEN=ambient-netlify CLOUDFLARE_API_TOKEN=ambient-cloudflare RENDER_API_KEY=ambient-render \
+      RAILWAY_TOKEN=ambient-railway GITHUB_TOKEN=ambient-github AWS_ACCESS_KEY_ID=ambient-aws PAYPAL_CLIENT_SECRET=ambient-paypal \
+      "$ROOT/scripts/run-benchmark" \
       --adapter codex --model fake --timeout 5 --run-id "$run_id" "$@"
   )
 }
@@ -258,8 +270,9 @@ fi
 (
   cd "$REPO"
   PATH="$BIN:$PATH" PRODIGI_API_KEY=test_11111111-1111-1111-1111-111111111111 \
-    BENCHMARK_VERCEL_TOKEN=fixture-harness-token FAKE_DEPLOYMENT_URL=https://anonymous-choice.netlify.app \
-    FAKE_NESTED_APP=1 FAKE_VERCEL_EXPECTED_CWD=store FAKE_BAD_VERCEL_CONFIG=1 FAKE_VERCEL_REJECT_CONFIG=1 \
+    BENCHMARK_VERCEL_TOKEN=fixture-harness-token BENCHMARK_DEPLOY_PROBE_DELAY_SECONDS=0 \
+    FAKE_DEPLOYMENT_URL=https://anonymous-choice.netlify.app FAKE_NESTED_APP=1 FAKE_VERCEL_EXPECTED_CWD=store \
+    FAKE_BAD_VERCEL_CONFIG=1 FAKE_VERCEL_REJECT_CONFIG=1 FAKE_LEAK_PATH=store/leaked.txt FAKE_DOTENV_SECRET=1 \
     "$ROOT/scripts/run-benchmark" --adapter codex --model fake --timeout 5 \
       --run-id provider-choice --prompt-file prompts/prompt-v4.md
 )
@@ -274,8 +287,34 @@ grep -q 'inspection_http_status=200' "$REPO/.benchmark-secrets/deployments/provi
 grep -q 'inspection_source=store' "$REPO/.benchmark-secrets/deployments/provider-choice.log" || fail 'nested application root was not selected'
 grep -q 'inspection_staged_without_provider_state=true' "$REPO/.benchmark-secrets/deployments/provider-choice.log" || fail 'inspection deploy did not use a clean staging copy'
 grep -q 'inspection_retry=framework_autodetect_without_vercel_json' "$REPO/.benchmark-secrets/deployments/provider-choice.log" || fail 'malformed provider config did not trigger framework-autodetect retry'
+grep -q 'inspection_probe_attempt=1 status=404 url=https://benchmark-inspection-copy.vercel.app' "$REPO/.benchmark-secrets/deployments/provider-choice.log" || fail 'delayed alias was not retried after its first 404'
+grep -q 'inspection_probe_attempt=2 status=200 url=https://benchmark-inspection-copy.vercel.app' "$REPO/.benchmark-secrets/deployments/provider-choice.log" || fail 'delayed alias did not become the selected durable URL'
 assert test -f "$FAKE_VERCEL_STATE"
 assert test -f "$FAKE_VERCEL_STATE.public"
+
+(
+  cd "$REPO"
+  PATH="$BIN:$PATH" PRODIGI_API_KEY=test_11111111-1111-1111-1111-111111111111 \
+    BENCHMARK_VERCEL_TOKEN=fixture-harness-token BENCHMARK_DEPLOY_PROBE_DELAY_SECONDS=0 \
+    "$ROOT/scripts/run-benchmark" --adapter codex --model fake --timeout 5 \
+      --run-id no-deployable-source --prompt-file prompts/prompt-v4.md
+)
+NO_SOURCE_METADATA=$(git --git-dir="$REMOTE" show benchmark-results:runs/no-deployable-source/metadata.json)
+[[ $NO_SOURCE_METADATA == *'"inspection_deployment_status": "failed"'* ]] || fail 'missing deployable source was not a durable-copy failure'
+grep -q 'inspection_error=no_deployable_source' "$REPO/.benchmark-secrets/deployments/no-deployable-source.log" || fail 'missing deployable source was not diagnosed'
+
+rm -f "$FAKE_CURL_STATE"
+(
+  cd "$REPO"
+  PATH="$BIN:$PATH" PRODIGI_API_KEY=test_11111111-1111-1111-1111-111111111111 \
+    BENCHMARK_VERCEL_TOKEN=fixture-harness-token BENCHMARK_DEPLOY_PROBE_DELAY_SECONDS=0 FAKE_CURL_MODE=unavailable \
+    FAKE_NESTED_APP=1 "$ROOT/scripts/run-benchmark" --adapter codex --model fake --timeout 5 \
+      --run-id unreachable-copy --prompt-file prompts/prompt-v4.md
+)
+UNREACHABLE_METADATA=$(git --git-dir="$REMOTE" show benchmark-results:runs/unreachable-copy/metadata.json)
+[[ $UNREACHABLE_METADATA == *'"inspection_deployment_status": "failed"'* ]] || fail 'all-404 inspection URLs were not marked failed'
+[[ $UNREACHABLE_METADATA == *'"inspection_deployment_url": "https://benchmark-inspection-copy.vercel.app"'* ]] || fail 'failed inspection did not retain its best candidate URL'
+grep -q 'inspection_http_status=$' "$REPO/.benchmark-secrets/deployments/unreachable-copy.log" || fail 'all-404 inspection probe result was not logged'
 LOG=$(git --git-dir="$REMOTE" show benchmark-results:runs/success/events.jsonl)
 [[ $LOG != *test_11111111-1111-1111-1111-111111111111* ]] || fail 'injected secret leaked into committed log'
 [[ $LOG != *sk_test_* ]] || fail 'Stripe pattern leaked into committed log'

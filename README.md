@@ -103,7 +103,7 @@ recorded too. Earlier suites compared `gpt-6-astra`, `gpt-5.6-sol`,
 `claude-sonnet-5`; those runs stay published on `benchmark-results`.
 
 `scripts/run-suite.mjs` now iterates a 13-model frontier comparison. It starts
-with the native harnesses (`gpt-6-astra`, `gpt-6.1-sol`, `gpt-6-luna`,
+with the native harnesses (`gpt-6-astra`, `gpt-6-sol`, `gpt-6-luna`,
 `claude-fable-5-1`, `claude-opus-5-5`, `claude-sonnet-5-5`, and
 `kimi-code/k3`), then runs the OpenCode-routed models (`glm-5.3#high`,
 `deepseek-v4.1-flash`, `qwen3.8-max`, `minimax-m3`, `gemini-3.8-flash`, and
@@ -277,14 +277,16 @@ deployment and payment CLIs—including Vercel, Netlify, Cloudflare and Stripe�
 absent, while Node, npm, npx, Git, curl and network access remain available. An
 agent may therefore choose and install a provider tool itself, but no
 preinstalled executable wins merely because it was easiest to discover.
-`tests/run-benchmark-test.sh` asserts both sides of this policy, including
-through a login shell. Metadata records the policy as
+`tests/run-benchmark-test.sh` asserts both sides of this policy through the
+bash/zsh login shells used by the harnesses and an ordinary POSIX shell.
+Metadata records the policy as
 `not_preinstalled_network_installs_allowed`.
 
 **This is not a sandbox.** The agent runs as the invoking user and can still
-reach the archive, this repository, `$HOME` and `/tmp` with an explicit search.
-Treat isolation as advisory; use a dedicated user account or container if it
-matters.
+reach the archive, this repository, `$HOME` and `/tmp` with an explicit search;
+it can also invoke an absolute executable path or deliberately reconstruct a
+system login PATH. Treat isolation as advisory; use a dedicated user account,
+container or VM if it matters.
 
 All four harnesses run non-interactively with memory features explicitly
 disabled — Codex via `exec --json` with ephemeral sessions, Claude via
