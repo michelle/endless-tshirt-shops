@@ -1,0 +1,17 @@
+{
+  "id": "we_1UMxLFBamWQyHs4e1Nifjtv0",
+  "object": "webhook_endpoint",
+  "api_version": null,
+  "application": null,
+  "created": 1791150789,
+  "description": "Orbital store fulfilment",
+  "enabled_events": [
+    "checkout.session.completed",
+    "checkout.session.async_payment_succeeded"
+  ],
+  "livemode": false,
+  "metadata": {},
+  "secret": "REDACTED_BUILD_PLACEHOLDER",
+  "status": "enabled",
+  "url": "https://temporary-snappy-sitar-rpze5gf.vercel.app/api/webhooks/stripe"
+}

@@ -1,0 +1,13 @@
+color = ''
+machine_uuid = '31431ed5-07e1-4599-8019-d0e127f5e83a'
+project-name = 'default'
+
+[default]
+account_id = 'acct_1UMojzBamWQyHs4e'
+device_name = 'Michelles-MacBook-Pro.local'
+display_name = 'acct_1UMojzBamWQyHs4e'
+sandbox_claim_url = 'https://dashboard.stripe.com/onboard_sandbox/YWNjdF8xVU1vanpCYW1XUXlIczRlLDE3OTE3NTQ4NzUv100Ty8lQl2a'
+sandbox_expires_at = '2026-10-11'
+test_mode_api_key = 'REDACTED_BUILD_PLACEHOLDER'
+test_mode_key_expires_at = '2027-01-02'
+test_mode_pub_key = 'REDACTED_BUILD_PLACEHOLDER'
