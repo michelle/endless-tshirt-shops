@@ -1,0 +1,49 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+  body {
+    background:
+      radial-gradient(circle at 12% 0%, rgba(212, 168, 87, 0.10) 0%, transparent 40%),
+      radial-gradient(circle at 88% 110%, rgba(212, 168, 87, 0.06) 0%, transparent 35%),
+      linear-gradient(180deg, #0c101a 0%, #141a26 100%);
+    background-attachment: fixed;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-md
+           bg-gold-500 hover:bg-gold-400 disabled:opacity-50
+           px-5 py-3 text-ink-950 font-medium
+           transition-colors duration-150 ease-out;
+  }
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 rounded-md
+           border border-ink-700 hover:border-ink-500
+           px-5 py-3 text-ink-100 font-medium
+           transition-colors duration-150 ease-out;
+  }
+  .input-field {
+    @apply block w-full rounded-md border border-ink-700 bg-ink-900/50
+           px-3 py-2 text-ink-100 placeholder-ink-400
+           focus:border-gold-500 focus:outline-none focus:ring-1 focus:ring-gold-500/40;
+  }
+  .label-eyebrow {
+    @apply text-xs uppercase tracking-[0.2em] text-gold-500/80 font-medium;
+  }
+  .hairline {
+    @apply h-px flex-1 bg-gradient-to-r from-transparent via-ink-700 to-transparent;
+  }
+}
+
+/* Use a subtle twinkle animation for the constellation lines. */
+@keyframes twinkle {
+  0%, 100% { opacity: 0.45; }
+  50%      { opacity: 0.65; }
+}
+.twinkle { animation: twinkle 8s ease-in-out infinite; }
