@@ -1,0 +1,16 @@
+{
+  "name": "nocturne",
+  "version": "1.0.0",
+  "private": true,
+  "description": "NOCTURNE — wear your sky. Custom star map tees, printed to order with DTG.",
+  "scripts": {
+    "dev": "node dev-server.js",
+    "build-catalog": "node scripts/build-catalog.js",
+    "test-astro": "node tests/astro.test.js",
+    "render-sample": "node tests/render-sample.js"
+  },
+  "dependencies": {
+    "@napi-rs/canvas": "^0.1.65",
+    "stripe": "^17.5.0"
+  }
+}

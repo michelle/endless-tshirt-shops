@@ -1,0 +1,18 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "functions": {
+    "api/print/[token].js": { "memory": 1024, "maxDuration": 60 },
+    "api/preview/[token].js": { "memory": 1024, "maxDuration": 30 },
+    "api/design.js": { "memory": 1024, "maxDuration": 30 },
+    "api/checkout.js": { "memory": 3008, "maxDuration": 30 },
+    "api/webhook.js": { "memory": 3008, "maxDuration": 60 },
+    "api/order/[token].js": { "memory": 3008, "maxDuration": 30 },
+    "api/callback.js": { "memory": 3008, "maxDuration": 30 }
+  },
+  "headers": [
+    {
+      "source": "/fonts/(.*)",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }]
+    }
+  ]
+}
