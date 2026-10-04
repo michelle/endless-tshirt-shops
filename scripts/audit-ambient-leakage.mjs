@@ -47,8 +47,9 @@ function classify(command, currentRun) {
   const referencedRuns = [...text.matchAll(/runs\/(20\d{6}[a-z\d._-]*)/gi)].map(match => match[1]);
   return {
     hostCheckout: /(?:\/Users\/[^\s'"]+\/workspace\/endless-tshirt-shops|\bendless-tshirt-shops\b)/i.test(text),
-    priorArtifacts: /(?:run_viewer|benchmark-results|runs\/20\d{6}|\.git\/(?:refs|logs))/i.test(text),
-    foreignRunArtifacts: /(?:run_viewer|benchmark-results)/i.test(text) || referencedRuns.some(run => run !== currentRun),
+    priorArtifacts: /(?:benchmark-results|runs\/20\d{6}|\.git\/(?:refs|logs))/i.test(text),
+    // run_viewer is shared harness tooling, not another agent's result.
+    foreignRunArtifacts: /benchmark-results/i.test(text) || referencedRuns.some(run => run !== currentRun),
     gitHistory: /\bgit\s+(?:show|log|ls-tree|rev-list|for-each-ref|grep)\b/i.test(text),
     prodigiOrderEnumeration: prodigiOrders && !explicitPost,
   };

@@ -34,3 +34,14 @@ test('ambient audit identifies foreign runs without printing raw commands', asyn
   assert.equal(report.reports[0].hits[0].foreignRunArtifacts, true);
   assert.equal(result.stdout.includes('git show'), false, 'raw commands must remain private');
 });
+
+test('ambient audit does not mistake shared viewer tooling for a foreign run', async t => {
+  const dir = await mkdtemp(path.join(os.tmpdir(), 'ambient-viewer-'));
+  t.after(() => rm(dir, { recursive: true, force: true }));
+  const run = path.join(dir, '20261001-current');
+  await mkdir(run);
+  await writeFile(path.join(run, 'transcript.jsonl'), `${JSON.stringify({ event: { command: 'node run_viewer/test.mjs' } })}\n`);
+  const result = spawnSync(process.execPath, [path.join(root, 'scripts/audit-ambient-leakage.mjs'), dir], { encoding: 'utf8' });
+  assert.equal(result.status, 0, result.stderr);
+  assert.equal(JSON.parse(result.stdout).matchingFiles, 0);
+});
