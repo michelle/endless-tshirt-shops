@@ -1,0 +1,7 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "rewrites": [{ "source": "/print/:file", "destination": "/api/print?file=:file" }],
+  "functions": {
+    "api/*.js": { "maxDuration": 60, "includeFiles": "{public/fonts/**,node_modules/@resvg/resvg-wasm/index_bg.wasm}" }
+  }
+}

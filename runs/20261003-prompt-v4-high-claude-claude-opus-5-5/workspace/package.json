@@ -1,0 +1,21 @@
+{
+  "name": "lifeline-transit-co",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": "24.x"
+  },
+  "scripts": {
+    "metrics": "node scripts/build-metrics.mjs",
+    "render": "node scripts/render-sample.mjs"
+  },
+  "dependencies": {
+    "@resvg/resvg-wasm": "^2.6.2",
+    "@vercel/functions": "^3.9.11",
+    "stripe": "^23.0.0"
+  },
+  "devDependencies": {
+    "opentype.js": "^2.0.0",
+    "puppeteer-core": "^24.43.1"
+  }
+}

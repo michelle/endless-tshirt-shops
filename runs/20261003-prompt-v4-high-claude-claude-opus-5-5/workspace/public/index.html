@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lifeline Transit Co. — Your life, as a transit map tee</title>
+  <meta name="description" content="Design a t-shirt that maps your life — or your love story, or your stag do — as a subway line. Every stop is yours. Printed to order.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='48' fill='%23E4002B'/%3E%3Ctext x='50' y='70' font-family='Arial' font-weight='700' font-size='60' fill='white' text-anchor='middle'%3EL%3C/text%3E%3C/svg%3E">
+  <link rel="preload" href="/fonts/Barlow-Bold.ttf" as="font" type="font/ttf" crossorigin>
+  <link rel="preload" href="/fonts/BarlowCondensed-ExtraBold.ttf" as="font" type="font/ttf" crossorigin>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="/"><span class="roundel">L</span> Lifeline Transit Co.</a>
+    <nav><a href="#how">How it works</a><a href="#faq">FAQ</a><a class="btn small" href="#design">Design yours</a></nav>
+  </header>
+
+  <section class="hero">
+    <div class="hero-copy">
+      <p class="eyebrow">Custom DTG tees · printed to order</p>
+      <h1>Your life,<br>as a <span class="u">transit map.</span></h1>
+      <p class="lede">Hometowns, first flats, the bar where you met. Name every stop on your line and we'll print it on a premium tee. Every shirt is one of one.</p>
+      <div class="hero-cta"><a class="btn" href="#design">Design your line →</a><span class="price-note">$38 · ships worldwide</span></div>
+    </div>
+    <div class="hero-shirts" id="heroShirts" aria-label="Example designs"></div>
+  </section>
+
+  <section class="strip" id="how">
+    <div class="step"><span class="num">1</span><h3>Pick a route</h3><p>A solo line for your life story, or two lines that merge where you met.</p></div>
+    <div class="step"><span class="num">2</span><h3>Name your stops</h3><p>Places, milestones, inside jokes. The map lays itself out as you type.</p></div>
+    <div class="step"><span class="num">3</span><h3>We print &amp; ship</h3><p>Direct-to-garment on a Bella+Canvas 3001, printed to order and shipped tracked.</p></div>
+  </section>
+
+  <section class="designer" id="design">
+    <div class="preview-col">
+      <div class="preview-card">
+        <div class="seg" role="tablist" aria-label="Preview mode">
+          <button type="button" class="on" data-view="shirt">On the shirt</button>
+          <button type="button" data-view="zoom">Close-up</button>
+          <button type="button" data-view="flat">Print file</button>
+        </div>
+        <div id="preview" class="preview"></div>
+        <p class="warn" id="contrastWarn" hidden></p>
+      </div>
+    </div>
+
+    <form class="controls" id="controls" autocomplete="off" onsubmit="return false">
+      <h2>Design your line</h2>
+      <fieldset>
+        <legend>Start from</legend>
+        <div class="chips" id="presets">
+          <button type="button" data-preset="life">Life story</button>
+          <button type="button" data-preset="love">Love story</button>
+          <button type="button" data-preset="crawl">Pub crawl / stag</button>
+          <button type="button" data-preset="grad">Graduation</button>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Route type</legend>
+        <div class="seg wide" id="mode">
+          <button type="button" data-mode="solo">One line</button>
+          <button type="button" data-mode="duo">Two lines that merge</button>
+        </div>
+      </fieldset>
+
+      <fieldset class="grid2">
+        <label>Line name<input name="title" maxlength="26" placeholder="The Maya Line"></label>
+        <label>Tagline<input name="subtitle" maxlength="44" placeholder="Est. 1994 · Austin to Brooklyn"></label>
+      </fieldset>
+
+      <fieldset>
+        <legend id="lineALegend">Line colour &amp; badge</legend>
+        <div class="line-pick">
+          <input class="bullet-in" name="bullet" maxlength="2" aria-label="Badge letters for line A">
+          <div class="swatches" data-color="colorA"></div>
+        </div>
+        <div class="line-pick duo-only">
+          <input class="bullet-in" name="bulletB" maxlength="2" aria-label="Badge letters for line B">
+          <div class="swatches" data-color="colorB"></div>
+        </div>
+      </fieldset>
+
+      <fieldset class="solo-only">
+        <legend>Stops <small>(3–10, top to bottom)</small></legend>
+        <div class="stops" data-list="stopsA"></div>
+        <div class="seg" id="shape" aria-label="Route shape">
+          <button type="button" data-shape="winding">Winding route</button>
+          <button type="button" data-shape="straight">Straight route</button>
+        </div>
+      </fieldset>
+
+      <fieldset class="duo-only">
+        <legend>Line A, before the lines meet <small>(1–4)</small></legend>
+        <div class="stops" data-list="stopsA"></div>
+      </fieldset>
+      <fieldset class="duo-only">
+        <legend>Line B, before the lines meet <small>(1–4)</small></legend>
+        <div class="stops" data-list="stopsB"></div>
+      </fieldset>
+      <fieldset class="duo-only">
+        <legend>The interchange, where you met</legend>
+        <div class="stop-row hub">
+          <input name="hubN" maxlength="24" placeholder="Where you met">
+          <input name="hubD" maxlength="30" placeholder="Note (e.g. year)">
+        </div>
+      </fieldset>
+      <fieldset class="duo-only">
+        <legend>Shared stops after that <small>(0–5)</small></legend>
+        <div class="stops" data-list="stopsShared"></div>
+      </fieldset>
+
+      <fieldset>
+        <label class="check"><input type="checkbox" name="futureOn"> Add a dashed “future service” extension</label>
+        <input name="future" maxlength="22" placeholder="Next stop: ???">
+      </fieldset>
+
+      <fieldset>
+        <legend>Shirt colour <small id="garmentName"></small></legend>
+        <div class="garments" id="garments"></div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Sizes <small>(unisex fit; mix sizes for group orders)</small></legend>
+        <div class="sizes" id="sizes"></div>
+      </fieldset>
+
+      <div class="buy">
+        <div class="total"><span id="qtyLabel">1 shirt</span><strong id="subtotal">$38.00</strong><small>+ shipping from $5.95, calculated at checkout</small></div>
+        <button type="button" class="btn big" id="checkout">Checkout securely →</button>
+      </div>
+      <p class="error" id="error" role="alert" hidden></p>
+    </form>
+  </section>
+
+  <section class="faq" id="faq">
+    <h2>Questions</h2>
+    <details><summary>How is it printed?</summary><p>Direct-to-garment (DTG): the ink goes into the cotton, so there's no stiff vinyl and no minimum order. Each shirt is printed after you order. Station centres are left unprinted on light tees and printed white on dark tees, so they stay crisp either way.</p></details>
+    <details><summary>Which shirt is it?</summary><p>The Bella+Canvas 3001: soft, 100% combed ring-spun cotton (heathers are blends), unisex retail fit. If you're between sizes, size up for a relaxed fit.</p></details>
+    <details><summary>How long does it take?</summary><p>Printing takes 2–4 business days. Standard tracked shipping usually adds 5–10 business days, Express 2–5. You'll get a link to follow your order.</p></details>
+    <details><summary>Can I order for a group?</summary><p>Yes. Add as many sizes as you need (up to 20 shirts per order). They all get the same design.</p></details>
+    <details><summary>What if something's wrong?</summary><p>If a shirt arrives misprinted or damaged, get in touch with a photo within 30 days and we'll reprint it for free. Typos you made yourself aren't covered, so read every stop carefully before you pay.</p></details>
+  </section>
+
+  <footer class="foot">
+    <span class="roundel">L</span> Lifeline Transit Co. · Every life is a route. Wear yours.
+  </footer>
+
+  <script type="module" src="/js/app.js"></script>
+</body>
+</html>

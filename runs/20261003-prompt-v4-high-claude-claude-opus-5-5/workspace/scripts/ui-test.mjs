@@ -1,0 +1,31 @@
+// Drives the designer like a customer and screenshots the preview.
+import puppeteer from 'puppeteer-core';
+const base = process.argv[2] || 'http://localhost:4319';
+const browser = await puppeteer.launch({ executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome', headless: true });
+const page = await browser.newPage();
+const errors = [];
+page.on('pageerror', (e) => errors.push(e.message));
+await page.setViewport({ width: 1300, height: 1000 });
+await page.goto(`${base}/#design`, { waitUntil: 'networkidle0' });
+await page.evaluate(() => localStorage.clear());
+await page.reload({ waitUntil: 'networkidle0' });
+await page.click('[data-mode="duo"]');
+await page.click('input[name=title]', { clickCount: 3 });
+await page.type('input[name=title]', 'Jo & Alex');
+await page.click('[data-g="white"]');
+await page.click('[data-color="colorB"] [data-k="green"]');
+await page.click('[data-add="stopsShared"]');
+await page.keyboard.type('Our First House');
+await page.click('[data-view="zoom"]');
+await new Promise((r) => setTimeout(r, 400));
+const el = await page.$('.preview-card');
+await el.screenshot({ path: 'out/ui-duo-zoom.png' });
+await page.click('[data-view="shirt"]');
+// invalid state: clear the title
+await page.click('input[name=title]', { clickCount: 3 });
+await page.keyboard.press('Backspace');
+await new Promise((r) => setTimeout(r, 200));
+const err = await page.$eval('#error', (e) => (e.hidden ? '' : e.textContent));
+const disabled = await page.$eval('#checkout', (b) => b.disabled);
+console.log({ validationMessage: err, checkoutDisabled: disabled, errors });
+await browser.close();
