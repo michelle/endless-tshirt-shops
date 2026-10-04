@@ -15,13 +15,13 @@ Options:
                       Optional provider reasoning level (low, medium, high, xhigh, or max)
   -h, --help           Show this help
 
-The runner requires PRODIGI_API_KEY, Stripe CLI, a clean repository, an origin remote,
+The runner requires PRODIGI_API_KEY, Stripe CLI for evaluator-side inspection, a clean repository, an origin remote,
 and either timeout or gtimeout. It appends the completed run to
 benchmark-results, then returns to the branch that was checked out when it
-started. Each run receives a private Stripe CLI config in a temporary
-directory holding only that run's profile, archived to .benchmark-secrets/stripe/
-after the agent exits. It is never committed. The agent's environment does not
-name the payment provider the harness has prepared.
+started. Provider-specific CLIs installed on the host are removed from the
+agent's effective PATH, while npm and network access remain available so the
+agent can deliberately install one. The harness keeps a private CLI profile for
+post-run inspection and never commits it.
 EOF
 }
 
@@ -59,24 +59,35 @@ vercel_project_name() {
 }
 
 inspection_source_root() {
-  # Most agents build directly in the empty workspace, but some scaffold one
-  # project directory below it. Deploy that sole application root rather than
-  # publishing a directory listing whose child happens to contain the app. A
-  # multi-package workspace is left at its root because choosing among several
-  # package manifests would be a guess.
-  local workspace=$1 candidate= count=0 manifest directory
-  if [[ -f $workspace/package.json || -f $workspace/vercel.json || -f $workspace/index.html ]]; then
-    printf '%s' "$workspace"
-    return
-  fi
-  while IFS= read -r manifest; do
-    directory=$(dirname "$manifest")
-    [[ $directory == "$candidate" ]] && continue
-    candidate=$directory
-    count=$((count + 1))
-  done < <(find "$workspace" -mindepth 2 -maxdepth 3 -type f \( -name package.json -o -name vercel.json -o -name index.html \) \
-    ! -path '*/node_modules/*' ! -path '*/.next/*' ! -path '*/build/*' ! -path '*/dist/*' | sort -u)
-  if (( count == 1 )); then printf '%s' "$candidate"; else printf '%s' "$workspace"; fi
+  node "$SCRIPT_DIR/select-deployment-root.mjs" "$1"
+}
+
+build_agent_path() {
+  # Mirror the host PATH without provider-specific executables. Removing whole
+  # directories is too blunt: vercel commonly sits beside node/npm, and the
+  # benchmark intentionally allows an agent to choose `npx vercel` itself.
+  local target=$1 source_path=$2 index=0 source mirror entry name result=
+  local blocked=' vercel netlify stripe wrangler cloudflared flyctl render railway firebase surge heroku gcloud aws az gh shopify '
+  mkdir -p "$target"
+  local old_ifs=$IFS
+  IFS=:
+  for source in $source_path; do
+    IFS=$old_ifs
+    [[ -n $source && -d $source ]] || { IFS=:; continue; }
+    mirror="$target/$index"
+    index=$((index + 1))
+    mkdir -p "$mirror"
+    for entry in "$source"/*; do
+      [[ -e $entry && -x $entry && ! -d $entry ]] || continue
+      name=$(basename "$entry")
+      [[ $blocked == *" $name "* ]] && continue
+      [[ -e $mirror/$name ]] || ln -s "$entry" "$mirror/$name"
+    done
+    result+="${result:+:}$mirror"
+    IFS=:
+  done
+  IFS=$old_ifs
+  printf '%s' "$result"
 }
 
 extract_url() {
@@ -183,6 +194,8 @@ node -e 'const [major, minor] = process.versions.node.split(".").map(Number); if
 command -v curl >/dev/null 2>&1 || die "curl is required for inspection deployment verification"
 command -v "$ADAPTER" >/dev/null 2>&1 || die "$ADAPTER CLI is not installed or not on PATH"
 STRIPE_REAL=$(command -v stripe) || die "Stripe CLI is not installed or not on PATH"
+VERCEL_REAL=$(command -v vercel || true)
+[[ -z $HARNESS_VERCEL_TOKEN || -n $VERCEL_REAL ]] || die "Vercel CLI is required when BENCHMARK_VERCEL_TOKEN is set"
 TIMEOUT_COMMAND=$(command -v timeout || command -v gtimeout || true)
 [[ -n $TIMEOUT_COMMAND ]] || die "install GNU coreutils (timeout/gtimeout) to enforce --timeout"
 
@@ -347,7 +360,8 @@ cleanup_runtime() {
   remove_publish_tree || true
   [[ -z ${AGENT_WORKSPACE-} ]] || rm -rf -- "$AGENT_WORKSPACE"
   [[ -z ${AGENT_CONTROL_DIR-} ]] || rm -rf -- "$AGENT_CONTROL_DIR"
-  [[ -z ${STRIPE_SHIM_DIR-} ]] || rm -rf -- "$STRIPE_SHIM_DIR"
+  [[ -z ${AGENT_TOOL_DIR-} ]] || rm -rf -- "$AGENT_TOOL_DIR"
+  [[ -z ${INSPECTION_STAGE-} ]] || rm -rf -- "$INSPECTION_STAGE"
   if [[ -n ${GLOBAL_STRIPE_BACKUP_DIR-} && -d $GLOBAL_STRIPE_BACKUP_DIR && ! -e ${GLOBAL_STRIPE_BACKUP-} ]]; then
     rm -rf -- "$GLOBAL_STRIPE_BACKUP_DIR"
   fi
@@ -364,7 +378,8 @@ AGENT_WORKSPACE=
 AGENT_CONTROL_DIR=
 AGENT_CAPTURE_DIR=
 AGENT_RAW_LOG=
-STRIPE_SHIM_DIR=
+AGENT_TOOL_DIR=
+INSPECTION_STAGE=
 STRIPE_LIVE_DIR=
 GLOBAL_STRIPE_BACKUP_DIR=
 GLOBAL_STRIPE_BACKUP=
@@ -384,8 +399,8 @@ AGENT_CAPTURE_DIR="$AGENT_CONTROL_DIR/capture"
 AGENT_RAW_LOG="$AGENT_CONTROL_DIR/agent.raw.log"
 cp -- "$PROMPT_FILE" "$AGENT_PROMPT_FILE"
 # Temporary directory names reach the agent through PATH and BASH_ENV, so they
-# must not disclose which payment provider the harness has pre-provisioned.
-STRIPE_SHIM_DIR=$(mktemp -d "${TMPDIR:-/tmp}/benchmark-tools.XXXXXX") || die "could not create Stripe CLI shim"
+# must remain provider-neutral.
+AGENT_TOOL_DIR=$(mktemp -d "${TMPDIR:-/tmp}/benchmark-tools.XXXXXX") || die "could not create isolated agent PATH"
 STRIPE_LIVE_DIR=$(mktemp -d "${TMPDIR:-/tmp}/benchmark-cli-state.XXXXXX") || die "could not create isolated CLI profile directory"
 GLOBAL_STRIPE_BACKUP_DIR=$(mktemp -d "${TMPDIR:-/tmp}/benchmark-cli-global.XXXXXX") || die "could not create Stripe config backup directory"
 chmod 700 "$GLOBAL_STRIPE_BACKUP_DIR"
@@ -397,15 +412,12 @@ chmod 700 "$STRIPE_LIVE_DIR"
 STRIPE_CONFIG="$STRIPE_LIVE_DIR/config.toml"
 : >"$STRIPE_CONFIG"
 chmod 600 "$STRIPE_CONFIG"
-cat >"$STRIPE_SHIM_DIR/stripe" <<EOF
-#!/usr/bin/env bash
-exec "${STRIPE_REAL}" --config "\${BENCHMARK_CLI_STATE}" "\$@"
+AGENT_PATH=$(build_agent_path "$AGENT_TOOL_DIR/path" "$PATH")
+[[ -n $AGENT_PATH ]] || die "could not construct isolated agent PATH"
+cat >"$AGENT_TOOL_DIR/bash-env" <<EOF
+export PATH="${AGENT_PATH}"
 EOF
-chmod 700 "$STRIPE_SHIM_DIR/stripe"
-cat >"$STRIPE_SHIM_DIR/bash-env" <<EOF
-export PATH="${STRIPE_SHIM_DIR}:\$PATH"
-EOF
-chmod 600 "$STRIPE_SHIM_DIR/bash-env"
+chmod 600 "$AGENT_TOOL_DIR/bash-env"
 
 if ! mkdir -- "$GLOBAL_STRIPE_LOCK_DIR" 2>/dev/null; then
   die "another benchmark may be using the global Stripe config (lock: $GLOBAL_STRIPE_LOCK_DIR)"
@@ -418,9 +430,14 @@ if [[ -e $GLOBAL_STRIPE_CONFIG ]]; then
   GLOBAL_STRIPE_ORIGINAL_PRESENT=1
 fi
 
-export BASH_ENV="$STRIPE_SHIM_DIR/bash-env"
-LOGIN_SHELL_STRIPE=$(PATH="$STRIPE_SHIM_DIR:$PATH" /bin/bash -lc 'command -v stripe')
-[[ $LOGIN_SHELL_STRIPE == "$STRIPE_SHIM_DIR/stripe" ]] || die "Stripe wrapper did not survive a login shell (resolved: $LOGIN_SHELL_STRIPE)"
+export BASH_ENV="$AGENT_TOOL_DIR/bash-env"
+for hidden_cli in vercel netlify stripe wrangler cloudflared flyctl render railway firebase surge heroku gcloud aws az gh shopify; do
+  if PATH="$AGENT_PATH" /bin/bash -lc "command -v $hidden_cli" >/dev/null 2>&1; then
+    die "provider CLI remained visible in isolated agent PATH: $hidden_cli"
+  fi
+done
+PATH="$AGENT_PATH" /bin/bash -lc 'command -v node >/dev/null && command -v npm >/dev/null && command -v curl >/dev/null' ||
+  die "neutral agent tools were lost while isolating provider CLIs"
 
 # Credentials must come from the isolated CLI profile, never from the runner's
 # ambient environment.
@@ -450,7 +467,7 @@ export BENCHMARK_CLI_STATE="$STRIPE_CONFIG"
 export BENCHMARK_CAPTURE_DIR="$AGENT_CAPTURE_DIR"
 
 set +e
-PATH="$STRIPE_SHIM_DIR:$PATH" "$TIMEOUT_COMMAND" "$TIMEOUT_SECONDS" node "$AGENT_RUNNER" "$ADAPTER" "${EXTRA_ARGS[@]}" >"$AGENT_RAW_LOG" 2>&1
+PATH="$AGENT_PATH" "$TIMEOUT_COMMAND" "$TIMEOUT_SECONDS" node "$AGENT_RUNNER" "$ADAPTER" "${EXTRA_ARGS[@]}" >"$AGENT_RAW_LOG" 2>&1
 AGENT_EXIT=$?
 set -e
 restore_global_stripe_config
@@ -500,35 +517,68 @@ if [[ -n $HARNESS_VERCEL_TOKEN ]]; then
   INSPECTION_LOG="$DEPLOYMENT_LOG_DIR/$RUN_ID.log"
   VERCEL_SCOPE_ARGS=()
   [[ -z $HARNESS_VERCEL_SCOPE ]] || VERCEL_SCOPE_ARGS+=(--scope "$HARNESS_VERCEL_SCOPE")
-  INSPECTION_SOURCE=$(inspection_source_root "$AGENT_WORKSPACE")
+  INSPECTION_SOURCE=$(inspection_source_root "$AGENT_WORKSPACE" 2>/dev/null || true)
+  if [[ -n $INSPECTION_SOURCE ]]; then
+    INSPECTION_SOURCE_RELATIVE=$(node -e 'const p=require("node:path"); process.stdout.write(p.relative(process.argv[1], process.argv[2]) || ".")' "$AGENT_WORKSPACE" "$INSPECTION_SOURCE")
+    INSPECTION_STAGE=$(mktemp -d "${TMPDIR:-/tmp}/benchmark-deploy.XXXXXX") || die "could not create inspection staging directory"
+    # Deploy from a clean copy. Anonymous provider linkage and cached settings
+    # previously contaminated authenticated projects, causing valid builds to
+    # report READY while every public URL returned Vercel-level NOT_FOUND.
+    tar -C "$INSPECTION_SOURCE" --exclude=.git --exclude=.vercel --exclude=.netlify --exclude=node_modules --exclude=.next --exclude=reference -cf - . |
+      tar -C "$INSPECTION_STAGE" -xf -
+  fi
   set +e
   (
-    cd "$INSPECTION_SOURCE" || exit 1
-    printf 'inspection_source=%s\n' "${INSPECTION_SOURCE#"$AGENT_WORKSPACE"/}"
+    [[ -n $INSPECTION_SOURCE && -n $INSPECTION_STAGE ]] || { printf 'inspection_error=no_deployable_source\n'; exit 1; }
+    cd "$INSPECTION_STAGE" || exit 1
+    printf 'inspection_source=%s\n' "$INSPECTION_SOURCE_RELATIVE"
+    printf 'inspection_staged_without_provider_state=true\n'
     # `deploy --project` selects an existing project; it does not create one.
     # Every benchmark uses a fresh run-specific name, so ensure that project
     # exists before the first deployment. An inspect failure is followed by an
     # explicit add; if the failure was auth/scope-related, add fails too and the
     # inspection remains correctly marked failed.
-    if ! VERCEL_TOKEN="$HARNESS_VERCEL_TOKEN" "$TIMEOUT_COMMAND" 60 vercel project inspect "$VERCEL_PROJECT" --non-interactive "${VERCEL_SCOPE_ARGS[@]}"; then
-      VERCEL_TOKEN="$HARNESS_VERCEL_TOKEN" "$TIMEOUT_COMMAND" 60 vercel project add "$VERCEL_PROJECT" --non-interactive "${VERCEL_SCOPE_ARGS[@]}" || exit 1
+    if ! VERCEL_TOKEN="$HARNESS_VERCEL_TOKEN" "$TIMEOUT_COMMAND" 60 "$VERCEL_REAL" project inspect "$VERCEL_PROJECT" --non-interactive "${VERCEL_SCOPE_ARGS[@]}"; then
+      VERCEL_TOKEN="$HARNESS_VERCEL_TOKEN" "$TIMEOUT_COMMAND" 60 "$VERCEL_REAL" project add "$VERCEL_PROJECT" --non-interactive "${VERCEL_SCOPE_ARGS[@]}" || exit 1
     fi
     # Inspection copies must be anonymously reachable by the evaluator. New
     # projects can inherit team-level SSO protection even when the deployment
     # itself succeeds, which otherwise turns the captured URL into a login
     # redirect and a false-positive "succeeded" status.
-    VERCEL_TOKEN="$HARNESS_VERCEL_TOKEN" "$TIMEOUT_COMMAND" 60 vercel project protection disable "$VERCEL_PROJECT" --sso --non-interactive "${VERCEL_SCOPE_ARGS[@]}" || exit 1
-    VERCEL_TOKEN="$HARNESS_VERCEL_TOKEN" "$TIMEOUT_COMMAND" 900 vercel deploy --prod --yes --project "$VERCEL_PROJECT" "${VERCEL_SCOPE_ARGS[@]}"
+    VERCEL_TOKEN="$HARNESS_VERCEL_TOKEN" "$TIMEOUT_COMMAND" 60 "$VERCEL_REAL" project protection disable "$VERCEL_PROJECT" --sso --non-interactive "${VERCEL_SCOPE_ARGS[@]}" || exit 1
+    if ! VERCEL_TOKEN="$HARNESS_VERCEL_TOKEN" "$TIMEOUT_COMMAND" 900 "$VERCEL_REAL" deploy --prod --yes --project "$VERCEL_PROJECT" "${VERCEL_SCOPE_ARGS[@]}"; then
+      # Retry a malformed agent-authored provider config using framework
+      # autodetection. This changes only the evaluator-owned staging copy.
+      [[ -f vercel.json ]] || exit 1
+      mv vercel.json vercel.json.agent-rejected
+      printf 'inspection_retry=framework_autodetect_without_vercel_json\n'
+      VERCEL_TOKEN="$HARNESS_VERCEL_TOKEN" "$TIMEOUT_COMMAND" 900 "$VERCEL_REAL" deploy --prod --yes --project "$VERCEL_PROJECT" "${VERCEL_SCOPE_ARGS[@]}"
+    fi
   ) >"$INSPECTION_LOG" 2>&1
   INSPECTION_EXIT=$?
   set -e
   if (( INSPECTION_EXIT == 0 )); then
-    INSPECTION_DEPLOYMENT_URL=$(grep -Eo 'https://[a-z0-9][a-z0-9.-]*\.vercel\.(app|sh)' "$INSPECTION_LOG" | tail -n 1 || true)
+    CANDIDATE_FILE="$INSPECTION_STAGE/url-candidates"
+    {
+      grep 'Aliased' "$INSPECTION_LOG" | grep -Eo 'https://[a-z0-9][a-z0-9.-]*\.vercel\.(app|sh)' || true
+      grep -Eo 'https://[a-z0-9][a-z0-9.-]*\.vercel\.(app|sh)' "$INSPECTION_LOG" || true
+    } | awk '!seen[$0]++' >"$CANDIDATE_FILE"
     INSPECTION_HTTP_STATUS=
-    if [[ -n $INSPECTION_DEPLOYMENT_URL ]]; then
-      INSPECTION_HTTP_STATUS=$(curl -sS -o /dev/null -w '%{http_code}' --max-time 30 "$INSPECTION_DEPLOYMENT_URL" 2>>"$INSPECTION_LOG" || true)
-      printf 'inspection_http_status=%s\n' "$INSPECTION_HTTP_STATUS" >>"$INSPECTION_LOG"
-    fi
+    for attempt in 1 2 3 4 5; do
+      while IFS= read -r candidate; do
+        [[ -n $candidate ]] || continue
+        status=$(curl -sS -L -o /dev/null -w '%{http_code}' --max-time 30 "$candidate" 2>>"$INSPECTION_LOG" || true)
+        printf 'inspection_probe_attempt=%s status=%s url=%s\n' "$attempt" "$status" "$candidate" >>"$INSPECTION_LOG"
+        if [[ $status =~ ^[23][0-9][0-9]$ ]]; then
+          INSPECTION_DEPLOYMENT_URL=$candidate
+          INSPECTION_HTTP_STATUS=$status
+          break 2
+        fi
+      done <"$CANDIDATE_FILE"
+      sleep 2
+    done
+    [[ -n $INSPECTION_DEPLOYMENT_URL ]] || INSPECTION_DEPLOYMENT_URL=$(head -n 1 "$CANDIDATE_FILE" || true)
+    printf 'inspection_http_status=%s\n' "$INSPECTION_HTTP_STATUS" >>"$INSPECTION_LOG"
     if [[ $INSPECTION_HTTP_STATUS =~ ^[23][0-9][0-9]$ ]]; then INSPECTION_DEPLOYMENT_STATUS=succeeded; else INSPECTION_DEPLOYMENT_STATUS=failed; fi
   else
     INSPECTION_DEPLOYMENT_STATUS=failed
@@ -571,6 +621,7 @@ WORKSPACE_TREE=$(git write-tree)
   printf '  "model": '; json_string "$MODEL"; printf ',\n'
   printf '  "reasoning_effort": '; json_string "$REASONING_EFFORT"; printf ',\n'
   printf '  "memory_policy": "explicitly_disabled",\n'
+  printf '  "provider_cli_policy": "not_preinstalled_network_installs_allowed",\n'
   printf '  "branch": '; json_string "$RESULTS_BRANCH"; printf ',\n'
   printf '  "vercel_project": '; json_string "$VERCEL_PROJECT"; printf ',\n'
   printf '  "stripe_config_ref": '; json_string "$RUN_ID"; printf ',\n'

@@ -41,14 +41,14 @@ export BENCHMARK_VERCEL_TOKEN='token-used-only-after-the-agent-exits'
 ```
 
 `PRODIGI_API_KEY` must be a sandbox key, and the suite controller checks its
-shape. Do not run `vercel login` for prompt v4: the agent is meant to encounter
-an unauthenticated CLI and choose its own deployment route. The harness uses
+shape. Host-installed deployment and payment CLIs are hidden from prompt-v4
+agents whether or not they are logged in; the harness uses
 `BENCHMARK_VERCEL_TOKEN` only for its later inspection copy. Also required:
 Node.js 20.11+ (the viewer in `run_viewer/` needs 22.13+),
 Git, an `origin` remote, and `timeout`/`gtimeout`. The inspector additionally
 needs Python 3 with Pillow.
 
-Every provider CLI must be runnable as a bare command, since `run-agent.mjs`
+Every **model** provider CLI must be runnable as a bare command, since `run-agent.mjs`
 spawns it by name: a CLI installed outside `PATH`, such as Kimi Code's
 `~/.kimi-code/bin/kimi`, needs a symlink or a `PATH` entry or its runs die at
 launch.
@@ -266,18 +266,20 @@ workspace into `runs/<run-id>/workspace/`, finalizes the public artifacts, and
 moves the private transcript into `.benchmark-secrets/transcripts/<run-id>/`.
 Interrupted runs archive any partial transcript during cleanup.
 
-Each run gets its own Vercel project (`benchmark-<run-id>`) and its own Stripe
-CLI profile in a private temporary directory, handed over as
-`BENCHMARK_CLI_STATE` and transparently applied to every `stripe` command,
-including through a login shell. The profile is archived afterwards to
+Each run gets its own evaluator-side Vercel project (`benchmark-<run-id>`) and a
+private CLI-state file archived afterwards to
 `.benchmark-secrets/stripe/<run-id>.toml`, which is Git-ignored. During the run
 the normal global Stripe config is quarantined and ambient Stripe variables are
 unset; a config the agent writes to the global path is captured too.
 
-For v2/v3 the environment is deliberately provider-neutral: no variable name or
-value, `PATH` entry or `BASH_ENV` path reveals which payment provider is
-prepared, and `tests/run-benchmark-test.sh` asserts that. The agent has to find
-the CLI by probing for it.
+The agent's effective `PATH` is deliberately provider-neutral. Host-installed
+deployment and payment CLIs—including Vercel, Netlify, Cloudflare and Stripe—are
+absent, while Node, npm, npx, Git, curl and network access remain available. An
+agent may therefore choose and install a provider tool itself, but no
+preinstalled executable wins merely because it was easiest to discover.
+`tests/run-benchmark-test.sh` asserts both sides of this policy, including
+through a login shell. Metadata records the policy as
+`not_preinstalled_network_installs_allowed`.
 
 **This is not a sandbox.** The agent runs as the invoking user and can still
 reach the archive, this repository, `$HOME` and `/tmp` with an explicit search.
@@ -357,7 +359,8 @@ bash tests/run-benchmark-test.sh
 `BENCHMARK_CLI_STATE` and optionally `BENCHMARK_VERCEL_PROJECT` and
 `BENCHMARK_REASONING_EFFORT`, and refuses to start if any of the first six is
 missing. `BENCHMARK_CLI_STATE` is named neutrally on purpose, so it does not
-steer the agent's choice of payment provider. `BENCHMARK_VERCEL_PROJECT` is
+steer the agent's choice of payment provider; no provider CLI is preinstalled in
+the agent's effective `PATH`. `BENCHMARK_VERCEL_PROJECT` is
 present only when the selected prompt explicitly names it; prompt v4 therefore
 gets no Vercel hint from the environment.
 

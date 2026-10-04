@@ -3,7 +3,7 @@ set -euo pipefail
 
 ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
 TMP_ROOT=$(mktemp -d "${TMPDIR:-/tmp}/benchmark-runner-test.XXXXXX")
-trap 'rm -rf "$TMP_ROOT"' EXIT
+trap 'if [[ -n ${KEEP_BENCHMARK_TEST_TMP-} ]]; then printf "kept test fixture: %s\\n" "$TMP_ROOT" >&2; else rm -rf "$TMP_ROOT"; fi' EXIT
 
 fail() { printf 'FAIL: %s\n' "$*" >&2; exit 1; }
 assert() { "$@" || fail "$*"; }
@@ -61,7 +61,10 @@ printf '%s\n' \
   '    *) shift ;;' \
   '  esac' \
   'done' \
-  'case $(/bin/bash -lc "command -v stripe") in *benchmark-tools.*/stripe) ;; *) exit 9 ;; esac' \
+  'if /bin/bash -lc "command -v stripe" >/dev/null 2>&1; then echo "Stripe CLI was preinstalled for the agent" >&2; exit 9; fi' \
+  'if /bin/bash -lc "command -v vercel" >/dev/null 2>&1; then echo "Vercel CLI was preinstalled for the agent" >&2; exit 15; fi' \
+  'if /bin/bash -lc "command -v cloudflared" >/dev/null 2>&1; then echo "Cloudflare CLI was preinstalled for the agent" >&2; exit 16; fi' \
+  '/bin/bash -lc "command -v npm >/dev/null && command -v npx >/dev/null"' \
   '[[ -z "${STRIPE_SECRET_KEY-}${STRIPE_API_KEY-}${STRIPE_PUBLISHABLE_KEY-}${STRIPE_WEBHOOK_SECRET-}" ]]' \
   '[[ -z "${VERCEL_TOKEN-}${BENCHMARK_VERCEL_TOKEN-}${BENCHMARK_VERCEL_SCOPE-}" ]]' \
   '# the environment must not disclose the pre-provisioned payment provider' \
@@ -77,9 +80,11 @@ printf '%s\n' \
   '[[ -n "${FAKE_ROOT_WRITE_PATH:-}" ]] && printf "outside workspace\n" >"$FAKE_ROOT_WRITE_PATH"' \
   'mkdir -p "$workspace"' \
   'git init -q "$workspace"' \
-  'stripe sandbox create --non-interactive' \
+  '# Simulate state created only after an agent deliberately installs/uses a provider CLI.' \
+  'printf "fake Stripe profile\\n" >>"$BENCHMARK_CLI_STATE"' \
   'app_dir=$workspace' \
   'if [[ -n "${FAKE_NESTED_APP:-}" ]]; then app_dir=$workspace/store; mkdir -p "$app_dir"; printf "{}\n" >"$app_dir/package.json"; fi' \
+  '[[ -z "${FAKE_BAD_VERCEL_CONFIG:-}" ]] || printf "{ invalid fixture }\n" >"$app_dir/vercel.json"' \
   'printf "%s\n" "${BENCHMARK_VERCEL_PROJECT-}" >"$app_dir/vercel-project.txt"' \
   'printf "node_modules\n" >"$app_dir/.gitignore"' \
   'mkdir -p "$app_dir/node_modules"' \
@@ -105,12 +110,12 @@ printf '%s\n' \
   '#!/usr/bin/env bash' \
   'set -euo pipefail' \
   '[[ ${VERCEL_TOKEN-} == fixture-harness-token ]]' \
-  '[[ -z "${FAKE_VERCEL_EXPECTED_CWD:-}" || $PWD == *"/$FAKE_VERCEL_EXPECTED_CWD" ]]' \
+  '[[ -z "${FAKE_VERCEL_EXPECTED_CWD:-}" || -f package.json ]]' \
   'case "${1-} ${2-}" in' \
   '  "project inspect") [[ -f $FAKE_VERCEL_STATE ]] ;;' \
   '  "project add") touch "$FAKE_VERCEL_STATE" ;;' \
   '  "project protection") [[ ${3-} == disable && ${5-} == --sso ]]; touch "$FAKE_VERCEL_STATE.public" ;;' \
-  '  "deploy --prod") [[ -f $FAKE_VERCEL_STATE && -f $FAKE_VERCEL_STATE.public ]]; printf "https://benchmark-inspection-copy.vercel.app\n" ;;' \
+  '  "deploy --prod") [[ -f $FAKE_VERCEL_STATE && -f $FAKE_VERCEL_STATE.public ]]; if [[ -n "${FAKE_VERCEL_REJECT_CONFIG:-}" && -f vercel.json ]]; then echo "invalid vercel config" >&2; exit 1; fi; printf "https://benchmark-inspection-copy.vercel.app\n" ;;' \
   '  *) echo "unexpected Vercel invocation: $*" >&2; exit 2 ;;' \
   'esac' >"$BIN/vercel"
 chmod +x "$BIN/vercel"
@@ -254,7 +259,7 @@ fi
   cd "$REPO"
   PATH="$BIN:$PATH" PRODIGI_API_KEY=test_11111111-1111-1111-1111-111111111111 \
     BENCHMARK_VERCEL_TOKEN=fixture-harness-token FAKE_DEPLOYMENT_URL=https://anonymous-choice.netlify.app \
-    FAKE_NESTED_APP=1 FAKE_VERCEL_EXPECTED_CWD=store \
+    FAKE_NESTED_APP=1 FAKE_VERCEL_EXPECTED_CWD=store FAKE_BAD_VERCEL_CONFIG=1 FAKE_VERCEL_REJECT_CONFIG=1 \
     "$ROOT/scripts/run-benchmark" --adapter codex --model fake --timeout 5 \
       --run-id provider-choice --prompt-file prompts/prompt-v4.md
 )
@@ -266,6 +271,9 @@ PROVIDER_METADATA=$(git --git-dir="$REMOTE" show benchmark-results:runs/provider
 [[ $PROVIDER_METADATA == *'"inspection_deployment_url": "https://benchmark-inspection-copy.vercel.app"'* ]] || fail 'harness inspection URL was not recorded'
 assert test -s "$REPO/.benchmark-secrets/deployments/provider-choice.log"
 grep -q 'inspection_http_status=200' "$REPO/.benchmark-secrets/deployments/provider-choice.log" || fail 'inspection deployment was not health checked'
+grep -q 'inspection_source=store' "$REPO/.benchmark-secrets/deployments/provider-choice.log" || fail 'nested application root was not selected'
+grep -q 'inspection_staged_without_provider_state=true' "$REPO/.benchmark-secrets/deployments/provider-choice.log" || fail 'inspection deploy did not use a clean staging copy'
+grep -q 'inspection_retry=framework_autodetect_without_vercel_json' "$REPO/.benchmark-secrets/deployments/provider-choice.log" || fail 'malformed provider config did not trigger framework-autodetect retry'
 assert test -f "$FAKE_VERCEL_STATE"
 assert test -f "$FAKE_VERCEL_STATE.public"
 LOG=$(git --git-dir="$REMOTE" show benchmark-results:runs/success/events.jsonl)
