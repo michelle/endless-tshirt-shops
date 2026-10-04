@@ -1,0 +1,1 @@
+declare namespace Cloudflare {interface Env {DB?:D1Database;BUCKET?:R2Bucket;PRODIGI_API_KEY?:string;STRIPE_SECRET_KEY?:string;STRIPE_WEBHOOK_SECRET?:string;SITE_URL?:string;STORE_MODE?:string;PRODIGI_MODE?:string;}}

@@ -1,0 +1,2 @@
+import {bucket,getOrder,jsonError} from '../../../../lib/store';
+export async function GET(req:Request,{params}:{params:Promise<{id:string}>}){try{const {id}=await params;const o=await getOrder(id);if(!o||new URL(req.url).searchParams.get('token')!==o.token)return jsonError('Not found',404);const file=await bucket().get(id+'.png');if(!file)return jsonError('Not found',404);return new Response(file.body,{headers:{'Content-Type':'image/png','Cache-Control':'private, max-age=3600','X-Content-Type-Options':'nosniff'}});}catch{return jsonError('Artwork unavailable',503);}}
