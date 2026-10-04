@@ -89,9 +89,12 @@ printf '%s\n' \
   "printf '%s\\n' '{\"type\":\"turn.completed\",\"usage\":{\"input_tokens\":11,\"output_tokens\":7,\"total_tokens\":18}}'" \
   'printf "PRODIGI_API_KEY=%s sk_test_abcdefghijklmnop rkcs_test_abcdefghijklmnop https://example.vercel.app\n" "$PRODIGI_API_KEY"' \
   'printf "final report\n" >"$output"' \
-  'printf "Deployed: **[Shop](https://benchmark-fake-store.vercel.app)**\n" >>"$output"' \
-  'printf "Webhook: `https://benchmark-fake-store.vercel.app/api/webhooks/stripe`\n" >>"$output"' \
-  '[[ -z "${FAKE_DEPLOYMENT_URL:-}" ]] || printf "DEPLOYMENT_URL: %s\n" "$FAKE_DEPLOYMENT_URL" >>"$output"' \
+  'if [[ -n "${FAKE_DEPLOYMENT_URL:-}" ]]; then' \
+  '  printf "Live site: %s/shop\n" "$FAKE_DEPLOYMENT_URL" >>"$output"' \
+  'else' \
+  '  printf "Deployed: **[Shop](https://benchmark-fake-store.vercel.app)**\n" >>"$output"' \
+  '  printf "Webhook: `https://benchmark-fake-store.vercel.app/api/webhooks/stripe`\n" >>"$output"' \
+  'fi' \
   'exit "${FAKE_CODEX_EXIT:-0}"' >"$BIN/codex"
 chmod +x "$BIN/codex"
 

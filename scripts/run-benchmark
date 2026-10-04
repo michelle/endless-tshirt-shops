@@ -59,21 +59,20 @@ vercel_project_name() {
 }
 
 extract_url() {
-  # Completion reports wrap the URL in Markdown links, bold spans and code
-  # spans, and usually mention a webhook route after the storefront. Matching
-  # only the origin keeps trailing punctuation and route paths out, and the
-  # first mention is the storefront rather than an API path.
-  local declared
-  declared=$(sed -nE 's/^DEPLOYMENT_URL:[[:space:]]*(https:\/\/[^[:space:]]+)[[:space:]]*$/\1/p' "$1" 2>/dev/null | head -n 1)
-  if [[ -n $declared ]]; then
-    printf '%s\n' "$declared"
-    return
-  fi
-  # An explicit negative result from prompt v4 must not be overwritten by an
-  # unrelated Vercel documentation or webhook URL elsewhere in the report.
-  grep -qE '^DEPLOYMENT_URL:[[:space:]]*none[[:space:]]*$' "$1" 2>/dev/null && return
-  # Backward compatibility for prompts that predate the structured final line.
-  grep -Eo 'https://[a-z0-9][a-z0-9.-]*\.vercel\.(app|sh)' "$1" 2>/dev/null | head -n 1 || true
+  # Prefer recognizable deployment hosts, then fall back to the first public
+  # URL in the completion report. Normalize to an origin so Markdown, webhook
+  # paths and trailing punctuation cannot leak into metadata.
+  node - "$1" <<'NODE' 2>/dev/null || true
+const fs = require('fs');
+const text = fs.readFileSync(process.argv[2], 'utf8');
+const matches = [...text.matchAll(/https:\/\/[^\s<>()`"']+/gi)].map(match => ({ index: match.index, value: match[0].replace(/[\],.;:!?}]+$/, '') }));
+const provider = /(?:\.vercel\.(?:app|sh)|\.netlify\.app|\.pages\.dev|\.onrender\.com|\.fly\.dev|\.railway\.app|\.web\.app|\.firebaseapp\.com|\.github\.io|\.surge\.sh)$/i;
+const blocked = /(?:^|\.)(?:stripe\.com|prodigi\.com|github\.com|npmjs\.com)$/i;
+const parsed = matches.flatMap(match => { try { const url = new URL(match.value); return url.protocol === 'https:' && !url.username && !url.password ? [{ ...match, url }] : []; } catch { return []; } });
+const contextual = parsed.filter(candidate => /\b(?:deploy(?:ed|ment)?|live|storefront|production|website)\b/i.test(text.slice(Math.max(0, candidate.index - 120), candidate.index + candidate.value.length + 80)));
+const selected = parsed.find(candidate => provider.test(candidate.url.hostname)) ?? contextual.find(candidate => !blocked.test(candidate.url.hostname));
+if (selected) process.stdout.write(selected.url.origin + '\n');
+NODE
 }
 
 url_candidates() {
@@ -88,7 +87,7 @@ url_candidates() {
   # An `|| printf '[]'` on the pipeline appends to what node already printed,
   # which published "[][]" and made metadata.json unparseable.
   local found
-  found=$(grep -Eo 'https://[a-z0-9][a-z0-9.-]*\.vercel\.(app|sh)' "$1" 2>/dev/null |
+  found=$(grep -Eo 'https://[a-z0-9][a-z0-9.-]*\.(vercel\.(app|sh)|netlify\.app|pages\.dev|onrender\.com|fly\.dev|railway\.app|web\.app|firebaseapp\.com|github\.io|surge\.sh)' "$1" 2>/dev/null |
     sort -u | head -n 20 |
     node -e 'let s = ""; process.stdin.on("data", d => s += d).on("end", () => process.stdout.write(JSON.stringify(s.split("\n").filter(Boolean))));' 2>/dev/null)
   [[ -n $found ]] || found='[]'

@@ -17,7 +17,7 @@ run names its prompt, and records the path and its SHA-256 in metadata.
 
 | File | Task |
 | --- | --- |
-| `prompt-v4.md` | **Current.** Concept commitment plus provider-neutral deployment: deploying is required, but no hosting service is suggested. |
+| `prompt-v4.md` | **Current.** Provider-neutral deployment: deploying is required, but no hosting service is suggested. |
 | `prompt-v3.md` | Any original theme, DTG-customised per customer; the agent picks its own payment provider and is directed to Vercel. |
 | `prompt-v3-concept-commit.md` | Prompt v3 plus an immutable concept file required as the first tool action, before environment or account inspection. |
 | `prompt-v2.md` | Any original theme. Predecessor to v3. |
@@ -126,9 +126,9 @@ recorded in `deployment_url_candidates`. That is deliberately a list, not a
 guess: agents probe unrelated hosts, one of them a known-nonexistent domain used
 as a control, so picking automatically would publish a confident wrong answer.
 
-Prompt v4 requires an exact final `DEPLOYMENT_URL:` line, allowing non-Vercel
-hosts to be recorded without guessing from arbitrary URLs in the transcript.
-After the agent exits, the harness can independently deploy the captured source
+For prompt v4, the harness recognizes common deployment hosts in the agent's
+ordinary completion report and records the normalized site origin. After the
+agent exits, the harness can independently deploy the captured source
 to a run-specific Vercel project when `BENCHMARK_VERCEL_TOKEN` is set. The token
 is removed before the agent starts. Metadata records the agent deployment and
 the evaluator-owned inspection deployment separately; the latter never rescues
@@ -167,7 +167,7 @@ attempt. A controller lock rejects concurrent launches.
 
 ### Ambient-leakage experiment
 
-`prompts/prompt-v3-concept-commit.md` and `prompts/prompt-v4.md` ask the model to write an immutable
+`prompts/prompt-v3-concept-commit.md` asks the model to write an immutable
 `concept-commitment.json` as its first tool action, before inspecting files,
 environment variables, the network or provider accounts. Validate the file in
 a completed workspace with:
