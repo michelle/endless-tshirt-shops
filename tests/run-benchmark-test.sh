@@ -14,6 +14,7 @@ BIN="$TMP_ROOT/bin"
 BIN_WITHOUT_TIMEOUT="$TMP_ROOT/bin-without-timeout"
 GLOBAL_STRIPE_CONFIG="$TMP_ROOT/global-stripe/config.toml"
 mkdir -p "$REPO" "$BIN" "$BIN_WITHOUT_TIMEOUT" "$(dirname "$GLOBAL_STRIPE_CONFIG")"
+export FAKE_VERCEL_STATE="$TMP_ROOT/fake-vercel-project"
 printf 'original global Stripe config\n' >"$GLOBAL_STRIPE_CONFIG"
 export BENCHMARK_GLOBAL_STRIPE_CONFIG="$GLOBAL_STRIPE_CONFIG"
 # Visible to the fake agent so it can assert no sibling run's profile is readable.
@@ -77,11 +78,13 @@ printf '%s\n' \
   'mkdir -p "$workspace"' \
   'git init -q "$workspace"' \
   'stripe sandbox create --non-interactive' \
-  'printf "%s\n" "${BENCHMARK_VERCEL_PROJECT-}" >"$workspace/vercel-project.txt"' \
-  'printf "node_modules\n" >"$workspace/.gitignore"' \
-  'mkdir -p "$workspace/node_modules"' \
-  'printf "generated dependency\n" >"$workspace/node_modules/example.js"' \
-  'printf "generated app\n" >"$workspace/app.txt"' \
+  'app_dir=$workspace' \
+  'if [[ -n "${FAKE_NESTED_APP:-}" ]]; then app_dir=$workspace/store; mkdir -p "$app_dir"; printf "{}\n" >"$app_dir/package.json"; fi' \
+  'printf "%s\n" "${BENCHMARK_VERCEL_PROJECT-}" >"$app_dir/vercel-project.txt"' \
+  'printf "node_modules\n" >"$app_dir/.gitignore"' \
+  'mkdir -p "$app_dir/node_modules"' \
+  'printf "generated dependency\n" >"$app_dir/node_modules/example.js"' \
+  'printf "generated app\n" >"$app_dir/app.txt"' \
   '# some agents persist the credentials they were handed into their workspace' \
   '[[ -n "${FAKE_LEAK_PATH:-}" ]] && printf "PRODIGI=%s\n" "$PRODIGI_API_KEY" >"$workspace/$FAKE_LEAK_PATH"' \
   'mkdir -p "$workspace/public/fonts"; printf "vendor license  \r\nunchanged  \r\n" >"$workspace/public/fonts/OFL.txt"' \
@@ -102,7 +105,13 @@ printf '%s\n' \
   '#!/usr/bin/env bash' \
   'set -euo pipefail' \
   '[[ ${VERCEL_TOKEN-} == fixture-harness-token ]]' \
-  'printf "https://benchmark-inspection-copy.vercel.app\n"' >"$BIN/vercel"
+  '[[ -z "${FAKE_VERCEL_EXPECTED_CWD:-}" || $PWD == *"/$FAKE_VERCEL_EXPECTED_CWD" ]]' \
+  'case "${1-} ${2-}" in' \
+  '  "project inspect") [[ -f $FAKE_VERCEL_STATE ]] ;;' \
+  '  "project add") touch "$FAKE_VERCEL_STATE" ;;' \
+  '  "deploy --prod") [[ -f $FAKE_VERCEL_STATE ]]; printf "https://benchmark-inspection-copy.vercel.app\n" ;;' \
+  '  *) echo "unexpected Vercel invocation: $*" >&2; exit 2 ;;' \
+  'esac' >"$BIN/vercel"
 chmod +x "$BIN/vercel"
 ln -s "$BIN/codex" "$BIN_WITHOUT_TIMEOUT/codex"
 
@@ -238,16 +247,18 @@ fi
   cd "$REPO"
   PATH="$BIN:$PATH" PRODIGI_API_KEY=test_11111111-1111-1111-1111-111111111111 \
     BENCHMARK_VERCEL_TOKEN=fixture-harness-token FAKE_DEPLOYMENT_URL=https://anonymous-choice.netlify.app \
+    FAKE_NESTED_APP=1 FAKE_VERCEL_EXPECTED_CWD=store \
     "$ROOT/scripts/run-benchmark" --adapter codex --model fake --timeout 5 \
       --run-id provider-choice --prompt-file prompts/prompt-v4.md
 )
-PROVIDER_WORKSPACE_PROJECT=$(git --git-dir="$REMOTE" show benchmark-results:runs/provider-choice/workspace/vercel-project.txt)
+PROVIDER_WORKSPACE_PROJECT=$(git --git-dir="$REMOTE" show benchmark-results:runs/provider-choice/workspace/store/vercel-project.txt)
 assert test -z "$PROVIDER_WORKSPACE_PROJECT"
 PROVIDER_METADATA=$(git --git-dir="$REMOTE" show benchmark-results:runs/provider-choice/metadata.json)
 [[ $PROVIDER_METADATA == *'"agent_deployment_url": "https://anonymous-choice.netlify.app"'* ]] || fail 'provider-neutral deployment URL was not recorded'
 [[ $PROVIDER_METADATA == *'"inspection_deployment_status": "succeeded"'* ]] || fail 'harness inspection deployment was not recorded'
 [[ $PROVIDER_METADATA == *'"inspection_deployment_url": "https://benchmark-inspection-copy.vercel.app"'* ]] || fail 'harness inspection URL was not recorded'
 assert test -s "$REPO/.benchmark-secrets/deployments/provider-choice.log"
+assert test -f "$FAKE_VERCEL_STATE"
 LOG=$(git --git-dir="$REMOTE" show benchmark-results:runs/success/events.jsonl)
 [[ $LOG != *test_11111111-1111-1111-1111-111111111111* ]] || fail 'injected secret leaked into committed log'
 [[ $LOG != *sk_test_* ]] || fail 'Stripe pattern leaked into committed log'

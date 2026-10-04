@@ -58,6 +58,27 @@ vercel_project_name() {
   fi
 }
 
+inspection_source_root() {
+  # Most agents build directly in the empty workspace, but some scaffold one
+  # project directory below it. Deploy that sole application root rather than
+  # publishing a directory listing whose child happens to contain the app. A
+  # multi-package workspace is left at its root because choosing among several
+  # package manifests would be a guess.
+  local workspace=$1 candidate= count=0 manifest directory
+  if [[ -f $workspace/package.json || -f $workspace/vercel.json || -f $workspace/index.html ]]; then
+    printf '%s' "$workspace"
+    return
+  fi
+  while IFS= read -r manifest; do
+    directory=$(dirname "$manifest")
+    [[ $directory == "$candidate" ]] && continue
+    candidate=$directory
+    count=$((count + 1))
+  done < <(find "$workspace" -mindepth 2 -maxdepth 3 -type f \( -name package.json -o -name vercel.json -o -name index.html \) \
+    ! -path '*/node_modules/*' ! -path '*/.next/*' ! -path '*/build/*' ! -path '*/dist/*' | sort -u)
+  if (( count == 1 )); then printf '%s' "$candidate"; else printf '%s' "$workspace"; fi
+}
+
 extract_url() {
   # Prefer recognizable deployment hosts, then fall back to the first public
   # URL in the completion report. Normalize to an origin so Markdown, webhook
@@ -476,12 +497,22 @@ if [[ -n $HARNESS_VERCEL_TOKEN ]]; then
   mkdir -p "$DEPLOYMENT_LOG_DIR"
   chmod 700 "$DEPLOYMENT_LOG_DIR"
   INSPECTION_LOG="$DEPLOYMENT_LOG_DIR/$RUN_ID.log"
-  INSPECTION_ARGS=(deploy --prod --yes --project "$VERCEL_PROJECT")
-  [[ -z $HARNESS_VERCEL_SCOPE ]] || INSPECTION_ARGS+=(--scope "$HARNESS_VERCEL_SCOPE")
+  VERCEL_SCOPE_ARGS=()
+  [[ -z $HARNESS_VERCEL_SCOPE ]] || VERCEL_SCOPE_ARGS+=(--scope "$HARNESS_VERCEL_SCOPE")
+  INSPECTION_SOURCE=$(inspection_source_root "$AGENT_WORKSPACE")
   set +e
   (
-    cd "$AGENT_WORKSPACE" || exit 1
-    VERCEL_TOKEN="$HARNESS_VERCEL_TOKEN" "$TIMEOUT_COMMAND" 900 vercel "${INSPECTION_ARGS[@]}"
+    cd "$INSPECTION_SOURCE" || exit 1
+    printf 'inspection_source=%s\n' "${INSPECTION_SOURCE#"$AGENT_WORKSPACE"/}"
+    # `deploy --project` selects an existing project; it does not create one.
+    # Every benchmark uses a fresh run-specific name, so ensure that project
+    # exists before the first deployment. An inspect failure is followed by an
+    # explicit add; if the failure was auth/scope-related, add fails too and the
+    # inspection remains correctly marked failed.
+    if ! VERCEL_TOKEN="$HARNESS_VERCEL_TOKEN" "$TIMEOUT_COMMAND" 60 vercel project inspect "$VERCEL_PROJECT" --non-interactive "${VERCEL_SCOPE_ARGS[@]}"; then
+      VERCEL_TOKEN="$HARNESS_VERCEL_TOKEN" "$TIMEOUT_COMMAND" 60 vercel project add "$VERCEL_PROJECT" --non-interactive "${VERCEL_SCOPE_ARGS[@]}" || exit 1
+    fi
+    VERCEL_TOKEN="$HARNESS_VERCEL_TOKEN" "$TIMEOUT_COMMAND" 900 vercel deploy --prod --yes --project "$VERCEL_PROJECT" "${VERCEL_SCOPE_ARGS[@]}"
   ) >"$INSPECTION_LOG" 2>&1
   INSPECTION_EXIT=$?
   set -e

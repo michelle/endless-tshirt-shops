@@ -132,7 +132,9 @@ agent exits, the harness can independently deploy the captured source
 to a run-specific Vercel project when `BENCHMARK_VERCEL_TOKEN` is set. The token
 is removed before the agent starts. Metadata records the agent deployment and
 the evaluator-owned inspection deployment separately; the latter never rescues
-the former's benchmark result. `BENCHMARK_VERCEL_SCOPE` is optional. Private
+the former's benchmark result. The harness creates the run-specific project on
+its first deployment and recognizes a sole application nested one directory
+below the agent workspace. `BENCHMARK_VERCEL_SCOPE` is optional. Private
 deployment logs live under `.benchmark-secrets/deployments/`.
 
 OpenCode's `opencode-go/*` aliases reach the same models but require Global
