@@ -12,7 +12,7 @@ test('frontier roster runs native harnesses before OpenCode', () => {
     'opencode', 'opencode', 'opencode', 'opencode', 'opencode', 'opencode',
   ]);
   assert.deepEqual(models.map(([, model]) => model), [
-    'gpt-6-astra', 'gpt-6-sol', 'gpt-6-luna',
+    'gpt-6-astra', 'gpt-6.1-sol', 'gpt-6-luna',
     'claude-fable-5-1', 'claude-opus-5-5', 'claude-sonnet-5-5',
     'kimi-code/k3', 'opencode/glm-5.3#high', 'opencode/deepseek-v4.1-flash',
     'opencode/qwen3.8-max', 'opencode/minimax-m3',

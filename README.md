@@ -103,7 +103,7 @@ recorded too. Earlier suites compared `gpt-6-astra`, `gpt-5.6-sol`,
 `claude-sonnet-5`; those runs stay published on `benchmark-results`.
 
 `scripts/run-suite.mjs` now iterates a 13-model frontier comparison. It starts
-with the native harnesses (`gpt-6-astra`, `gpt-6-sol`, `gpt-6-luna`,
+with the native harnesses (`gpt-6-astra`, `gpt-6.1-sol`, `gpt-6-luna`,
 `claude-fable-5-1`, `claude-opus-5-5`, `claude-sonnet-5-5`, and
 `kimi-code/k3`), then runs the OpenCode-routed models (`glm-5.3#high`,
 `deepseek-v4.1-flash`, `qwen3.8-max`, `minimax-m3`, `gemini-3.8-flash`, and
