@@ -1,0 +1,321 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NightSky Tee &mdash; the sky over your moment, on a shirt</title>
+  <meta name="description" content="A personalised t-shirt showing the night sky from any place and time &mdash; birthdays, anniversaries, the night you met. Direct-to-garment printed in your size.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="brand">
+    <span class="logo-mark">✦</span>
+    <span class="brand-name">NightSky Tee</span>
+  </div>
+  <nav>
+    <a href="#how">How it works</a>
+    <a href="#design">Design yours</a>
+    <a href="#about">About</a>
+  </nav>
+</header>
+
+<!-- HERO =============================================== -->
+<section class="hero">
+  <div class="hero-text">
+    <p class="eyebrow">Personalised t-shirts · Direct-to-garment printing</p>
+    <h1>The sky over <em>your moment</em>, on a shirt you&rsquo;ll keep forever.</h1>
+    <p class="lede">
+      Pick any place, any night &mdash; a birthday, an anniversary, the
+      night you said yes &mdash; and we&rsquo;ll print the actual stars
+      exactly the way they appeared. Every shirt is unique to the
+      minute you choose.
+    </p>
+    <a href="#design" class="btn btn-primary">Design your shirt →</a>
+    <ul class="usp">
+      <li><strong>Actually accurate.</strong> Real astronomy, not a generic pattern.</li>
+      <li><strong>Made when ordered.</strong> DTG-printed on a premium cotton tee.</li>
+      <li><strong>Ships worldwide.</strong> From the closest of 30+ print labs.</li>
+    </ul>
+  </div>
+  <div class="hero-art" aria-hidden="true">
+    <div id="hero-preview"></div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS =============================================== -->
+<section id="how" class="how">
+  <h2>How it works</h2>
+  <ol class="steps">
+    <li>
+      <span class="step-num">1</span>
+      <h3>Pick a moment</h3>
+      <p>Choose where you were, when it happened, and what to say.</p>
+    </li>
+    <li>
+      <span class="step-num">2</span>
+      <h3>We render the sky</h3>
+      <p>Our server computes the real positions of the brightest 80+ stars and renders them at print quality.</p>
+    </li>
+    <li>
+      <span class="step-num">3</span>
+      <h3>Your shirt, printed</h3>
+      <p>Direct-to-garment printing on a soft, fitted cotton tee, then shipped from the lab closest to you.</p>
+    </li>
+  </ol>
+</section>
+
+<!-- GALLERY =============================================== -->
+<section class="gallery">
+  <h2>Real shirts. Actual moments.</h2>
+  <p class="lede">Four examples rendered live by the same pipeline that&rsquo;ll print your shirt.</p>
+  <div class="gallery-grid">
+    <figure>
+      <img src="/samples/rome-meet.png" alt="Star map of Rome, June 2024">
+      <figcaption>Rome &middot; 14 Jun 2024 &middot; <em>The Night We Met</em></figcaption>
+    </figure>
+    <figure>
+      <img src="/samples/nyc-eve.png" alt="Star map of NYC, Christmas Eve">
+      <figcaption>NYC &middot; 24 Dec 2023 &middot; <em>Orion Above Manhattan</em></figcaption>
+    </figure>
+    <figure>
+      <img src="/samples/tokyo-spring.png" alt="Star map of Tokyo, April 2025">
+      <figcaption>Tokyo &middot; 10 Apr 2025 &middot; <em>Hanami Sky</em></figcaption>
+    </figure>
+    <figure>
+      <img src="/samples/sydney-winter.png" alt="Star map of Sydney, August 2024">
+      <figcaption>Sydney &middot; 15 Aug 2024 &middot; <em>Centaurus Rising</em></figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- DESIGN TOOL =============================================== -->
+<section id="design" class="design">
+  <h2>Design your shirt</h2>
+
+  <div class="design-grid">
+    <!-- FORM -->
+    <form id="form" class="form" autocomplete="off">
+
+      <fieldset>
+        <legend>The moment</legend>
+
+        <div class="field">
+          <label for="title">Custom title</label>
+          <input id="title" name="title" required maxlength="32"
+                 placeholder="The Night We Met">
+          <small>The line that anchors the design. Up to 32 characters.</small>
+        </div>
+
+        <div class="field">
+          <label for="subtitle">Subtitle <em>(optional)</em></label>
+          <input id="subtitle" name="subtitle" maxlength="60"
+                 placeholder="It was the best of times">
+        </div>
+
+        <div class="row">
+          <div class="field">
+            <label for="date">Date</label>
+            <input id="date" name="date" type="date" required>
+          </div>
+          <div class="field">
+            <label for="time">Time (UTC)</label>
+            <input id="time" name="time" type="time" required value="22:00">
+            <small>Pick the moment that matters.</small>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="where">Where</label>
+          <input id="where" name="where" required
+                 placeholder="Start typing a city…"
+                 autocomplete="off">
+          <div id="where-results" class="suggest" hidden></div>
+          <small>Pick from the list. (We use this to compute the sky you saw.)</small>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>The shirt</legend>
+
+        <div class="field">
+          <label>Color</label>
+          <div class="swatches">
+            <label class="swatch"><input type="radio" name="color" value="black" checked><span class="chip chip-black"></span><span class="swatch-label">Black</span></label>
+            <label class="swatch"><input type="radio" name="color" value="navy"><span class="chip chip-navy"></span><span class="swatch-label">Navy</span></label>
+            <label class="swatch"><input type="radio" name="color" value="charcoal"><span class="chip chip-charcoal"></span><span class="swatch-label">Charcoal</span></label>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="size">Size</label>
+          <select id="size" name="size" required>
+            <option value="xs">XS</option>
+            <option value="s">S</option>
+            <option value="m" selected>M</option>
+            <option value="l">L</option>
+            <option value="xl">XL</option>
+            <option value="2xl">2XL</option>
+            <option value="3xl">3XL</option>
+          </select>
+          <small>Bella + Canvas 3001, tailored unisex fit. <a href="#size-chart">Size chart ↘</a></small>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Shipping</legend>
+        <div class="row">
+          <div class="field grow">
+            <label for="name">Name</label>
+            <input id="name" name="name" required placeholder="Recipient full name">
+          </div>
+        </div>
+        <div class="row">
+          <div class="field grow">
+            <label for="email">Email</label>
+            <input id="email" name="email" type="email" required placeholder="you@example.com">
+          </div>
+        </div>
+        <div class="field">
+          <label for="line1">Address line 1</label>
+          <input id="line1" name="line1" required placeholder="1 Apple Park Way">
+        </div>
+        <div class="row">
+          <div class="field grow">
+            <label for="city">City</label>
+            <input id="city" name="city" required placeholder="Cupertino">
+          </div>
+          <div class="field">
+            <label for="state">State / Region</label>
+            <input id="state" name="state" placeholder="CA">
+          </div>
+          <div class="field">
+            <label for="zip">Postal code</label>
+            <input id="zip" name="zip" required placeholder="95014">
+          </div>
+        </div>
+        <div class="field">
+          <label for="country">Country</label>
+          <select id="country" name="country" required>
+            <option value="US">United States</option>
+            <option value="GB">United Kingdom</option>
+            <option value="CA">Canada</option>
+            <option value="AU">Australia</option>
+            <option value="DE">Germany</option>
+            <option value="FR">France</option>
+            <option value="IT">Italy</option>
+            <option value="ES">Spain</option>
+            <option value="NL">Netherlands</option>
+            <option value="IE">Ireland</option>
+            <option value="SE">Sweden</option>
+            <option value="NO">Norway</option>
+            <option value="DK">Denmark</option>
+            <option value="FI">Finland</option>
+            <option value="JP">Japan</option>
+            <option value="KR">South Korea</option>
+            <option value="SG">Singapore</option>
+            <option value="HK">Hong Kong</option>
+            <option value="TW">Taiwan</option>
+            <option value="MX">Mexico</option>
+            <option value="BR">Brazil</option>
+            <option value="NZ">New Zealand</option>
+            <option value="IL">Israel</option>
+            <option value="AE">United Arab Emirates</option>
+            <option value="PT">Portugal</option>
+            <option value="AT">Austria</option>
+            <option value="CH">Switzerland</option>
+            <option value="PL">Poland</option>
+            <option value="CZ">Czechia</option>
+            <option value="GR">Greece</option>
+            <option value="BE">Belgium</option>
+          </select>
+        </div>
+      </fieldset>
+
+      <div class="total">
+        <div>
+          <span class="total-label">Your shirt</span>
+          <span class="total-amount">$44.99</span>
+        </div>
+        <small>Includes worldwide shipping &amp; tax.</small>
+      </div>
+
+      <button id="buy" type="submit" class="btn btn-primary big">
+        Buy &amp; print &mdash; $44.99
+      </button>
+      <p class="legal">
+        You&rsquo;ll pay via Stripe and we&rsquo;ll send your design straight
+        to our printers once payment clears. Each shirt is printed on demand
+        and is non-returnable.
+      </p>
+    </form>
+
+    <!-- PREVIEW -->
+    <aside class="preview-pane">
+      <div class="preview-frame">
+        <img id="preview-img" alt="Live preview of your design" />
+        <div class="preview-spinner" id="preview-spinner" hidden></div>
+      </div>
+      <div class="preview-meta">
+        <div class="preview-line">
+          <span class="dot"></span>
+          <span id="preview-dim">Live preview</span>
+        </div>
+        <div class="preview-controls">
+          <button type="button" class="btn-ghost" id="randomize">Try a different moment</button>
+        </div>
+      </div>
+    </aside>
+  </div>
+</section>
+
+<!-- SIZE CHART -->
+<section id="size-chart" class="size-chart">
+  <h2>Size chart</h2>
+  <p>Bella + Canvas 3001, fitted unisex cotton tee. Measurements in inches.</p>
+  <table>
+    <thead><tr><th></th><th>XS</th><th>S</th><th>M</th><th>L</th><th>XL</th><th>2XL</th><th>3XL</th></tr></thead>
+    <tbody>
+      <tr><th>Chest</th><td>16.5</td><td>18</td><td>20</td><td>22</td><td>24</td><td>26</td><td>28</td></tr>
+      <tr><th>Length</th><td>27</td><td>28</td><td>29</td><td>30</td><td>31</td><td>32</td><td>33</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ABOUT -->
+<section id="about" class="about">
+  <h2>About the printing</h2>
+  <p>
+    Direct-to-garment (DTG) printing lays water-based ink directly
+    into the cotton fibres of a soft combed-ring-spun tee, so the design
+    becomes part of the fabric &mdash; not a layer of plastic on top.
+    Vibrant colours, soft hand-feel, no peeling or cracking, and the
+    fabric still breathes.
+  </p>
+  <p>
+    We use <a href="https://www.prodigi.com/">Prodigi&rsquo;s</a> global
+    print network, which routes every order to the lab nearest the
+    recipient. A shirt sold in Tokyo is printed in Tokyo. A shirt sold
+    in Berlin is printed in Europe. Lower carbon, faster delivery, and
+    identical print quality everywhere.
+  </p>
+  <p>
+    The design data is computed deterministically from your input &mdash;
+    the same time, the same place, will always produce the same shirt.
+    Astro catalog source: Yale Bright Star Catalog.
+  </p>
+</section>
+
+<footer class="site-footer">
+  <p>© NightSky Tee. Each shirt is printed on demand by Prodigi.</p>
+</footer>
+
+<!-- Iframe for Stripe Checkout (kept invisible, fully redirected instead) -->
+<script src="/app.js"></script>
+</body>
+</html>

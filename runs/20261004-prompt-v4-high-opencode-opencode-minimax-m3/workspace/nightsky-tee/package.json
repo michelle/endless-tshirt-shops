@@ -1,0 +1,16 @@
+{
+  "name": "nightsky-tee",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Personalized night-sky t-shirts, printed on demand via Prodigi",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "@resvg/resvg-js": "^2.6.2",
+    "express": "^5.2.1",
+    "stripe": "^23.0.0"
+  }
+}

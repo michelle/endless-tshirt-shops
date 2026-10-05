@@ -1,0 +1,14 @@
+NightSky Tee listening on http://localhost:8787
+  PUBLIC_URL = https://objects-ownership-rim-vitamin.trycloudflare.com
+  Stripe    = configured
+  Prodigi   = configured
+[prodigi] submitToProdigi called for e5215ec9-9454-4e3f-b459-5bfe34a1eb4a
+[prodigi-client] POST https://api.sandbox.prodigi.com/v4.0/Orders merchantReference=NS-e5215ec9-9454-4e3f-b459-5bfe34a1eb4a
+[prodigi-client] https://api.sandbox.prodigi.com/v4.0/Orders -> 200 in 14346ms
+[prodigi] placeOrder returned for e5215ec9-9454-4e3f-b459-5bfe34a1eb4a: outcome=Created, prodigiId=ord_1177358
+[prodigi] submitToProdigi called for 1d9377d3-a462-4d7d-a78c-7c6090cd6c3e
+[prodigi-client] POST https://api.sandbox.prodigi.com/v4.0/Orders merchantReference=NS-1d9377d3-a462-4d7d-a78c-7c6090cd6c3e
+[prodigi-client] https://api.sandbox.prodigi.com/v4.0/Orders -> 200 in 12468ms
+[prodigi] placeOrder returned for 1d9377d3-a462-4d7d-a78c-7c6090cd6c3e: outcome=Created, prodigiId=ord_1177359
+[prodigi] submitToProdigi called for e5215ec9-9454-4e3f-b459-5bfe34a1eb4a
+[prodigi] already submitted e5215ec9-9454-4e3f-b459-5bfe34a1eb4a -> ord_1177358
