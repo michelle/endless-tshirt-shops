@@ -3,6 +3,35 @@
   "note": "Append new published destinations. Do not remove old IDs to make a regression pass; preserve compatibility or add aliases.",
   "suites": [
     {
+      "id": "20261004-prompt-v4-high",
+      "runs": [
+        { "id": "astra", "model": "Codex · gpt-6-astra" },
+        { "id": "gsol", "model": "OpenAI · gpt-6-sol" },
+        { "id": "luna6", "model": "OpenAI · gpt-6-luna" },
+        { "id": "fable", "model": "Claude · claude-fable-5-1" },
+        { "id": "opus", "model": "Claude · claude-opus-5-5" },
+        { "id": "sonnet", "model": "Claude · claude-sonnet-5-5" },
+        { "id": "k3", "model": "Kimi · k3" },
+        { "id": "glm", "model": "Z.ai · glm-5.3 high" },
+        { "id": "deepseek", "model": "DeepSeek · deepseek-v4.1-flash" },
+        { "id": "qwen", "model": "Qwen · qwen3.8-max" },
+        { "id": "minimax", "model": "MiniMax · minimax-m3" },
+        { "id": "gemini", "model": "Google · gemini-3.8-flash" },
+        { "id": "grok47", "model": "xAI · grok-4.7" },
+        { "id": "sol61", "model": "OpenAI · gpt-6.1-sol" }
+      ],
+      "headings": [
+        "summary-prompt-v4-clean-workspace-frontier-suite",
+        "summary-automated-inspection-evidence",
+        "summary-run-and-framework-evidence",
+        "summary-documentation-use-evidence",
+        "summary-payment-and-fulfillment-observations",
+        "summary-isolation-evidence",
+        "summary-artwork-evidence",
+        "summary-review-required"
+      ]
+    },
+    {
       "id": "20260910-prompt-v3-high",
       "runs": [
         { "id": "astra", "model": "Codex · gpt-6-astra" },
