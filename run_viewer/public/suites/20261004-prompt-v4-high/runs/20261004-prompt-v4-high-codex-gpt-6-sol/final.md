@@ -1,0 +1,7 @@
+[**Elsewhere, Always · public store**](https://elsewhere-always.hazelcough.chatgpt.site) is deployed. Customers can personalize a navy shirt with a place, date, and message and see the artwork update live. The site returned HTTP 200, and Prodigi’s sandbox confirmed the shirt variant and all five offered sizes are available for US delivery.
+
+**Checkout is not active yet.** I integrated Stripe Checkout and a payment-verified webhook that submits to Prodigi only after payment succeeds, but no Stripe credentials were available. The public site clearly marks checkout as unavailable and rejects checkout requests until the credentials are set. I could not run a paid end-to-end test.
+
+To finish test checkout, provide a Stripe test secret key and webhook signing secret for `https://elsewhere-always.hazelcough.chatgpt.site/api/stripe-webhook`. Then test with [Stripe’s `4242 4242 4242 4242` card](https://docs.stripe.com/testing?numbers-or-method-or-token=tokens) and a US shipping address; check that the order appears in Prodigi’s sandbox. [Sandbox orders are not printed or shipped](https://support.prodigi.com/hc/en-us/articles/13133832567708-Do-you-have-a-Print-API).
+
+Before taking real orders, switch both services to live credentials, order a physical sample, and settle sales tax, customer support, and refund handling. Setup details are in [README.md](/private/var/folders/mq/v8s9bp2x5gg6gvywwjfszb8r0000gn/T/benchmark-workspace.hctv3A/shirt-store/README.md).
