@@ -1,0 +1,65 @@
+{
+  "id": "3147798042e9c7ccd004",
+  "createdAt": "2026-10-05T00:28:51.192Z",
+  "word": "MOONLIGHT",
+  "paletteId": "glacier",
+  "shirtColor": "black",
+  "size": "l",
+  "designId": "27ba3524bd8b6a70",
+  "edition": "B2AD-4939",
+  "priceUsd": 34,
+  "recipient": {
+    "name": "Ada Lovelace",
+    "email": "ada@example.com",
+    "phone": "",
+    "line1": "12 Analytical Way",
+    "line2": "",
+    "townOrCity": "London",
+    "stateOrCounty": "",
+    "postalOrZipCode": "E1 6AN",
+    "countryCode": "GB"
+  },
+  "payment": {
+    "driver": "paygate",
+    "status": "paid",
+    "payRequestId": "6F3131C7-DAE3-BC4A-8512-ECB33FE797C7",
+    "gatewayStatus": "1",
+    "paidAt": "2026-10-05T00:29:23.354Z",
+    "gatewayTxnId": "1255559915"
+  },
+  "fulfillment": {
+    "status": "submitted",
+    "submittedAt": "2026-10-05T00:29:34.926Z",
+    "prodigiOrderId": "ord_1177284",
+    "prodigiStage": "InProgress",
+    "source": "paygate-notify",
+    "prodigiDetails": {
+      "downloadAssets": "Complete",
+      "printReadyAssetsPrepared": "Complete",
+      "allocateProductionLocation": "Complete",
+      "inProduction": "InProgress",
+      "shipping": "NotStarted"
+    },
+    "shipments": [
+      {
+        "id": "shp_734428",
+        "dispatchDate": null,
+        "carrier": {
+          "name": "royalmail",
+          "service": "Royal Mail RM48 Tracked"
+        },
+        "fulfillmentLocation": {
+          "countryCode": "GB",
+          "labCode": "uk2"
+        },
+        "tracking": null,
+        "items": [
+          {
+            "itemId": "ori_1649932"
+          }
+        ],
+        "status": "Processing"
+      }
+    ]
+  }
+}

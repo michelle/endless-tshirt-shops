@@ -1,0 +1,38 @@
+{
+  "id": "df88553768a1a97cb379",
+  "createdAt": "2026-10-05T00:15:00.590Z",
+  "word": "TESTPILOT",
+  "paletteId": "solar",
+  "shirtColor": "black",
+  "size": "m",
+  "designId": "229620b31a23bdff",
+  "edition": "9963-53CE",
+  "priceUsd": 34,
+  "recipient": {
+    "name": "Test Pilot",
+    "email": "pilot@example.com",
+    "phone": "",
+    "line1": "1 Infinite Loop",
+    "line2": "",
+    "townOrCity": "Cupertino",
+    "stateOrCounty": "CA",
+    "postalOrZipCode": "95014",
+    "countryCode": "US"
+  },
+  "payment": {
+    "driver": "paygate",
+    "status": "paid",
+    "payRequestId": "A5A454E2-E682-69BF-B809-09C9E6AD3644",
+    "gatewayStatus": "1",
+    "paidAt": "2026-10-05T00:15:32.769Z",
+    "gatewayTxnId": "1255558118"
+  },
+  "fulfillment": {
+    "status": "submitted",
+    "error": "Prodigi POST /v4.0/orders -> HTTP 400: {\"outcome\":\"ValidationFailed\",\"failures\":{\"recipient.address.line2\":[{\"code\":\"MustNotBeEmptyOrWhitespace\",\"providedValue\":\"\"}]},\"traceParent\":\"00-76290303c69f9c5b8a073ef53ea668a8-a1d4034abbca5d0a-00\"}",
+    "submittedAt": "2026-10-05T00:20:34.660Z",
+    "prodigiOrderId": "ord_1177283",
+    "prodigiStage": "InProgress",
+    "source": "manual-retry"
+  }
+}

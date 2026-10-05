@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ONEOFONE — wear a one-of-one artwork</title>
+<meta name="description" content="Type a word. We grow a one-of-one generative artwork from it and print it on a premium tee. No two shirts exist.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<header class="nav">
+  <div class="brand">ONE<span class="slash">/</span>OF<span class="slash">/</span>ONE</div>
+  <div class="nav-tag">generative apparel · edition 1 of 1</div>
+</header>
+
+<section class="hero">
+  <h1>Your word becomes<br>an artwork that exists <em>once</em>.</h1>
+  <p class="lede">Type a word — a name, a mantra, a date that matters. Our field engine grows a
+  one-of-one artwork from its letters, seeded so no other word can ever grow the same piece.
+  Printed on demand with DTG, because every print <strong>should</strong> be different.</p>
+  <ol class="steps">
+    <li><span>01</span> Type your word</li>
+    <li><span>02</span> Watch your artwork grow</li>
+    <li><span>03</span> Wear edition 1 of 1</li>
+  </ol>
+</section>
+
+<main class="studio" id="studio">
+  <div class="preview-col">
+    <div class="mockup" id="mockup">
+      <svg id="shirtSvg" viewBox="0 0 400 480" aria-label="t-shirt mockup">
+        <defs>
+          <linearGradient id="shade" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#fff" stop-opacity=".10"/>
+            <stop offset=".5" stop-color="#fff" stop-opacity="0"/>
+            <stop offset="1" stop-color="#000" stop-opacity=".18"/>
+          </linearGradient>
+        </defs>
+        <g id="shirtBody">
+          <path id="shirtPath" d="M138 40 C120 46 96 58 78 72 L46 132 C44 137 46 142 51 144 L96 162 L96 424 C96 432 102 438 110 438 L290 438 C298 438 304 432 304 424 L304 162 L349 144 C354 142 356 137 354 132 L322 72 C304 58 280 46 262 40 C252 58 228 68 200 68 C172 68 148 58 138 40 Z"/>
+          <path d="M138 40 C148 58 172 68 200 68 C228 68 252 58 262 40 C255 36 245 33 235 31 C228 46 215 53 200 53 C185 53 172 46 165 31 C155 33 145 36 138 40 Z" fill="#000" opacity=".22"/>
+          <path d="M138 40 C120 46 96 58 78 72 L46 132 C44 137 46 142 51 144 L96 162 L96 424 C96 432 102 438 110 438 L290 438 C298 438 304 432 304 424 L304 162 L349 144 C354 142 356 137 354 132 L322 72 C304 58 280 46 262 40 C252 58 228 68 200 68 C172 68 148 58 138 40 Z" fill="url(#shade)"/>
+          <path d="M96 162 L96 424 C96 432 102 438 110 438 L290 438 C298 438 304 432 304 424 L304 162" fill="none" stroke="#000" opacity=".12" stroke-width="2"/>
+        </g>
+      </svg>
+      <div class="design-frame"><img id="designImg" alt="your generated artwork"></div>
+      <div class="preview-loading" id="previewLoading">growing…</div>
+    </div>
+    <div class="edition-line" id="editionLine"></div>
+  </div>
+
+  <div class="controls-col">
+    <label class="ctl-label" for="wordInput">Your word</label>
+    <input id="wordInput" maxlength="14" autocomplete="off" spellcheck="false" value="AURORA" placeholder="e.g. AURORA">
+    <p class="hint">letters, numbers, spaces &amp; ' - · up to 14 characters</p>
+
+    <label class="ctl-label">Shirt</label>
+    <div class="seg" id="shirtSeg">
+      <button data-shirt="black" class="on">Black</button>
+      <button data-shirt="white">White</button>
+    </div>
+
+    <label class="ctl-label">Ink palette</label>
+    <div class="swatches" id="paletteSwatches"></div>
+
+    <label class="ctl-label">Size <span class="hint-inline">(Bella+Canvas 3001, unisex)</span></label>
+    <div class="seg sizes" id="sizeSeg"></div>
+
+    <div class="price-row">
+      <div class="price">$34.00</div>
+      <div class="price-note">free budget shipping worldwide<br>printed &amp; shipped by Prodigi</div>
+    </div>
+    <button class="cta" id="designBtn">Wear it →</button>
+  </div>
+</main>
+
+<section class="checkout" id="checkout" hidden>
+  <h2>Almost yours.</h2>
+  <p class="lede-sm">Where should the printers send edition Nº <span id="ckEdition"></span>?</p>
+  <form id="orderForm" autocomplete="on">
+    <div class="grid2">
+      <label>Full name<input name="name" required autocomplete="name"></label>
+      <label>Email<input name="email" type="email" required autocomplete="email"></label>
+    </div>
+    <label>Address line 1<input name="line1" required autocomplete="address-line1"></label>
+    <label>Address line 2 <span class="opt">(optional)</span><input name="line2" autocomplete="address-line2"></label>
+    <div class="grid3">
+      <label>City<input name="townOrCity" required autocomplete="address-level2"></label>
+      <label>State / county<input name="stateOrCounty" autocomplete="address-level1"></label>
+      <label>ZIP / postcode<input name="postalOrZipCode" required autocomplete="postal-code"></label>
+    </div>
+    <label>Country
+      <select name="countryCode" required autocomplete="country">
+        <option value="US">United States</option>
+        <option value="GB">United Kingdom</option>
+        <option value="CA">Canada</option>
+        <option value="AU">Australia</option>
+        <option value="DE">Germany</option>
+        <option value="FR">France</option>
+        <option value="NL">Netherlands</option>
+        <option value="IE">Ireland</option>
+        <option value="ES">Spain</option>
+        <option value="IT">Italy</option>
+      </select>
+    </label>
+    <button class="cta pay" id="payBtn" type="submit">Pay <span id="payAmount"></span> →</button>
+    <p class="sandbox-note" id="sandboxNote"></p>
+  </form>
+</section>
+
+<footer>
+  <div>ONE/OF/ONE — every shirt is edition 1 of 1.</div>
+  <div class="foot-dim">Artwork grown from your word by a deterministic field engine · Bella+Canvas 3001 · DTG print by Prodigi</div>
+</footer>
+
+<form id="payuForm" method="post" style="display:none"></form>
+<script src="/app.js"></script>
+</body>
+</html>

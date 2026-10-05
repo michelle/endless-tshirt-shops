@@ -1,0 +1,22 @@
+{
+  "publicUrl": "https://mechanical-relay-ireland-quilt.trycloudflare.com",
+  "paymentDriver": "paygate",
+  "payu": {
+    "key": "gtKFFx",
+    "salt": "4R38IvwiV57FwVpsgOvTXBdLE4tHUXFW"
+  },
+  "btcpay": {
+    "baseUrl": "https://testnet.demo.btcpayserver.org",
+    "storeId": "HEnfJc7UBzZRXEsjcAXpTcqe81mLWRWz3rFNGX2KKTwt",
+    "apiKey": "b4825d12d691f8e15bad314ccfb81f340b47ad0d",
+    "webhookSecret": "4b1d215a7c06205d76d3f191030cb472"
+  },
+  "stripe": {
+    "secretKey": "",
+    "webhookSecret": ""
+  },
+  "paygate": {
+    "id": "10011072130",
+    "key": "secret"
+  }
+}

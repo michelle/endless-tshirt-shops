@@ -1,0 +1,30 @@
+{
+  "id": "67c3f5bd4fbe35259fac",
+  "createdAt": "2026-10-04T23:42:29.229Z",
+  "word": "TESTPILOT",
+  "paletteId": "solar",
+  "shirtColor": "black",
+  "size": "m",
+  "designId": "229620b31a23bdff",
+  "edition": "9963-53CE",
+  "priceUsd": 34,
+  "recipient": {
+    "name": "Test Pilot",
+    "email": "pilot@example.com",
+    "phone": "",
+    "line1": "1 Infinite Loop",
+    "line2": "",
+    "townOrCity": "Cupertino",
+    "stateOrCounty": "CA",
+    "postalOrZipCode": "95014",
+    "countryCode": "US"
+  },
+  "payment": {
+    "driver": "payu",
+    "status": "pending",
+    "amountInr": 2856
+  },
+  "fulfillment": {
+    "status": "not_started"
+  }
+}

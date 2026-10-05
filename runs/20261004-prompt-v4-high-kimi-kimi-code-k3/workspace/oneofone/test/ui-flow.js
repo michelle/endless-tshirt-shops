@@ -1,0 +1,27 @@
+const { chromium } = require('playwright');
+(async () => {
+  const browser = await chromium.launch({ headless: true });
+  const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+  const BASE = 'https://mechanical-relay-ireland-quilt.trycloudflare.com';
+  await page.goto(BASE + '/', { waitUntil: 'networkidle' });
+  await page.waitForTimeout(2500);
+  await page.fill('#wordInput', 'SUPERNOVA');
+  await page.waitForTimeout(1200);
+  await page.click('button[data-shirt="white"]');
+  await page.waitForTimeout(1200);
+  await page.click('#sizeSeg button[data-size="xl"]');
+  await page.click('#designBtn');
+  await page.fill('input[name="name"]', 'Grace Hopper');
+  await page.fill('input[name="email"]', 'grace@example.com');
+  await page.fill('input[name="line1"]', '1 Compiler Lane');
+  await page.fill('input[name="townOrCity"]', 'Arlington');
+  await page.fill('input[name="stateOrCounty"]', 'VA');
+  await page.fill('input[name="postalOrZipCode"]', '22201');
+  await page.click('#payBtn');
+  await page.waitForTimeout(9000);
+  console.log('LANDED:', page.url().slice(0, 80));
+  const bodyText = await page.evaluate(() => document.body.innerText.slice(0, 300));
+  console.log('PAGE SAYS:', bodyText.replace(/\s+/g, ' ').slice(0, 250));
+  await page.screenshot({ path: '/tmp/ui_gateway.png' });
+  await browser.close();
+})().catch((e) => { console.error('FAILED:', e.message); process.exit(1); });

@@ -1,0 +1,30 @@
+{
+  "id": "156bfe831b5d1585e0db",
+  "createdAt": "2026-10-05T00:23:39.712Z",
+  "word": "X",
+  "paletteId": "solar",
+  "shirtColor": "black",
+  "size": "m",
+  "designId": "97503d3d1f462b08",
+  "edition": "4BF4-0EA2",
+  "priceUsd": 34,
+  "recipient": {
+    "name": "T",
+    "email": "t@e.co",
+    "phone": "",
+    "line1": "1",
+    "line2": "",
+    "townOrCity": "c",
+    "stateOrCounty": "",
+    "postalOrZipCode": "1",
+    "countryCode": "US"
+  },
+  "payment": {
+    "driver": "paygate",
+    "status": "pending",
+    "payRequestId": "576923E9-E01F-E457-E1BD-8D87974C4472"
+  },
+  "fulfillment": {
+    "status": "not_started"
+  }
+}

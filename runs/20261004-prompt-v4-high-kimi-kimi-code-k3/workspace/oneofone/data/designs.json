@@ -1,0 +1,42 @@
+{
+  "2ee82f5055b38ad7": {
+    "word": "AURORA",
+    "paletteId": "solar"
+  },
+  "229620b31a23bdff": {
+    "word": "TESTPILOT",
+    "paletteId": "solar"
+  },
+  "27ba3524bd8b6a70": {
+    "word": "MOONLIGHT",
+    "paletteId": "glacier"
+  },
+  "97503d3d1f462b08": {
+    "word": "X",
+    "paletteId": "solar"
+  },
+  "cb1f4f889d18542e": {
+    "word": "MOONLIGHT",
+    "paletteId": "solar"
+  },
+  "a755bf2052a4d79a": {
+    "word": "DECLINED",
+    "paletteId": "ember"
+  },
+  "99c06c4774aae9a1": {
+    "word": "AURORA",
+    "paletteId": "ember"
+  },
+  "45ac7d17c806bfba": {
+    "word": "FINAL",
+    "paletteId": "glacier"
+  },
+  "43c28820647cf025": {
+    "word": "SUPERNOVA",
+    "paletteId": "solar"
+  },
+  "3e027b5b5b92ad2e": {
+    "word": "SUPERNOVA",
+    "paletteId": "ember"
+  }
+}

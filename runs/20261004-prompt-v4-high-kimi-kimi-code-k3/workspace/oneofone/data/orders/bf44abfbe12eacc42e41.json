@@ -1,0 +1,32 @@
+{
+  "id": "bf44abfbe12eacc42e41",
+  "createdAt": "2026-10-05T00:32:50.634Z",
+  "word": "DECLINED",
+  "paletteId": "ember",
+  "shirtColor": "white",
+  "size": "s",
+  "designId": "a755bf2052a4d79a",
+  "edition": "9903-9B67",
+  "priceUsd": 34,
+  "recipient": {
+    "name": "Decline Test",
+    "email": "d@example.com",
+    "phone": "",
+    "line1": "1 No St",
+    "line2": "",
+    "townOrCity": "Austin",
+    "stateOrCounty": "",
+    "postalOrZipCode": "78701",
+    "countryCode": "US"
+  },
+  "payment": {
+    "driver": "paygate",
+    "status": "failed",
+    "payRequestId": "C4278F6F-43C7-F998-7CF7-37BEBC915A36",
+    "gatewayStatus": "2",
+    "failReason": "paygate status 2 (Insufficient Funds)"
+  },
+  "fulfillment": {
+    "status": "not_started"
+  }
+}

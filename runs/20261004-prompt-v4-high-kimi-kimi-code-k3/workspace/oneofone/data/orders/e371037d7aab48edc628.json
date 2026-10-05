@@ -1,0 +1,30 @@
+{
+  "id": "e371037d7aab48edc628",
+  "createdAt": "2026-10-05T00:37:55.255Z",
+  "word": "SUPERNOVA",
+  "paletteId": "ember",
+  "shirtColor": "white",
+  "size": "xl",
+  "designId": "3e027b5b5b92ad2e",
+  "edition": "E406-208E",
+  "priceUsd": 34,
+  "recipient": {
+    "name": "Grace Hopper",
+    "email": "grace@example.com",
+    "phone": "",
+    "line1": "1 Compiler Lane",
+    "line2": "",
+    "townOrCity": "Arlington",
+    "stateOrCounty": "VA",
+    "postalOrZipCode": "22201",
+    "countryCode": "US"
+  },
+  "payment": {
+    "driver": "paygate",
+    "status": "pending",
+    "payRequestId": "EA7A30FE-23AC-F6A2-F2C5-23F3A24CF824"
+  },
+  "fulfillment": {
+    "status": "not_started"
+  }
+}
