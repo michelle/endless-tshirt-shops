@@ -1,0 +1,1 @@
+Anonymous Vercel deploys work (60-minute lifetime, keepable via a claim link). Now I have two open questions that genuinely need the user's input — payment credentials and deployment preference — while I probe the Prodigi asset-upload and catalog endpoints in parallel.
