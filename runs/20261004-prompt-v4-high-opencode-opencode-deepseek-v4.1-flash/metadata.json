@@ -29,7 +29,7 @@
   "agent_deployment_status": "reported",
   "agent_deployment_url": "https://temporary-spry-orion-vl69qeo.vercel.app**",
   "inspection_deployment_provider": "vercel",
-  "inspection_deployment_status": "failed",
+  "inspection_deployment_status": "succeeded",
   "inspection_deployment_url": "https://benchmark-20261004-prompt-v4-high-o.vercel.app",
   "deployment_url": "https://temporary-spry-orion-vl69qeo.vercel.app**"
 }

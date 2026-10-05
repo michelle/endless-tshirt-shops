@@ -29,7 +29,7 @@
   "agent_deployment_status": "reported",
   "agent_deployment_url": "https://temporary-sonic-agate-w4zxmnu.vercel.app",
   "inspection_deployment_provider": "vercel",
-  "inspection_deployment_status": "failed",
+  "inspection_deployment_status": "succeeded",
   "inspection_deployment_url": "https://benchmark-20261004-prompt-v4-high-c-khaki.vercel.app",
   "deployment_url": "https://temporary-sonic-agate-w4zxmnu.vercel.app"
 }

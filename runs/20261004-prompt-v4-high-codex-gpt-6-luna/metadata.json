@@ -28,8 +28,8 @@
   "deployment_url_candidates": [],
   "agent_deployment_status": "reported",
   "agent_deployment_url": "https://orbit-and-origin.hazelcough.chatgpt.site",
-  "inspection_deployment_provider": "vercel",
-  "inspection_deployment_status": "failed",
-  "inspection_deployment_url": "https://benchmark-20261004-prompt-v4-high-c-sigma.vercel.app",
+  "inspection_deployment_provider": "sites",
+  "inspection_deployment_status": "succeeded",
+  "inspection_deployment_url": "https://orbit-and-origin.hazelcough.chatgpt.site",
   "deployment_url": "https://orbit-and-origin.hazelcough.chatgpt.site"
 }
