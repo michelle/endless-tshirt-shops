@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CELESTIA — Custom Astronomical Star Map T-Shirts</title>
+  <meta name="description" content="Custom DTG-printed t-shirts displaying the exact celestial sky from the moment and place that changed your life.">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+
+  <!-- Site Navigation -->
+  <nav class="navbar">
+    <div class="nav-inner">
+      <div class="brand">
+        <span class="star-icon">✦</span>
+        <span class="brand-name">CELESTIA</span>
+      </div>
+      <div class="nav-links">
+        <a href="#customizer">Custom Studio</a>
+        <a href="#gallery">Moments Gallery</a>
+        <a href="#craft">The DTG Craft</a>
+      </div>
+      <div class="nav-actions">
+        <a href="#customizer" class="btn btn-sm btn-accent">Create Shirt</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Banner -->
+  <header class="hero">
+    <div class="hero-content">
+      <div class="hero-badge">Direct-to-Garment Personalized Astronomy</div>
+      <h1>The Exact Sky From The Moment Your World Changed</h1>
+      <p class="hero-sub">
+        Every shirt is a one-of-one custom DTG print calculated from the Yale Bright Star Catalog.
+        Pick any date and coordinate on Earth — we render the real astronomical sky at that exact minute onto a premium Bella + Canvas 3001 tee.
+      </p>
+      <div class="hero-ctas">
+        <a href="#customizer" class="btn btn-primary">Design Your Starmap Tee — $38</a>
+        <a href="#craft" class="btn btn-secondary">Learn About Our DTG Print</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Customization Studio -->
+  <section id="customizer" class="studio-section">
+    <div class="container studio-layout">
+
+      <!-- Left Column: Live Garment & Artwork Mockup -->
+      <div class="preview-column">
+        <div class="tshirt-stage">
+          <div class="tshirt-mockup" id="shirtMockup" data-color="black">
+            <!-- Simulated t-shirt outline and shading -->
+            <div class="shirt-body"></div>
+            <!-- Chest print container for DTG artwork -->
+            <div class="print-area">
+              <div id="svgContainer" class="svg-wrapper">
+                <div class="spinner"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="preview-footer">
+          <span class="print-spec-badge">DTG Front Print · 4680 × 5790 px · 300 DPI</span>
+          <button id="inspectPrintBtn" class="btn-link">View Full 300 DPI Print File ↗</button>
+        </div>
+      </div>
+
+      <!-- Right Column: Interactive Studio Controls -->
+      <div class="controls-column">
+        <div class="controls-card">
+          <h2 class="controls-heading">Personalize Your Sky</h2>
+          <p class="controls-desc">Tune your moment. The celestial engine computes star altitude and azimuth in real-time.</p>
+
+          <!-- 1. Custom Dedication & Message -->
+          <div class="form-group">
+            <label for="inputTitle">Primary Title</label>
+            <input type="text" id="inputTitle" value="THE NIGHT WE MET" maxlength="32" placeholder="e.g. THE NIGHT WE MET">
+          </div>
+
+          <div class="form-group">
+            <label for="inputSub">Custom Dedication Subtitle</label>
+            <input type="text" id="inputSub" value="Underneath the autumn sky" maxlength="60" placeholder="e.g. Underneath the autumn sky">
+          </div>
+
+          <!-- 2. Location -->
+          <div class="form-row">
+            <div class="form-group flex-2">
+              <label for="citySelect">Observation Location</label>
+              <select id="citySelect">
+                <!-- Populated dynamically via /api/cities -->
+              </select>
+            </div>
+            <div class="form-group flex-1">
+              <label for="inputWhere">City Label</label>
+              <input type="text" id="inputWhere" value="New York, USA">
+            </div>
+          </div>
+
+          <!-- 3. Date & Time -->
+          <div class="form-row">
+            <div class="form-group flex-1">
+              <label for="inputDate">Date of Moment</label>
+              <input type="date" id="inputDate" value="2024-10-04">
+            </div>
+            <div class="form-group flex-1">
+              <label for="inputTime">Time (Local)</label>
+              <input type="time" id="inputTime" value="21:00">
+            </div>
+          </div>
+
+          <!-- 4. Garment Color & Size -->
+          <div class="form-group">
+            <label>Garment Color (Bella + Canvas 3001)</label>
+            <div class="color-picker">
+              <label class="color-option active" data-color="black">
+                <span class="color-swatch swatch-black"></span>
+                <span class="color-name">Black</span>
+              </label>
+              <label class="color-option" data-color="navy">
+                <span class="color-swatch swatch-navy"></span>
+                <span class="color-name">Navy Blue</span>
+              </label>
+              <label class="color-option" data-color="asphalt">
+                <span class="color-swatch swatch-asphalt"></span>
+                <span class="color-name">Asphalt</span>
+              </label>
+              <label class="color-option" data-color="dark heather grey">
+                <span class="color-swatch swatch-grey"></span>
+                <span class="color-name">Dark Heather</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="inputSize">Unisex Size</label>
+            <div class="size-picker">
+              <button class="size-btn" data-size="s">S</button>
+              <button class="size-btn" data-size="m">M</button>
+              <button class="size-btn active" data-size="l">L</button>
+              <button class="size-btn" data-size="xl">XL</button>
+              <button class="size-btn" data-size="2xl">2XL</button>
+            </div>
+          </div>
+
+          <!-- Price & Checkout Block -->
+          <div class="checkout-box">
+            <div class="price-row">
+              <div class="price-info">
+                <span class="price-amount">$38.00</span>
+                <span class="price-shipping">Free worldwide shipping · Standard DTG</span>
+              </div>
+              <div class="security-badge">
+                <span>🔒 Powered by Stripe</span>
+              </div>
+            </div>
+
+            <!-- Primary Stripe Checkout -->
+            <button id="stripeCheckoutBtn" class="btn btn-primary btn-block btn-lg">
+              Order Custom Shirt with Stripe
+            </button>
+
+            <!-- Instant Test Payment Option -->
+            <button id="instantTestBtn" class="btn btn-secondary btn-block" style="margin-top: 10px;">
+              ⚡ One-Click Instant Sandbox Test (Fulfills to Prodigi)
+            </button>
+            <p id="checkoutStatus" class="checkout-status"></p>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Inspiration Gallery -->
+  <section id="gallery" class="gallery-section">
+    <div class="container">
+      <div class="section-title">
+        <h2>Moments Written in the Stars</h2>
+        <p>Explore celestial moments from around the world. Click any design to load it into the custom studio.</p>
+      </div>
+
+      <div class="gallery-grid">
+        <div class="gallery-card" data-preset="rome">
+          <div class="card-art">
+            <span class="card-icon">✦</span>
+          </div>
+          <div class="card-info">
+            <h3>THE NIGHT WE MET</h3>
+            <p class="card-sub">Rome, Italy · June 14, 2024</p>
+            <span class="card-badge">Load in Studio →</span>
+          </div>
+        </div>
+
+        <div class="gallery-card" data-preset="paris">
+          <div class="card-art">
+            <span class="card-icon">✦</span>
+          </div>
+          <div class="card-info">
+            <h3>SHE SAID YES</h3>
+            <p class="card-sub">Paris, France · September 18, 2023</p>
+            <span class="card-badge">Load in Studio →</span>
+          </div>
+        </div>
+
+        <div class="gallery-card" data-preset="tokyo">
+          <div class="card-art">
+            <span class="card-icon">✦</span>
+          </div>
+          <div class="card-info">
+            <h3>A STAR WAS BORN</h3>
+            <p class="card-sub">Tokyo, Japan · March 28, 2024</p>
+            <span class="card-badge">Load in Studio →</span>
+          </div>
+        </div>
+
+        <div class="gallery-card" data-preset="nyc">
+          <div class="card-art">
+            <span class="card-icon">✦</span>
+          </div>
+          <div class="card-info">
+            <h3>UNDER NEW YORK LIGHTS</h3>
+            <p class="card-sub">New York, USA · December 31, 2023</p>
+            <span class="card-badge">Load in Studio →</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- The Craft Section -->
+  <section id="craft" class="craft-section">
+    <div class="container">
+      <div class="section-title">
+        <h2>Why Direct-to-Garment (DTG) Changes Everything</h2>
+        <p>DTG technology enables genuine one-of-a-kind astronomical apparel with zero waste.</p>
+      </div>
+
+      <div class="craft-grid">
+        <div class="craft-item">
+          <div class="craft-icon">✦</div>
+          <h3>100% Unique Every Order</h3>
+          <p>Traditional screen printing requires hundreds of identical shirts. DTG injects micro-pigment water-based ink directly into the ring-spun cotton fibers, making individual celestial charts feasible.</p>
+        </div>
+
+        <div class="craft-item">
+          <div class="craft-icon">◎</div>
+          <h3>Astrophysical Precision</h3>
+          <p>We compute Julian Day, Greenwich Mean Sidereal Time (GMST), and local altitude/azimuth across 80+ Yale Bright Star coordinates with stereographic celestial projection.</p>
+        </div>
+
+        <div class="craft-item">
+          <div class="craft-icon">✧</div>
+          <h3>Bella + Canvas 3001 Quality</h3>
+          <p>Printed onto retail-quality 100% Airlume combed and ring-spun cotton. Pre-shrunk, super-soft hand feel with seamless durability across washes.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <span class="star-icon">✦</span> CELESTIA
+        <p>Custom Direct-to-Garment Astronomical Apparel.</p>
+      </div>
+      <div class="footer-tech">
+        <p>Powered by <strong>Stripe Payments</strong> & <strong>Prodigi Global Print API</strong>.</p>
+        <p class="footer-copy">© 2026 Celestia Apparel. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/app.js"></script>
+</body>
+</html>

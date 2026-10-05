@@ -1,0 +1,74 @@
+{
+  "e543e1f8-38a2-42c0-af3d-def8fefebcf3": {
+    "id": "e543e1f8-38a2-42c0-af3d-def8fefebcf3",
+    "date": "2024-10-04T21:00:00.000Z",
+    "lat": 40.7128,
+    "lon": -74.006,
+    "whereLabel": "New York, USA",
+    "messageTitle": "THE NIGHT WE MET",
+    "messageSub": "Underneath the autumn sky",
+    "color": "black",
+    "size": "l",
+    "recipient": {
+      "name": "Celestia E2E Test Buyer",
+      "email": "buyer@celestia-tees.example",
+      "phoneNumber": null,
+      "address": {
+        "line1": "350 5th Ave",
+        "line2": null,
+        "townOrCity": "New York",
+        "stateOrCounty": "NY",
+        "postalOrZipCode": "10118",
+        "countryCode": "US"
+      }
+    },
+    "status": "fulfilled",
+    "createdAt": "2026-10-05T03:34:30.099Z",
+    "updatedAt": "2026-10-05T03:34:40.688Z",
+    "prodigiOrderId": "ord_1177360",
+    "stripePaymentIntentId": "pi_3UN2fLEXcAdFRXIt1SL99lLE"
+  },
+  "54401922-e11f-4cf0-8106-0896b16a315c": {
+    "id": "54401922-e11f-4cf0-8106-0896b16a315c",
+    "date": "2024-06-14T22:30:00.000Z",
+    "lat": 41.9028,
+    "lon": 12.4964,
+    "whereLabel": "Rome, Italy",
+    "messageTitle": "THE NIGHT WE MET",
+    "messageSub": "Underneath the Roman stars",
+    "color": "navy",
+    "size": "m",
+    "status": "pending_payment",
+    "createdAt": "2026-10-05T03:35:23.813Z",
+    "updatedAt": "2026-10-05T03:35:23.813Z"
+  },
+  "654faee6-cebf-4b39-ae6b-49333c786028": {
+    "id": "654faee6-cebf-4b39-ae6b-49333c786028",
+    "date": "2024-06-14T22:30:00.000Z",
+    "lat": 41.9028,
+    "lon": 12.4964,
+    "whereLabel": "Rome, Italy",
+    "messageTitle": "THE NIGHT WE MET",
+    "messageSub": "Underneath the Roman stars",
+    "color": "navy",
+    "size": "m",
+    "status": "pending_payment",
+    "createdAt": "2026-10-05T03:35:29.882Z",
+    "updatedAt": "2026-10-05T03:35:29.882Z"
+  },
+  "74fae81a-bdfa-40f4-8eea-ec04d6707a45": {
+    "id": "74fae81a-bdfa-40f4-8eea-ec04d6707a45",
+    "date": "2024-06-14T22:30:00.000Z",
+    "lat": 41.9028,
+    "lon": 12.4964,
+    "whereLabel": "Rome, Italy",
+    "messageTitle": "THE NIGHT WE MET",
+    "messageSub": "Underneath the Roman stars",
+    "color": "navy",
+    "size": "m",
+    "status": "pending_payment",
+    "createdAt": "2026-10-05T03:35:43.918Z",
+    "updatedAt": "2026-10-05T03:35:44.299Z",
+    "stripeSessionId": "cs_test_a1JRJvoizrzRGoMCB6rhBl1lg0VV3FekMx9EqdVK6ztPmsPAoauWALeUcG"
+  }
+}

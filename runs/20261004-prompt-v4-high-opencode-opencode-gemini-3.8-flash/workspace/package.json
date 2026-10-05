@@ -1,0 +1,14 @@
+{
+  "name": "celestia-tee",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "@resvg/resvg-js": "^2.6.2",
+    "express": "^5.2.1",
+    "stripe": "^23.0.0"
+  }
+}

@@ -1,0 +1,668 @@
+/* public/styles.css */
+/* Celestia Astronomical T-Shirt Store Stylesheet */
+
+:root {
+  --bg-space: #070913;
+  --bg-card: rgba(15, 20, 35, 0.85);
+  --bg-card-border: rgba(197, 164, 103, 0.25);
+  --accent-gold: #c5a467;
+  --accent-gold-light: #e6cb95;
+  --accent-gold-hover: #b08e50;
+  --text-main: #f5eedc;
+  --text-muted: #959fb8;
+  --text-dim: #656f88;
+  --font-serif: Georgia, 'Times New Roman', serif;
+  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--bg-space);
+  color: var(--text-main);
+  font-family: var(--font-sans);
+  line-height: 1.6;
+  min-height: 100vh;
+  background-image: 
+    radial-gradient(circle at 50% 0%, rgba(28, 38, 75, 0.35) 0%, transparent 70%),
+    radial-gradient(circle at 80% 60%, rgba(40, 25, 65, 0.25) 0%, transparent 60%);
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* Navigation */
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  backdrop-filter: blur(12px);
+  background: rgba(7, 9, 19, 0.85);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.nav-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-serif);
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 4px;
+  color: var(--accent-gold);
+}
+
+.star-icon {
+  color: var(--accent-gold);
+  font-size: 20px;
+}
+
+.nav-links {
+  display: flex;
+  gap: 28px;
+}
+
+.nav-links a {
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.nav-links a:hover {
+  color: var(--text-main);
+}
+
+/* Buttons */
+.btn {
+  display: inline-block;
+  padding: 14px 28px;
+  border-radius: 6px;
+  font-size: 15px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  border: none;
+  transition: all 0.25s ease;
+  text-align: center;
+}
+
+.btn-sm {
+  padding: 8px 16px;
+  font-size: 13px;
+}
+
+.btn-lg {
+  padding: 16px 32px;
+  font-size: 16px;
+}
+
+.btn-block {
+  display: block;
+  width: 100%;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #c5a467 0%, #b08e50 100%);
+  color: #0c0e17;
+  box-shadow: 0 4px 18px rgba(197, 164, 103, 0.3);
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, #d4b57b 0%, #c5a467 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 22px rgba(197, 164, 103, 0.45);
+}
+
+.btn-secondary {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-main);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.btn-accent {
+  background: rgba(197, 164, 103, 0.15);
+  color: var(--accent-gold-light);
+  border: 1px solid rgba(197, 164, 103, 0.4);
+}
+
+.btn-accent:hover {
+  background: rgba(197, 164, 103, 0.25);
+}
+
+.btn-link {
+  background: none;
+  border: none;
+  color: var(--accent-gold);
+  font-size: 14px;
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 0;
+}
+
+/* Hero Section */
+.hero {
+  padding: 70px 24px 40px;
+  text-align: center;
+}
+
+.hero-content {
+  max-width: 820px;
+  margin: 0 auto;
+}
+
+.hero-badge {
+  display: inline-block;
+  padding: 6px 16px;
+  background: rgba(197, 164, 103, 0.12);
+  border: 1px solid rgba(197, 164, 103, 0.35);
+  color: var(--accent-gold-light);
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 24px;
+}
+
+.hero h1 {
+  font-family: var(--font-serif);
+  font-size: 46px;
+  line-height: 1.2;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 20px;
+}
+
+.hero-sub {
+  font-size: 18px;
+  color: var(--text-muted);
+  margin-bottom: 34px;
+}
+
+.hero-ctas {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+/* Studio Section */
+.studio-section {
+  padding: 40px 0 80px;
+}
+
+.studio-layout {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 40px;
+  align-items: start;
+}
+
+/* T-Shirt Preview Column */
+.preview-column {
+  position: sticky;
+  top: 90px;
+}
+
+.tshirt-stage {
+  background: radial-gradient(circle, rgba(25, 32, 54, 0.6) 0%, rgba(10, 13, 24, 0.9) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 30px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.tshirt-mockup {
+  position: relative;
+  width: 100%;
+  max-width: 480px;
+  aspect-ratio: 1 / 1.15;
+  border-radius: 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: background-color 0.3s ease;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+/* Mockup Garment Colors */
+.tshirt-mockup[data-color="black"] {
+  background-color: #121316;
+  border: 1px solid #22242b;
+}
+
+.tshirt-mockup[data-color="navy"] {
+  background-color: #111a33;
+  border: 1px solid #1c2a50;
+}
+
+.tshirt-mockup[data-color="asphalt"] {
+  background-color: #272a31;
+  border: 1px solid #383c46;
+}
+
+.tshirt-mockup[data-color="dark heather grey"] {
+  background-color: #34373d;
+  border: 1px solid #454952;
+}
+
+/* Printable chest area */
+.print-area {
+  position: absolute;
+  top: 12%;
+  width: 64%;
+  height: 78%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.svg-wrapper {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.svg-wrapper svg {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 10px rgba(0,0,0,0.5));
+}
+
+.preview-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 16px;
+  padding: 0 8px;
+}
+
+.print-spec-badge {
+  font-size: 12px;
+  color: var(--text-dim);
+  font-weight: 500;
+  letter-spacing: 0.5px;
+}
+
+/* Studio Controls Card */
+.controls-card {
+  background: var(--bg-card);
+  border: 1px solid var(--bg-card-border);
+  border-radius: 16px;
+  padding: 34px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+}
+
+.controls-heading {
+  font-family: var(--font-serif);
+  font-size: 26px;
+  color: #fff;
+  margin-bottom: 6px;
+}
+
+.controls-desc {
+  font-size: 14px;
+  color: var(--text-muted);
+  margin-bottom: 24px;
+}
+
+.form-group {
+  margin-bottom: 18px;
+}
+
+.form-row {
+  display: flex;
+  gap: 16px;
+}
+
+.flex-1 { flex: 1; }
+.flex-2 { flex: 2; }
+
+label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--accent-gold-light);
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+}
+
+input[type="text"],
+input[type="date"],
+input[type="time"],
+select {
+  width: 100%;
+  padding: 12px 14px;
+  background: rgba(9, 12, 22, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 6px;
+  color: #fff;
+  font-size: 15px;
+  font-family: var(--font-sans);
+  transition: border-color 0.2s;
+}
+
+input:focus, select:focus {
+  outline: none;
+  border-color: var(--accent-gold);
+}
+
+/* Garment Color Swatches */
+.color-picker {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
+.color-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.color-option.active {
+  border-color: var(--accent-gold);
+  background: rgba(197, 164, 103, 0.12);
+}
+
+.color-swatch {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.swatch-black { background-color: #101014; }
+.swatch-navy { background-color: #0f1833; }
+.swatch-asphalt { background-color: #272a31; }
+.swatch-grey { background-color: #40444d; }
+
+.color-name {
+  font-size: 12px;
+  color: var(--text-main);
+  text-transform: none;
+}
+
+/* Size Selector */
+.size-picker {
+  display: flex;
+  gap: 10px;
+}
+
+.size-btn {
+  flex: 1;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 6px;
+  color: var(--text-main);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.size-btn.active {
+  background: var(--accent-gold);
+  color: #0c0e17;
+  border-color: var(--accent-gold);
+}
+
+/* Checkout Box */
+.checkout-box {
+  margin-top: 28px;
+  padding-top: 24px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.price-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18px;
+}
+
+.price-amount {
+  font-family: var(--font-serif);
+  font-size: 32px;
+  font-weight: 700;
+  color: #fff;
+  display: block;
+}
+
+.price-shipping {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.security-badge {
+  font-size: 12px;
+  color: var(--accent-gold-light);
+}
+
+.checkout-status {
+  margin-top: 12px;
+  font-size: 14px;
+  text-align: center;
+}
+
+/* Gallery Section */
+.gallery-section {
+  padding: 80px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.section-title {
+  text-align: center;
+  max-width: 640px;
+  margin: 0 auto 50px;
+}
+
+.section-title h2 {
+  font-family: var(--font-serif);
+  font-size: 36px;
+  color: #fff;
+  margin-bottom: 12px;
+}
+
+.section-title p {
+  color: var(--text-muted);
+  font-size: 16px;
+}
+
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+}
+
+.gallery-card {
+  background: var(--bg-card);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.gallery-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--accent-gold);
+}
+
+.card-art {
+  height: 180px;
+  background: radial-gradient(circle, #151c38 0%, #070914 100%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.card-icon {
+  font-size: 36px;
+  color: var(--accent-gold);
+}
+
+.card-info {
+  padding: 18px;
+}
+
+.card-info h3 {
+  font-family: var(--font-serif);
+  font-size: 16px;
+  color: #fff;
+  margin-bottom: 4px;
+}
+
+.card-sub {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+}
+
+.card-badge {
+  font-size: 12px;
+  color: var(--accent-gold-light);
+  font-weight: 600;
+}
+
+/* Craft Section */
+.craft-section {
+  padding: 80px 0;
+  background: rgba(0, 0, 0, 0.25);
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.craft-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 30px;
+}
+
+.craft-item {
+  background: rgba(18, 23, 40, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  padding: 30px;
+}
+
+.craft-icon {
+  font-size: 28px;
+  color: var(--accent-gold);
+  margin-bottom: 16px;
+}
+
+.craft-item h3 {
+  font-family: var(--font-serif);
+  font-size: 20px;
+  color: #fff;
+  margin-bottom: 10px;
+}
+
+.craft-item p {
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+/* Footer */
+.site-footer {
+  padding: 50px 0 30px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 14px;
+  color: var(--text-dim);
+}
+
+.footer-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.footer-brand {
+  font-family: var(--font-serif);
+  color: var(--accent-gold);
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.footer-brand p {
+  font-family: var(--font-sans);
+  color: var(--text-dim);
+  font-size: 13px;
+  margin-top: 4px;
+  font-weight: normal;
+}
+
+.footer-tech {
+  text-align: right;
+}
+
+.footer-copy {
+  margin-top: 4px;
+}
+
+/* Spinner */
+.spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid rgba(197, 164, 103, 0.2);
+  border-top-color: var(--accent-gold);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .studio-layout {
+    grid-template-columns: 1fr;
+  }
+  .gallery-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .craft-grid {
+    grid-template-columns: 1fr;
+  }
+  .preview-column {
+    position: static;
+  }
+}
