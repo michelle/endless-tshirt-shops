@@ -300,6 +300,7 @@ assert test -f "$FAKE_VERCEL_STATE.public"
 # The harness must retain it directly and never try to reinterpret its
 # Cloudflare-oriented source tree as a Vercel project.
 : >"$FAKE_VERCEL_CALLS"
+rm -f "$FAKE_CURL_STATE"
 (
   cd "$REPO"
   PATH="$BIN:$PATH" PRODIGI_API_KEY=test_11111111-1111-1111-1111-111111111111 \
@@ -312,6 +313,29 @@ SITES_METADATA=$(git --git-dir="$REMOTE" show benchmark-results:runs/sites-reuse
 [[ $SITES_METADATA == *'"inspection_deployment_provider": "sites"'* ]] || fail 'Sites deployment provider was not retained'
 [[ $SITES_METADATA == *'"inspection_deployment_status": "succeeded"'* ]] || fail 'healthy Sites deployment was not retained'
 [[ $SITES_METADATA == *'"inspection_deployment_url": "https://fixture.chatgpt.site"'* ]] || fail 'Sites URL was not retained as the durable URL'
+grep -q 'inspection_sites_probe_attempt=1 status=404' "$REPO/.benchmark-secrets/deployments/sites-reuse.log" || fail 'transient Sites failure was not recorded'
+grep -q 'inspection_sites_probe_attempt=2 status=200' "$REPO/.benchmark-secrets/deployments/sites-reuse.log" || fail 'Sites deployment was not retried'
+grep -q 'inspection_http_status=200' "$REPO/.benchmark-secrets/deployments/sites-reuse.log" || fail 'healthy Sites deployment was not health checked'
+assert test ! -s "$FAKE_VERCEL_CALLS"
+
+# A failed Sites health check must remain attributed to Sites. Its
+# Cloudflare/Vinext source cannot become a valid Vercel copy merely because a
+# generic build reports success.
+: >"$FAKE_VERCEL_CALLS"
+rm -f "$FAKE_CURL_STATE"
+(
+  cd "$REPO"
+  PATH="$BIN:$PATH" PRODIGI_API_KEY=test_11111111-1111-1111-1111-111111111111 \
+    BENCHMARK_VERCEL_TOKEN=fixture-harness-token BENCHMARK_DEPLOY_PROBE_DELAY_SECONDS=0 FAKE_CURL_MODE=unavailable \
+    FAKE_DEPLOYMENT_URL=https://unhealthy.chatgpt.site \
+    "$ROOT/scripts/run-benchmark" --adapter codex --model fake --timeout 5 \
+      --run-id sites-unhealthy --prompt-file prompts/prompt-v4.md
+)
+UNHEALTHY_SITES_METADATA=$(git --git-dir="$REMOTE" show benchmark-results:runs/sites-unhealthy/metadata.json)
+[[ $UNHEALTHY_SITES_METADATA == *'"inspection_deployment_provider": "sites"'* ]] || fail 'failed Sites deployment lost its provider identity'
+[[ $UNHEALTHY_SITES_METADATA == *'"inspection_deployment_status": "failed"'* ]] || fail 'unhealthy Sites deployment was not marked failed'
+[[ $UNHEALTHY_SITES_METADATA == *'"inspection_deployment_url": "https://unhealthy.chatgpt.site"'* ]] || fail 'failed Sites URL was not retained for review'
+grep -q 'inspection_sites_probe_attempt=5 status=404' "$REPO/.benchmark-secrets/deployments/sites-unhealthy.log" || fail 'unhealthy Sites deployment did not exhaust retries'
 assert test ! -s "$FAKE_VERCEL_CALLS"
 
 (

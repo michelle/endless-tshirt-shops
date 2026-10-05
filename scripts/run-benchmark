@@ -555,23 +555,38 @@ URL_CANDIDATES='[]'
 INSPECTION_DEPLOYMENT_STATUS=not_configured
 INSPECTION_DEPLOYMENT_URL=
 INSPECTION_DEPLOYMENT_PROVIDER=vercel
+IS_SITES_DEPLOYMENT=0
 # A Sites URL is already a durable production deployment. Reuse it rather than
 # feeding a Cloudflare Workers-oriented Sites build into Vercel, where a build
 # can report READY but contain no Vercel routes.
 if [[ $DEPLOYMENT_URL =~ ^https://[a-z0-9][a-z0-9.-]*\.chatgpt\.site/?$ ]]; then
-  SITES_BODY=$(curl -sS -L --max-time 30 "$DEPLOYMENT_URL" 2>/dev/null || true)
-  SITES_STATUS=$(curl -sS -L -o /dev/null -w '%{http_code}' --max-time 30 "$DEPLOYMENT_URL" 2>/dev/null || true)
-  SITES_BROWSER_HEALTH=0
-  if [[ ${BENCHMARK_DISABLE_BROWSER_HEALTH:-0} == 1 ]] || node "$SCRIPT_DIR/browser-health.mjs" "$DEPLOYMENT_URL" >/dev/null 2>&1; then
-    SITES_BROWSER_HEALTH=1
-  fi
-  if [[ $SITES_STATUS =~ ^[23][0-9][0-9]$ && $SITES_BODY != *'Deployment Expired'* && $SITES_BODY != *$'\nNOT_FOUND\n'* && $SITES_BROWSER_HEALTH == 1 ]]; then
-    INSPECTION_DEPLOYMENT_PROVIDER=sites
-    INSPECTION_DEPLOYMENT_STATUS=succeeded
-    INSPECTION_DEPLOYMENT_URL=$DEPLOYMENT_URL
-  fi
+  IS_SITES_DEPLOYMENT=1
+  INSPECTION_DEPLOYMENT_PROVIDER=sites
+  INSPECTION_DEPLOYMENT_STATUS=failed
+  INSPECTION_DEPLOYMENT_URL=$DEPLOYMENT_URL
+  mkdir -p "$DEPLOYMENT_LOG_DIR"
+  chmod 700 "$DEPLOYMENT_LOG_DIR"
+  INSPECTION_LOG="$DEPLOYMENT_LOG_DIR/$RUN_ID.log"
+  : >"$INSPECTION_LOG"
+  for attempt in 1 2 3 4 5; do
+    SITES_STATUS=$(curl -sS -L -o /dev/null -w '%{http_code}' --max-time 30 "$DEPLOYMENT_URL" 2>>"$INSPECTION_LOG" || true)
+    printf 'inspection_sites_probe_attempt=%s status=%s url=%s\n' "$attempt" "$SITES_STATUS" "$DEPLOYMENT_URL" >>"$INSPECTION_LOG"
+    if [[ $SITES_STATUS =~ ^[23][0-9][0-9]$ ]]; then
+      SITES_BODY=$(curl -sS -L --max-time 30 "$DEPLOYMENT_URL" 2>>"$INSPECTION_LOG" || true)
+      if [[ $SITES_BODY == *'Deployment Expired'* || $SITES_BODY == *$'\nNOT_FOUND\n'* ]]; then
+        printf 'inspection_sites_probe_rejected=provider_error_page url=%s\n' "$DEPLOYMENT_URL" >>"$INSPECTION_LOG"
+      elif [[ ${BENCHMARK_DISABLE_BROWSER_HEALTH:-0} == 1 ]] || node "$SCRIPT_DIR/browser-health.mjs" "$DEPLOYMENT_URL" >>"$INSPECTION_LOG" 2>&1; then
+        INSPECTION_DEPLOYMENT_STATUS=succeeded
+        break
+      else
+        printf 'inspection_sites_probe_rejected=browser_smoke_failed url=%s\n' "$DEPLOYMENT_URL" >>"$INSPECTION_LOG"
+      fi
+    fi
+    (( attempt == 5 )) || sleep "$HARNESS_DEPLOY_PROBE_DELAY_SECONDS"
+  done
+  printf 'inspection_http_status=%s\n' "${SITES_STATUS:-}" >>"$INSPECTION_LOG"
 fi
-if [[ $INSPECTION_DEPLOYMENT_STATUS != succeeded && -n $HARNESS_VERCEL_TOKEN ]]; then
+if [[ $IS_SITES_DEPLOYMENT == 0 && $INSPECTION_DEPLOYMENT_STATUS != succeeded && -n $HARNESS_VERCEL_TOKEN ]]; then
   mkdir -p "$DEPLOYMENT_LOG_DIR"
   chmod 700 "$DEPLOYMENT_LOG_DIR"
   INSPECTION_LOG="$DEPLOYMENT_LOG_DIR/$RUN_ID.log"
