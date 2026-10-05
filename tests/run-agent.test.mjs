@@ -5,7 +5,16 @@ import { existsSync } from 'node:fs';
 import { spawn } from 'node:child_process';
 import path from 'node:path';
 import os from 'node:os';
+import { unattendedOpenCodeConfig } from '../scripts/opencode-config.mjs';
 const root = path.resolve(import.meta.dirname, '..');
+
+test('OpenCode unattended config hides questions while preserving inline settings', () => {
+  assert.deepEqual(JSON.parse(unattendedOpenCodeConfig()), { tools: { question: false } });
+  assert.deepEqual(JSON.parse(unattendedOpenCodeConfig(JSON.stringify({ share: 'disabled', tools: { bash: true, question: true } }))), {
+    share: 'disabled', tools: { bash: true, question: false },
+  });
+  assert.deepEqual(JSON.parse(unattendedOpenCodeConfig('{ invalid')), { tools: { question: false } });
+});
 async function run(provider, events, t, { exit = 0, final = 'Codex final', tail = '', delay = false, drop = null, model = 'fake', refresh = null } = {}) {
   const dir = await mkdtemp(path.join(os.tmpdir(), 'run-agent-')); t.after(() => rm(dir, { recursive: true, force: true }));
   await mkdir(path.join(dir, 'bin'));

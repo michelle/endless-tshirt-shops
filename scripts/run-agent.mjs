@@ -3,6 +3,7 @@ import { openSync, writeSync, closeSync, mkdirSync, readFileSync, writeFileSync,
 import os from 'node:os';
 import path from 'node:path';
 import { normalize } from './run-inspector/transcript.mjs';
+import { unattendedOpenCodeConfig } from './opencode-config.mjs';
 
 // Launch one provider CLI for one benchmark run, record its raw event stream
 // privately, and report a failure the CLI itself may not have reported.
@@ -125,6 +126,13 @@ const childEnv = provider === 'claude' ? {
   ...baseChildEnv,
   KIMI_CODE_HOME: isolatedKimiHome = kimiHome(),
   KIMI_CODE_NO_AUTO_UPDATE: '1',
+} : provider === 'opencode' ? {
+  ...baseChildEnv,
+  // `opencode run` is noninteractive, but it still advertises the question
+  // tool. A model that calls it receives a dismissed-question error and the
+  // whole session shuts down. Hide that tool so unattended runs must make a
+  // reasonable assumption and continue instead of dying while awaiting input.
+  OPENCODE_CONFIG_CONTENT: unattendedOpenCodeConfig(baseChildEnv.OPENCODE_CONFIG_CONTENT),
 } : baseChildEnv;
 const child = spawn(provider, args, { cwd: workspace, env: childEnv, stdio: ['ignore', 'pipe', 'pipe'] });
 const pending = { stdout: '', stderr: '' };
