@@ -39,6 +39,11 @@ async function setup(t) {
 test('a suite must name its prompt rather than inherit a default', () => {
   assert.throws(() => parseArgs(['--suite', 'fixture-suite']), /--prompt is required/);
 });
+
+test('pause-after accepts a proper prefix and rejects a whole-suite pause', () => {
+  assert.equal(parseArgs(['--suite', 'example', '--prompt', 'prompts/prompt-v4.md', '--pause-after', '1']).pauseAfter, '1');
+  assert.throws(() => parseArgs(['--suite', 'example', '--prompt', 'prompts/prompt-v4.md', '--pause-after', String(models.length)]), /Invalid pause-after/);
+});
 test('suite run ids are sanitized exactly like the runner sanitizes --run-id', () => {
   assert.equal(sanitizeRunId('fixture-suite-kimi-kimi-code/kimi-for-coding'), 'fixture-suite-kimi-kimi-code-kimi-for-coding');
   assert.equal(sanitizeRunId('Suite_K3.A/B-C'), 'suite_k3.a-b-c');
@@ -64,6 +69,20 @@ test('controller stops on absent publication and preserves progress', async t =>
   assert.equal(calls, 1);
   const progress = JSON.parse(await readFile(path.join(opts.repo, '.benchmark-secrets/suites/fixture-suite/progress.json')));
   assert.equal(progress.state, 'blocked'); assert.equal(progress.completed.length, 1);
+});
+test('controller checkpoint pauses after a published prefix and resumes with the next model', async t => {
+  const opts = { ...(await setup(t)), pauseAfter: '1' }; let calls = 0;
+  const paused = await runSuite(opts, { git, execute: async () => { calls++; return { code: 0, signal: null }; } });
+  assert.equal(paused.state, 'blocked'); assert.equal(paused.completed, 1); assert.equal(calls, 1);
+  const saved = JSON.parse(await readFile(path.join(paused.directory, 'progress.json')));
+  assert.match(saved.reason, /sanity audit/); assert.equal(saved.active, null);
+
+  const resumedCalls = [];
+  const resumed = await runSuite({ ...opts, pauseAfter: undefined, resume: true }, { git, execute: async (command, args) => {
+    resumedCalls.push({ command, args }); return { code: 0, signal: null };
+  } });
+  assert.equal(resumed.state, 'awaiting-human-audit'); assert.equal(resumed.completed, models.length);
+  assert.equal(resumedCalls[0].args[resumedCalls[0].args.indexOf('--model') + 1], models[1][1]);
 });
 
 async function blocked(t) {

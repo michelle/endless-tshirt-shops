@@ -34,7 +34,7 @@ export function parseArgs(args) {
   const options = { repo: process.cwd(), effort: 'high', timeout: '7200' };
   for (let i = 0; i < args.length; i++) {
     if (args[i] === '--resume') { options.resume = true; continue; }
-    const key = { '--repo': 'repo', '--suite': 'suite', '--prompt': 'prompt', '--effort': 'effort', '--timeout': 'timeout' }[args[i]];
+    const key = { '--repo': 'repo', '--suite': 'suite', '--prompt': 'prompt', '--effort': 'effort', '--timeout': 'timeout', '--pause-after': 'pauseAfter' }[args[i]];
     if (!key || !args[i + 1] || args[i + 1].startsWith('--')) throw new Error('Unknown option or missing value');
     options[key] = args[i + 1];
     i++;
@@ -42,6 +42,7 @@ export function parseArgs(args) {
   identifier(options.suite);
   if (!options.prompt) throw new Error('--prompt is required: a default would pin the whole suite to the wrong task');
   if (!['low', 'medium', 'high', 'xhigh', 'max'].includes(options.effort) || !/^[1-9]\d*$/.test(options.timeout)) throw new Error('Invalid effort or timeout');
+  if (options.pauseAfter && (!/^[1-9]\d*$/.test(options.pauseAfter) || Number(options.pauseAfter) >= models.length)) throw new Error('Invalid pause-after count');
   return options;
 }
 async function execute(command, args, options) {
@@ -118,6 +119,12 @@ export async function runSuite(options, dependencies = {}) {
       assertBase();
       // A model failure can continue; absent publication is a controller blocker.
       progress.completed.at(-1).publication = published(runId, adapter, model); await record();
+      if (options.pauseAfter && progress.completed.length >= Number(options.pauseAfter) && progress.completed.length < models.length) {
+        progress.state = 'blocked';
+        progress.reason = `Paused after ${progress.completed.length} run(s) for requested sanity audit`;
+        await record();
+        return { directory, state: progress.state, completed: progress.completed.length };
+      }
     }
     progress.state = 'inspecting'; await record();
     const inspection = path.join(directory, `inspection-${new Date().toISOString().replace(/[:.]/g, '-')}`);
@@ -131,7 +138,7 @@ export async function runSuite(options, dependencies = {}) {
   return { directory, state: progress.state, completed: progress.completed.length };
 }
 if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href) {
-  if (process.argv.includes('--help')) console.log('Usage: node scripts/run-suite.mjs --suite ID --prompt FILE [--repo CLEAN_WORKTREE] [--effort high] [--timeout 7200] [--resume]\nResume verifies published attempts and the original base/prompt/effort before skipping them. Requires PRODIGI_API_KEY.');
+  if (process.argv.includes('--help')) console.log('Usage: node scripts/run-suite.mjs --suite ID --prompt FILE [--repo CLEAN_WORKTREE] [--effort high] [--timeout 7200] [--pause-after N] [--resume]\nResume verifies published attempts and the original base/prompt/effort before skipping them. Requires PRODIGI_API_KEY.');
   else try { console.log(JSON.stringify(await runSuite(parseArgs(process.argv.slice(2))), null, 2)); }
   catch (error) { console.error(error.message); process.exitCode = 1; }
 }
