@@ -360,9 +360,15 @@ cleanup_runtime() {
     note "warning: leaving unarchived Stripe profile at ${STRIPE_LIVE_DIR-unknown}"
   fi
   remove_publish_tree || true
+  restore_base_branch
   [[ -z ${AGENT_WORKSPACE-} ]] || rm -rf -- "$AGENT_WORKSPACE"
   [[ -z ${AGENT_CONTROL_DIR-} ]] || rm -rf -- "$AGENT_CONTROL_DIR"
-  [[ -z ${AGENT_TOOL_DIR-} ]] || rm -rf -- "$AGENT_TOOL_DIR"
+  if [[ -n ${AGENT_TOOL_DIR-} && -d $AGENT_TOOL_DIR ]]; then
+    # Older harnesses could accidentally remove search permission from the
+    # zsh profile directory. Make cleanup robust to that partial setup state.
+    chmod u+rwx "$AGENT_TOOL_DIR" "$AGENT_TOOL_DIR/zsh" 2>/dev/null || true
+    rm -rf -- "$AGENT_TOOL_DIR"
+  fi
   [[ -z ${INSPECTION_STAGE-} ]] || rm -rf -- "$INSPECTION_STAGE"
   if [[ -n ${GLOBAL_STRIPE_BACKUP_DIR-} && -d $GLOBAL_STRIPE_BACKUP_DIR && ! -e ${GLOBAL_STRIPE_BACKUP-} ]]; then
     rm -rf -- "$GLOBAL_STRIPE_BACKUP_DIR"
@@ -425,7 +431,13 @@ for shell_env in .zshenv .zprofile .zlogin .zshrc; do
   printf 'export PATH=%q\n' "$AGENT_PATH" >"$AGENT_TOOL_DIR/zsh/$shell_env"
 done
 printf 'export PATH=%q\n' "$AGENT_PATH" >"$AGENT_TOOL_DIR/sh-env"
-chmod 600 "$AGENT_TOOL_DIR/zsh/".* "$AGENT_TOOL_DIR/sh-env"
+chmod 700 "$AGENT_TOOL_DIR/zsh"
+chmod 600 \
+  "$AGENT_TOOL_DIR/zsh/.zshenv" \
+  "$AGENT_TOOL_DIR/zsh/.zprofile" \
+  "$AGENT_TOOL_DIR/zsh/.zlogin" \
+  "$AGENT_TOOL_DIR/zsh/.zshrc" \
+  "$AGENT_TOOL_DIR/sh-env"
 
 if ! mkdir -- "$GLOBAL_STRIPE_LOCK_DIR" 2>/dev/null; then
   die "another benchmark may be using the global Stripe config (lock: $GLOBAL_STRIPE_LOCK_DIR)"
