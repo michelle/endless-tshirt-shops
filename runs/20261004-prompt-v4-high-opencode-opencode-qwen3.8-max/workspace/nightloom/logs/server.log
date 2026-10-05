@@ -1,0 +1,4 @@
+NightLoom listening on :8080
+  payments : DEMO mode (set STRIPE_SECRET_KEY for Stripe)
+  prodigi  : https://api.sandbox.prodigi.com/v4.0 (key set)
+  public   : https://acb11e08725cf4.lhr.life

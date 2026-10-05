@@ -1,0 +1,317 @@
+{
+ "orders": {
+  "nl_300f4afe7ea7c8d1": {
+   "id": "nl_300f4afe7ea7c8d1",
+   "createdAt": "2026-10-05T03:00:31.307Z",
+   "events": [
+    {
+     "at": "2026-10-05T03:00:31.307Z",
+     "type": "created",
+     "info": null
+    },
+    {
+     "at": "2026-10-05T03:00:31.307Z",
+     "type": "checkout.requested",
+     "info": null
+    },
+    {
+     "at": "2026-10-05T03:00:31.307Z",
+     "type": "checkout.created",
+     "info": {
+      "provider": "demo"
+     }
+    },
+    {
+     "at": "2026-10-05T03:00:34.559Z",
+     "type": "payment.succeeded",
+     "info": {
+      "provider": "demo",
+      "simulated": true
+     }
+    },
+    {
+     "at": "2026-10-05T03:00:34.559Z",
+     "type": "fulfillment.rendering",
+     "info": null
+    },
+    {
+     "at": "2026-10-05T03:00:35.701Z",
+     "type": "asset.published",
+     "info": {
+      "assetUrl": "http://localhost:8080/art/nl_300f4afe7ea7c8d1.png"
+     }
+    },
+    {
+     "at": "2026-10-05T03:00:48.760Z",
+     "type": "fulfillment.sent",
+     "info": {
+      "prodigiOrderId": "ord_1177341",
+      "outcome": "Created"
+     }
+    }
+   ],
+   "design": {
+    "title": "THE NIGHT WE MET",
+    "subtitle": "and the stars knew it",
+    "date": "2019-06-14",
+    "time": "21:41",
+    "lat": 40.7128,
+    "lon": -74.006,
+    "placeName": "NEW YORK",
+    "countryName": "UNITED STATES",
+    "palette": "midnight",
+    "constellations": true,
+    "utcISO": "2019-06-15T01:41:00.000Z"
+   },
+   "product": {
+    "sku": "GLOBAL-TEE-BC-3001",
+    "color": "navy blue",
+    "size": "l",
+    "qty": 1
+   },
+   "customer": {
+    "name": "Test Person",
+    "email": "test@example.com",
+    "phone": "1 555 0100",
+    "line1": "14 test place",
+    "line2": "",
+    "city": "somewhere",
+    "state": "NY",
+    "zip": "12345",
+    "country": "US"
+   },
+   "pricing": {
+    "currency": "usd",
+    "unitAmount": 3400,
+    "shippingAmount": 600,
+    "totalAmount": 4000
+   },
+   "payment": {
+    "provider": "demo",
+    "status": "paid",
+    "reference": "demo_a02cee378ec8",
+    "paidAt": "2026-10-05T03:00:34.559Z"
+   },
+   "fulfillment": {
+    "status": "sent",
+    "prodigiOrderId": "ord_1177341",
+    "outcome": "Created",
+    "error": null,
+    "assetUrl": "http://localhost:8080/art/nl_300f4afe7ea7c8d1.png",
+    "sentAt": "2026-10-05T03:00:48.760Z",
+    "attempts": 1,
+    "issues": [],
+    "assetReachable": true,
+    "prodigiStage": "InProgress",
+    "prodigiSnapshot": {
+     "stage": "InProgress",
+     "details": {
+      "downloadAssets": "NotStarted",
+      "printReadyAssetsPrepared": "NotStarted",
+      "allocateProductionLocation": "NotStarted",
+      "inProduction": "NotStarted",
+      "shipping": "NotStarted"
+     },
+     "issues": [],
+     "shipments": []
+    }
+   }
+  },
+  "nl_e5cb8cb16121fa27": {
+   "id": "nl_e5cb8cb16121fa27",
+   "createdAt": "2026-10-05T03:01:30.948Z",
+   "events": [
+    {
+     "at": "2026-10-05T03:01:30.948Z",
+     "type": "created",
+     "info": null
+    },
+    {
+     "at": "2026-10-05T03:01:30.948Z",
+     "type": "checkout.requested",
+     "info": null
+    },
+    {
+     "at": "2026-10-05T03:01:30.948Z",
+     "type": "checkout.created",
+     "info": {
+      "provider": "demo"
+     }
+    },
+    {
+     "at": "2026-10-05T03:01:38.043Z",
+     "type": "payment.succeeded",
+     "info": {
+      "provider": "demo",
+      "simulated": true
+     }
+    },
+    {
+     "at": "2026-10-05T03:01:38.043Z",
+     "type": "fulfillment.rendering",
+     "info": null
+    },
+    {
+     "at": "2026-10-05T03:01:39.657Z",
+     "type": "asset.published",
+     "info": {
+      "assetUrl": "https://acb11e08725cf4.lhr.life/art/nl_e5cb8cb16121fa27.png"
+     }
+    },
+    {
+     "at": "2026-10-05T03:01:51.806Z",
+     "type": "fulfillment.sent",
+     "info": {
+      "prodigiOrderId": "ord_1177342",
+      "outcome": "Created"
+     }
+    }
+   ],
+   "design": {
+    "title": "WHERE IT ALL BEGAN",
+    "subtitle": "under a waxing moon",
+    "date": "2021-08-11",
+    "time": "23:15",
+    "lat": 51.5074,
+    "lon": -0.1278,
+    "placeName": "LONDON",
+    "countryName": "UNITED KINGDOM",
+    "palette": "obsidian",
+    "constellations": true,
+    "utcISO": "2021-08-11T22:15:00.000Z"
+   },
+   "product": {
+    "sku": "GLOBAL-TEE-BC-3001",
+    "color": "black",
+    "size": "m",
+    "qty": 1
+   },
+   "customer": {
+    "name": "E2E Tester",
+    "email": "e2e@example.com",
+    "phone": "44 20 7946 0000",
+    "line1": "14 test place",
+    "line2": "",
+    "city": "somewhere",
+    "state": "",
+    "zip": "12345",
+    "country": "GB"
+   },
+   "pricing": {
+    "currency": "usd",
+    "unitAmount": 3400,
+    "shippingAmount": 600,
+    "totalAmount": 4000
+   },
+   "payment": {
+    "provider": "demo",
+    "status": "paid",
+    "reference": "demo_a4bd13fb9db5",
+    "paidAt": "2026-10-05T03:01:38.042Z"
+   },
+   "fulfillment": {
+    "status": "sent",
+    "prodigiOrderId": "ord_1177342",
+    "outcome": "Created",
+    "error": null,
+    "assetUrl": "https://acb11e08725cf4.lhr.life/art/nl_e5cb8cb16121fa27.png",
+    "sentAt": "2026-10-05T03:01:51.806Z",
+    "attempts": 1,
+    "issues": [],
+    "assetReachable": true,
+    "prodigiStage": "InProgress",
+    "prodigiSnapshot": {
+     "stage": "InProgress",
+     "details": {
+      "downloadAssets": "Complete",
+      "printReadyAssetsPrepared": "NotStarted",
+      "allocateProductionLocation": "NotStarted",
+      "inProduction": "NotStarted",
+      "shipping": "NotStarted"
+     },
+     "issues": [],
+     "shipments": []
+    }
+   }
+  },
+  "nl_62c850d5911de82e": {
+   "id": "nl_62c850d5911de82e",
+   "createdAt": "2026-10-05T03:01:35.080Z",
+   "events": [
+    {
+     "at": "2026-10-05T03:01:35.080Z",
+     "type": "created",
+     "info": null
+    },
+    {
+     "at": "2026-10-05T03:01:35.080Z",
+     "type": "checkout.requested",
+     "info": null
+    },
+    {
+     "at": "2026-10-05T03:01:35.080Z",
+     "type": "checkout.created",
+     "info": {
+      "provider": "demo"
+     }
+    },
+    {
+     "at": "2026-10-05T03:01:35.107Z",
+     "type": "payment.failed",
+     "info": "demo card declined"
+    }
+   ],
+   "design": {
+    "title": "X",
+    "subtitle": "",
+    "date": "2020-01-01",
+    "time": "20:00",
+    "lat": 10,
+    "lon": 10,
+    "placeName": "TEST",
+    "countryName": "",
+    "palette": "midnight",
+    "constellations": true,
+    "utcISO": "2020-01-01T19:00:00.000Z"
+   },
+   "product": {
+    "sku": "GLOBAL-TEE-BC-3001",
+    "color": "black",
+    "size": "m",
+    "qty": 1
+   },
+   "customer": {
+    "name": "T",
+    "email": "t@t.tt",
+    "phone": "",
+    "line1": "1 x",
+    "line2": "",
+    "city": "x",
+    "state": "",
+    "zip": "1",
+    "country": "US"
+   },
+   "pricing": {
+    "currency": "usd",
+    "unitAmount": 3400,
+    "shippingAmount": 600,
+    "totalAmount": 4000
+   },
+   "payment": {
+    "provider": "demo",
+    "status": "failed",
+    "reference": null,
+    "paidAt": null
+   },
+   "fulfillment": {
+    "status": "none",
+    "prodigiOrderId": null,
+    "outcome": null,
+    "error": null,
+    "assetUrl": null,
+    "sentAt": null,
+    "attempts": 0
+   }
+  }
+ }
+}

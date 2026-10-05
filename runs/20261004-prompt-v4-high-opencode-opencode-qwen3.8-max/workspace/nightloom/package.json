@@ -1,0 +1,22 @@
+{
+  "name": "nightloom",
+  "version": "1.0.0",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js",
+    "tunnel": "node scripts/tunnel.js",
+    "data": "node scripts/fetch-data.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "Personalized star-map t-shirts, printed on demand via Prodigi DTG",
+  "dependencies": {
+    "@napi-rs/canvas": "^1.0.10",
+    "astronomy-engine": "^2.1.19",
+    "express": "^5.2.1",
+    "stripe": "^23.0.0",
+    "tz-lookup": "^6.1.25"
+  }
+}

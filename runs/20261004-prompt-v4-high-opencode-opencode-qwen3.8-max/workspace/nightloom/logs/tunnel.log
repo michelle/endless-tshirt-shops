@@ -1,0 +1,3 @@
+[2026-10-05T03:01:11.552Z] starting tunnel via localhost.run (ssh -R 80:localhost:8080 -o StrictHostKeyChecking=no -o ServerAliveInterval=20 -o ExitOnForwardFailure=yes nokey@localhost.run)
+[2026-10-05T03:01:12.987Z] PUBLIC URL -> https://acb11e08725cf4.lhr.life
+[2026-10-05T03:01:13.476Z] healthz through tunnel: OK

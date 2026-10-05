@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Your order — NightLoom</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='30' fill='%23070b18'/%3E%3Ccircle cx='32' cy='32' r='4' fill='%23c9a86a'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600&family=Cormorant+Garamond:wght@400;600&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+<style>
+  .order-wrap { max-width: 980px; margin: 2.5rem auto 4rem; padding: 0 1rem; display: grid; grid-template-columns: 1.15fr 0.85fr; gap: 1.6rem; align-items: start; }
+  .panel { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 1.6rem; }
+  .timeline { list-style: none; margin: 1.2rem 0 0; padding: 0; }
+  .timeline li { position: relative; padding: 0 0 1.5rem 2.2rem; border-left: 2px solid var(--line); margin-left: 0.6rem; }
+  .timeline li:last-child { border-left-color: transparent; padding-bottom: 0.2rem; }
+  .timeline li::before { content: ""; position: absolute; left: -9px; top: 2px; width: 16px; height: 16px; border-radius: 50%; background: var(--bg2); border: 2px solid var(--ink-faint); }
+  .timeline li.done::before { background: var(--gold); border-color: var(--gold); }
+  .timeline li.active::before { border-color: var(--gold); box-shadow: 0 0 0 4px rgba(201,168,106,0.2); }
+  .timeline li.fail::before { background: #b44; border-color: #b44; }
+  .timeline h4 { margin: 0; font-family: var(--display); font-size: 1rem; letter-spacing: 0.06em; font-weight: 600; }
+  .timeline p { margin: 0.2rem 0 0; font-size: 0.86rem; color: var(--ink-dim); }
+  .timeline .dim { color: var(--ink-faint); }
+  .stage-detail { font-size: 0.8rem; color: var(--ink-faint); margin-top: 0.3rem; display: grid; gap: 0.15rem; }
+  .art-panel img { width: 100%; border-radius: 8px; border: 1px solid var(--line); }
+  .art-panel .dl { font-size: 0.82rem; margin-top: 0.7rem; text-align: center; }
+  .meta { font-size: 0.86rem; color: var(--ink-dim); display: grid; gap: 0.25rem; margin-top: 1rem; }
+  .meta b { color: var(--ink); font-weight: 500; }
+  .badge { display: inline-block; padding: 0.15rem 0.6rem; border-radius: 999px; font-size: 0.74rem; letter-spacing: 0.06em; border: 1px solid var(--gold-soft); color: var(--gold); margin-left: 0.5rem; vertical-align: middle; }
+  .retry { margin-top: 1rem; }
+  @media (max-width: 860px) { .order-wrap { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<header class="nav">
+  <a class="brand" href="/"><svg class="brand-mark" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="29" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="24" cy="24" r="2.4" fill="currentColor"/><circle cx="41" cy="21" r="1.7" fill="currentColor"/><circle cx="44" cy="37" r="2.1" fill="currentColor"/><circle cx="27" cy="43" r="1.5" fill="currentColor"/><path d="M24 24 L41 21 L44 37 L27 43 Z" stroke="currentColor" stroke-width="1" fill="none" opacity=".65"/></svg><span>NIGHTLOOM</span></a>
+  <nav class="nav-links"><a href="/">← Back to store</a></nav>
+</header>
+
+<main class="order-wrap">
+  <div class="panel">
+    <h1 style="font-size:1.5rem">Your order <span class="badge" id="oId"></span></h1>
+    <ul class="timeline" id="timeline"></ul>
+    <div class="retry" id="payBox" hidden>
+      <a class="btn" id="payLink" href="#">Complete payment →</a>
+    </div>
+    <div class="retry" id="retryBox" hidden>
+      <button class="btn" id="retryBtn">Retry sending to print lab</button>
+    </div>
+  </div>
+  <div class="panel art-panel">
+    <img id="oDesign" alt="Your design" src="">
+    <p class="dl"><a id="oArtLink" href="#" target="_blank" rel="noopener">View print-resolution artwork ↗</a></p>
+    <div class="meta" id="oMeta"></div>
+  </div>
+</main>
+
+<script>
+'use strict';
+const orderId = location.pathname.split('/').pop();
+const fmt = c => `$${(c/100).toFixed(2)}`;
+let timer = null;
+
+function step(cls, title, body, detail) {
+  return `<li class="${cls}"><h4>${title}</h4>${body ? `<p>${body}</p>` : ''}${detail ? `<div class="stage-detail">${detail}</div>` : ''}</li>`;
+}
+
+function stageDetails(det) {
+  if (!det) return '';
+  const LABELS = { downloadAssets: 'Artwork downloaded', printReadyAssetsPrepared: 'Artwork prepared', allocateProductionLocation: 'Lab allocated', inProduction: 'In production', shipping: 'Shipping' };
+  return Object.entries(det).map(([k, v]) => `<span>${LABELS[k] || k}: <b>${v}</b></span>`).join('');
+}
+
+function render(o) {
+  document.getElementById('oId').textContent = o.id;
+  const d = o.design;
+  const params = new URLSearchParams({ title: d.title, subtitle: d.subtitle || '', date: d.date, time: d.time, lat: d.lat, lon: d.lon, placeName: d.placeName, countryName: d.countryName || '', palette: d.palette, constellations: String(d.constellations) });
+  document.getElementById('oDesign').src = `/api/preview?${params}`;
+  document.getElementById('oMeta').innerHTML = `
+    <b>${d.title}</b>
+    <span>${d.date} · ${d.time} · ${d.placeName} (${d.lat}, ${d.lon})</span>
+    <span>Palette: ${d.palette} · ${d.constellations ? 'with' : 'without'} constellations</span>
+    <span>Tee: <b>${o.product.color}</b>, size <b>${o.product.size.toUpperCase()}</b> × ${o.product.qty}</span>
+    <span>Ships to: <b>${o.shippingTo.name}</b>, ${o.shippingTo.city}${o.shippingTo.state ? ', ' + o.shippingTo.state : ''} ${o.shippingTo.zip}, ${o.shippingTo.country}</span>
+    <span>Total: <b>${fmt(o.pricing.totalAmount)}</b> · ${o.payment.provider || '—'}${o.payment.provider === 'demo' ? ' (simulated)' : ''}</span>`;
+  const artLink = document.getElementById('oArtLink');
+  if (o.fulfillment.assetUrl) { artLink.href = o.fulfillment.assetUrl; artLink.parentElement.hidden = false; }
+  else { artLink.parentElement.hidden = true; }
+
+  const tl = document.getElementById('timeline');
+  let html = '';
+  // 1. payment
+  if (o.payment.status === 'paid') {
+    html += step('done', 'Payment received', `${o.payment.paidAt ? new Date(o.payment.paidAt).toLocaleString() : ''} · ${o.payment.provider}${o.payment.provider === 'demo' ? ' (simulated sandbox payment)' : ''}`);
+  } else if (o.payment.status === 'failed') {
+    html += step('fail', 'Payment failed', 'No charge was made. You can start a new checkout from the store.');
+  } else {
+    html += step('active', 'Awaiting payment', 'Your shirt is reserved but not yet printed.');
+  }
+  // 2. render
+  const f = o.fulfillment;
+  if (f.status === 'sent' || f.status === 'rendering') {
+    html += step(f.status === 'sent' ? 'done' : 'active', 'Print artwork rendered', f.status === 'sent' ? '300 dpi, 4680 × 5790 px, exact Bella+Canvas front print area.' : 'Rendering at print resolution…');
+  } else if (o.payment.status === 'paid') {
+    html += step('active', 'Rendering print artwork', 'Computing your sky at 300 dpi…');
+  } else {
+    html += step('', 'Print artwork', '<span class="dim">Rendered after payment succeeds.</span>');
+  }
+  // 3. prodigi
+  if (f.status === 'sent') {
+    html += step('done', 'Sent to the print lab', `Prodigi order <b>${f.prodigiOrderId || '—'}</b> · outcome: ${f.outcome}${f.issues && f.issues.length ? ' · issues: ' + JSON.stringify(f.issues) : ''}`);
+  } else if (f.status === 'failed') {
+    html += step('fail', 'Print submission failed', f.error || 'Unknown error.');
+  } else if (o.payment.status === 'paid') {
+    html += step('active', 'Sending to the print lab', 'Submitting your order to Prodigi…');
+  } else {
+    html += step('', 'Sent to the print lab', '<span class="dim">Happens automatically after payment.</span>');
+  }
+  // 4. production & shipping
+  if (f.prodigiSnapshot) {
+    const s = f.prodigiSnapshot;
+    const done = s.stage === 'Complete';
+    let body = `Lab stage: <b>${s.stage}</b>`;
+    let detail = stageDetails(s.details);
+    if (s.shipments && s.shipments.length) {
+      for (const sh of s.shipments) {
+        body += `<br>Shipment: <b>${sh.status}</b>${sh.carrier ? ' · ' + JSON.stringify(sh.carrier) : ''}${sh.fulfillmentLocation ? ' · from ' + sh.fulfillmentLocation.countryCode : ''}`;
+        if (sh.tracking && sh.tracking.number) body += ` · <a href="${sh.tracking.url || '#'}" target="_blank" rel="noopener">tracking ${sh.tracking.number}</a>`;
+      }
+    }
+    if (s.issues && s.issues.length) body += `<br>Issues: ${JSON.stringify(s.issues)}`;
+    html += step(done ? 'done' : 'active', 'Production & shipping', body, detail);
+  } else {
+    html += step('', 'Production & shipping', '<span class="dim">Live lab status appears here — refreshing automatically.</span>');
+  }
+  tl.innerHTML = html;
+
+  document.getElementById('retryBox').hidden = !(o.payment.status === 'paid' && f.status === 'failed');
+  const payBox = document.getElementById('payBox');
+  payBox.hidden = o.payment.status !== 'pending';
+  document.getElementById('payLink').href = `/pay/${o.id}`;
+
+  // keep polling?
+  const keepPolling =
+    o.payment.status === 'pending' ||
+    (o.payment.status === 'paid' && f.status !== 'sent') ||
+    (f.status === 'sent' && (!f.prodigiSnapshot || !['Complete', 'Cancelled'].includes(f.prodigiSnapshot.stage)));
+  clearTimeout(timer);
+  if (keepPolling) timer = setTimeout(load, f.status === 'sent' ? 15000 : 5000);
+}
+
+async function load() {
+  try {
+    const r = await fetch(`/api/orders/${orderId}`);
+    if (!r.ok) return;
+    render(await r.json());
+  } catch { /* transient */ }
+}
+
+document.getElementById('retryBtn').addEventListener('click', async () => {
+  const btn = document.getElementById('retryBtn');
+  btn.disabled = true; btn.textContent = 'Retrying…';
+  try {
+    await fetch(`/api/orders/${orderId}/retry`, { method: 'POST' });
+  } catch { /* ignore */ }
+  await load();
+  btn.disabled = false; btn.textContent = 'Retry sending to print lab';
+});
+
+load();
+</script>
+</body>
+</html>

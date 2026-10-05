@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NightLoom — Wear the sky from your moment</title>
+<meta name="description" content="Personalized star-map t-shirts. We compute the real night sky — every star, the moon's exact phase and the planets — for your date and place, and print it on a premium tee with direct-to-garment technology.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='30' fill='%23070b18'/%3E%3Ccircle cx='24' cy='24' r='2.4' fill='%23efe9dc'/%3E%3Ccircle cx='40' cy='20' r='1.8' fill='%23efe9dc'/%3E%3Ccircle cx='44' cy='36' r='2.2' fill='%23c9a86a'/%3E%3Ccircle cx='28' cy='42' r='1.6' fill='%23efe9dc'/%3E%3Cpath d='M24 24 L40 20 L44 36 L28 42 Z' stroke='%23c9a86a' stroke-width='1' fill='none' opacity='.7'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+
+<header class="nav">
+  <a class="brand" href="#top">
+    <svg class="brand-mark" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="29" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="24" cy="24" r="2.4" fill="currentColor"/><circle cx="41" cy="21" r="1.7" fill="currentColor"/><circle cx="44" cy="37" r="2.1" fill="currentColor"/><circle cx="27" cy="43" r="1.5" fill="currentColor"/><path d="M24 24 L41 21 L44 37 L27 43 Z" stroke="currentColor" stroke-width="1" fill="none" opacity=".65"/></svg>
+    <span>NIGHTLOOM</span>
+  </a>
+  <nav class="nav-links">
+    <a href="#create">Design yours</a>
+    <a href="#how">How it works</a>
+    <a href="#details">The tee</a>
+    <a href="#faq">FAQ</a>
+  </nav>
+  <a class="btn btn-small" href="#create">Start your sky</a>
+</header>
+<div id="demoRibbon" class="demo-ribbon" hidden>⚙︎ Sandbox build — payments are simulated and printing runs against the Prodigi sandbox. No real charges, no real shipments.</div>
+
+<main id="top">
+
+<!-- ============ HERO ============ -->
+<section class="hero">
+  <div class="hero-copy">
+    <p class="eyebrow">PERSONALIZED STAR-MAP TEES · PRINTED ON DEMAND</p>
+    <h1>Wear the sky<br>from <em>your</em> moment.</h1>
+    <p class="lede">A birth. A first kiss. The night you said yes. Tell us the minute that
+      changed everything — we compute the <strong>real positions of every star</strong>, the moon's
+      exact phase and the wandering planets for that place and time, and print your sky
+      on a premium tee. No two shirts alike, because no two moments are.</p>
+    <div class="hero-cta">
+      <a class="btn" href="#create">Design your sky</a>
+      <span class="hero-note">From $34 · ships worldwide</span>
+    </div>
+    <ul class="hero-facts">
+      <li><strong>25,000+</strong> real stars per design</li>
+      <li><strong>Exact</strong> moon phase &amp; planets</li>
+      <li><strong>DTG printed</strong> in full detail</li>
+    </ul>
+  </div>
+  <div class="hero-art">
+    <div class="art-frame">
+      <img id="heroDesign" alt="Sample personalized star map design" width="860" height="1064">
+    </div>
+    <p class="art-caption">“THE NIGHT WE MET” · 14 JUNE 2019, 9:41 PM · NEW YORK</p>
+  </div>
+</section>
+
+<!-- ============ CUSTOMIZER ============ -->
+<section id="create" class="create">
+  <div class="section-head">
+    <p class="eyebrow">THE STUDIO</p>
+    <h2>Compose your moment</h2>
+    <p class="sub">Everything updates live. What you see is what we print — rendered at 300&nbsp;dpi for the garment.</p>
+  </div>
+
+  <div class="studio">
+    <!-- left: mockup + summary -->
+    <div class="studio-left">
+      <div class="mockup-card">
+        <svg id="teeMock" viewBox="0 0 640 660" aria-label="T-shirt preview">
+          <defs>
+            <linearGradient id="sideShade" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0" stop-color="#000" stop-opacity="0.30"/>
+              <stop offset="0.14" stop-color="#000" stop-opacity="0.05"/>
+              <stop offset="0.5" stop-color="#000" stop-opacity="0"/>
+              <stop offset="0.86" stop-color="#000" stop-opacity="0.05"/>
+              <stop offset="1" stop-color="#000" stop-opacity="0.30"/>
+            </linearGradient>
+            <radialGradient id="chestLight" cx="0.5" cy="0.34" r="0.55">
+              <stop offset="0" stop-color="#fff" stop-opacity="0.14"/>
+              <stop offset="1" stop-color="#fff" stop-opacity="0"/>
+            </radialGradient>
+            <clipPath id="teeClip">
+              <path d="M 252 100 C 285 138, 355 138, 388 100 L 490 128 C 540 146, 570 200, 584 262 C 560 288, 520 300, 486 296 L 452 240 C 462 380, 464 500, 462 612 C 400 630, 240 630, 178 612 C 176 500, 178 380, 188 240 L 154 296 C 120 300, 80 288, 56 262 C 70 200, 100 146, 150 128 Z"/>
+            </clipPath>
+          </defs>
+          <!-- body -->
+          <path id="teeBody" fill="#111111" d="M 252 100 C 285 138, 355 138, 388 100 L 490 128 C 540 146, 570 200, 584 262 C 560 288, 520 300, 486 296 L 452 240 C 462 380, 464 500, 462 612 C 400 630, 240 630, 178 612 C 176 500, 178 380, 188 240 L 154 296 C 120 300, 80 288, 56 262 C 70 200, 100 146, 150 128 Z"/>
+          <g clip-path="url(#teeClip)">
+            <rect x="0" y="60" width="640" height="600" fill="url(#chestLight)"/>
+            <image id="teeDesign" x="180" y="162" width="280" height="346.4" href="" opacity="0.97"/>
+            <rect x="0" y="60" width="640" height="600" fill="url(#sideShade)"/>
+            <!-- soft folds -->
+            <path d="M 210 480 C 260 500, 300 505, 340 498 C 300 515, 250 512, 210 500 Z" fill="#000" opacity="0.07"/>
+            <path d="M 330 540 C 380 552, 420 552, 452 545 C 420 565, 375 562, 330 552 Z" fill="#000" opacity="0.06"/>
+          </g>
+          <!-- collar + seams -->
+          <path d="M 252 100 C 285 138, 355 138, 388 100" fill="none" stroke="#000" stroke-opacity="0.35" stroke-width="9" stroke-linecap="round"/>
+          <path d="M 252 100 C 285 143, 355 143, 388 100" fill="none" stroke="#fff" stroke-opacity="0.14" stroke-width="3"/>
+          <path d="M 154 296 C 120 300, 80 288, 56 262" fill="none" stroke="#000" stroke-opacity="0.25" stroke-width="3"/>
+          <path d="M 486 296 C 520 300, 560 288, 584 262" fill="none" stroke="#000" stroke-opacity="0.25" stroke-width="3"/>
+          <path d="M 178 606 C 240 624, 400 624, 462 606" fill="none" stroke="#000" stroke-opacity="0.25" stroke-width="3" stroke-dasharray="1 7" stroke-linecap="round"/>
+        </svg>
+        <div class="mockup-zoom"><a id="zoomLink" href="#" target="_blank" rel="noopener">View full design ↗</a></div>
+      </div>
+
+      <div class="sky-info" id="skyInfo" aria-live="polite">
+        <div class="sky-info-row" id="skyTz">Computing the sky…</div>
+        <div class="sky-info-row" id="skyMoon"></div>
+        <div class="sky-info-row" id="skyPlanets"></div>
+        <div class="sky-info-row" id="skyCons"></div>
+      </div>
+
+      <div class="summary-card">
+        <div class="summary-row"><span id="sumShirt">Signature tee (M, black)</span><span id="sumShirtPrice">$34.00</span></div>
+        <div class="summary-row"><span>Shipping</span><span id="sumShip">$6.00</span></div>
+        <div class="summary-row total"><span>Total</span><span id="sumTotal">$40.00</span></div>
+      </div>
+    </div>
+
+    <!-- right: form -->
+    <form id="orderForm" class="studio-right" novalidate>
+      <fieldset>
+        <legend><span class="step">1</span> The moment</legend>
+        <div class="chips" id="momentChips">
+          <button type="button" class="chip" data-title="THE NIGHT WE MET" data-sub="and the stars knew it">The night we met</button>
+          <button type="button" class="chip" data-title="THE NIGHT YOU WERE BORN" data-sub="the sky welcomed you">A birthday</button>
+          <button type="button" class="chip" data-title="UNDER THE SAME SKY" data-sub="two places, one moment">Long distance</button>
+          <button type="button" class="chip" data-title="WE SAID I DO" data-sub="">A wedding</button>
+        </div>
+        <label>Title on your shirt
+          <input type="text" id="fTitle" maxlength="40" placeholder="THE NIGHT WE MET" value="THE NIGHT WE MET" autocomplete="off">
+        </label>
+        <label>Personal line <span class="hint">(optional, small italics under the coordinates)</span>
+          <input type="text" id="fSubtitle" maxlength="70" placeholder="and the stars knew it" value="and the stars knew it" autocomplete="off">
+        </label>
+        <div class="row2">
+          <label>Date
+            <input type="date" id="fDate" value="2019-06-14" min="1900-01-01" max="2100-12-31">
+          </label>
+          <label>Local time
+            <input type="time" id="fTime" value="21:41">
+          </label>
+        </div>
+        <label>Place
+          <select id="fCity"></select>
+        </label>
+        <div id="customPlace" hidden>
+          <label>Search anywhere
+            <span class="inline">
+              <input type="text" id="fGeo" placeholder="e.g. Reykjavik, a beach in Portugal, 51.5,-0.12">
+              <button type="button" class="btn btn-small" id="geoBtn">Find</button>
+            </span>
+          </label>
+          <div class="geo-msg" id="geoMsg"></div>
+        </div>
+        <details class="advanced">
+          <summary>Exact coordinates &amp; place label</summary>
+          <div class="row2">
+            <label>Latitude <input type="number" id="fLat" step="0.0001" min="-90" max="90" value="40.7128"></label>
+            <label>Longitude <input type="number" id="fLon" step="0.0001" min="-180" max="180" value="-74.0060"></label>
+          </div>
+          <label>Place label on shirt <input type="text" id="fPlace" maxlength="60" value="NEW YORK" autocomplete="off"></label>
+        </details>
+      </fieldset>
+
+      <fieldset>
+        <legend><span class="step">2</span> The look</legend>
+        <div class="palettes" id="palettes"></div>
+        <label class="check"><input type="checkbox" id="fConst" checked> Draw constellation figures &amp; names</label>
+      </fieldset>
+
+      <fieldset>
+        <legend><span class="step">3</span> The tee</legend>
+        <div class="swatches" id="colors"></div>
+        <div class="sizes" id="sizes"></div>
+        <label>Quantity
+          <span class="qty">
+            <button type="button" id="qtyMinus" aria-label="Decrease">−</button>
+            <input type="number" id="fQty" value="1" min="1" max="5" readonly>
+            <button type="button" id="qtyPlus" aria-label="Increase">+</button>
+          </span>
+        </label>
+      </fieldset>
+
+      <fieldset>
+        <legend><span class="step">4</span> Delivery</legend>
+        <div class="row2">
+          <label>Full name <input type="text" id="fName" maxlength="80" autocomplete="name" required></label>
+          <label>Email <input type="email" id="fEmail" maxlength="120" autocomplete="email" required></label>
+        </div>
+        <label>Street address <input type="text" id="fLine1" maxlength="100" autocomplete="address-line1" required></label>
+        <label>Apt / suite <span class="hint">(optional)</span> <input type="text" id="fLine2" maxlength="100" autocomplete="address-line2"></label>
+        <div class="row3">
+          <label>City <input type="text" id="fCityTown" maxlength="60" autocomplete="address-level2" required></label>
+          <label>State / county <input type="text" id="fState" maxlength="60" autocomplete="address-level1"></label>
+          <label>Postal / ZIP <input type="text" id="fZip" maxlength="20" autocomplete="postal-code" required></label>
+        </div>
+        <div class="row2">
+          <label>Country <select id="fCountry" autocomplete="country-name"></select></label>
+          <label>Phone <span class="hint">(helps customs)</span> <input type="text" id="fPhone" maxlength="32" autocomplete="tel"></label>
+        </div>
+      </fieldset>
+
+      <div class="checkout-box">
+        <div class="errors" id="formErrors" hidden></div>
+        <button class="btn btn-big" id="submitBtn" type="submit">Continue to payment →</button>
+        <p class="pay-note" id="payNote"></p>
+      </div>
+    </form>
+  </div>
+</section>
+
+<!-- ============ HOW ============ -->
+<section id="how" class="how">
+  <div class="section-head">
+    <p class="eyebrow">HOW IT WORKS</p>
+    <h2>From moment to garment</h2>
+  </div>
+  <div class="steps">
+    <div class="step-card"><span class="step-num">01</span><h3>Choose your moment</h3><p>Pick the date, time and place that matters — down to the minute. We resolve the exact timezone (including daylight saving) for that place and date.</p></div>
+    <div class="step-card"><span class="step-num">02</span><h3>We compute your sky</h3><p>Real astronomy, not clip art: 25,000+ stars from ESA's Hipparcos catalog, IAU constellation figures, the moon's true phase and orientation, and the positions of Mercury through Saturn — projected for your horizon.</p></div>
+    <div class="step-card"><span class="step-num">03</span><h3>Printed &amp; shipped</h3><p>After your payment clears, your artwork is rendered at 300&nbsp;dpi and sent to our printing partner. Direct-to-garment inks reproduce every faint star and gradient. Printed in the lab closest to you, shipped to your door.</p></div>
+  </div>
+</section>
+
+<!-- ============ DETAILS ============ -->
+<section id="details" class="details">
+  <div class="section-head">
+    <p class="eyebrow">THE GARMENT</p>
+    <h2>Premium in every thread</h2>
+  </div>
+  <div class="specs">
+    <div class="spec"><h4>Blank</h4><p>Bella+Canvas 3001 — 100% combed, ring-spun cotton, 4.2&nbsp;oz. Retail fit, unisex. Sideseamed. Honestly one of the softest shirts you'll own.</p></div>
+    <div class="spec"><h4>Print</h4><p>Direct-to-garment (DTG) with water-based inks. Your sky is printed as a ~10.6″ medallion on the chest with soft, breathable detail — gradients and thousands of tiny stars that screen printing simply can't do.</p></div>
+    <div class="spec"><h4>Palette guide</h4><p><strong>Ivory Negative</strong> is printed <em>with</em> the fabric — the shirt itself becomes your sky. Choose it on white, cream or grey. Midnight, Obsidian and Dusk are self-contained skies that shine on any color.</p></div>
+    <div class="spec"><h4>Care</h4><p>Machine wash cold, inside-out, with like colors. Tumble dry low or hang. No bleach, no ironing the print. Your sky will outlast countless washes.</p></div>
+  </div>
+  <div class="sizewrap">
+    <h4>Unisex sizing (approximate, inches)</h4>
+    <table class="sizechart">
+      <thead><tr><th>Size</th><th>XS</th><th>S</th><th>M</th><th>L</th><th>XL</th><th>2XL</th><th>3XL</th><th>4XL</th></tr></thead>
+      <tbody>
+        <tr><td>Chest (to fit)</td><td>30–32</td><td>34–36</td><td>38–40</td><td>42–44</td><td>46–48</td><td>50–52</td><td>54–56</td><td>58–60</td></tr>
+        <tr><td>Body length</td><td>27</td><td>28</td><td>29</td><td>30</td><td>31</td><td>32</td><td>33</td><td>34</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ============ FAQ ============ -->
+<section id="faq" class="faq">
+  <div class="section-head">
+    <p class="eyebrow">QUESTIONS</p>
+    <h2>Good ones</h2>
+  </div>
+  <div class="faq-grid">
+    <details><summary>Is the sky really accurate?</summary><p>Yes. Star positions come from ESA's Hipparcos catalog (accurate to arcseconds), and the moon, sun and planets are computed with professional-grade ephemerides for your exact minute, timezone and coordinates. The moon is drawn at its true phase, with the lit side facing the real sun.</p></details>
+    <details><summary>What if my moment happened during the day?</summary><p>Your stars are still drawn exactly where they were — you just couldn't see them with the naked eye. We'll add a small golden sun to the map so the moment reads honestly. Many birthday shirts are midday skies.</p></details>
+    <details><summary>Why direct-to-garment printing?</summary><p>Because your sky has ~25,000 stars, delicate gradients and a true-phase moon. DTG prints full-color detail straight onto the fabric — the only technology that can carry this design faithfully. It's also zero-inventory: your shirt only exists after you order it.</p></details>
+    <details><summary>How long does delivery take?</summary><p>Production is 2–5 business days; shipping to the US and Europe typically 3–7 business days after that. Your order page shows live status from the print lab, including tracking once dispatched.</p></details>
+    <details><summary>Can I return it?</summary><p>Because every shirt is made just for you, we can't accept change-of-mind returns — but if your shirt arrives damaged or misprinted, we'll reprint or refund it immediately. Double-check your moment and spelling before ordering; the preview is exactly what prints.</p></details>
+    <details><summary>Where does my shirt ship from?</summary><p>Our print network produces your tee in the facility closest to your delivery address (US, EU, UK, AU and more), which keeps delivery fast and emissions lower.</p></details>
+  </div>
+</section>
+
+</main>
+
+<footer class="footer">
+  <div class="footer-brand">
+    <p class="footer-logo">NIGHTLOOM</p>
+    <p>Wear the sky from your moment.</p>
+  </div>
+  <div class="footer-credits">
+    <p>Star data: ESA Hipparcos catalog (van Leeuwen 2007). Constellation figures: Stellarium sky culture (CC-BY-SA). Ephemerides: astronomy-engine. Printing: Prodigi print-on-demand.</p>
+    <p>Every design is computed live — no two shirts are the same. <a href="#create">Make yours →</a></p>
+  </div>
+</footer>
+
+<div id="spinner" class="spinner" hidden><div class="spin-ring"></div><p id="spinText">Preparing your checkout…</p></div>
+
+<script src="/app.js"></script>
+</body>
+</html>

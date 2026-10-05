@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Checkout — NightLoom</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='30' fill='%23070b18'/%3E%3Ccircle cx='32' cy='32' r='4' fill='%23c9a86a'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600&family=Cormorant+Garamond:wght@400;600&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+<style>
+  .pay-wrap { max-width: 980px; margin: 2.5rem auto 4rem; padding: 0 1rem; display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 1.6rem; align-items: start; }
+  .pay-card, .order-card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 1.6rem; }
+  .pay-card h1 { font-size: 1.5rem; }
+  .demo-banner { background: rgba(201,168,106,0.12); border: 1px solid var(--gold-soft); color: var(--gold); border-radius: 10px; padding: 0.8rem 1rem; font-size: 0.85rem; margin-bottom: 1.3rem; }
+  .cardform label { font-size: 0.8rem; }
+  .cardrow { display: grid; grid-template-columns: 1fr 1fr; gap: 0.9rem; }
+  .pay-total { display: flex; justify-content: space-between; align-items: baseline; border-top: 1px solid var(--line); margin-top: 1.2rem; padding-top: 1rem; }
+  .pay-total .amt { font-family: var(--display); font-size: 1.6rem; }
+  .fail-link { display: block; text-align: center; margin-top: 0.9rem; font-size: 0.8rem; color: var(--ink-faint); cursor: pointer; background: none; border: none; text-decoration: underline; width: 100%; }
+  .order-card img { width: 100%; border-radius: 8px; border: 1px solid var(--line); }
+  .order-meta { margin-top: 1rem; font-size: 0.88rem; color: var(--ink-dim); display: grid; gap: 0.3rem; }
+  .order-meta b { color: var(--ink); font-weight: 500; }
+  .pay-error { background: rgba(180,60,60,0.14); border: 1px solid rgba(220,100,100,0.45); color: #f0c4c4; border-radius: 10px; padding: 0.7rem 1rem; font-size: 0.88rem; margin-top: 1rem; }
+  @media (max-width: 860px) { .pay-wrap { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<header class="nav">
+  <a class="brand" href="/"><svg class="brand-mark" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="29" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="24" cy="24" r="2.4" fill="currentColor"/><circle cx="41" cy="21" r="1.7" fill="currentColor"/><circle cx="44" cy="37" r="2.1" fill="currentColor"/><circle cx="27" cy="43" r="1.5" fill="currentColor"/><path d="M24 24 L41 21 L44 37 L27 43 Z" stroke="currentColor" stroke-width="1" fill="none" opacity=".65"/></svg><span>NIGHTLOOM</span></a>
+  <nav class="nav-links"><a href="/">← Back to store</a></nav>
+</header>
+
+<main class="pay-wrap">
+  <div class="pay-card">
+    <div class="demo-banner">⚙︎ <strong>Demo checkout</strong> — this sandbox build simulates payment. No card is charged. Set <code>STRIPE_SECRET_KEY</code> + <code>STRIPE_WEBHOOK_SECRET</code> to switch to real Stripe Checkout.</div>
+    <h1>Pay for your sky</h1>
+    <div class="cardform">
+      <label>Email<input type="email" id="pEmail" value="test@example.com"></label>
+      <label>Card information<input type="text" id="pCard" value="4242 4242 4242 4242" inputmode="numeric"></label>
+      <div class="cardrow">
+        <label>Expiry<input type="text" value="12 / 29"></label>
+        <label>CVC<input type="text" value="424"></label>
+      </div>
+      <label>Name on card<input type="text" id="pName" value=""></label>
+    </div>
+    <div class="pay-total">
+      <span>Total due</span>
+      <span class="amt" id="pTotal">—</span>
+    </div>
+    <div style="margin-top:1.2rem">
+      <button class="btn btn-big" id="payBtn">Pay now</button>
+      <button class="fail-link" id="failBtn">or simulate a declined card</button>
+    </div>
+    <div class="pay-error" id="payError" hidden></div>
+    <p class="pay-note">After payment succeeds, your design is rendered at print resolution and submitted to the print lab — never before.</p>
+  </div>
+
+  <div class="order-card">
+    <img id="pDesign" alt="Your design" src="">
+    <div class="order-meta" id="pMeta"></div>
+  </div>
+</main>
+
+<script>
+'use strict';
+const orderId = location.pathname.split('/').pop();
+const fmt = c => `$${(c/100).toFixed(2)}`;
+
+(async function load() {
+  const r = await fetch(`/api/orders/${orderId}`);
+  if (!r.ok) { document.querySelector('.pay-wrap').innerHTML = '<p style="padding:2rem">Order not found. <a href="/">Return to the store</a>.</p>'; return; }
+  const o = await r.json();
+  if (o.payment.status === 'paid') { location.href = `/order/${orderId}`; return; }
+  document.getElementById('pTotal').textContent = fmt(o.pricing.totalAmount);
+  document.getElementById('pName').value = '';
+  const d = o.design;
+  const params = new URLSearchParams({ title: d.title, subtitle: d.subtitle || '', date: d.date, time: d.time, lat: d.lat, lon: d.lon, placeName: d.placeName, countryName: d.countryName || '', palette: d.palette, constellations: String(d.constellations) });
+  document.getElementById('pDesign').src = `/api/preview?${params}`;
+  document.getElementById('pMeta').innerHTML = `
+    <b>${d.title}</b>
+    <span>${d.date} · ${d.time} · ${d.placeName}</span>
+    <span>Shirt: ${o.product.color}, size ${o.product.size.toUpperCase()} × ${o.product.qty}</span>
+    ${o.shippingTo ? `<span>Ships to: ${o.shippingTo.name}, ${o.shippingTo.city} ${o.shippingTo.zip}, ${o.shippingTo.country}</span>` : ''}
+    <span>Order ${o.id}</span>`;
+})();
+
+async function pay(fail) {
+  const btn = document.getElementById('payBtn');
+  const err = document.getElementById('payError');
+  err.hidden = true; btn.disabled = true; btn.textContent = 'Processing…';
+  try {
+    const r = await fetch(`/api/pay/demo/${orderId}`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ fail: !!fail }),
+    });
+    const j = await r.json();
+    if (r.ok && j.ok) {
+      btn.textContent = 'Payment succeeded ✓';
+      setTimeout(() => { location.href = j.redirect || `/order/${orderId}`; }, 700);
+      return;
+    }
+    err.textContent = (j && j.error) || 'Payment failed.';
+    err.hidden = false;
+    btn.disabled = false; btn.textContent = 'Pay now';
+  } catch {
+    err.textContent = 'Network error — try again.';
+    err.hidden = false;
+    btn.disabled = false; btn.textContent = 'Pay now';
+  }
+}
+document.getElementById('payBtn').addEventListener('click', () => pay(false));
+document.getElementById('failBtn').addEventListener('click', () => pay(true));
+</script>
+</body>
+</html>
