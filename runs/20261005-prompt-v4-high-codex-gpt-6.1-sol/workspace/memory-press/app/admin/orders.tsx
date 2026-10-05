@@ -1,0 +1,9 @@
+'use client';
+import {useEffect,useState} from 'react';
+export default function AdminOrders(){
+ const [orders,setOrders]=useState<any[]>([]),[error,setError]=useState(''),[busy,setBusy]=useState('');
+ async function load(){const r=await fetch('/api/admin/orders');const d:any=await r.json();if(!r.ok)throw new Error(d.error);setOrders(d.orders);}
+ useEffect(()=>{load().catch(e=>setError(e.message));},[]);
+ async function retry(id:string){setBusy(id);setError('');try{const r=await fetch('/api/admin/retry/'+id,{method:'POST'});const d:any=await r.json();if(!r.ok)throw new Error(d.error);await load();}catch(e:any){setError(e.message);}finally{setBusy('');}}
+ return <><header className="nav"><a className="wordmark" href="/">elsewhere<span>®</span></a><span>OWNER OPERATIONS</span></header><main className="section"><span className="eyebrow">LATEST 200 ORDERS</span><h1 style={{fontSize:45,margin:'18px 0 25px'}}>The field ledger.</h1><p className="muted" style={{marginBottom:25}}>Stripe verifies every payment before print submission. Use Stripe for payments and refunds; use Prodigi for production and shipping management.</p>{error&&<p className="error" role="alert">{error}</p>}<div style={{overflowX:'auto'}}><table className="admin-table"><thead><tr><th>Place / reference</th><th>Created</th><th>Mode</th><th>Status</th><th>Total</th><th>Print reference</th><th>Action</th></tr></thead><tbody>{orders.map(o=><tr key={o.id}><td><strong>{JSON.parse(o.design).place}</strong><br/><small>{o.id}</small></td><td>{new Date(o.created).toLocaleString()}</td><td>{o.mode}</td><td>{o.state}{o.error&&<p>{o.error}</p>}</td><td>{'$'+(o.amount/100).toFixed(2)}</td><td>{o.prodigi_id??'—'}</td><td>{o.mode!=='demo'&&!o.prodigi_id&&<button className="button dark" disabled={Boolean(busy)} onClick={()=>retry(o.id)}>{busy===o.id?'Verifying…':'Verify & retry'}</button>}</td></tr>)}</tbody></table></div>{!orders.length&&<p>No orders yet.</p>}</main></>;
+}
