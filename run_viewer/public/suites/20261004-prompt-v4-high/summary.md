@@ -4,14 +4,14 @@ Fourteen runs used the same prompt, base commit, clean per-run workspace, and hi
 
 Kimi K3 is treated as a completed run in this viewer. It produced a finished storefront, a final report, and a working durable inspection deployment before the deadline. Its archived process status remains `timed_out` because long-lived server and Cloudflare Tunnel children kept the capture process open until the harness terminated it roughly seventeen minutes after the final answer. The automated table below preserves that raw process-level status.
 
-Deployment evidence distinguishes the URL reported by each agent from the durable Vercel copy attempted by the harness. At capture time, all twelve runs with a usable agent or harness URL rendered successfully. GLM and Grok produced no deployable storefront.
+Deployment evidence distinguishes the URL reported by each agent from the durable inspection deployment retained by the harness. At recapture time, eleven storefronts had a healthy durable deployment: the four ChatGPT Sites deployments were reused directly, and the remaining healthy copies were hosted on Vercel. DeepSeek's copy reached the browser but crashed during client initialization; GLM and Grok produced no usable storefront.
 
 The evidence below is automated and still requires human review. Stripe and Prodigi observations establish linked sandbox objects for some runs, not proof that every customer-facing checkout path was correct. No physical shirt was inspected.
 
 <!-- run-inspector:v1:start -->
 ## Automated inspection evidence
 
-Snapshot: 2026-10-05T12:01:12.158Z. Suite: `20261004-prompt-v4-high`. Artifact ref: `e3cdd08206d758aa8f8dd1bf9fb91984ddf1f621`. Inspector: `1.0.0`.
+Snapshot: 2026-10-05T12:47:24.838Z. Suite: `20261004-prompt-v4-high`. Artifact ref: `3994bf75b45c4ea26b2bb8dafc34d28371e65bbd`. Inspector: `1.0.0`.
 
 This is generated evidence, not a reviewed pass/fail rating. Searches do not prove reading or training-data reliance; paid Stripe objects do not prove the customer checkout flow. Live observations are later snapshots, not historical run-time evidence.
 
@@ -19,11 +19,11 @@ This is generated evidence, not a reviewed pass/fail rating. Searches do not pro
 
 | Model | Run status | Agent deployment | Harness inspection deployment | Seconds | Framework dependencies | Runtime files / lines | Verification files / lines |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| gpt-6-astra | succeeded | reported | failed | 657 | next@16.3.4, next-themes@^0.4.6, react@19.2.6, react-day-picker@^10.0.1, react-dom@19.2.6, react-hook-form@^7.85.0, react-resizable-panels@^4.12.2 | 90 / 9207 | 11 / 1128 |
-| gpt-6-sol | succeeded | reported | failed | 848 | next@16.3.4, next-themes@^0.4.6, react@19.2.6, react-day-picker@^10.0.1, react-dom@19.2.6, react-hook-form@^7.85.0, react-resizable-panels@^4.12.2 | 92 / 9093 | 9 / 1093 |
-| gpt-6-luna | succeeded | reported | failed | 845 | next@16.3.4, next-themes@^0.4.6, react@19.2.6, react-day-picker@^10.0.1, react-dom@19.2.6, react-hook-form@^7.85.0, react-resizable-panels@^4.12.2 | 92 / 9345 | 9 / 1093 |
-| claude-fable-5-1 | succeeded | reported | failed | 1925 | @resvg/resvg-js@^2.6.2, next@16.3.8, react@19.2.8, react-dom@19.2.8, stripe@^23.0.0 | 23 / 1424 | 1 / 91 |
-| claude-opus-5-5 | succeeded | reported | failed | 1872 | @resvg/resvg-wasm@^2.6.2, next@^16.3.8, react@^19.3.0, react-dom@^19.3.0, stripe@^23.0.0 | 25 / 2026 | 2 / 31 |
+| gpt-6-astra | succeeded | reported | succeeded | 657 | next@16.3.4, next-themes@^0.4.6, react@19.2.6, react-day-picker@^10.0.1, react-dom@19.2.6, react-hook-form@^7.85.0, react-resizable-panels@^4.12.2 | 90 / 9207 | 11 / 1128 |
+| gpt-6-sol | succeeded | reported | succeeded | 848 | next@16.3.4, next-themes@^0.4.6, react@19.2.6, react-day-picker@^10.0.1, react-dom@19.2.6, react-hook-form@^7.85.0, react-resizable-panels@^4.12.2 | 92 / 9093 | 9 / 1093 |
+| gpt-6-luna | succeeded | reported | succeeded | 845 | next@16.3.4, next-themes@^0.4.6, react@19.2.6, react-day-picker@^10.0.1, react-dom@19.2.6, react-hook-form@^7.85.0, react-resizable-panels@^4.12.2 | 92 / 9345 | 9 / 1093 |
+| claude-fable-5-1 | succeeded | reported | succeeded | 1925 | @resvg/resvg-js@^2.6.2, next@16.3.8, react@19.2.8, react-dom@19.2.8, stripe@^23.0.0 | 23 / 1424 | 1 / 91 |
+| claude-opus-5-5 | succeeded | reported | succeeded | 1872 | @resvg/resvg-wasm@^2.6.2, next@^16.3.8, react@^19.3.0, react-dom@^19.3.0, stripe@^23.0.0 | 25 / 2026 | 2 / 31 |
 | claude-sonnet-5-5 | succeeded | reported | succeeded | 1023 | @resvg/resvg-js@^2.6.2, stripe@^23.0.0 | 17 / 1820 | 2 / 314 |
 | kimi-code/k3 | timed_out | reported | succeeded | 7200 | sharp@^0.34.4 | 13 / 1600 | 3 / 114 |
 | opencode/glm-5.3#high | failed | not_reported | failed | 421 |  | 0 / 0 | 0 / 0 |
@@ -32,7 +32,7 @@ This is generated evidence, not a reviewed pass/fail rating. Searches do not pro
 | opencode/minimax-m3 | succeeded | reported | succeeded | 1177 | @resvg/resvg-js@^2.6.2, stripe@^23.0.0 | 8 / 2215 | 0 / 0 |
 | opencode/gemini-3.8-flash | succeeded | reported | succeeded | 772 | @resvg/resvg-js@^2.6.2, stripe@^23.0.0 | 8 / 2531 | 0 / 0 |
 | opencode/grok-4.7 | failed | not_reported | failed | 4681 | next@^15.1.0, react@^19.0.0, react-dom@^19.0.0, sharp@^0.33.5, stripe@^17.7.0 | 21 / 1667 | 1 / 89 |
-| gpt-6.1-sol | succeeded | reported | failed | 742 |  | 8 / 128 | 1 / 16 |
+| gpt-6.1-sol | succeeded | reported | succeeded | 742 |  | 8 / 128 | 1 / 16 |
 
 ### Documentation-use evidence
 
@@ -128,7 +128,7 @@ Overall: **fail**. Observed suite only; not proof of absence of all ambient-stat
 | webhook destination | unknown | 20261004-prompt-v4-high-codex-gpt-6-luna | Enabled endpoints must target this deployment; no endpoints is unknown |
 | objects predate run | unknown | 20261004-prompt-v4-high-codex-gpt-6-luna | Objects older than run start (60s tolerance) suggest pre-existing account state |
 | profile/account agreement | unknown | 20261004-prompt-v4-high-claude-claude-fable-5-1 | Live GET /v1/account versus saved profile identity |
-| webhook destination | pass | 20261004-prompt-v4-high-claude-claude-fable-5-1 | Enabled endpoints must target this deployment; no endpoints is unknown |
+| webhook destination | fail | 20261004-prompt-v4-high-claude-claude-fable-5-1 | Enabled endpoints must target this deployment; no endpoints is unknown |
 | objects predate run | pass | 20261004-prompt-v4-high-claude-claude-fable-5-1 | Objects older than run start (60s tolerance) suggest pre-existing account state |
 | profile/account agreement | unknown | 20261004-prompt-v4-high-claude-claude-opus-5-5 | Live GET /v1/account versus saved profile identity |
 | webhook destination | unknown | 20261004-prompt-v4-high-claude-claude-opus-5-5 | Enabled endpoints must target this deployment; no endpoints is unknown |
@@ -182,5 +182,5 @@ No artwork is reconstructed or executed automatically. Reviewed selections prese
 - Review retry/idempotency, paid-state guards, deployment environment configuration and cross-run references.
 - Do not publish private snapshots, transcripts, profile files, signed source URLs or raw customer records.
 
-Warnings: 20261004-prompt-v4-high-kimi-kimi-code-k3: no terminal transcript event; 20261004-prompt-v4-high-opencode-opencode-deepseek-v4.1-flash: no terminal transcript event; 20261004-prompt-v4-high-opencode-opencode-qwen3.8-max: no terminal transcript event; 20261004-prompt-v4-high-opencode-opencode-minimax-m3: no terminal transcript event; 20261004-prompt-v4-high-opencode-opencode-gemini-3.8-flash: no terminal transcript event; Runs without deployment URL could not be captured.
+Warnings: 20261004-prompt-v4-high-kimi-kimi-code-k3: no terminal transcript event; 20261004-prompt-v4-high-opencode-opencode-deepseek-v4.1-flash: no terminal transcript event; 20261004-prompt-v4-high-opencode-opencode-qwen3.8-max: no terminal transcript event; 20261004-prompt-v4-high-opencode-opencode-minimax-m3: no terminal transcript event; 20261004-prompt-v4-high-opencode-opencode-gemini-3.8-flash: no terminal transcript event.
 <!-- run-inspector:v1:end -->

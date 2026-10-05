@@ -66,7 +66,11 @@ export async function registeredAssets(suites, publicRoot) {
         const expectedView = run.inspectionDeployment.status === 'succeeded'
           ? run.inspectionDeployment.url
           : run.agentDeployment.status === 'reported' ? run.agentDeployment.url : null;
-        assert.equal(run.deployment, expectedView, `Prompt v4 capture target must prefer the harness inspection copy: ${run.id}`);
+        const capturedFailedInspection = run.inspectionDeployment.status === 'failed'
+          && run.inspectionDeployment.url
+          && run.deployment === run.inspectionDeployment.url;
+        assert.ok(run.deployment === expectedView || capturedFailedInspection,
+          `Prompt v4 capture target must prefer the durable copy or explicitly capture its failure: ${run.id}`);
       }
       const prefix = `/suites/${suite.id}/runs/`;
       assert.ok(run.finalOutput.startsWith(prefix) && run.finalOutput.endsWith("/final.md"));
