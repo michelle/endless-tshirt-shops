@@ -1,0 +1,23 @@
+{
+  "name": "elsewhere-club",
+  "main": "dist/server/index.js",
+  "compatibility_date": "2026-05-01",
+  "assets": {
+    "directory": "dist/client",
+    "binding": "ASSETS"
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "elsewhere-local",
+      "database_id": "local",
+      "migrations_dir": "drizzle"
+    }
+  ],
+  "r2_buckets": [
+    {
+      "binding": "ART",
+      "bucket_name": "elsewhere-art"
+    }
+  ]
+}
