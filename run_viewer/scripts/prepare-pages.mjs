@@ -19,7 +19,7 @@ async function archive(directory) {
     if (!isPublishedArchivePath(name)) continue;
     const destination = join(output, name);
     await mkdir(dirname(destination), { recursive: true });
-    if (/\.(?:md|json|svg)$/.test(name)) {
+    if (/\.(?:html|md|json|svg)$/.test(name)) {
       const original = await readFile(path, "utf8");
       let published = redactForPages(original);
       if (published !== original) {

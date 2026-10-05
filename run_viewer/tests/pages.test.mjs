@@ -16,6 +16,7 @@ test("publication removes private links, credentials, and email, including dotte
   ]) assert.notEqual(redactForPages(input), input);
   assert.equal(redactForPages("https://example.com/store"), "https://example.com/store");
   assert.ok(isPublishedArchivePath("suites/future/runs/future-gpt-5.6-sol/design.png"));
+  assert.ok(isPublishedArchivePath("suites/future/charts/index.html"));
   assert.ok(!isPublishedArchivePath("suites/future/runs/future/.env"));
   assert.ok(!isPublishedArchivePath("suites/future/capture-errors.json"));
 });

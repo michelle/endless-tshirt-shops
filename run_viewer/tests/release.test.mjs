@@ -19,10 +19,15 @@ test("release serves every registered and archived asset, never a disguised SPA 
     for (const asset of new Set([...registered, ...archived])) {
       const response = await fetch(new URL(asset.slice(1), base), { redirect: "error" });
       assert.equal(response.status, 200, `Inaccessible release asset: ${asset}`);
-      assert.ok(!response.headers.get("content-type")?.includes("text/html"), `SPA fallback instead of asset: ${asset}`);
       const expected = await readFile(new URL(`../out${asset}`, import.meta.url));
       assert.ok(expected.length > 0);
       assert.deepEqual(Buffer.from(await response.arrayBuffer()), expected, `Wrong served bytes: ${asset}`);
+      if (asset.endsWith(".html")) {
+        assert.match(response.headers.get("content-type") ?? "", /text\/html/);
+        assert.match(expected.toString("utf8"), /^<!doctype html>/i, `Invalid static HTML artifact: ${asset}`);
+      } else {
+        assert.ok(!response.headers.get("content-type")?.includes("text/html"), `SPA fallback instead of asset: ${asset}`);
+      }
     }
   } finally { await new Promise(resolve => server.httpServer.close(resolve)); }
 });

@@ -1,5 +1,7 @@
 # Prompt v4 clean-workspace frontier suite
 
+[Open the suite charts](https://michelle.github.io/endless-tshirt-shops/suites/20261004-prompt-v4-high/charts/)
+
 Fourteen runs used the same prompt, base commit, clean per-run workspace, and high reasoning effort. Eleven completed normally. GLM 5.3 High stopped after requesting interactive guidance that the noninteractive harness could not provide, and Grok 4.7 stopped during implementation.
 
 Kimi K3 is treated as a completed run in this viewer. It produced a finished storefront, a final report, and a working durable inspection deployment before the deadline. Its archived process status remains `timed_out` because long-lived server and Cloudflare Tunnel children kept the capture process open until the harness terminated it roughly seventeen minutes after the final answer. The automated table below preserves that raw process-level status.
