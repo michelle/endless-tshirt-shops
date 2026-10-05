@@ -1,0 +1,2 @@
+import {body,sameOrigin,rate,response} from '@/lib/store';import {designSchema} from '@/lib/design';import {printPdf} from '@/lib/print';
+export async function POST(req:Request){try{sameOrigin(req);await rate(req,30);const d=designSchema.parse(await body(req));return new Response((await printPdf(d)).slice().buffer as ArrayBuffer,{headers:{'Content-Type':'application/pdf','Content-Disposition':'attachment; filename="field-notes-print.pdf"','Cache-Control':'no-store'}});}catch{return response({error:'Could not create proof. Check your fields or try again later.'},400);}}

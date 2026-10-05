@@ -1,0 +1,2 @@
+import {bucket} from '@/lib/store';
+export async function GET(_:Request,{params}:{params:Promise<{key:string}>}){const {key}=await params;if(!/^[0-9a-f-]{36}\.pdf$/.test(key))return new Response('Not found',{status:404});const file=await bucket().get(key);if(!file)return new Response('Not found',{status:404});return new Response(file.body,{headers:{'Content-Type':'application/pdf','Cache-Control':'public, max-age=31536000, immutable','X-Content-Type-Options':'nosniff'}});}

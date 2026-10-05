@@ -1,0 +1,5 @@
+import {db,fulfill,prodigi,response,type Order} from '@/lib/store';
+export async function GET(req:Request){const u=new URL(req.url),id=u.searchParams.get('id'),token=u.searchParams.get('token');if(!id||!token)return response({error:'Order link is incomplete.'},400);let o=await db().prepare('SELECT * FROM orders WHERE id=? AND token=?').bind(id,token).first<Order>();if(!o)return response({error:'Order not found.'},404);let printStatus=null,tracking:any[]=[];
+ if(o.session&&!o.prodigi_id){try{await fulfill(o.session);o=(await db().prepare('SELECT * FROM orders WHERE id=?').bind(id).first<Order>())!;}catch{/* No fulfillment without confirmed payment. Status stays durable. */}}
+ if(o.prodigi_id){try{const p=await prodigi(`orders/${o.prodigi_id}`);printStatus=p.order?.status?.stage;tracking=(p.order?.shipments||[]).map((s:any)=>({carrier:s.carrier?.name,number:s.tracking?.number,url:s.tracking?.url}));}catch{}}
+ return response({id:o.id,status:o.status,design:JSON.parse(o.design),total:o.amount,prodigiId:o.prodigi_id,printStatus,tracking,assetUrl:o.prodigi_id?`/api/assets/${o.asset}`:null});}
