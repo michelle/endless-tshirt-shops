@@ -15,7 +15,9 @@ BIN_WITHOUT_TIMEOUT="$TMP_ROOT/bin-without-timeout"
 GLOBAL_STRIPE_CONFIG="$TMP_ROOT/global-stripe/config.toml"
 mkdir -p "$REPO" "$BIN" "$BIN_WITHOUT_TIMEOUT" "$(dirname "$GLOBAL_STRIPE_CONFIG")"
 export FAKE_VERCEL_STATE="$TMP_ROOT/fake-vercel-project"
+export FAKE_VERCEL_CALLS="$TMP_ROOT/fake-vercel-calls"
 export FAKE_CURL_STATE="$TMP_ROOT/fake-curl-count"
+export BENCHMARK_DISABLE_BROWSER_HEALTH=1
 printf 'original global Stripe config\n' >"$GLOBAL_STRIPE_CONFIG"
 export BENCHMARK_GLOBAL_STRIPE_CONFIG="$GLOBAL_STRIPE_CONFIG"
 # Visible to the fake agent so it can assert no sibling run's profile is readable.
@@ -115,10 +117,12 @@ printf '%s\n' \
   '#!/usr/bin/env bash' \
   'set -euo pipefail' \
   '[[ ${VERCEL_TOKEN-} == fixture-harness-token ]]' \
+  'printf "%s\n" "$*" >>"$FAKE_VERCEL_CALLS"' \
   '[[ -z "${FAKE_VERCEL_EXPECTED_CWD:-}" || -f package.json ]]' \
   'case "${1-} ${2-}" in' \
   '  "project inspect") [[ -f $FAKE_VERCEL_STATE ]] ;;' \
   '  "project add") touch "$FAKE_VERCEL_STATE" ;;' \
+  '  "project update") ;;' \
   '  "project protection") [[ ${3-} == disable && ${5-} == --sso ]]; touch "$FAKE_VERCEL_STATE.public" ;;' \
   '  "deploy --prod") [[ -f $FAKE_VERCEL_STATE && -f $FAKE_VERCEL_STATE.public ]]; if [[ -n "${FAKE_VERCEL_REJECT_CONFIG:-}" && -f vercel.json ]]; then echo "invalid vercel config" >&2; exit 1; fi; [[ ! -e .env ]]; ! grep -R -q "test_11111111-1111-1111-1111-111111111111" .; printf "Production: https://benchmark-inspection-hash.vercel.app\nAliased: https://benchmark-inspection-copy.vercel.app\n" ;;' \
   '  *) echo "unexpected Vercel invocation: $*" >&2; exit 2 ;;' \
@@ -291,6 +295,24 @@ grep -q 'inspection_probe_attempt=1 status=404 url=https://benchmark-inspection-
 grep -q 'inspection_probe_attempt=2 status=200 url=https://benchmark-inspection-copy.vercel.app' "$REPO/.benchmark-secrets/deployments/provider-choice.log" || fail 'delayed alias did not become the selected durable URL'
 assert test -f "$FAKE_VERCEL_STATE"
 assert test -f "$FAKE_VERCEL_STATE.public"
+
+# An existing ChatGPT Sites deployment is itself a durable production URL.
+# The harness must retain it directly and never try to reinterpret its
+# Cloudflare-oriented source tree as a Vercel project.
+: >"$FAKE_VERCEL_CALLS"
+(
+  cd "$REPO"
+  PATH="$BIN:$PATH" PRODIGI_API_KEY=test_11111111-1111-1111-1111-111111111111 \
+    BENCHMARK_VERCEL_TOKEN=fixture-harness-token BENCHMARK_DEPLOY_PROBE_DELAY_SECONDS=0 \
+    FAKE_DEPLOYMENT_URL=https://fixture.chatgpt.site \
+    "$ROOT/scripts/run-benchmark" --adapter codex --model fake --timeout 5 \
+      --run-id sites-reuse --prompt-file prompts/prompt-v4.md
+)
+SITES_METADATA=$(git --git-dir="$REMOTE" show benchmark-results:runs/sites-reuse/metadata.json)
+[[ $SITES_METADATA == *'"inspection_deployment_provider": "sites"'* ]] || fail 'Sites deployment provider was not retained'
+[[ $SITES_METADATA == *'"inspection_deployment_status": "succeeded"'* ]] || fail 'healthy Sites deployment was not retained'
+[[ $SITES_METADATA == *'"inspection_deployment_url": "https://fixture.chatgpt.site"'* ]] || fail 'Sites URL was not retained as the durable URL'
+assert test ! -s "$FAKE_VERCEL_CALLS"
 
 (
   cd "$REPO"

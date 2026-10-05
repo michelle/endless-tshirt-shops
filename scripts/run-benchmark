@@ -554,7 +554,24 @@ URL_CANDIDATES='[]'
 # a credential that was never present in its environment.
 INSPECTION_DEPLOYMENT_STATUS=not_configured
 INSPECTION_DEPLOYMENT_URL=
-if [[ -n $HARNESS_VERCEL_TOKEN ]]; then
+INSPECTION_DEPLOYMENT_PROVIDER=vercel
+# A Sites URL is already a durable production deployment. Reuse it rather than
+# feeding a Cloudflare Workers-oriented Sites build into Vercel, where a build
+# can report READY but contain no Vercel routes.
+if [[ $DEPLOYMENT_URL =~ ^https://[a-z0-9][a-z0-9.-]*\.chatgpt\.site/?$ ]]; then
+  SITES_BODY=$(curl -sS -L --max-time 30 "$DEPLOYMENT_URL" 2>/dev/null || true)
+  SITES_STATUS=$(curl -sS -L -o /dev/null -w '%{http_code}' --max-time 30 "$DEPLOYMENT_URL" 2>/dev/null || true)
+  SITES_BROWSER_HEALTH=0
+  if [[ ${BENCHMARK_DISABLE_BROWSER_HEALTH:-0} == 1 ]] || node "$SCRIPT_DIR/browser-health.mjs" "$DEPLOYMENT_URL" >/dev/null 2>&1; then
+    SITES_BROWSER_HEALTH=1
+  fi
+  if [[ $SITES_STATUS =~ ^[23][0-9][0-9]$ && $SITES_BODY != *'Deployment Expired'* && $SITES_BODY != *$'\nNOT_FOUND\n'* && $SITES_BROWSER_HEALTH == 1 ]]; then
+    INSPECTION_DEPLOYMENT_PROVIDER=sites
+    INSPECTION_DEPLOYMENT_STATUS=succeeded
+    INSPECTION_DEPLOYMENT_URL=$DEPLOYMENT_URL
+  fi
+fi
+if [[ $INSPECTION_DEPLOYMENT_STATUS != succeeded && -n $HARNESS_VERCEL_TOKEN ]]; then
   mkdir -p "$DEPLOYMENT_LOG_DIR"
   chmod 700 "$DEPLOYMENT_LOG_DIR"
   INSPECTION_LOG="$DEPLOYMENT_LOG_DIR/$RUN_ID.log"
@@ -583,6 +600,14 @@ if [[ -n $HARNESS_VERCEL_TOKEN ]]; then
     # inspection remains correctly marked failed.
     if ! VERCEL_TOKEN="$HARNESS_VERCEL_TOKEN" "$TIMEOUT_COMMAND" 60 "$VERCEL_REAL" project inspect "$VERCEL_PROJECT" --non-interactive "${VERCEL_SCOPE_ARGS[@]}"; then
       VERCEL_TOKEN="$HARNESS_VERCEL_TOKEN" "$TIMEOUT_COMMAND" 60 "$VERCEL_REAL" project add "$VERCEL_PROJECT" --non-interactive "${VERCEL_SCOPE_ARGS[@]}" || exit 1
+    fi
+    # `project add` can infer a generic `public` output directory merely
+    # because a framework app contains public assets. That produces either a
+    # false READY/404 deployment or "No Output Directory named public". Pin
+    # recognized frameworks and reset build/output settings to autodetection.
+    VERCEL_FRAMEWORK=$(node "$SCRIPT_DIR/vercel-framework.mjs" "$INSPECTION_STAGE")
+    if [[ -n $VERCEL_FRAMEWORK ]]; then
+      VERCEL_TOKEN="$HARNESS_VERCEL_TOKEN" "$TIMEOUT_COMMAND" 60 "$VERCEL_REAL" project update "$VERCEL_PROJECT" --framework "$VERCEL_FRAMEWORK" --auto-detect build-command --auto-detect install-command --auto-detect output-directory --auto-detect root-directory --non-interactive "${VERCEL_SCOPE_ARGS[@]}" || exit 1
     fi
     # Inspection copies must be anonymously reachable by the evaluator. New
     # projects can inherit team-level SSO protection even when the deployment
@@ -613,6 +638,17 @@ if [[ -n $HARNESS_VERCEL_TOKEN ]]; then
         status=$(curl -sS -L -o /dev/null -w '%{http_code}' --max-time 30 "$candidate" 2>>"$INSPECTION_LOG" || true)
         printf 'inspection_probe_attempt=%s status=%s url=%s\n' "$attempt" "$status" "$candidate" >>"$INSPECTION_LOG"
         if [[ $status =~ ^[23][0-9][0-9]$ ]]; then
+          body=$(curl -sS -L --max-time 30 "$candidate" 2>>"$INSPECTION_LOG" || true)
+          if [[ $body == *'Deployment Expired'* || $body == *$'\nNOT_FOUND\n'* ]]; then
+            printf 'inspection_probe_rejected=provider_error_page url=%s\n' "$candidate" >>"$INSPECTION_LOG"
+            continue
+          fi
+          if [[ ${BENCHMARK_DISABLE_BROWSER_HEALTH:-0} != 1 ]]; then
+            if ! node "$SCRIPT_DIR/browser-health.mjs" "$candidate" >>"$INSPECTION_LOG" 2>&1; then
+              printf 'inspection_probe_rejected=browser_smoke_failed url=%s\n' "$candidate" >>"$INSPECTION_LOG"
+              continue
+            fi
+          fi
           INSPECTION_DEPLOYMENT_URL=$candidate
           INSPECTION_HTTP_STATUS=$status
           break 2
@@ -682,7 +718,7 @@ WORKSPACE_TREE=$(git write-tree)
   printf '  "deployment_url_candidates": %s,\n' "$URL_CANDIDATES"
   printf '  "agent_deployment_status": '; json_string "$AGENT_DEPLOYMENT_STATUS"; printf ',\n'
   printf '  "agent_deployment_url": '; json_string "$DEPLOYMENT_URL"; printf ',\n'
-  printf '  "inspection_deployment_provider": "vercel",\n'
+  printf '  "inspection_deployment_provider": '; json_string "$INSPECTION_DEPLOYMENT_PROVIDER"; printf ',\n'
   printf '  "inspection_deployment_status": '; json_string "$INSPECTION_DEPLOYMENT_STATUS"; printf ',\n'
   printf '  "inspection_deployment_url": '; json_string "$INSPECTION_DEPLOYMENT_URL"; printf ',\n'
   printf '  "deployment_url": '; json_string "$DEPLOYMENT_URL"; printf '\n}\n'
