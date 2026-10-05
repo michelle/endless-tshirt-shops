@@ -15,10 +15,10 @@ test('OpenCode unattended config hides questions while preserving inline setting
   });
   assert.deepEqual(JSON.parse(unattendedOpenCodeConfig('{ invalid')), { tools: { question: false } });
 });
-async function run(provider, events, t, { exit = 0, final = 'Codex final', tail = '', delay = false, drop = null, model = 'fake', refresh = null } = {}) {
+async function run(provider, events, t, { exit = 0, final = 'Codex final', tail = '', delay = false, hang = false, descendant = false, drop = null, model = 'fake', refresh = null } = {}) {
   const dir = await mkdtemp(path.join(os.tmpdir(), 'run-agent-')); t.after(() => rm(dir, { recursive: true, force: true }));
   await mkdir(path.join(dir, 'bin'));
-  const script = `#!${process.execPath}\nconst fs = require('node:fs');\nconst args = process.argv.slice(2);\nfs.writeFileSync(process.env.ARGUMENTS, JSON.stringify(args));\nfs.writeFileSync(process.env.CHILD_ENV_DUMP, JSON.stringify({ cwd: process.cwd(), pwd: process.env.PWD, initCwd: process.env.INIT_CWD, oldPwd: process.env.OLDPWD, prompt: process.env.BENCHMARK_PROMPT_FILE, final: process.env.BENCHMARK_FINAL_OUTPUT, usage: process.env.BENCHMARK_USAGE_OUTPUT, capture: process.env.BENCHMARK_CAPTURE_DIR }));\nfs.writeFileSync(process.env.MEMORY_ENV, JSON.stringify({ auto: process.env.CLAUDE_CODE_DISABLE_AUTO_MEMORY, md: process.env.CLAUDE_CODE_DISABLE_CLAUDE_MDS }));\nfs.writeFileSync(process.env.KIMI_ENV_DUMP, JSON.stringify({ home: process.env.KIMI_CODE_HOME, noUpdate: process.env.KIMI_CODE_NO_AUTO_UPDATE }));\nif (process.env.KIMI_REFRESH) fs.writeFileSync(process.env.KIMI_CODE_HOME + '/credentials/fixture.json', process.env.KIMI_REFRESH);\n${provider === 'codex' ? `fs.writeFileSync(args[args.indexOf('--output-last-message') + 1], ${JSON.stringify(final)});` : ''}\nfor (const event of ${JSON.stringify(events)}) process.stdout.write(JSON.stringify(event) + '\\n');\nprocess.stdout.write(${JSON.stringify(tail)});\n${delay ? 'setTimeout(() => process.exit(0), 30000);' : `process.exitCode = ${exit};`}`;
+  const script = `#!${process.execPath}\nconst fs = require('node:fs');\nconst args = process.argv.slice(2);\nfs.writeFileSync(process.env.ARGUMENTS, JSON.stringify(args));\nfs.writeFileSync(process.env.CHILD_ENV_DUMP, JSON.stringify({ cwd: process.cwd(), pwd: process.env.PWD, initCwd: process.env.INIT_CWD, oldPwd: process.env.OLDPWD, prompt: process.env.BENCHMARK_PROMPT_FILE, final: process.env.BENCHMARK_FINAL_OUTPUT, usage: process.env.BENCHMARK_USAGE_OUTPUT, capture: process.env.BENCHMARK_CAPTURE_DIR }));\nfs.writeFileSync(process.env.MEMORY_ENV, JSON.stringify({ auto: process.env.CLAUDE_CODE_DISABLE_AUTO_MEMORY, md: process.env.CLAUDE_CODE_DISABLE_CLAUDE_MDS }));\nfs.writeFileSync(process.env.KIMI_ENV_DUMP, JSON.stringify({ home: process.env.KIMI_CODE_HOME, noUpdate: process.env.KIMI_CODE_NO_AUTO_UPDATE }));\nif (process.env.KIMI_REFRESH) fs.writeFileSync(process.env.KIMI_CODE_HOME + '/credentials/fixture.json', process.env.KIMI_REFRESH);\n${provider === 'codex' ? `fs.writeFileSync(args[args.indexOf('--output-last-message') + 1], ${JSON.stringify(final)});` : ''}\n${descendant ? `const keeper = require('node:child_process').spawn(process.execPath, ['-e', 'setInterval(() => {}, 1000)'], { stdio: ['ignore', 'inherit', 'inherit'] }); keeper.unref(); fs.writeFileSync(process.env.DESCENDANT_PID, String(keeper.pid));` : ''}\nfor (const event of ${JSON.stringify(events)}) process.stdout.write(JSON.stringify(event) + '\\n');\nprocess.stdout.write(${JSON.stringify(tail)});\n${hang ? 'setInterval(() => {}, 1000);' : delay ? 'setTimeout(() => process.exit(0), 30000);' : `process.exitCode = ${exit};`}`;
   await writeFile(path.join(dir, 'bin', provider), script, { mode: 0o700 });
   await writeFile(path.join(dir, 'prompt.md'), 'Fixture prompt');
   // Kimi runs always get a fixture source home so the test never touches the
@@ -29,7 +29,7 @@ async function run(provider, events, t, { exit = 0, final = 'Codex final', tail 
     await writeFile(path.join(dir, 'kimi-source', 'config.toml'), 'fixture config\n');
     await writeFile(path.join(dir, 'kimi-source', 'credentials', 'fixture.json'), '{}');
   }
-  const env = { ...process.env, PATH: `${dir}/bin:${process.env.PATH}`, ARGUMENTS: `${dir}/args.json`, CHILD_ENV_DUMP: `${dir}/child-env.json`, MEMORY_ENV: `${dir}/memory-env.json`, KIMI_ENV_DUMP: `${dir}/kimi-env.json`, BENCHMARK_WORKSPACE: dir, BENCHMARK_PROMPT_FILE: `${dir}/prompt.md`, BENCHMARK_MODEL: model, BENCHMARK_REASONING_EFFORT: 'high', BENCHMARK_FINAL_OUTPUT: `${dir}/final.md`, BENCHMARK_USAGE_OUTPUT: `${dir}/usage.json`, BENCHMARK_CAPTURE_DIR: `${dir}/capture`, ...(provider === 'kimi' ? { KIMI_CODE_HOME: `${dir}/kimi-source` } : {}), ...(refresh ? { KIMI_REFRESH: refresh } : {}) };
+  const env = { ...process.env, PATH: `${dir}/bin:${process.env.PATH}`, ARGUMENTS: `${dir}/args.json`, CHILD_ENV_DUMP: `${dir}/child-env.json`, MEMORY_ENV: `${dir}/memory-env.json`, KIMI_ENV_DUMP: `${dir}/kimi-env.json`, DESCENDANT_PID: `${dir}/descendant.pid`, BENCHMARK_WORKSPACE: dir, BENCHMARK_PROMPT_FILE: `${dir}/prompt.md`, BENCHMARK_MODEL: model, BENCHMARK_REASONING_EFFORT: 'high', BENCHMARK_FINAL_OUTPUT: `${dir}/final.md`, BENCHMARK_USAGE_OUTPUT: `${dir}/usage.json`, BENCHMARK_CAPTURE_DIR: `${dir}/capture`, ...(provider === 'kimi' ? { KIMI_CODE_HOME: `${dir}/kimi-source` } : {}), ...(refresh ? { KIMI_REFRESH: refresh } : {}) };
   if (drop) delete env[drop];
   const child = spawn(process.execPath, [path.join(root, 'scripts/run-agent.mjs'), provider], { env });
   let stdout = '', stderr = '';
@@ -120,6 +120,30 @@ test('Kimi stream-json launch keeps final.md to finalize-capture and isolates it
   assert.equal(await readFile(`${childEnv.home}/credentials/fixture.json`, 'utf8'), '{}');
   // ...but sessions and history never carry over between runs.
   assert.equal(existsSync(`${childEnv.home}/sessions`), false);
+});
+
+test('Kimi terminal answer ends a hung CLI and its long-lived descendants successfully', async t => {
+  const started = Date.now();
+  const r = await run('kimi', [
+    { role: 'assistant', content: 'Still working', tool_calls: [{ type: 'function', id: 'call_1', function: { name: 'Bash', arguments: '{}' } }] },
+    { role: 'tool', tool_call_id: 'call_1', content: 'started server' },
+    { role: 'assistant', content: 'Finished successfully' },
+  ], t, { hang: true, descendant: true });
+  assert.equal(r.code, 0, r.stderr);
+  assert.ok(Date.now() - started < 5000, 'protocol completion should beat the external timeout');
+  const exit = JSON.parse(await readFile(`${r.dir}/capture/exit.json`, 'utf8'));
+  assert.equal(exit.protocolCompleted, true); assert.equal(exit.cleanupRequested, true); assert.equal(exit.signal, 'SIGTERM');
+  const descendantPid = Number(await readFile(`${r.dir}/descendant.pid`, 'utf8'));
+  await new Promise(resolve => setTimeout(resolve, 100));
+  assert.throws(() => process.kill(descendantPid, 0), { code: 'ESRCH' }, 'the provider process group must be gone');
+});
+
+test('a normally exited provider cannot leave a pipe-holding descendant behind', async t => {
+  const r = await run('opencode', [{ type: 'text', part: { type: 'text', text: 'done' } }], t, { descendant: true });
+  assert.equal(r.code, 0, r.stderr);
+  const descendantPid = Number(await readFile(`${r.dir}/descendant.pid`, 'utf8'));
+  await new Promise(resolve => setTimeout(resolve, 100));
+  assert.throws(() => process.kill(descendantPid, 0), { code: 'ESRCH' }, 'descendants must die when their provider exits');
 });
 
 // The provider rotates the refresh token when the CLI refreshes mid-run, so the

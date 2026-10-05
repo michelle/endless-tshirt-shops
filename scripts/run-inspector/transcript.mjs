@@ -110,7 +110,10 @@ export function normalize(text, provider) {
           const call = push(r, { callId: key, tool: name, kind: /WebSearch|WebFetch|FetchURL/.test(name) ? 'web_search' : /Bash|Read|Grep|Glob/.test(name) ? 'command_execution' : 'mcp_tool_call', status: 'incomplete',
             _input: typeof input === 'string' ? input : JSON.stringify(input ?? {}), _output: '', queries: query ? [query] : [], webAction: /WebSearch/.test(name) ? 'search' : /WebFetch|FetchURL/.test(name) ? 'open' : undefined }); calls.set(key, call);
         }
-        if (typeof e.content === 'string' && e.content) kimiFinal = e.content;
+        // Tool-calling assistant messages are intermediate narration, not a
+        // completed answer. Kimi's stream has no separate result envelope, so
+        // only a non-empty assistant message with no tool calls is terminal.
+        if (typeof e.content === 'string' && e.content && (!Array.isArray(e.tool_calls) || e.tool_calls.length === 0)) kimiFinal = e.content;
       } else if (e.role === 'tool') {
         const call = calls.get(e.tool_call_id);
         if (call) { call.status = 'completed'; call._output = typeof e.content === 'string' ? e.content : JSON.stringify(e.content ?? ''); call.completedSequence = r.sequence; }

@@ -134,12 +134,49 @@ const childEnv = provider === 'claude' ? {
   // reasonable assumption and continue instead of dying while awaiting input.
   OPENCODE_CONFIG_CONTENT: unattendedOpenCodeConfig(baseChildEnv.OPENCODE_CONFIG_CONTENT),
 } : baseChildEnv;
-const child = spawn(provider, args, { cwd: workspace, env: childEnv, stdio: ['ignore', 'pipe', 'pipe'] });
+// Give the provider its own process group on POSIX. Agents routinely launch
+// preview servers and tunnels; killing only the CLI leaves those descendants
+// alive and, when they inherited stdout/stderr, can keep this wrapper open
+// forever even after the CLI itself exits.
+const grouped = process.platform !== 'win32';
+const child = spawn(provider, args, { cwd: workspace, env: childEnv, detached: grouped, stdio: ['ignore', 'pipe', 'pipe'] });
 const pending = { stdout: '', stderr: '' };
+let protocolCompleted = false, cleanupRequested = false, closed = false, forceTimer = null, completionTimer = null;
+function signalProvider(signal) {
+  let sent = false;
+  if (grouped && child.pid) {
+    try { process.kill(-child.pid, signal); sent = true; }
+    catch (error) { if (error?.code !== 'ESRCH') throw error; }
+  }
+  if (!sent && child.exitCode === null && child.signalCode === null) child.kill(signal);
+}
+function stopProvider(signal = 'SIGTERM') {
+  signalProvider(signal);
+  if (signal !== 'SIGKILL' && !forceTimer) {
+    forceTimer = setTimeout(() => {
+      if (closed) return;
+      signalProvider('SIGKILL');
+      // A descendant can deliberately create a different process group while
+      // retaining these descriptors. Do not let an escaped pipe defeat the
+      // wrapper's own shutdown after the provider has been killed.
+      child.stdout.destroy(); child.stderr.destroy();
+    }, 5000);
+  }
+}
 function record(stream, line) {
   let event; try { event = JSON.parse(line); } catch { event = { type: 'diagnostic', text: line }; }
   writeSync(fd, JSON.stringify({ captureVersion: 1, sequence: ++sequence, receivedAt: new Date().toISOString(), stream, event }) + '\n');
   process.stdout.write(line + '\n'); // Parent redirects to a private log.
+  // Kimi's stream has no separate result envelope. A non-empty assistant
+  // message without tool calls is its terminal answer (assistant messages
+  // that continue working carry tool_calls). Some Kimi versions nevertheless
+  // stay alive when an agent-started server/tunnel remains open. Once the
+  // terminal answer is safely captured, give the CLI a moment to flush its
+  // session/auth state and then clean up the whole process group.
+  if (provider === 'kimi' && event?.role === 'assistant' && typeof event.content === 'string' && event.content && (!Array.isArray(event.tool_calls) || event.tool_calls.length === 0) && !protocolCompleted) {
+    protocolCompleted = true;
+    completionTimer = setTimeout(() => { if (!closed) { cleanupRequested = true; stopProvider(); } }, 1000);
+  }
 }
 for (const stream of ['stdout', 'stderr']) {
   child[stream].setEncoding('utf8'); child[stream].on('data', data => {
@@ -147,17 +184,25 @@ for (const stream of ['stdout', 'stderr']) {
     while ((newline = pending[stream].indexOf('\n')) !== -1) { record(stream, pending[stream].slice(0, newline)); pending[stream] = pending[stream].slice(newline + 1); }
   });
 }
-for (const signal of ['SIGTERM', 'SIGINT']) process.on(signal, () => child.kill(signal));
+for (const signal of ['SIGTERM', 'SIGINT']) process.on(signal, () => stopProvider(signal));
 child.on('error', () => record('stderr', 'CLI launch failed'));
+// `close` waits for stdio to close. Kill anything left in the provider's
+// process group as soon as the CLI exits so an inherited pipe cannot hold the
+// wrapper (and therefore the suite) open.
+child.on('exit', () => stopProvider());
 child.on('close', (code, signal) => {
+  closed = true;
+  if (forceTimer) clearTimeout(forceTimer);
+  if (completionTimer) clearTimeout(completionTimer);
   for (const stream of ['stdout', 'stderr']) if (pending[stream]) record(stream, pending[stream]);
   closeSync(fd);
   // Normalized here only to judge the outcome: run-benchmark then calls
   // finalize-capture.mjs, which is the single writer of the run's artifacts.
   const result = normalize(readFileSync(target, 'utf8'), provider);
   if (isolatedKimiHome) syncKimiAuthBack(isolatedKimiHome);
-  writeFileSync(path.join(directory, 'exit.json'), JSON.stringify({ code, signal, capturedRecords: sequence }), { mode: 0o600 });
+  writeFileSync(path.join(directory, 'exit.json'), JSON.stringify({ code, signal, capturedRecords: sequence, protocolCompleted, cleanupRequested }), { mode: 0o600 });
   // Claude, Kimi and OpenCode deliver their final answer as text in the
   // stream; a zero exit without one means the run produced no report.
-  process.exitCode = code === 0 && (result.failed || ((provider === 'claude' || provider === 'kimi' || provider === 'opencode') && result.final === null)) ? 1 : code ?? 1;
+  const effectiveCode = protocolCompleted && cleanupRequested && ['SIGTERM', 'SIGKILL'].includes(signal) ? 0 : code ?? 1;
+  process.exitCode = effectiveCode === 0 && (result.failed || ((provider === 'claude' || provider === 'kimi' || provider === 'opencode') && result.final === null)) ? 1 : effectiveCode;
 });

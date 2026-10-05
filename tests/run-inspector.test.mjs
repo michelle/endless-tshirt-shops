@@ -56,13 +56,14 @@ test('Kimi stream-json captures tool calls and the final answer without exposing
     { role: 'tool', tool_call_id: 'call_2', content: 'ok' },
     { role: 'assistant', tool_calls: [{ type: 'function', id: 'call_3', function: { name: 'FetchURL', arguments: '{"url":"https://docs.stripe.com/api"}' } }] },
     { role: 'tool', tool_call_id: 'call_3', content: 'Fetched documentation' },
+    { role: 'assistant', content: 'Intermediate narration', tool_calls: [{ type: 'function', id: 'call_4', function: { name: 'Bash', arguments: '{}' } }] },
     { role: 'assistant', content: 'Kimi final only' },
     { role: 'meta', type: 'system.version', version: '2.1.0' },
   ]), 'kimi');
   assert.equal(n.final, 'Kimi final only');
   assert.equal(n.usage, null);
   assert.equal(n.failed, false);
-  assert.deepEqual(n.events.map(e => e.evidence), ['tool_result_available', 'tool_result_available', 'tool_result_available']);
+  assert.deepEqual(n.events.map(e => e.evidence), ['tool_result_available', 'tool_result_available', 'tool_result_available', 'incomplete_attempt']);
   assert.equal(n.events[0].operation, 'search');
   assert.equal(n.events[1].operation, 'local_reference_read');
   assert.equal(n.events[2].operation, 'document_request');
