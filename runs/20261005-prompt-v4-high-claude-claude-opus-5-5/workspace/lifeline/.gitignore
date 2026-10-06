@@ -1,0 +1,7 @@
+node_modules
+out
+secrets.generated.js
+.env*
+.vercel
+.host
+bin

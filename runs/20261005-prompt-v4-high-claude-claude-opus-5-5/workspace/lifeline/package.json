@@ -1,0 +1,20 @@
+{
+  "name": "lifeline-transit",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "metrics": "node scripts/gen-metrics.mjs",
+    "render": "node scripts/render-local.mjs",
+    "start": "node scripts/server.mjs",
+    "deploy:netlify": "scripts/deploy.sh"
+  },
+  "devDependencies": {
+    "fontkit": "^2.0.4"
+  },
+  "dependencies": {
+    "@resvg/resvg-wasm": "^2.6.2"
+  }
+}

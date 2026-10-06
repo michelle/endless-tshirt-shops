@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lifeline Transit Co. — Your life, as a subway line</title>
+  <meta name="description" content="Custom t-shirts that map your life as a transit line. Every stop is yours: where you were born, who you met, where you’re headed. Printed to order on Bella+Canvas.">
+  <meta property="og:title" content="Lifeline Transit Co. — Your life, as a subway line">
+  <meta property="og:description" content="A one-of-one transit map tee of your life’s stops, printed to order.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='30' fill='%23EE352E'/%3E%3Ctext x='32' y='45' font-family='Arial' font-weight='900' font-size='38' fill='white' text-anchor='middle'%3EL%3C/text%3E%3C/svg%3E">
+  <link rel="preload" href="/fonts/InterDisplay-Bold.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/fonts/InterDisplay-Black.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <div class="testbar">Test-mode store — no real charges. Pay with card <b>4242 4242 4242 4242</b>, any future date, any CVC.</div>
+
+  <header class="nav">
+    <a class="brand" href="/"><span class="bullet sm" style="--c:#EE352E">L</span> Lifeline Transit Co.</a>
+    <nav>
+      <a href="#how">How it works</a>
+      <a href="#faq">FAQ</a>
+      <a class="btn small" href="#design">Design yours</a>
+    </nav>
+  </header>
+
+  <section class="hero">
+    <div class="hero-copy">
+      <p class="kicker">Now boarding</p>
+      <h1>Your life,<br>as a subway line.</h1>
+      <p class="lede">Where you were born. The friend you transferred to. The city you call home. We set every stop of your story in classic transit-map style and print it on a soft tee. Each one is one of a kind.</p>
+      <div class="hero-cta">
+        <a class="btn" href="#design">Design your line →</a>
+        <span class="price-note">$36 · Bella+Canvas 3001 · printed to order</span>
+      </div>
+      <ul class="pills">
+        <li>Birthdays</li><li>Anniversaries</li><li>Retirements</li><li>Graduations</li><li>Family reunions</li>
+      </ul>
+    </div>
+    <div class="hero-shirts" id="heroShirts" aria-hidden="true"></div>
+  </section>
+
+  <section class="designer" id="design">
+    <div class="preview-col">
+      <div class="preview-card">
+        <div class="preview-toggle" role="tablist">
+          <button type="button" class="on" data-view="shirt">On the shirt</button>
+          <button type="button" data-view="print">Print file</button>
+        </div>
+        <div id="preview" class="preview"></div>
+        <p class="preview-cap" id="previewCap">Live preview. This is the exact artwork we send to the printer.</p>
+      </div>
+    </div>
+
+    <form class="form-col" id="form" novalidate autocomplete="off">
+      <div class="presets">
+        <span>Start from:</span>
+        <div id="presets" class="chips"></div>
+      </div>
+
+      <fieldset>
+        <legend><span class="step">1</span> Your line</legend>
+        <div class="row">
+          <label class="field letter">
+            <span>Bullet</span>
+            <input id="letter" maxlength="2" data-field="letter" placeholder="J">
+          </label>
+          <label class="field grow">
+            <span>Line name</span>
+            <input id="name" maxlength="24" data-field="name" placeholder="The Jamie Line">
+          </label>
+        </div>
+        <label class="field">
+          <span>Tagline <em>optional</em></span>
+          <input id="tagline" maxlength="34" data-field="tagline" placeholder="Local service since 1991">
+        </label>
+        <div class="field">
+          <span>Line colour</span>
+          <div id="lineColors" class="swatches" data-field="color"></div>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend><span class="step">2</span> Your stops <em id="stopCount"></em></legend>
+        <p class="hint">Top to bottom, first stop to latest. Mark a <b>transfer</b> where someone joined your route.</p>
+        <ol id="stops" class="stops" data-field="stops"></ol>
+        <button type="button" class="btn ghost" id="addStop">+ Add a stop</button>
+        <label class="field">
+          <span>Next stop <em>optional, shown as a dashed line</em></span>
+          <input id="next" maxlength="26" data-field="next" placeholder="Wherever’s next">
+        </label>
+      </fieldset>
+
+      <fieldset>
+        <legend><span class="step">3</span> Your shirt</legend>
+        <div class="field">
+          <span>Shirt colour: <b id="shirtName"></b></span>
+          <div id="shirtColors" class="swatches big"></div>
+        </div>
+        <div class="field">
+          <span>Sizes &amp; quantities <em>unisex fit, mix sizes for the whole crew</em></span>
+          <div id="sizes" class="sizes"></div>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend><span class="step">4</span> Ship &amp; pay</legend>
+        <label class="field">
+          <span>Ship to</span>
+          <select id="country"></select>
+        </label>
+        <div class="summary" id="summary"></div>
+        <div class="form-error" id="formError" role="alert"></div>
+        <button type="submit" class="btn wide" id="checkout">Checkout securely →</button>
+        <p class="fine">Secure payment by Stripe. Your shirt goes to print only after payment succeeds.</p>
+      </fieldset>
+    </form>
+  </section>
+
+  <section class="how" id="how">
+    <h2>How it works</h2>
+    <div class="steps">
+      <div><span class="bullet" style="--c:#0039A6">1</span><h3>Map your stops</h3><p>Add up to eight milestones, transfers for the people who joined you, and where you’re headed next.</p></div>
+      <div><span class="bullet" style="--c:#00933C">2</span><h3>We print yours</h3><p>Your design is rendered at 300 dpi and printed direct-to-garment in full colour. No minimums, no screens, one shirt at a time.</p></div>
+      <div><span class="bullet" style="--c:#FF6319">3</span><h3>It ships to you</h3><p>Printed at the facility nearest you and shipped with tracking, usually within 1–2 weeks.</p></div>
+    </div>
+  </section>
+
+  <section class="faq" id="faq">
+    <h2>Questions</h2>
+    <details><summary>What shirt is it?</summary><p>The Bella+Canvas 3001: 100% combed ring-spun cotton (heathers are cotton/poly), side-seamed and retail fit. It’s the softest everyday tee we know. Sizes XS–4XL, unisex.</p></details>
+    <details><summary>How is it printed?</summary><p>Direct-to-garment (DTG): the ink goes straight into the fabric, like a photo printer for shirts. That’s why every shirt can be different, with no setup fees. On dark shirts, a white underbase keeps colours bright.</p></details>
+    <details><summary>Can I return it?</summary><p>Every shirt is made just for you, so we can’t take back changes of heart. If anything arrives misprinted or damaged, we’ll reprint it free.</p></details>
+    <details><summary>Will my text fit?</summary><p>The preview is the real print file. Long names shrink a little to fit. If it looks good here, it’ll look good on the shirt.</p></details>
+  </section>
+
+  <footer class="foot">
+    <span><span class="bullet sm" style="--c:#EE352E">L</span> Lifeline Transit Co.</span>
+    <span>Not affiliated with any transit authority. Mind the gap.</span>
+  </footer>
+
+  <script type="module" src="/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,13 @@
+[build]
+  publish = "public"
+  command = ""
+
+[functions]
+  node_bundler = "nft"
+  included_files = ["fonts/**", "node_modules/@resvg/resvg-wasm/index_bg.wasm", "secrets.generated.js"]
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
