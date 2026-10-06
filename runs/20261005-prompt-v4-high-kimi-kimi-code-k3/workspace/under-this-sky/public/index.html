@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Under This Sky — the night sky of your moment, on a shirt</title>
+<meta name="description" content="A museum-quality star map of the exact night sky above your most important moment — custom printed on a premium tee.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<nav>
+  <div class="brand">UNDER&nbsp;THIS&nbsp;SKY</div>
+  <a class="nav-cta" href="#customize">Create yours</a>
+</nav>
+
+<header class="hero">
+  <div id="hero-sky" aria-hidden="true"></div>
+  <div class="hero-inner">
+    <p class="eyebrow">Custom star-map apparel</p>
+    <h1>Wear the night that<br>changed everything.</h1>
+    <p class="lede">Every shirt is a one-of-one: the exact arrangement of stars above
+    <em>your</em> place, at <em>your</em> moment — computed with real astronomy and
+    printed on demand, just for you.</p>
+    <a class="btn btn-gold" href="#customize">Design your shirt</a>
+  </div>
+</header>
+
+<section id="customize" class="customizer">
+  <h2>Create your sky</h2>
+  <p class="section-sub">Pick the moment. We chart the sky exactly as it stood above it.</p>
+
+  <div class="customizer-grid">
+    <div class="preview">
+      <div class="shirt-wrap">
+        <svg id="shirt" viewBox="0 0 500 600" aria-label="Shirt preview">
+          <path id="shirt-body" d="M180 42 C158 46 118 62 92 88 L56 152 L104 178 L132 142 L132 538 C132 554 142 564 158 564 L342 564 C358 564 368 554 368 538 L368 142 L396 178 L444 152 L408 88 C382 62 342 46 320 42 C302 60 272 68 250 68 C228 68 198 60 180 42 Z"
+            fill="#16161a" stroke="rgba(255,255,255,0.14)" stroke-width="2"/>
+          <path d="M180 42 C198 60 228 68 250 68 C272 68 302 60 320 42 C312 66 284 82 250 82 C216 82 188 66 180 42 Z" fill="rgba(0,0,0,0.25)"/>
+          <foreignObject x="155" y="105" width="190" height="235">
+            <div xmlns="http://www.w3.org/1999/xhtml" id="design-slot"></div>
+          </foreignObject>
+        </svg>
+      </div>
+      <p class="preview-note">Live preview — the actual file we send to print</p>
+    </div>
+
+    <form id="form" autocomplete="off">
+      <label>Your moment <span class="req">*</span>
+        <input id="title" maxlength="42" value="The Night We Met" required>
+      </label>
+      <label>Second line <span class="opt">(optional)</span>
+        <input id="subtitle" maxlength="60" value="Elena &amp; Marco" placeholder="Names, a date, a few words…">
+      </label>
+      <label>Place <span class="req">*</span>
+        <input id="place" placeholder="Start typing a city…" required>
+        <div id="place-results" class="place-results" hidden></div>
+      </label>
+      <div class="row">
+        <label>Date <span class="req">*</span><input id="date" type="date" value="2019-06-14" required></label>
+        <label>Time <span class="req">*</span><input id="time" type="time" value="23:30" required></label>
+      </div>
+      <div class="row">
+        <div class="field-label">Shirt colour</div>
+        <div id="colors" class="swatches">
+          <button type="button" data-color="black" class="swatch selected" style="--c:#16161a" title="Black"></button>
+          <button type="button" data-color="navy blue" class="swatch" style="--c:#1f2a44" title="Navy"></button>
+          <button type="button" data-color="white" class="swatch" style="--c:#f2f2ef" title="White"></button>
+        </div>
+      </div>
+      <div class="row">
+        <div class="field-label">Size <span class="size-note">(unisex, Bella+Canvas 3001)</span></div>
+        <div id="sizes" class="sizes">
+          <button type="button" data-size="s">S</button>
+          <button type="button" data-size="m" class="selected">M</button>
+          <button type="button" data-size="l">L</button>
+          <button type="button" data-size="xl">XL</button>
+          <button type="button" data-size="2xl">2XL</button>
+          <button type="button" data-size="3xl">3XL</button>
+        </div>
+      </div>
+      <div class="buy-row">
+        <div class="price">$34.99 <span>· free shipping</span></div>
+        <button id="buy" class="btn btn-gold" type="submit">Buy my sky</button>
+      </div>
+      <p id="form-error" class="form-error" hidden></p>
+      <p class="fine">Secure checkout by Stripe · Printed &amp; shipped by Prodigi ·
+      Every design is generated uniquely for your order.</p>
+    </form>
+  </div>
+</section>
+
+<section class="how">
+  <h2>How it works</h2>
+  <div class="how-grid">
+    <div><div class="num">1</div><h3>Tell us the moment</h3><p>A first kiss, a birth, the night everything changed — any place, any date, any time.</p></div>
+    <div><div class="num">2</div><h3>We chart the sky</h3><p>We compute the true positions of 1,600+ stars and every constellation above that exact spot, at that exact minute.</p></div>
+    <div><div class="num">3</div><h3>Printed just for you</h3><p>Your one-of-one design is DTG-printed on a premium Bella+Canvas tee and shipped to your door.</p></div>
+  </div>
+</section>
+
+<footer>
+  <div class="brand">UNDER&nbsp;THIS&nbsp;SKY</div>
+  <p>Each shirt is astronomically unique — no two skies are ever printed twice.</p>
+</footer>
+
+<script type="module" src="app.js"></script>
+</body>
+</html>

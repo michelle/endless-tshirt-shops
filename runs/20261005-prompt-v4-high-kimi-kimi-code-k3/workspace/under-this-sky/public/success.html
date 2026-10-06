@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Order confirmed — Under This Sky</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<nav><div class="brand">UNDER&nbsp;THIS&nbsp;SKY</div><a class="nav-cta" href="/">Create another</a></nav>
+<main class="confirm">
+  <h1>The sky is yours.</h1>
+  <p class="muted">Payment received. Your one-of-one star map is being prepared for print.</p>
+  <div class="status-pill" id="status">Confirming with print partner…</div>
+  <p id="detail" class="muted"></p>
+  <div><img id="design" alt="Your custom star map design" hidden></div>
+  <p class="muted" style="margin-top:28px">You’ll receive your shirt by standard shipping.<br>
+  <a href="/" style="color:var(--gold)">← Back to the store</a></p>
+</main>
+<script>
+const sessionId = new URLSearchParams(location.search).get('session_id');
+const statusEl = document.getElementById('status');
+const detailEl = document.getElementById('detail');
+const imgEl = document.getElementById('design');
+
+let tries = 0;
+async function poll() {
+  tries++;
+  try {
+    const r = await fetch(`/api/order/${encodeURIComponent(sessionId)}`);
+    if (r.ok) {
+      const o = await r.json();
+      if (o.imageUrl && !imgEl.src) { imgEl.src = o.imageUrl; imgEl.hidden = false; }
+      if (o.status === 'submitted') {
+        statusEl.textContent = 'Print order confirmed' + (o.prodigiOrderId ? ` · ${o.prodigiOrderId}` : '');
+        detailEl.textContent = `“${o.title}” · ${o.color} tee · size ${String(o.size).toUpperCase()} · ${o.place}, ${o.date}`;
+        return;
+      }
+      if (o.status === 'error') {
+        statusEl.textContent = 'We hit a snag — our team has been notified and will follow up by email.';
+        return;
+      }
+    }
+  } catch {}
+  if (tries < 15) setTimeout(poll, 2000);
+  else statusEl.textContent = 'Order received — print confirmation will follow by email.';
+}
+if (sessionId) poll();
+else statusEl.textContent = 'Order received.';
+</script>
+</body>
+</html>

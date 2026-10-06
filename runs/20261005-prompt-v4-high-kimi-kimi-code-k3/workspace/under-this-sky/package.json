@@ -1,0 +1,19 @@
+{
+  "name": "under-this-sky",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "type": "module",
+  "dependencies": {
+    "@resvg/resvg-js": "^2.6.2",
+    "express": "^5.2.1",
+    "playwright": "^1.63.0",
+    "tz-lookup": "^6.1.25"
+  }
+}
