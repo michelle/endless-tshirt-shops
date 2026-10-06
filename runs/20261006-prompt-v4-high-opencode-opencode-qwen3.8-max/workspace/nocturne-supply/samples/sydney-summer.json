@@ -1,0 +1,45 @@
+{
+  "utcDate": "1989-01-26T11:30:00.000Z",
+  "lat": -33.8688,
+  "lon": 151.2093,
+  "headline": "UNDER SOUTHERN SKIES",
+  "dedication": null,
+  "subline": "JANUARY 26, 1989 · 10:30 PM · SYDNEY, AUSTRALIA",
+  "coordsLine": "33.87° S · 151.21° E",
+  "shirtColor": "white",
+  "facts": {
+    "constellations": [
+      "Aries",
+      "Auriga",
+      "Canis Major",
+      "Carina",
+      "Cetus",
+      "Eridanus",
+      "Gemini",
+      "Orion"
+    ],
+    "constellationCount": 52,
+    "brightestStar": {
+      "name": "Sirius",
+      "mag": -1.44
+    },
+    "starsAboveHorizon": 2667,
+    "moon": {
+      "name": "Waning Gibbous Moon",
+      "fraction": 0.8167870795065836,
+      "aboveHorizon": true
+    },
+    "planetsUp": [
+      {
+        "name": "Mars",
+        "mag": 0.46799693255456576
+      },
+      {
+        "name": "Jupiter",
+        "mag": -2.511056018378463
+      }
+    ],
+    "sunAltitude": -25.319170262716572,
+    "daylight": false
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "name": "nocturne-supply",
+  "version": "1.0.0",
+  "main": "server.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "Custom night-sky t-shirts, printed DTG on demand",
+  "type": "commonjs",
+  "dependencies": {
+    "@resvg/resvg-js": "^2.6.2",
+    "astronomy-engine": "^2.1.19",
+    "express": "^5.2.1",
+    "luxon": "^3.7.2",
+    "stripe": "^23.0.0",
+    "tz-lookup": "^6.1.25"
+  }
+}

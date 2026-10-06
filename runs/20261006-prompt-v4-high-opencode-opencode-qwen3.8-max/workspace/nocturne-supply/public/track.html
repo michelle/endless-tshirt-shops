@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Track your order — Nocturne Supply Co.</title>
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand"><a href="/" style="color:inherit"><span class="mark">NOCTURNE</span> <span class="sub">Supply Co.</span></a></div>
+    <nav class="top"><a href="/">Design a shirt</a></nav>
+  </header>
+  <section>
+    <h2>Track your order</h2>
+    <div class="card" style="max-width:520px">
+      <label class="f"><span class="lab">Order number</span>
+        <div class="locrow">
+          <input type="text" id="oid" placeholder="noc_…">
+          <button class="btn" id="go" type="button">Look up</button>
+        </div>
+      </label>
+      <div class="err" id="err"></div>
+    </div>
+    <div id="result"></div>
+  </section>
+</div>
+<script>
+  const oid = new URLSearchParams(location.search).get('order') || localStorage.getItem('noc_last_order') || '';
+  document.getElementById('oid').value = oid;
+  document.getElementById('go').onclick = () => { location.href = `/success.html?order=${encodeURIComponent(document.getElementById('oid').value.trim())}`; };
+  if (oid) setTimeout(() => document.getElementById('go').click(), 50);
+</script>
+</body>
+</html>

@@ -1,0 +1,41 @@
+{
+  "utcDate": "2019-09-22T02:15:00.000Z",
+  "lat": 40.7128,
+  "lon": -74.006,
+  "headline": "THE NIGHT WE SAID YES",
+  "dedication": "ANA & JAMES",
+  "subline": "SEPTEMBER 21, 2019 · 10:15 PM · NEW YORK, NY",
+  "coordsLine": "40.71° N · 74.01° W",
+  "shirtColor": "navy blue",
+  "facts": {
+    "constellations": [
+      "Andromeda",
+      "Aquila",
+      "Aries",
+      "Cassiopeia",
+      "Cetus",
+      "Cygnus",
+      "Pegasus",
+      "Perseus"
+    ],
+    "constellationCount": 38,
+    "brightestStar": {
+      "name": "Arcturus",
+      "mag": -0.05
+    },
+    "starsAboveHorizon": 2376,
+    "moon": {
+      "name": "Last Quarter Moon",
+      "fraction": 0.5032412554962932,
+      "aboveHorizon": false
+    },
+    "planetsUp": [
+      {
+        "name": "Saturn",
+        "mag": 0.304665141143623
+      }
+    ],
+    "sunAltitude": -36.11967745932641,
+    "daylight": false
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "utcDate": "2015-02-28T23:00:00.000Z",
+  "lat": 64.1466,
+  "lon": -21.9426,
+  "headline": "THE NIGHT THE SKY DANCED",
+  "dedication": null,
+  "subline": "FEBRUARY 28, 2015 · 11:00 PM · REYKJAVÍK, ICELAND",
+  "coordsLine": "64.15° N · 21.94° W",
+  "shirtColor": "dark heather grey",
+  "facts": {
+    "constellations": [
+      "Andromeda",
+      "Aries",
+      "Auriga",
+      "Boötes",
+      "Cassiopeia",
+      "Cygnus",
+      "Gemini",
+      "Leo"
+    ],
+    "constellationCount": 38,
+    "brightestStar": {
+      "name": "Sirius",
+      "mag": -1.44
+    },
+    "starsAboveHorizon": 2476,
+    "moon": {
+      "name": "Waxing Gibbous Moon",
+      "fraction": 0.8043535755796279,
+      "aboveHorizon": true
+    },
+    "planetsUp": [
+      {
+        "name": "Jupiter",
+        "mag": -2.5099008386288384
+      }
+    ],
+    "sunAltitude": -27.206435850857478,
+    "daylight": false
+  }
+}

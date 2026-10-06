@@ -1,0 +1,45 @@
+{
+  "utcDate": "2001-03-14T20:42:00.000Z",
+  "lat": 48.8566,
+  "lon": 2.3522,
+  "headline": "THE NIGHT YOU WERE BORN",
+  "dedication": "FOR EMMA",
+  "subline": "MARCH 14, 2001 · 9:42 PM · PARIS, FRANCE",
+  "coordsLine": "48.86° N · 2.35° E",
+  "shirtColor": "black",
+  "facts": {
+    "constellations": [
+      "Andromeda",
+      "Aries",
+      "Auriga",
+      "Boötes",
+      "Canis Major",
+      "Cassiopeia",
+      "Gemini",
+      "Leo"
+    ],
+    "constellationCount": 37,
+    "brightestStar": {
+      "name": "Sirius",
+      "mag": -1.44
+    },
+    "starsAboveHorizon": 2515,
+    "moon": {
+      "name": "Waning Gibbous Moon",
+      "fraction": 0.6963785580560513,
+      "aboveHorizon": false
+    },
+    "planetsUp": [
+      {
+        "name": "Jupiter",
+        "mag": -2.1958666617442226
+      },
+      {
+        "name": "Saturn",
+        "mag": 0.08111765681564442
+      }
+    ],
+    "sunAltitude": -27.243985885882076,
+    "daylight": false
+  }
+}

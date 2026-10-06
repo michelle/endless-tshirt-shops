@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Checkout — Nocturne Supply Co.</title>
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand"><a href="/" style="color:inherit"><span class="mark">NOCTURNE</span> <span class="sub">Supply Co.</span></a></div>
+    <nav class="top"><a href="/">Back to designer</a></nav>
+  </header>
+
+  <section>
+    <h2>Checkout</h2>
+    <p class="lede">Shipping first, then payment. Your shirt goes to the printers only after payment succeeds.</p>
+
+    <div class="designer" style="grid-template-columns: minmax(320px,520px) 1fr;">
+      <div>
+        <div class="card">
+          <h3><span class="step">01</span>Contact & shipping</h3>
+          <label class="f"><span class="lab">Email</span><input type="text" id="email" placeholder="you@example.com"></label>
+          <label class="f"><span class="lab">Full name</span><input type="text" id="name"></label>
+          <label class="f"><span class="lab">Address line 1</span><input type="text" id="line1"></label>
+          <label class="f"><span class="lab">Address line 2 (optional)</span><input type="text" id="line2"></label>
+          <div class="row2">
+            <label class="f"><span class="lab">City</span><input type="text" id="city"></label>
+            <label class="f"><span class="lab">State / county</span><input type="text" id="state"></label>
+          </div>
+          <div class="row2">
+            <label class="f"><span class="lab">Postal code</span><input type="text" id="postal"></label>
+            <label class="f"><span class="lab">Country</span>
+              <select id="country">
+                <option value="US">United States</option><option value="GB">United Kingdom</option>
+                <option value="CA">Canada</option><option value="AU">Australia</option>
+                <option value="DE">Germany</option><option value="FR">France</option>
+                <option value="NL">Netherlands</option><option value="ES">Spain</option>
+                <option value="IT">Italy</option><option value="SE">Sweden</option>
+                <option value="DK">Denmark</option><option value="IE">Ireland</option>
+                <option value="NZ">New Zealand</option><option value="JP">Japan</option>
+              </select>
+            </label>
+          </div>
+          <label class="f"><span class="lab">Shipping speed</span>
+            <select id="method">
+              <option value="Standard">Standard — 5–10 business days</option>
+              <option value="Express">Express — 2–4 business days</option>
+            </select>
+          </label>
+        </div>
+      </div>
+      <div>
+        <div class="card">
+          <h3><span class="step">02</span>Your order</h3>
+          <div id="summary"></div>
+          <div class="totals" id="totals"><div class="hint">Calculating shipping…</div></div>
+          <div class="err" id="err"></div>
+          <button class="btn big" id="payBtn" style="margin-top:16px" type="button">Pay</button>
+          <div class="hint" id="payHint" style="margin-top:10px"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+<script>
+(() => {
+  const $ = (id) => document.getElementById(id);
+  const money = (c) => `$${(c / 100).toFixed(2)}`;
+  let cart = JSON.parse(localStorage.getItem('noc_cart') || '[]');
+  let cfg = null;
+
+  async function boot() {
+    cfg = await (await fetch('/api/config')).json();
+    if (!cart.length) {
+      $('summary').innerHTML = '<div class="hint">Your cart is empty. <a href="/">Design a shirt first</a>.</div>';
+      $('payBtn').disabled = true;
+      return;
+    }
+    if (cfg.paymentsMode === 'simulated') {
+      $('payHint').innerHTML = '<span class="badge warn">simulated test payment</span> Stripe keys are not configured on this deployment; no card is charged and the order still flows to the print sandbox.';
+    } else {
+      $('payHint').innerHTML = '<span class="badge ok">secure card payment</span> You will be redirected to Stripe Checkout.';
+    }
+    renderSummary();
+    ['country', 'method'].forEach((id) => $(id).addEventListener('change', quote));
+    $('payBtn').onclick = pay;
+    quote();
+  }
+
+  function renderSummary() {
+    $('summary').innerHTML = cart.map((l) => {
+      const c = cfg.colors.find((x) => x.id === l.color);
+      return `<div class="cartline"><div><b>${l.design.headline}</b>${l.design.dedication ? ` <span class="hint">— ${l.design.dedication}</span>` : ''}<br>
+        <span class="hint">${l.design.date} ${l.design.time} · ${l.design.place}</span></div>
+        <div class="hint">${l.size.toUpperCase()}<br>${c ? c.name : l.color}</div><div>×${l.qty}</div>
+        <div>${money(cfg.pricing.shirtUnit * l.qty)}</div></div>`;
+    }).join('');
+  }
+
+  async function quote() {
+    $('totals').innerHTML = '<div class="hint">Calculating shipping…</div>';
+    try {
+      const r = await fetch('/api/quote', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ items: cart.map(({ size, color, qty }) => ({ size, color, qty })), country: $('country').value, shippingMethod: $('method').value }),
+      });
+      const q = await r.json();
+      if (!r.ok) throw new Error(q.error);
+      $('totals').innerHTML = q.lineItems.map((li) => `<div class="line"><span>${li.label}</span><span>${money(li.cents)}</span></div>`).join('')
+        + `<div class="line grand"><span>Total</span><span>${money(q.totalCents)}</span></div>`
+        + `<div class="hint" style="margin-top:6px">Printed & shipped from ${q.fulfillmentCountry || 'the nearest print lab'} via ${q.carrier || 'our print network'} · ${q.eta}</div>`;
+      $('payBtn').textContent = `Pay ${money(q.totalCents)}`;
+    } catch (e) {
+      $('totals').innerHTML = `<div class="err">${e.message}</div>`;
+    }
+  }
+
+  async function pay() {
+    $('err').textContent = '';
+    const address = {
+      name: $('name').value.trim(), line1: $('line1').value.trim(), line2: $('line2').value.trim(),
+      city: $('city').value.trim(), state: $('state').value.trim(), postal: $('postal').value.trim(),
+      country: $('country').value,
+    };
+    if (!address.name || !address.line1 || !address.city || !address.postal) {
+      $('err').textContent = 'Name, address, city and postal code are required.'; return;
+    }
+    const email = $('email').value.trim();
+    if (!/.+@.+\..+/.test(email)) { $('err').textContent = 'A valid email is required for order updates.'; return; }
+    $('payBtn').disabled = true; $('payBtn').textContent = 'Creating order…';
+    try {
+      const r = await fetch('/api/checkout', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email, address, shippingMethod: $('method').value,
+          items: cart.map(({ size, color, qty }) => ({ size, color, qty })),
+          design: cart[0].design,
+        }),
+      });
+      const res = await r.json();
+      if (!r.ok) throw new Error(res.error);
+      localStorage.setItem('noc_last_order', res.orderId);
+      if (res.mode === 'stripe') {
+        location.href = res.url;
+      } else {
+        location.href = `/success.html?order=${res.orderId}&simulated=1`;
+      }
+    } catch (e) {
+      $('err').textContent = e.message;
+      $('payBtn').disabled = false; $('payBtn').textContent = 'Pay';
+    }
+  }
+
+  boot();
+})();
+</script>
+</body>
+</html>

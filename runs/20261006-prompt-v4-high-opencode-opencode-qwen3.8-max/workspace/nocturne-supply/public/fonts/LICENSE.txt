@@ -1,0 +1,14 @@
+FONT LICENSES
+=============
+
+Cinzel (Cinzel-500.ttf, Cinzel-600.ttf, Cinzel-700.ttf)
+  Copyright 2020 The Cinzel Project Authors (https://github.com/NDISCOVER/Cinzel)
+  Licensed under the SIL Open Font License, Version 1.1.
+  https://openfontlicense.org
+
+Inter (Inter-400.ttf, Inter-500.ttf, Inter-600.ttf)
+  Copyright 2020 The Inter Project Authors (https://github.com/rsms/inter)
+  Licensed under the SIL Open Font License, Version 1.1.
+  https://openfontlicense.org
+
+Full OFL 1.1 text: https://openfontlicense.org/documents/OFL.txt
