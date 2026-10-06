@@ -1,0 +1,8 @@
+data
+proof
+.env.local
+.stripe-claim.txt
+.git
+node_modules
+scripts
+assets
