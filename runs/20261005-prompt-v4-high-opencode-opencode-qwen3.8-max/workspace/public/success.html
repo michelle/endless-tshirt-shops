@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Order confirmed · Heliogram</title>
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<header class="masthead">
+  <div class="brand"><span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="13" fill="none" stroke="currentColor" stroke-width="1.4"/><circle cx="16" cy="16" r="6.5" fill="currentColor"/></svg></span> HELIOGRAM</div>
+  <div class="tag"><a href="/" style="color:inherit;text-decoration:none">← back to the studio</a></div>
+</header>
+<div class="success-wrap">
+  <div class="receipt" id="receipt">
+    <h2 id="headline">Confirming your payment…</h2>
+    <p class="fine" id="sub" style="margin-top:0"><span class="spinner"></span> talking to Stripe</p>
+    <dl id="rows"></dl>
+    <p class="fine" id="printLink" style="display:none"></p>
+  </div>
+</div>
+<script type="module">
+const session = new URLSearchParams(location.search).get('session_id');
+const $ = (s) => document.querySelector(s);
+const money = (c, cur) => `${(c / 100).toFixed(2)} ${String(cur || 'usd').toUpperCase()}`;
+
+async function poll() {
+  if (!session) {
+    $('#headline').textContent = 'No checkout session found';
+    $('#sub').textContent = 'Return to the studio and place your order again.';
+    return;
+  }
+  let last;
+  for (let i = 0; i < 24; i++) {
+    try {
+      const r = await fetch(`/api/order-status?session=${encodeURIComponent(session)}`);
+      last = await r.json();
+      paint(last);
+      if (last.fulfillment?.status === 'sent' || last.fulfillment?.status === 'error') return;
+      if (last.paymentStatus !== 'paid') { await sleep(2500); continue; }
+      if (last.fulfillment?.status === 'sent') return;
+    } catch { /* retry */ }
+    await sleep(2500);
+  }
+  if (last?.fulfillment?.status !== 'sent') {
+    $('#sub').innerHTML = 'Payment is confirmed; the print order is still being placed. This page retries automatically — you can also check back later with your order email.';
+  }
+}
+
+function paint(s) {
+  const rows = [];
+  if (s.paymentStatus === 'paid') {
+    $('#headline').textContent = 'Payment confirmed — your plate goes to the printer.';
+  } else if (s.paymentStatus === 'unpaid') {
+    $('#headline').textContent = 'Waiting for payment…';
+  } else {
+    $('#headline').textContent = `Payment status: ${s.paymentStatus}`;
+  }
+  $('#sub').innerHTML = s.paymentStatus === 'paid'
+    ? (s.fulfillment?.status === 'sent' ? 'Sent to the print network.' : '<span class="spinner"></span> placing your print order')
+    : '<span class="spinner"></span> waiting for Stripe';
+  rows.push(['Amount', money(s.amountTotal, s.currency)]);
+  rows.push(['Receipt email', s.customerEmail || '—']);
+  const f = s.fulfillment || {};
+  if (f.status === 'sent') {
+    rows.push(['Print order', f.orderId || '—']);
+    rows.push(['Print stage', f.stage || '—']);
+    rows.push(['Network', f.env === 'sandbox' ? 'Prodigi sandbox (test — nothing ships)' : 'Prodigi live']);
+    rows.push(['Fulfilled by', f.source || 'webhook']);
+    if (f.detail?.shipments?.length) {
+      rows.push(['Shipment', f.detail.shipments.map((sh) => `${sh.carrier || ''} ${sh.tracking ? sh.tracking : ''}`).join(', ')]);
+    }
+  } else if (f.status === 'error') {
+    rows.push(['Print order', `error: ${f.message}`]);
+  }
+  $('#rows').innerHTML = rows.map(([k, v]) => `<div class="row"><dt>${k}</dt><dd>${escapeHtml(String(v))}</dd></div>`).join('');
+  if (s.artUrl) {
+    $('#printLink').style.display = 'block';
+    $('#printLink').innerHTML = `Your exact 4677×5787 print file (300&nbsp;dpi): <a href="${s.artUrl}" target="_blank" rel="noopener" style="color:var(--gold)">open artwork</a> — this URL is what the printer fetches.`;
+  }
+}
+
+function escapeHtml(s) { return s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+poll();
+</script>
+</body>
+</html>

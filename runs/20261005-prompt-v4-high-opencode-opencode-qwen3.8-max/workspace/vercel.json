@@ -1,0 +1,12 @@
+{
+  "outputDirectory": "public",
+  "cleanUrls": true,
+  "functions": {
+    "api/art.js": {
+      "includeFiles": "lib/fonts/**/*",
+      "maxDuration": 60
+    },
+    "api/webhook.js": { "maxDuration": 60 },
+    "api/order-status.js": { "maxDuration": 60 }
+  }
+}

@@ -1,0 +1,8 @@
+node_modules
+.preview
+.secrets
+tests
+scripts
+.env
+.env.example
+*.md

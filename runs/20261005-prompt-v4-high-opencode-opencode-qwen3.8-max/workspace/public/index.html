@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Heliogram — the year of light where you live, on a shirt</title>
+<meta name="description" content="A one-of-one DTG print: the daily sunrise-to-sunset record of any place on Earth, drawn as a celestial dial for the dates that matter to you.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='13' fill='%230B1020'/%3E%3Ccircle cx='16' cy='16' r='7' fill='%23F2B64C'/%3E%3Ccircle cx='16' cy='16' r='11' fill='none' stroke='%23EFE6D2' stroke-width='1.4'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<header class="masthead">
+  <div class="brand">
+    <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="13" fill="none" stroke="currentColor" stroke-width="1.4"/><circle cx="16" cy="16" r="6.5" fill="currentColor"/><g stroke="currentColor" stroke-width="1.2"><line x1="16" y1="1" x2="16" y2="5"/><line x1="16" y1="27" x2="16" y2="31"/><line x1="1" y1="16" x2="5" y2="16"/><line x1="27" y1="16" x2="31" y2="16"/></g></svg></span>
+    HELIOGRAM
+  </div>
+  <div class="tag">Printed to order · ships worldwide</div>
+</header>
+
+<main>
+  <section class="lede">
+    <h1>The year of light<br><em>where you live.</em></h1>
+    <p class="lede-copy">
+      Every place on Earth keeps its own calendar of light — when the sun rose and set,
+      each day of the year. Heliogram draws that record as a celestial dial: a ring of
+      gold for the daylight hours, graded twilight for the dusk, a starfield for the
+      night, and your own dates set into the rim like jewels.
+    </p>
+    <p class="lede-copy small">
+      No two places share a dial. No two shirts are alike. Printed direct-to-garment on a
+      Bella+Canvas 3001 the moment your payment clears — full colour, edge to edge, the way
+      only DTG can.
+    </p>
+    <div class="samples" id="samples"></div>
+  </section>
+
+  <section class="studio">
+    <div class="stage">
+      <div class="mock" id="mock" aria-label="Shirt preview"></div>
+      <div class="stage-note" id="stageNote"></div>
+    </div>
+
+    <form class="panel" id="panel" autocomplete="on">
+      <fieldset>
+        <legend>1 · The place</legend>
+        <div class="geo">
+          <input id="q" type="search" placeholder="Search any city or town…" aria-label="Search place">
+          <div class="results" id="results" role="listbox"></div>
+        </div>
+        <div class="place-line" id="placeLine">Choose a place to begin.</div>
+        <input type="hidden" id="lat"><input type="hidden" id="lon">
+        <input type="hidden" id="city"><input type="hidden" id="admin1"><input type="hidden" id="country">
+      </fieldset>
+
+      <fieldset>
+        <legend>2 · Your dates <span class="opt">up to three</span></legend>
+        <div id="markers"></div>
+        <label class="field">
+          <span>Dedication <span class="opt">optional, ≤ 28 characters</span></span>
+          <input id="dedication" maxlength="28" placeholder="for Marie">
+        </label>
+      </fieldset>
+
+      <fieldset>
+        <legend>3 · The garment</legend>
+        <div class="swatches" id="swatches"></div>
+        <div class="sizes" id="sizes"></div>
+      </fieldset>
+
+      <div class="buy">
+        <div class="price" id="price"></div>
+        <button type="submit" id="buyBtn" disabled>Buy this shirt</button>
+        <p class="fine">Secure payment by Stripe. Printed &amp; shipped by Prodigi once payment clears. Test mode: card <code>4242 4242 4242 4242</code>.</p>
+      </div>
+    </form>
+  </section>
+
+  <section class="how">
+    <h2>How the dial reads</h2>
+    <div class="how-grid">
+      <div><span class="k" style="background:#E39B33"></span><p><b>The river of light.</b> Around the year, day by day: how long the sun stayed up. Wide in summer, pinched in winter — at true solar time, so noon is always the middle of the band.</p></div>
+      <div><span class="k" style="background:#41548F"></span><p><b>Graded twilight.</b> Civil, nautical and astronomical dusk, in three blues. Where they vanish, the sun never set: the midnight sun.</p></div>
+      <div><span class="k" style="background:#0E1626;outline:1px solid #3A4A68"></span><p><b>The starfield.</b> Hours of true night, seeded from your coordinates — the same sky, same stars, every time you order.</p></div>
+      <div><span class="k star">✦</span><p><b>Your dates in the rim.</b> A birthday, an anniversary, the day you arrived. Set as markers with their own inscription.</p></div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <p>Heliogram · art computed from solar geometry at your exact coordinates · geocoding by Open-Meteo · printed on demand by Prodigi · payments by Stripe</p>
+  <p class="fine">This storefront runs in test mode: payments use Stripe’s sandbox and prints are placed with Prodigi’s sandbox API, so nothing physical ships.</p>
+</footer>
+
+<script type="module" src="/app.js"></script>
+</body>
+</html>

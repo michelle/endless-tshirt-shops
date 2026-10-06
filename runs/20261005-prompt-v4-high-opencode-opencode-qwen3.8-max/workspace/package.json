@@ -1,0 +1,17 @@
+{
+  "name": "heliogram",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Heliogram — the year of light where you live, on a shirt. Personalized DTG prints via Prodigi.",
+  "scripts": {
+    "dev": "node scripts/dev.mjs",
+    "test": "node --test tests/",
+    "preview": "node scripts/render-preview.mjs",
+    "deploy": "node scripts/deploy.mjs",
+    "e2e": "node scripts/e2e.mjs"
+  },
+  "dependencies": {
+    "@resvg/resvg-js": "^2.6.2"
+  }
+}
