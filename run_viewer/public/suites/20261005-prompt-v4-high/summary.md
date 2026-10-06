@@ -1,6 +1,6 @@
 # 20261005-prompt-v4-high Prompt v4 suite
 
-[Compare all three Prompt v4 suites](/suites/20261006-prompt-v4-high/charts/)
+[Compare all three Prompt v4 suites](/endless-tshirt-shops/suites/20261006-prompt-v4-high/charts/)
 
 This is automated evidence pending human review; it is not a model ranking or launch certification.
 
