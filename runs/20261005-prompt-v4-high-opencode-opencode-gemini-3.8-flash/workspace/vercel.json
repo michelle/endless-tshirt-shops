@@ -1,0 +1,8 @@
+{
+  "cleanUrls": true,
+  "functions": {
+    "api/design.js": {
+      "includeFiles": "{node_modules/@resvg/resvg-wasm/index_bg.wasm,api/_assets/**}"
+    }
+  }
+}

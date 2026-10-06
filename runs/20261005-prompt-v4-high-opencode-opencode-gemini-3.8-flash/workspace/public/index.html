@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Under Same Sky — Personalised Star Map T-Shirts</title>
+<meta name="description" content="Wear the exact sky above the moment that mattered. A personalised star map, printed to order on a soft Bella + Canvas tee." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/styles.css" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23080b16'/%3E%3Ccircle cx='16' cy='16' r='9' fill='none' stroke='%23e7c879' stroke-width='1.5'/%3E%3Ccircle cx='16' cy='16' r='1.6' fill='%23fff'/%3E%3C/svg%3E" />
+</head>
+<body>
+<header class="nav">
+  <a class="brand" href="/">UNDER<span>SAME</span>SKY</a>
+  <nav>
+    <a href="#design">Design</a>
+    <a href="#how">How it works</a>
+    <a href="#quality">The shirt</a>
+    <a href="#faq">FAQ</a>
+  </nav>
+</header>
+
+<section class="hero">
+  <p class="eyebrow">PERSONALISED STAR MAPS · PRINTED TO ORDER</p>
+  <h1>Wear the sky from<br/>the moment that mattered.</h1>
+  <p class="lede">Choose a date, a time and a place. We plot the real stars that were overhead, connect the constellations, and print the sky on a soft, heavyweight tee — one shirt, made only for you.</p>
+  <a class="btn" href="#design">Design your sky →</a>
+  <p class="hero-note">Free-form personalisation · Printed on demand with DTG · Ships worldwide</p>
+</section>
+
+<section id="how" class="band">
+  <h2>How it works</h2>
+  <div class="steps">
+    <div><span>01</span><h3>Choose your moment</h3><p>An anniversary, a birth, a first night in a new city. Add a caption and two names if you like.</p></div>
+    <div><span>02</span><h3>We compute the sky</h3><p>Using real star catalogues, we project the stars, constellation lines and the Moon for that instant and place.</p></div>
+    <div><span>03</span><h3>Printed &amp; shipped</h3><p>Your artwork goes to the press at 300 DPI. It is printed direct-to-garment and shipped straight to your door.</p></div>
+  </div>
+</section>
+
+<section id="design" class="designer">
+  <div class="preview-col">
+    <div class="preview-frame">
+      <img id="preview" alt="Your star map preview" />
+      <div id="preview-loading" class="loading">Plotting the sky…</div>
+    </div>
+    <p class="preview-caption">Live preview — this is the artwork we print.</p>
+  </div>
+
+  <form class="form-col" id="order-form" novalidate>
+    <h2>Make it yours</h2>
+
+    <label class="field">
+      <span>Caption</span>
+      <input id="caption" maxlength="70" value="The night we said yes" placeholder="e.g. The night we said yes" />
+    </label>
+
+    <label class="field">
+      <span>Names <em>(optional)</em></span>
+      <input id="names" maxlength="40" value="Maya &amp; Leo" placeholder="e.g. Maya &amp; Leo" />
+    </label>
+
+    <div class="row">
+      <label class="field">
+        <span>Date</span>
+        <input id="date" type="date" value="2021-06-14" />
+      </label>
+      <label class="field">
+        <span>Time</span>
+        <input id="time" type="time" value="21:30" />
+      </label>
+    </div>
+
+    <label class="field place-field">
+      <span>Place</span>
+      <input id="place" autocomplete="off" value="Lisbon, Portugal" placeholder="Start typing a city…" />
+      <div id="place-results" class="autocomplete" hidden></div>
+      <small id="place-status"></small>
+    </label>
+
+    <div class="field">
+      <span>Shirt colour</span>
+      <div id="colors" class="swatches"></div>
+    </div>
+
+    <div class="row">
+      <label class="field">
+        <span>Size</span>
+        <select id="size"></select>
+      </label>
+      <div class="field price-field">
+        <span>Total</span>
+        <div id="price" class="price">—</div>
+      </div>
+    </div>
+
+    <p id="error" class="error" hidden></p>
+
+    <button id="checkout" class="btn btn-wide" type="submit">Checkout securely →</button>
+    <div style="margin-top: 10px;">
+      <button id="sandbox-btn" class="btn btn-wide" type="button" style="background: #232d3f; border: 1px solid #3e4f6d; color: #e2e8f0;">⚡ 1-Click Sandbox Test Order (Instant Stripe + Prodigi)</button>
+    </div>
+    <div id="sandbox-result" class="card" style="margin-top: 14px; text-align: left; padding: 14px; border-radius: 8px; background: rgba(255,255,255,0.05);" hidden></div>
+    <p class="fineprint">Secure payment by Stripe. Printed and shipped by Prodigi after payment. In test mode, use card <code>4242 4242 4242 4242</code>.</p>
+  </form>
+</section>
+
+<section id="quality" class="band split">
+  <div>
+    <h2>Made to be worn</h2>
+    <p>The artwork is generated at the printer's full front-print resolution — 4,677 × 5,881 pixels at 300&nbsp;DPI — with a transparent background so the design sits softly on the fabric instead of printing a heavy block of ink.</p>
+    <p>We print on the <strong>Bella + Canvas 3001</strong> unisex tee: 100% Airlume combed and ring-spun cotton, 4.2&nbsp;oz, side-seamed, with a retail fit. It is a favourite canvas for direct-to-garment printing because the fine knit takes fine detail and stays soft.</p>
+  </div>
+  <ul class="spec-list">
+    <li><span>Print method</span> Direct-to-garment (DTG)</li>
+    <li><span>Blank</span> Bella + Canvas 3001</li>
+    <li><span>Fabric</span> 100% Airlume cotton, 4.2 oz</li>
+    <li><span>Ink</span> Water-based, soft-hand</li>
+    <li><span>Colours</span> 9 shirt colours</li>
+    <li><span>Sizes</span> XS – 4XL</li>
+    <li><span>Production</span> 2–5 business days</li>
+  </ul>
+</section>
+
+<section id="faq" class="band">
+  <h2>Questions</h2>
+  <div class="faq">
+    <details><summary>Is the star map accurate?</summary><p>Yes. We use the HYG/d3-celestial bright-star catalogue and standard sidereal-time maths to project the real sky for your date, time and coordinates. Constellation lines show the classic figures, and the Moon shows its true phase for that night.</p></details>
+    <details><summary>What if I don't know the exact time?</summary><p>Pick your best guess. A few hours shifts the map gently; the caption, names and date stay exactly as you set them.</p></details>
+    <details><summary>How does the design look on a dark shirt?</summary><p>We automatically switch the ink palette: a warm white-and-gold sky on dark shirts, and a deep navy-and-bronze sky on light shirts. Every design is printed on a transparent background.</p></details>
+    <details><summary>When will it arrive?</summary><p>Production takes 2–5 business days, then shipping. This is a made-to-order item, so returns are limited to printing faults — see our policies below.</p></details>
+  </div>
+</section>
+
+<footer>
+  <div class="brand small">UNDER<span>SAME</span>SKY</div>
+  <p>Personalised star-map tees, printed on demand and shipped worldwide by Prodigi.</p>
+  <nav>
+    <a href="/policies.html">Policies &amp; shipping</a>
+    <a href="/api/health">Service status</a>
+  </nav>
+  <p class="tiny">Test-mode demo. Payments run through Stripe test mode and printing through the Prodigi sandbox — no real charge or shipment is made.</p>
+</footer>
+
+<script src="/app.js"></script>
+</body>
+</html>
