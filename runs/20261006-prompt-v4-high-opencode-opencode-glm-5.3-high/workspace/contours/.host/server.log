@@ -1,0 +1,75 @@
+Contours store → http://localhost:3457
+payments ready: true · prodigi: sandbox · webhook secret: MISSING
+2026-10-06T09:23:34Z new public URL: https://pamela-finding-institution-range.trycloudflare.com
+webhook created: we_1UNUahDR3GEwCKDUcq4sJmgM https://pamela-finding-institution-range.trycloudflare.com/api/stripe-webhook
+webhook secret saved → /Users/mchl/.contour-secrets/webhook.secret
+2026-10-06T09:23:34Z stripe webhook → https://pamela-finding-institution-range.trycloudflare.com/api/stripe-webhook
+server exited (143), restarting
+Contours store → http://localhost:3457
+payments ready: true · prodigi: sandbox · webhook secret: configured
+2026-10-06T09:24:29.127Z GET / → 200 (2ms)
+2026-10-06T09:24:29.338Z GET /style.css → 200 (1ms)
+2026-10-06T09:24:29.577Z GET /samples/matterhorn.png → 200 (2ms)
+2026-10-06T09:24:30.020Z GET /api/contours → 200 (142ms)
+2026-10-06T09:24:43.970Z POST /api/checkout → 200 (7034ms)
+2026-10-06T09:24:52.201Z GET /api/order → 200 (6525ms)
+2026-10-06T09:24:52.519Z POST /api/stripe-webhook → 200 (6296ms)
+2026-10-06T09:24:52.953Z GET /api/print.png → 400 (1ms)
+2026-10-06T09:25:07.583Z POST /api/stripe-webhook → 200 (193ms)
+2026-10-06T09:25:13.407Z GET /api/print.png → 400 (1ms)
+2026-10-06T09:25:21.881Z GET /api/print.png → 400 (1ms)
+server exited (143), restarting
+Contours store → http://localhost:3457
+payments ready: true · prodigi: sandbox · webhook secret: configured
+2026-10-06T09:25:35.877Z POST /api/checkout → 200 (6873ms)
+2026-10-06T09:25:46.696Z POST /api/stripe-webhook → 200 (9131ms)
+2026-10-06T09:25:47.291Z GET /api/order → 200 (10180ms)
+2026-10-06T09:25:48.102Z GET /api/print.png → 500 (38ms)
+2026-10-06T09:25:56.316Z GET /api/print.png → 500 (7ms)
+2026-10-06T09:26:13.090Z GET /api/print.png → 500 (8ms)
+2026-10-06T09:26:13.092Z GET /api/print.png → 400 (1ms)
+2026-10-06T09:26:14.015Z GET /api/print.png → 500 (10ms)
+2026-10-06T09:26:22.328Z GET /api/print.png → 400 (2ms)
+server exited (143), restarting
+Contours store → http://localhost:3457
+payments ready: true · prodigi: sandbox · webhook secret: configured
+2026-10-06T09:26:49.096Z POST /api/checkout → 200 (11988ms)
+2026-10-06T09:27:04.952Z POST /api/stripe-webhook → 200 (13560ms)
+2026-10-06T09:27:05.018Z GET /api/order → 200 (14275ms)
+2026-10-06T09:27:09.511Z GET /api/print.png → 200 (4379ms)
+2026-10-06T09:27:09.511Z GET /api/print.png → 200 (2047ms)
+2026-10-06T09:27:15.426Z GET /api/print.png → 200 (2083ms)
+2026-10-06T09:27:17.490Z GET /api/print.png → 200 (2064ms)
+2026-10-06T09:27:17.491Z GET /api/print.png → 400 (0ms)
+2026-10-06T09:27:19.567Z GET /api/print.png → 200 (2075ms)
+2026-10-06T09:28:13.289Z GET /api/print.png → 400 (1ms)
+2026-10-06T09:28:16.663Z GET /order/success → 404 (2ms)
+2026-10-06T09:28:16.881Z GET /orders.html → 200 (2ms)
+2026-10-06T09:28:17.110Z GET /api/orders → 200 (1ms)
+2026-10-06T09:28:17.524Z GET /api/preview.png → 200 (223ms)
+2026-10-06T09:28:17.727Z GET /api/print.png → 403 (0ms)
+server exited (143), restarting
+Contours store → http://localhost:3457
+payments ready: true · prodigi: sandbox · webhook secret: configured
+2026-10-06T09:28:36.640Z GET /order/success → 200 (5ms)
+2026-10-06T09:28:36.724Z GET /orders → 200 (1ms)
+2026-10-06T09:28:37.747Z GET /api/order → 200 (826ms)
+2026-10-06T09:29:13.200Z GET /api/print.png → 400 (2ms)
+2026-10-06T09:29:24.022Z GET /api/order → 200 (733ms)
+2026-10-06T09:29:24.343Z GET /api/order → 200 (211ms)
+2026-10-06T09:29:24.648Z GET /api/order → 200 (212ms)
+2026-10-06T09:29:24.745Z POST /api/stripe-webhook → 400 (1ms)
+2026-10-06T09:29:46.397Z GET /api/orders → 200 (7ms)
+2026-10-06T09:29:46.593Z GET / → 200 (2ms)
+2026-10-06T09:30:06.995Z POST /api/checkout → 200 (6700ms)
+2026-10-06T09:30:07.103Z POST /api/checkout → 400 (1ms)
+2026-10-06T09:30:07.183Z GET /api/contours → 400 (0ms)
+2026-10-06T09:30:07.869Z GET /api/contours → 200 (464ms)
+2026-10-06T09:30:08.069Z GET / → 200 (0ms)
+2026-10-06T09:30:13.098Z GET /api/print.png → 400 (2ms)
+2026-10-06T09:30:28.266Z POST /api/checkout → 400 (2ms)
+2026-10-06T09:30:28.356Z POST /api/checkout → 400 (0ms)
+2026-10-06T09:30:34.651Z GET /api/quote → 200 (6215ms)
+2026-10-06T09:31:03.315Z GET / → 200 (1ms)
+2026-10-06T09:31:13.086Z GET /api/print.png → 400 (1ms)
+2026-10-06T09:31:22.713Z GET /api/print.png → 400 (1ms)

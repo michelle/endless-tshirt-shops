@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Contours — orders (demo)</title>
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+<header class="nav">
+  <div class="wrap">
+    <a class="brand" href="/">C<span class="brand-amp">·</span>NTOURS</a>
+    <nav><a href="/">Store</a><a href="/api/orders">JSON</a></nav>
+  </div>
+</header>
+
+<section class="success" style="text-align:left">
+  <div class="wrap">
+    <h2>Orders <span class="k">live from the store</span></h2>
+    <table class="orders-table">
+      <thead><tr><th>Order</th><th>Placed</th><th>Design</th><th>Payment</th><th>Production</th></tr></thead>
+      <tbody id="rows"><tr><td colspan="5">Loading…</td></tr></tbody>
+    </table>
+    <p class="hint">Demo view of the store's order book (refreshes every 10 s). Prodigi order IDs link to the store's status record; in production you'd gate this behind auth.</p>
+  </div>
+</section>
+
+<script type="module">
+async function load() {
+  try {
+    const r = await fetch('/api/orders');
+    const { orders } = await r.json();
+    const rows = orders.map((o) => {
+      const badge = o.status === 'fulfilled'
+        ? '<span class="badge ok">Sent to Prodigi</span>'
+        : o.status === 'fulfil_error'
+          ? '<span class="badge err">Fulfilment error</span>'
+          : `<span class="badge">${o.status || '—'}</span>`;
+      return `<tr>
+        <td><b>${o.id}</b><br><span class="hint">${o.sessionId?.slice(0, 24) || ''}</span></td>
+        <td>${(o.createdAt || '').replace('T', ' ').slice(0, 19)}</td>
+        <td><b>${o.design?.title || '—'}</b><br><span class="hint">${o.design?.place || ''} · ${o.design?.lat?.toFixed(3)}, ${o.design?.lng?.toFixed(3)} · ${o.design?.sizeKey?.toUpperCase()} · ×${o.design?.qty}</span></td>
+        <td>${o.paymentStatus || '—'}<br><span class="hint">$${((o.amountTotalCents || 0) / 100).toFixed(2)}</span></td>
+        <td>${badge}${o.prodigiOrderId ? `<br><span class="hint">${o.prodigiOrderId}</span>` : ''}${o.error ? `<br><span class="hint" style="color:#9c2f16">${String(o.error).slice(0, 120)}</span>` : ''}</td>
+      </tr>`;
+    });
+    document.getElementById('rows').innerHTML = rows.length ? rows.join('') : '<tr><td colspan="5">No orders yet.</td></tr>';
+  } catch (e) {
+    document.getElementById('rows').innerHTML = `<tr><td colspan="5">${e.message}</td></tr>`;
+  }
+}
+load();
+setInterval(load, 10000);
+</script>
+</body>
+</html>

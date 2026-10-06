@@ -1,0 +1,21 @@
+{
+  "name": "contours",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "node server.mjs",
+    "host": "bash scripts/host.sh",
+    "samples": "node scripts/render-samples.mjs",
+    "smoke": "node scripts/smoke.mjs",
+    "webhook": "node scripts/register-webhook.mjs"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "Contours — custom topographic t-shirt store",
+  "dependencies": {
+    "@resvg/resvg-wasm": "^2.6.2",
+    "pngjs": "^7.0.0"
+  },
+  "type": "module"
+}

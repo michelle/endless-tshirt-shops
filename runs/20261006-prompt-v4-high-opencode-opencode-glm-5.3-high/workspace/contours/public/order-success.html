@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Contours — order confirmation</title>
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+<header class="nav">
+  <div class="wrap">
+    <a class="brand" href="/">C<span class="brand-amp">·</span>NTOURS</a>
+    <nav><a href="/">Design another</a></nav>
+  </div>
+</header>
+
+<section class="success">
+  <div class="wrap success-card">
+    <div id="status">
+      <p class="status-line"><span class="spin">Verifying your payment</span> …</p>
+    </div>
+    <div class="flat" id="design-box"></div>
+    <div class="details" id="details"></div>
+    <p class="hint">This page is live: it re-checks with Stripe and then sends your shirt to production. It's safe to close — if anything fails, our order system retries from the webhook.</p>
+  </div>
+</section>
+
+<script type="module">
+import { renderDesignSVG } from './design.js';
+import { colorByKey, extentByKey, SIZES } from './catalog.js';
+
+const params = new URLSearchParams(location.search);
+let sessionId = params.get('session_id');
+const statusEl = document.getElementById('status');
+const detailsEl = document.getElementById('details');
+
+async function poll() {
+  if (!sessionId) {
+    statusEl.innerHTML = '<p class="status-line">No order reference in the URL.</p>';
+    return;
+  }
+  try {
+    const r = await fetch('/api/order?session_id=' + encodeURIComponent(sessionId));
+    const data = await r.json();
+    if (!r.ok) throw new Error(data.error || 'order lookup failed');
+    render(data);
+    if (data.paid && !data.prodigiOrderId) setTimeout(poll, 3000);
+    else if (!data.paid) setTimeout(poll, 4000);
+  } catch (e) {
+    statusEl.innerHTML = `<p class="status-line">Lookup problem: ${String(e.message).slice(0, 140)}</p>`;
+    setTimeout(poll, 6000);
+  }
+}
+
+function render(d) {
+  if (d.error) {
+    statusEl.innerHTML = `<p class="status-line">Payment received · production error: <b>${String(d.error).slice(0, 160)}</b></p>`;
+    return;
+  }
+  if (d.paid && d.prodigiOrderId) {
+    const stage = d.prodigi?.stage || 'InProduction';
+    statusEl.innerHTML = `<p class="status-line">Payment received · shirt in production <span class="spin">⟡</span></p>`;
+    const det = d.prodigi?.details || {};
+    detailsEl.innerHTML = [
+      ['Order', d.orderId],
+      ['Production', d.prodigiOrderId + (d.prodigi?.stage ? ' · ' + d.prodigi.stage : '')],
+      ['Design', d.design ? `${d.design.title || '—'} · ${d.design.place || ''}` : '—'],
+      ['Size / colour', d.design ? SIZES.find((s) => s.key === d.design.sizeKey)?.label + ' · ' + (colorByKey(d.design.colorKey)?.label || '') : '—'],
+      d.prodigi?.tracking ? ['Tracking', `<a href="${d.prodigi.tracking.url}">${d.prodigi.tracking.number} (${d.prodigi.tracking.carrier || 'carrier'})</a>`] : null,
+    ].filter(Boolean).map(([k, v]) => `<div class="row"><span>${k}</span><b>${v}</b></div>`).join('');
+  } else if (d.paid) {
+    statusEl.innerHTML = '<p class="status-line">Payment received · sending to production <span class="spin">…</span></p>';
+  } else {
+    statusEl.innerHTML = `<p class="status-line">Payment not completed yet (${d.reason || 'pending'}) — if you cancelled, <a href="/#configure">design another</a>.</p>`;
+  }
+  if (d.design) {
+    fetch(`/api/contours?lat=${d.design.lat}&lng=${d.design.lng}&extent=${d.design.extentKey || extentByKey(String(d.design.extentKm))?.key || 'massif'}`)
+      .then((r) => r.json())
+      .then((terrain) => {
+        if (!terrain.lines) return;
+        const { svg } = renderDesignSVG({
+          title: d.design.title, place: d.design.place, lat: d.design.lat, lng: d.design.lng,
+          extentKm: terrain.extentKm, colorKey: d.design.colorKey, sizeKey: d.design.sizeKey,
+        }, terrain, { width: 420 });
+        const box = document.getElementById('design-box');
+        box.innerHTML = svg;
+        box.querySelector('svg').style.width = '210px';
+      })
+      .catch(() => {});
+  }
+}
+
+poll();
+</script>
+</body>
+</html>

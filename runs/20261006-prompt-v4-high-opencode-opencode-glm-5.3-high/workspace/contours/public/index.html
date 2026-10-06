@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Contours — custom topographic t-shirts</title>
+<meta name="description" content="Custom topographic map t-shirts, drawn from real elevation data and direct-to-garment printed to order. Any place on Earth, one shirt at a time.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><g fill='none' stroke='%2329241b' stroke-width='7'><path d='M50 15 C75 25 80 45 65 60 C50 75 55 90 50 92'/><path d='M50 15 C30 22 25 40 35 52 C45 64 42 80 50 92'/></g></svg>">
+<link rel="stylesheet" href="/style.css">
+<script type="module" src="/app.js" defer></script>
+</head>
+<body>
+
+<header class="nav">
+  <div class="wrap">
+    <a class="brand" href="/">C<span class="brand-amp">·</span>NTOURS</a>
+    <nav>
+      <a href="#how">How it works</a>
+      <a href="/orders.html">Orders</a>
+      <a class="cta-small" href="#configure">Design yours</a>
+    </nav>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <h1>Wear the shape<br>of a place.</h1>
+      <p class="lede">
+        A minimalist contour map of anywhere on Earth — the summit you summited, the valley you
+        grew up in, the coastline you got married on — drawn from real elevation data and
+        direct-to-garment printed, one shirt at a time. No two are ever the same.
+      </p>
+      <p class="hero-facts">
+        <span>Bella + Canvas 3001</span><span class="dot"></span>
+        <span>printed from real terrain</span><span class="dot"></span>
+        <span>shipped worldwide</span>
+      </p>
+      <a class="cta" href="#configure">Design your shirt →</a>
+    </div>
+    <div class="hero-art" id="hero-art">
+      <img src="/samples/matterhorn.png" alt="Sample topographic t-shirt design: the Matterhorn">
+      <img class="hero-art-2" src="/samples/rainier.png" alt="Sample design: Mount Rainier">
+    </div>
+  </div>
+</section>
+
+<section class="samples">
+  <div class="wrap">
+    <h2 class="k">Recent expeditions</h2>
+    <div class="sample-row">
+      <figure><img src="/samples/dolomites.png" alt="Tre Cime di Lavaredo, the Dolomites"><figcaption>Tre Cime · Dolomites</figcaption></figure>
+      <figure><img src="/samples/mauna-kea.png" alt="Mauna Kea, Hawaii"><figcaption>Mauna Kea · Hawaiʻi</figcaption></figure>
+      <figure><img src="/samples/matterhorn.png" alt="Matterhorn, Switzerland"><figcaption>Matterhorn · Zermatt</figcaption></figure>
+    </div>
+  </div>
+</section>
+
+<section class="how" id="how">
+  <div class="wrap">
+    <h2>How it works</h2>
+    <ol class="steps">
+      <li><b>Pick a place.</b> Search it by name, or drop exact coordinates for a spot with no name — a trailhead, a beach, a bend in the river.</li>
+      <li><b>We draw the terrain.</b> Real elevation data becomes clean contour lines — coastline, every fifth line heavier, the high point marked with its height.</li>
+      <li><b>It's printed & shipped.</b> Your map is printed directly onto a Bella + Canvas 3001 and shipped to your door, usually within a few working days.</li>
+    </ol>
+  </div>
+</section>
+
+<section class="configure" id="configure">
+  <div class="wrap">
+    <h2>Design yours</h2>
+
+    <div class="config-grid">
+      <!-- left: controls -->
+      <div class="controls">
+
+        <label class="field">
+          <span class="label">The place</span>
+          <div class="search">
+            <input id="place-search" type="text" placeholder="Try “Matterhorn”, “Kyoto”, “Zermatt”…" autocomplete="off">
+            <div id="place-results" class="results" hidden></div>
+          </div>
+        </label>
+
+        <div class="fieldrow">
+          <label class="field half"><span class="label">Latitude</span><input id="lat" type="number" step="0.0001" min="-84" max="84"></label>
+          <label class="field half"><span class="label">Longitude</span><input id="lng" type="number" step="0.0001" min="-180" max="180"></label>
+        </div>
+
+        <label class="field"><span class="label">Window — how much terrain</span>
+          <div class="pills" id="extent-pills"></div>
+        </label>
+
+        <label class="field"><span class="label">Title <em id="title-count"></em></span>
+          <input id="title" type="text" maxlength="40" placeholder="Where We Got Married">
+        </label>
+
+        <label class="field"><span class="label">Caption <em id="place-count"></em></span>
+          <input id="caption" type="text" maxlength="48" placeholder="Zermatt, Switzerland">
+        </label>
+
+        <div class="field"><span class="label">Shirt</span>
+          <div class="swatches" id="swatches"></div>
+          <div class="fieldrow" style="margin-top:12px">
+            <label class="field half"><span class="label">Size</span><select id="size"></select></label>
+            <label class="field half"><span class="label">Qty</span><select id="qty"></select></label>
+          </div>
+          <p class="hint" id="size-note"></p>
+        </div>
+
+        <div class="field"><span class="label">Ship to</span>
+          <select id="country"></select>
+          <div class="pills" id="ship-pills"></div>
+          <p class="hint" id="ship-note"></p>
+        </div>
+
+        <div class="summary">
+          <div class="row"><span id="sum-shirt">1 × Contours Tee</span><b id="sum-shirt-amt">—</b></div>
+          <div class="row"><span id="sum-ship">Shipping</span><b id="sum-ship-amt">—</b></div>
+          <div class="row total"><span>Total</span><b id="sum-total">—</b></div>
+        </div>
+
+        <button class="cta buy" id="buy" disabled>Continue to payment</button>
+        <p class="error" id="error" hidden></p>
+        <p class="hint secure">Payment runs on Stripe. Your shirt is only produced after payment is confirmed — nothing is printed for an unpaid order.</p>
+      </div>
+
+      <!-- right: preview -->
+      <div class="preview-pane">
+        <div class="preview-frame" id="shirt-preview"></div>
+        <div class="flat-holder">
+          <div class="flat" id="flat-preview"></div>
+          <p class="hint">Print file preview — exactly what goes to the printer, ink on transparent.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap foot">
+    <div>
+      <div class="brand">C<span class="brand-amp">·</span>NTOURS</div>
+      <p class="hint">Custom topographic t-shirts, printed to order via Prodigi on Bella + Canvas 3001. Payments by Stripe.</p>
+    </div>
+    <div class="hint">Made from open elevation data (Terrarium tiles, AWS Open Data).</div>
+  </div>
+</footer>
+
+</body>
+</html>
