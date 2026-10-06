@@ -1,0 +1,33 @@
+{
+  "name": "under-this-sky",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Personalized celestial apparel printed on demand.",
+  "scripts": {
+    "dev": "next dev -p 3000",
+    "build": "next build",
+    "start": "next start -p 3000",
+    "lint": "next lint",
+    "smoke": "node --import tsx/esm scripts/smoke-test.ts",
+    "deploy": "vercel deploy --yes --prod"
+  },
+  "dependencies": {
+    "@resvg/resvg-js": "2.6.2",
+    "astronomy-engine": "2.1.19",
+    "next": "14.2.18",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "stripe": "17.5.0",
+    "zod": "3.23.8"
+  },
+  "devDependencies": {
+    "@types/node": "20.17.6",
+    "@types/react": "18.3.12",
+    "@types/react-dom": "18.3.1",
+    "autoprefixer": "10.4.20",
+    "postcss": "8.4.49",
+    "tailwindcss": "3.4.15",
+    "tsx": "^4.19.2",
+    "typescript": "5.6.3"
+  }
+}

@@ -1,0 +1,101 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-serif: "Cormorant Garamond", "EB Garamond", Georgia, serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+@layer base {
+  html,
+  body {
+    height: 100%;
+  }
+
+  body {
+    background: radial-gradient(
+        ellipse at top,
+        #0a1830 0%,
+        #040a18 70%
+      ),
+      #040a18;
+    background-color: #040a18;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-serif);
+    letter-spacing: -0.01em;
+  }
+}
+
+@layer components {
+  .container-narrow {
+    @apply max-w-5xl mx-auto px-6 md:px-10;
+  }
+
+  .h-display {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-weight: 500;
+    line-height: 0.95;
+  }
+
+  .label-display {
+    font-family: var(--font-serif);
+    text-transform: uppercase;
+    letter-spacing: 0.32em;
+    font-weight: 600;
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center gap-2 px-6 py-3 rounded-full
+      bg-gold text-inkDeep font-semibold uppercase tracking-widest
+      transition hover:bg-parchment hover:no-underline;
+  }
+
+  .btn-ghost {
+    @apply inline-flex items-center gap-2 px-6 py-3 rounded-full
+      border border-gold/50 text-parchment uppercase tracking-widest
+      transition hover:border-gold hover:bg-gold/10;
+  }
+
+  .field {
+    @apply w-full bg-ink/40 border border-gold/30 rounded px-3 py-2.5
+      text-parchment placeholder-parchment/40 focus:border-gold focus:outline-none
+      focus:ring-2 focus:ring-gold/30 transition;
+  }
+
+  .field-label {
+    @apply block label-display text-xs text-gold/80 mb-2;
+  }
+
+  .pill {
+    @apply inline-flex items-center gap-1.5 rounded-full
+      border border-gold/30 px-3 py-1 text-xs uppercase tracking-widest
+      text-gold/80;
+  }
+}
+
+@keyframes drift {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(-200px, -200px, 0);
+  }
+}
+
+.bg-stars {
+  background-image:
+    radial-gradient(1px 1px at 12% 18%, rgba(244, 236, 216, 0.6), transparent),
+    radial-gradient(1px 1px at 84% 32%, rgba(244, 236, 216, 0.5), transparent),
+    radial-gradient(1.5px 1.5px at 28% 56%, rgba(217, 182, 122, 0.7), transparent),
+    radial-gradient(1px 1px at 78% 78%, rgba(244, 236, 216, 0.4), transparent),
+    radial-gradient(1px 1px at 50% 50%, rgba(217, 182, 122, 0.5), transparent),
+    radial-gradient(1.5px 1.5px at 5% 90%, rgba(244, 236, 216, 0.7), transparent),
+    radial-gradient(1px 1px at 95% 12%, rgba(244, 236, 216, 0.45), transparent);
+}
