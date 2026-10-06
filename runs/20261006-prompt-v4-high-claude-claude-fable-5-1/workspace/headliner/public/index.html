@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HEADLINER — Your life, as a tour shirt</title>
+<meta name="description" content="Turn the places and moments that made you into an authentic concert tour tee. Every shirt is printed to order, one of one.">
+<link rel="stylesheet" href="/styles.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>★</text></svg>">
+</head>
+<body>
+<header class="top">
+  <div class="brand">
+    <span class="wordmark">HEADLINER</span>
+    <span class="tag">YOUR LIFE. ON TOUR. ON A SHIRT.</span>
+  </div>
+  <nav><a href="#how">How it works</a><a href="#faq">FAQ</a></nav>
+</header>
+
+<section class="hero">
+  <h1>Every band gets a tour shirt.<br><em>Why not you?</em></h1>
+  <p>Name your tour. List the dates: the cities you lived in, the night you met, the hospital where the kid showed up, the road trip that nearly ended the friendship. We typeset it like a real tour tee and print it to order. One shirt, one of one.</p>
+  <a class="btn primary" href="#design">Start your tour</a>
+</section>
+
+<main id="design" class="designer">
+  <section class="controls">
+    <div class="card">
+      <h2><span class="step">1</span> Name the tour</h2>
+      <p class="hint">Start from a preset, then make it yours.</p>
+      <div class="chips" id="presets"></div>
+      <label>Tour name <input id="tourName" maxlength="40" placeholder="THE OKONKWO FAMILY"></label>
+      <div class="row2">
+        <label>Tour type <input id="subtitle" maxlength="28" placeholder="WORLD TOUR"></label>
+        <label>Years <small>(blank = auto from dates)</small><input id="years" maxlength="16" placeholder="2009 – 2026"></label>
+      </div>
+      <label>Kicker line <small>(optional)</small><input id="tagline" maxlength="40" placeholder="LIVE AND IN PERSON"></label>
+    </div>
+
+    <div class="card">
+      <h2><span class="step">2</span> Tour dates</h2>
+      <p class="hint">3 to 16 stops. When, where, and what went down. Up to 8 stops prints as one big list; more gives you two columns.</p>
+      <div class="stops-head"><span>When</span><span>Where</span><span>What happened</span><span></span></div>
+      <div id="stops"></div>
+      <button class="btn ghost" id="addStop" type="button">+ Add a stop</button>
+      <label class="mt">Footer line <input id="footer" maxlength="70" placeholder="ALL DATES SUBJECT TO CHANGE · NO REFUNDS ON MEMORIES"></label>
+      <label class="check"><input type="checkbox" id="soldOut"> Add a <strong>SOLD OUT</strong> stamp</label>
+    </div>
+
+    <div class="card">
+      <h2><span class="step">3</span> The shirt</h2>
+      <div class="layouts" id="layouts"></div>
+      <label>Shirt colour</label>
+      <div class="swatches" id="shirtColors"></div>
+      <label>Ink</label>
+      <div class="swatches" id="palettes"></div>
+      <p class="warn" id="contrastWarn" hidden>Heads up: that ink is close to the shirt colour and will print faint. Pick a higher-contrast ink.</p>
+      <label>Size
+        <select id="size"></select>
+      </label>
+      <p class="hint">Bella+Canvas 3001 unisex tee, 100% ring-spun cotton. True to size. Direct-to-garment printed, so there's no plastic feel to the print.</p>
+    </div>
+  </section>
+
+  <aside class="preview">
+    <div class="tabs">
+      <button type="button" data-area="front" class="tab active">Front</button>
+      <button type="button" data-area="back" class="tab">Back</button>
+    </div>
+    <div class="mockup" id="mockup">
+      <svg viewBox="0 0 400 460" id="shirtSvg" aria-label="Shirt preview">
+        <defs>
+          <linearGradient id="shade" x1="0" x2="1" y1="0" y2="0">
+            <stop offset="0" stop-color="#000" stop-opacity=".18"/>
+            <stop offset=".18" stop-color="#000" stop-opacity="0"/>
+            <stop offset=".82" stop-color="#000" stop-opacity="0"/>
+            <stop offset="1" stop-color="#000" stop-opacity=".18"/>
+          </linearGradient>
+          <clipPath id="teeClip"><path id="teeClipPath" d=""/></clipPath>
+        </defs>
+        <path id="tee" d="" fill="#141414" stroke="rgba(0,0,0,.35)" stroke-width="1.5"/>
+        <path id="collar" d="" fill="none" stroke="rgba(0,0,0,.35)" stroke-width="1.5"/>
+        <g clip-path="url(#teeClip)">
+          <image id="printImg" x="117" y="88" width="166" height="205" preserveAspectRatio="xMidYMid meet"/>
+          <path id="teeShade" d="" fill="url(#shade)"/>
+        </g>
+      </svg>
+      <div class="loading" id="loading">Rendering…</div>
+    </div>
+    <p class="note" id="areaNote"></p>
+    <div class="buy">
+      <div class="price"><span id="price">$44</span> <small>+ $6.95 shipping, worldwide</small></div>
+      <button class="btn primary big" id="buy" type="button">Buy this shirt</button>
+      <p class="fine">Secure checkout by Stripe. Printed and shipped by Prodigi in 2–5 business days.</p>
+    </div>
+  </aside>
+</main>
+
+<section id="how" class="how">
+  <h2>How it works</h2>
+  <ol>
+    <li><strong>You write the setlist.</strong> Tour name, a kicker, and the dates. The preview is the actual print file, not a mockup.</li>
+    <li><strong>We typeset it like a tour tee.</strong> Chest logo on the front, full dates on the back, with the type sized to fit however many stops you have.</li>
+    <li><strong>Printed to order, one of one.</strong> Direct-to-garment printing means your shirt is printed the moment you pay. No minimums, no blanks sitting in a warehouse.</li>
+  </ol>
+</section>
+
+<section id="faq" class="faq">
+  <h2>Good questions</h2>
+  <details><summary>What if my dates are embarrassing?</summary><p>That's the point. The best tour shirts have at least one stop nobody wants to talk about.</p></details>
+  <details><summary>Can I put a dog on tour?</summary><p>Yes. Dogs, bands, book clubs, the 2019 fantasy league. Anything with a history.</p></details>
+  <details><summary>Will the print hold up?</summary><p>DTG ink is water-based and soaks into the cotton. Wash inside out, cold, and it ages like a real tour shirt should.</p></details>
+  <details><summary>Where do you ship?</summary><p>US, Canada, UK, EU, Australia, NZ, Japan, Singapore, Mexico. Flat $6.95.</p></details>
+</section>
+
+<footer class="bottom">© HEADLINER · Printed on demand · Nothing is made until you buy it.</footer>
+<script src="/app.js" type="module"></script>
+</body>
+</html>

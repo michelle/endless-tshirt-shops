@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0"><dict>
+  <key>Label</key><string>com.headliner.server</string>
+  <key>ProgramArguments</key><array><string>/Users/mchl/.nvm/versions/node/v22.13.0/bin/node</string><string>server/index.js</string></array>
+  <key>WorkingDirectory</key><string>/private/var/folders/mq/v8s9bp2x5gg6gvywwjfszb8r0000gn/T/benchmark-workspace.2xUqNX/headliner</string>
+  <key>EnvironmentVariables</key><dict><key>PATH</key><string>/Users/mchl/.nvm/versions/node/v22.13.0/bin:/opt/homebrew/bin:/usr/bin:/bin</string></dict>
+  <key>RunAtLoad</key><true/>
+  <key>KeepAlive</key><true/>
+  <key>ThrottleInterval</key><integer>5</integer>
+  <key>StandardOutPath</key><string>/private/var/folders/mq/v8s9bp2x5gg6gvywwjfszb8r0000gn/T/benchmark-workspace.2xUqNX/headliner/data/logs/server.log</string>
+  <key>StandardErrorPath</key><string>/private/var/folders/mq/v8s9bp2x5gg6gvywwjfszb8r0000gn/T/benchmark-workspace.2xUqNX/headliner/data/logs/server.log</string>
+</dict></plist>

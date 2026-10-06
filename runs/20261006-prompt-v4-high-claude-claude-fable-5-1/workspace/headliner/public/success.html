@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>You're on the tour — HEADLINER</title>
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<header class="top"><div class="brand"><a class="wordmark" href="/">HEADLINER</a></div></header>
+<main class="success">
+  <h1 id="title">Checking your ticket…</h1>
+  <p id="sub">Confirming payment with Stripe.</p>
+  <ol class="timeline" id="timeline">
+    <li data-k="paid">Payment confirmed</li>
+    <li data-k="sent">Print files generated &amp; sent to printer</li>
+    <li data-k="printing">Printing</li>
+    <li data-k="shipped">Shipped</li>
+  </ol>
+  <dl class="meta" id="meta"></dl>
+  <div class="proofs" id="proofs"></div>
+  <p class="fine" id="err"></p>
+  <p><a class="btn ghost" href="/">Make another</a></p>
+</main>
+<script>
+const sid = new URLSearchParams(location.search).get('session_id');
+const $ = (s) => document.querySelector(s);
+const stages = { paid: 0, sent_to_printer: 1 };
+function mark(n) { [...$('#timeline').children].forEach((li, i) => li.classList.toggle('done', i <= n)); }
+async function poll() {
+  if (!sid) { $('#title').textContent = 'No session found.'; return; }
+  try {
+    const r = await fetch('/api/orders/by-session/' + encodeURIComponent(sid));
+    if (!r.ok) throw new Error('Order lookup failed (' + r.status + ')');
+    const o = await r.json();
+    const stage = (o.prodigiStage || '').toLowerCase();
+    let n = -1;
+    if (['paid', 'submitting_to_prodigi', 'sent_to_printer', 'fulfilment_error'].includes(o.status)) n = 0;
+    if (o.prodigiOrderId) n = 1;
+    if (stage === 'inprogress') n = 2;
+    if (stage === 'complete') n = 3;
+    mark(n);
+    if (n >= 1) { $('#title').textContent = "You're on the tour."; $('#sub').textContent = 'Your shirt is with the printer. We emailed your Stripe receipt' + (o.customerEmail ? ' to ' + o.customerEmail : '') + '.'; }
+    else if (n === 0) { $('#title').textContent = 'Paid. Sending to the printer…'; $('#sub').textContent = 'Generating your 300-DPI print files.'; }
+    else { $('#title').textContent = 'Waiting for payment confirmation…'; }
+    $('#meta').innerHTML = [
+      ['Order', o.id],
+      ['Printer order', o.prodigiOrderId || '—'],
+      ['Printer status', o.prodigiStage || '—'],
+      ['Total', o.amountTotal ? '$' + (o.amountTotal / 100).toFixed(2) : '—'],
+    ].map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join('');
+    if (o.designId && !$('#proofs').children.length) {
+      for (const a of (o.prodigiOrderId ? ['front', 'back'] : [])) {
+        const img = new Image(); img.src = `/api/preview/${o.designId}/${a}.png?w=500`; img.alt = a + ' print';
+        img.onerror = () => img.remove(); $('#proofs').appendChild(img);
+      }
+    }
+    if (o.status === 'fulfilment_error') $('#err').textContent = 'We hit a snag sending this to the printer: ' + o.lastError + ' — we will retry; your payment is safe.';
+    if (n < 1 || n < 3 && stage !== 'complete') setTimeout(poll, n < 1 ? 2500 : 15000);
+  } catch (e) { $('#err').textContent = e.message; setTimeout(poll, 4000); }
+}
+poll();
+</script>
+</body>
+</html>
