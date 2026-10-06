@@ -1,0 +1,23 @@
+{
+  "name": "written-in-the-stars",
+  "version": "1.0.0",
+  "description": "Personalized star-map t-shirt store (DTG via Prodigi, payments via Stripe)",
+  "type": "commonjs",
+  "main": "server.js",
+  "scripts": {
+    "start": "node tools/dev-server.js",
+    "bundle": "node tools/bundle.js",
+    "render:test": "node tools/render-test.js"
+  },
+  "dependencies": {
+    "opentype.js": "^2.0.0",
+    "sharp": "^0.33.5"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.2"
+  },
+  "optionalDependencies": {
+    "@img/sharp-libvips-linux-arm64": "1.0.4",
+    "@img/sharp-linux-arm64": "0.33.5"
+  }
+}

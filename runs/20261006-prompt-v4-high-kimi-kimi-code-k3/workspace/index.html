@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Written in the Stars — Personalized Star-Map Tees</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Crimson+Text:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/styles.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="brand">✦ Written in the Stars</div>
+  <div class="tagline">The exact night sky over your moment — printed on a tee, just for you.</div>
+</header>
+
+<main class="layout">
+  <section class="preview-pane">
+    <div class="shirt-stage">
+      <svg id="shirtSvg" viewBox="0 0 480 480" aria-label="T-shirt preview">
+        <defs>
+          <linearGradient id="shade" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#ffffff" stop-opacity="0.10"/>
+            <stop offset="1" stop-color="#000000" stop-opacity="0.18"/>
+          </linearGradient>
+        </defs>
+        <path id="shirtBody" d="M188 32
+          C 206 60 274 60 292 32
+          C 318 38 344 44 366 54
+          C 398 82 424 106 448 132
+          C 430 154 410 176 388 196
+          C 376 184 364 174 352 164
+          L 352 446 L 128 446 L 128 164
+          C 116 174 104 184 92 196
+          C 70 176 50 154 32 132
+          C 56 106 82 82 114 54
+          C 136 44 162 38 188 32 Z"
+          fill="#14161a"/>
+        <path d="M188 32 C 206 60 274 60 292 32 C 318 38 344 44 366 54 C 398 82 424 106 448 132
+          C 430 154 410 176 388 196 C 376 184 364 174 352 164 L 352 446 L 128 446 L 128 164
+          C 116 174 104 184 92 196 C 70 176 50 154 32 132 C 56 106 82 82 114 54
+          C 136 44 162 38 188 32 Z" fill="url(#shade)"/>
+        <path d="M188 32 C 206 60 274 60 292 32" fill="none" stroke="#000" stroke-opacity="0.25" stroke-width="3"/>
+      </svg>
+      <div id="artOverlay" class="art-overlay"></div>
+    </div>
+    <p class="preview-note">Live preview · your shirt is generated from the real star catalog for your exact date, time &amp; place</p>
+  </section>
+
+  <section class="form-pane">
+    <h1>Your moment. Your sky. Your shirt.</h1>
+    <p class="lede">Every tee is printed on demand with the star chart of one night that matters — a birth, a wedding, the night you met. No two shirts are alike.</p>
+
+    <form id="customizer" autocomplete="off">
+      <label>Names or headline <span class="req">*</span>
+        <input type="text" id="title" maxlength="60" placeholder="Amelia &amp; Noah" value="Amelia &amp; Noah" required>
+      </label>
+
+      <label>Dedication line <span class="opt">(optional)</span>
+        <input type="text" id="subtitle" maxlength="80" placeholder="the night everything began" value="the night everything began">
+      </label>
+
+      <div class="row">
+        <label>Date <span class="req">*</span>
+          <input type="date" id="date" value="1997-03-14" required>
+        </label>
+        <label>Time <span class="req">*</span>
+          <input type="time" id="time" value="21:30" required>
+        </label>
+      </div>
+
+      <label class="place-label">Place <span class="req">*</span>
+        <input type="text" id="place" placeholder="Start typing a city…" value="">
+        <div id="placeResults" class="place-results"></div>
+      </label>
+      <input type="hidden" id="lat"><input type="hidden" id="lon">
+
+      <div class="row">
+        <div>
+          <span class="group-label">Shirt color</span>
+          <div id="colors" class="swatches"></div>
+        </div>
+        <div>
+          <span class="group-label">Size</span>
+          <div id="sizes" class="sizes"></div>
+        </div>
+      </div>
+
+      <div class="price-row">
+        <div class="price">$34.99 <span class="ship">· ships worldwide</span></div>
+        <button type="submit" id="buyBtn" class="buy">Buy this shirt</button>
+      </div>
+      <p id="formError" class="error"></p>
+    </form>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <p>Printed on demand on a Gildan 5000 heavy-cotton tee · Direct-to-garment print · Made one at a time, just for you.</p>
+</footer>
+
+<script src="/shared/starmap.js"></script>
+<script src="/assets/app.js"></script>
+</body>
+</html>

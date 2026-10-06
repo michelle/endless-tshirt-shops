@@ -1,0 +1,83 @@
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #0e1220;
+  --panel: #161b2e;
+  --ink: #f2ead8;
+  --muted: #9aa3b8;
+  --accent: #d9b25f;
+}
+
+body {
+  background: radial-gradient(1200px 800px at 70% -10%, #1b2240 0%, var(--bg) 60%);
+  color: var(--ink);
+  font-family: Georgia, "Times New Roman", serif;
+  min-height: 100vh;
+}
+
+.site-header { text-align: center; padding: 42px 20px 8px; }
+.brand { font-size: 30px; letter-spacing: 4px; color: var(--accent); }
+.tagline { margin-top: 8px; color: var(--muted); font-style: italic; font-size: 15px; }
+
+.layout {
+  display: flex; flex-wrap: wrap; gap: 40px;
+  max-width: 1080px; margin: 30px auto 60px; padding: 0 24px;
+  align-items: flex-start; justify-content: center;
+}
+
+.preview-pane { flex: 1 1 380px; max-width: 460px; }
+.shirt-stage { position: relative; width: 100%; }
+#shirtSvg { width: 100%; display: block; filter: drop-shadow(0 18px 30px rgba(0,0,0,.5)); }
+.art-overlay {
+  position: absolute; left: 27.5%; top: 24%; width: 45%; aspect-ratio: 5 / 6;
+  mix-blend-mode: screen; opacity: .96; pointer-events: none;
+}
+.art-overlay.light-shirt { mix-blend-mode: multiply; }
+.art-overlay svg { width: 100%; height: 100%; display: block; }
+.preview-note { margin-top: 14px; text-align: center; color: var(--muted); font-size: 13px; font-style: italic; }
+
+.form-pane { flex: 1 1 380px; max-width: 460px; background: var(--panel); border: 1px solid #262d47; border-radius: 14px; padding: 30px 30px 24px; }
+.form-pane h1 { font-size: 24px; letter-spacing: 1px; margin-bottom: 10px; }
+.lede { color: var(--muted); font-size: 14px; line-height: 1.55; margin-bottom: 22px; }
+
+form label { display: block; font-size: 13px; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); margin-bottom: 16px; }
+form input[type="text"], form input[type="date"], form input[type="time"] {
+  display: block; width: 100%; margin-top: 6px;
+  background: #0f1322; border: 1px solid #2c3554; border-radius: 8px;
+  color: var(--ink); padding: 11px 12px; font-size: 15px; font-family: inherit;
+}
+form input:focus { outline: none; border-color: var(--accent); }
+.row { display: flex; gap: 14px; }
+.row > * { flex: 1; }
+.req { color: var(--accent); }
+.opt { text-transform: none; font-size: 11px; }
+
+.place-label { position: relative; }
+.place-results { position: absolute; left: 0; right: 0; top: 100%; z-index: 10; background: #0f1322; border: 1px solid #2c3554; border-radius: 8px; overflow: hidden; display: none; }
+.place-results.open { display: block; }
+.place-results div { padding: 9px 12px; font-size: 14px; text-transform: none; letter-spacing: 0; color: var(--ink); cursor: pointer; }
+.place-results div:hover { background: #1c2340; }
+
+.group-label { display: block; font-size: 13px; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+.swatches { display: flex; gap: 8px; margin-bottom: 16px; }
+.swatch { width: 34px; height: 34px; border-radius: 50%; border: 2px solid transparent; cursor: pointer; }
+.swatch.selected { border-color: var(--accent); box-shadow: 0 0 0 2px #0e1220, 0 0 0 4px var(--accent); }
+.sizes { display: flex; gap: 6px; margin-bottom: 16px; }
+.size { padding: 8px 11px; border: 1px solid #2c3554; border-radius: 8px; background: #0f1322; color: var(--ink); cursor: pointer; font-family: inherit; font-size: 13px; }
+.size.selected { border-color: var(--accent); color: var(--accent); }
+
+.price-row { display: flex; align-items: center; justify-content: space-between; margin-top: 8px; gap: 12px; }
+.price { font-size: 22px; color: var(--ink); }
+.ship { font-size: 12px; color: var(--muted); }
+.buy {
+  background: var(--accent); color: #181300; border: 0; border-radius: 10px;
+  font-size: 16px; font-weight: bold; font-family: inherit; letter-spacing: 1px;
+  padding: 13px 22px; cursor: pointer;
+}
+.buy:hover { filter: brightness(1.08); }
+.buy:disabled { opacity: .55; cursor: wait; }
+.error { color: #ff9d9d; font-size: 13px; margin-top: 12px; min-height: 18px; }
+
+.site-footer { text-align: center; color: var(--muted); font-size: 12px; padding: 20px 16px 40px; }
+
+@media (max-width: 860px) { .layout { gap: 24px; } }

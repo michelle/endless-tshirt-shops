@@ -1,0 +1,4 @@
+secrets.local.env
+node_modules
+data/
+preview*.png
