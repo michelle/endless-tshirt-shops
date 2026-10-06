@@ -1,0 +1,9 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "functions": {
+    "api/**/*.js": { "includeFiles": "{public/fonts/**,node_modules/@resvg/resvg-wasm/index_bg.wasm}", "maxDuration": 60 }
+  },
+  "headers": [
+    { "source": "/fonts/(.*)", "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }] }
+  ]
+}

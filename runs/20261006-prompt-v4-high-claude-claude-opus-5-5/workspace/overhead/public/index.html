@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Overhead — the sky above your moment, on a tee</title>
+  <meta name="description" content="A t-shirt printed with the exact night sky above any place and moment you choose — real stars, constellations, planets and the Moon in its true phase.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='15' fill='%230d1020'/%3E%3Cpath d='M16 5Q17.5 14.5 27 16Q17.5 17.5 16 27Q14.5 17.5 5 16Q14.5 14.5 16 5Z' fill='%23D2AE6A'/%3E%3C/svg%3E">
+  <link rel="preload" href="/fonts/cormorant-600.ttf" as="font" type="font/ttf" crossorigin>
+  <link rel="preload" href="/fonts/jost-400.ttf" as="font" type="font/ttf" crossorigin>
+  <link rel="preload" href="/fonts/jost-500.ttf" as="font" type="font/ttf" crossorigin>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <div id="test-banner" class="banner" hidden>
+    <strong>Test mode.</strong> Pay with card <code>4242 4242 4242 4242</code>, any future expiry, any CVC. No real money moves and orders go to Prodigi's sandbox, so nothing is actually printed.
+  </div>
+
+  <header class="site-header">
+    <a class="brand" href="/"><span class="brand-mark">✦</span> Overhead</a>
+    <nav><a href="#how">How it works</a><a href="#details">The tee</a><a href="#faq">FAQ</a></nav>
+  </header>
+
+  <section class="hero">
+    <p class="eyebrow">One sky. One moment. One shirt.</p>
+    <h1>Wear the sky that was above you.</h1>
+    <p class="lede">Pick a place and a moment: the night you were born, where you met, the first night in your new home. We calculate exactly which stars, constellations and planets were overhead, and which phase the Moon was in, then print that sky on a tee made just for you.</p>
+  </section>
+
+  <main class="designer" id="designer">
+    <section class="preview-col">
+      <div class="preview-tabs" role="tablist">
+        <button role="tab" class="tab active" data-view="shirt" aria-selected="true">On the shirt</button>
+        <button role="tab" class="tab" data-view="print" aria-selected="false">Print file</button>
+        <button role="tab" class="tab" data-view="detail" aria-selected="false">Close-up</button>
+      </div>
+      <div class="preview-stage" id="stage">
+        <div class="loading">Plotting your sky…</div>
+      </div>
+      <p class="sky-facts" id="sky-facts"></p>
+    </section>
+
+    <section class="form-col">
+      <form id="design-form" autocomplete="off" novalidate>
+        <fieldset>
+          <legend><span class="step">1</span> The moment</legend>
+          <label class="field">
+            <span>Where</span>
+            <div class="place-search">
+              <input id="place-q" type="search" placeholder="Search a city, town or landmark" aria-autocomplete="list" aria-controls="place-results">
+              <ul id="place-results" class="place-results" role="listbox" hidden></ul>
+            </div>
+            <small id="place-chosen" class="hint"></small>
+          </label>
+          <div class="row">
+            <label class="field"><span>Date</span><input id="date" type="date" required min="1900-01-01" max="2099-12-31"></label>
+            <label class="field"><span>Local time</span><input id="time" type="time" required></label>
+          </div>
+          <details class="advanced">
+            <summary>Exact coordinates</summary>
+            <div class="row">
+              <label class="field"><span>Latitude</span><input id="lat" type="number" step="0.0001" min="-90" max="90"></label>
+              <label class="field"><span>Longitude</span><input id="lon" type="number" step="0.0001" min="-180" max="180"></label>
+            </div>
+            <label class="field"><span>Time zone</span><input id="tz" type="text" placeholder="e.g. Europe/Paris"></label>
+          </details>
+        </fieldset>
+
+        <fieldset>
+          <legend><span class="step">2</span> The words</legend>
+          <label class="field">
+            <span>Headline <em class="count" data-for="headline"></em></span>
+            <input id="headline" maxlength="34" placeholder="The night we met">
+          </label>
+          <div class="chips" id="headline-chips">
+            <button type="button" class="chip">The night you were born</button>
+            <button type="button" class="chip">Where it all began</button>
+            <button type="button" class="chip">Under this sky</button>
+            <button type="button" class="chip">Our first night home</button>
+            <button type="button" class="chip">Hello, world</button>
+          </div>
+          <label class="field auto-field"><span>Place line <button type="button" class="reset" data-reset="place" hidden>↺ auto</button></span><input id="place" maxlength="44"></label>
+          <label class="field auto-field"><span>Date line <button type="button" class="reset" data-reset="dateLine" hidden>↺ auto</button></span><input id="dateLine" maxlength="44"></label>
+          <label class="field auto-field"><span>Coordinates line <button type="button" class="reset" data-reset="coords" hidden>↺ auto</button></span><input id="coords" maxlength="44"></label>
+          <p class="hint" id="text-warning" role="alert"></p>
+        </fieldset>
+
+        <fieldset>
+          <legend><span class="step">3</span> The look</legend>
+          <div class="field"><span>Shirt colour</span><div class="swatches" id="shirt-swatches"></div></div>
+          <div class="field"><span>Ink</span><div class="swatches" id="ink-swatches"></div></div>
+          <div class="toggles">
+            <label><input type="checkbox" id="lines" checked> Constellation lines</label>
+            <label><input type="checkbox" id="planets" checked> Moon &amp; planet labels</label>
+            <label><input type="checkbox" id="names"> Constellation names</label>
+            <label><input type="checkbox" id="ecliptic"> Path of the planets (ecliptic)</label>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend><span class="step">4</span> Size &amp; delivery</legend>
+          <div class="row">
+            <label class="field"><span>Size</span><select id="size"></select></label>
+            <label class="field narrow"><span>Qty</span><input id="qty" type="number" min="1" max="10" value="1"></label>
+          </div>
+          <label class="field"><span>Ship to</span><select id="country"></select></label>
+          <div class="summary" id="summary">
+            <div><span>Tee</span><span id="sum-tee">—</span></div>
+            <div><span>Shipping (tracked)</span><span id="sum-ship">—</span></div>
+            <div class="total"><span>Total</span><span id="sum-total">—</span></div>
+          </div>
+          <button type="submit" class="cta" id="checkout">Checkout securely</button>
+          <p class="hint center">Payment by Stripe. Your shirt goes to print only after payment succeeds.</p>
+          <p class="error" id="checkout-error" role="alert"></p>
+        </fieldset>
+      </form>
+    </section>
+  </main>
+
+  <section class="info" id="how">
+    <h2>How it works</h2>
+    <div class="cards">
+      <div class="card"><span class="num">01</span><h3>Choose your moment</h3><p>Any place on Earth, any minute from 1900 to 2099. We convert your local time, time zone and all, into the exact sky.</p></div>
+      <div class="card"><span class="num">02</span><h3>We plot the heavens</h3><p>Around 2,300 real stars from the Hipparcos and Yale Bright Star catalogues, 88 constellations, the planets and the Moon in its true phase, all computed for your coordinates.</p></div>
+      <div class="card"><span class="num">03</span><h3>Printed just for you</h3><p>Your design is printed direct-to-garment on a premium cotton tee and shipped, tracked, to your door, usually within 5–12 business days.</p></div>
+    </div>
+  </section>
+
+  <section class="info" id="details">
+    <h2>The tee</h2>
+    <div class="cards two">
+      <div class="card"><h3>Bella+Canvas 3001</h3><p>The tee printers love: 100% combed and ring-spun cotton, a soft retail fit, side-seamed and unisex. Sizes XS–4XL depending on colour.</p></div>
+      <div class="card"><h3>Built for DTG</h3><p>The artwork is drawn as vectors and rendered at 300 DPI with solid, opaque inks. Lines and stars are never thinner than about 0.6 mm, so every detail actually prints.</p></div>
+    </div>
+  </section>
+
+  <section class="info" id="faq">
+    <h2>Questions</h2>
+    <details><summary>How accurate is the sky?</summary><p>Star positions come from professional catalogues and are rotated for the exact date, time and place. Planet and Moon positions use the open-source Astronomy Engine, accurate to well under a degree. The chart is drawn as if you were lying on your back looking up: north at the top, east on the left.</p></details>
+    <details><summary>What if the moment was during the day?</summary><p>We still show the stars that were above you. They were there, just hidden by sunlight. The preview tells you when the Sun was up.</p></details>
+    <details><summary>Returns?</summary><p>Every shirt is one of a kind, so we can't take returns for a change of mind. If anything arrives misprinted or damaged, we'll reprint it free.</p></details>
+    <details><summary>Where do you ship?</summary><p>The US, Canada, the UK, most of Europe, Australia, New Zealand, Japan, Singapore, Hong Kong and Mexico. Shipping is calculated at cost from our print partner.</p></details>
+  </section>
+
+  <footer class="site-footer">
+    <p>© Overhead. Star data: Hipparcos / Yale BSC via d3-celestial (BSD). Ephemerides: Astronomy Engine (MIT). Place search: Open-Meteo.</p>
+  </footer>
+
+  <script type="module" src="/app.js"></script>
+</body>
+</html>

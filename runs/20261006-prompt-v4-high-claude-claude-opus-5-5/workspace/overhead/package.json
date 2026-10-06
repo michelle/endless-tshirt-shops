@@ -1,0 +1,15 @@
+{
+  "name": "overhead-store",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node scripts/dev-server.js",
+    "build-data": "node scripts/build-data.js"
+  },
+  "dependencies": {
+    "@resvg/resvg-wasm": "^2.6.2",
+    "astronomy-engine": "^2.1.19",
+    "opentype.js": "^2.0.0",
+    "stripe": "^23.0.0"
+  }
+}
