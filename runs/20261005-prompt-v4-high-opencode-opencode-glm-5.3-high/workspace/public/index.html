@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Starloom — the night sky above your moment, on a tee</title>
+<meta name="description" content="Custom star-map t-shirts. Pick a moment and a place — we chart the exact sky above it and print it on a heavyweight cotton tee.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="/style.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='13' fill='none' stroke='%23e9e2d0' stroke-width='1.5'/%3E%3Ccircle cx='16' cy='16' r='2' fill='%23e9e2d0'/%3E%3Ccircle cx='9' cy='11' r='1' fill='%23e9e2d0'/%3E%3Ccircle cx='22' cy='20' r='1.4' fill='%23e9e2d0'/%3E%3Ccircle cx='19' cy='8' r='.8' fill='%23e9e2d0'/%3E%3C/svg%3E">
+</head>
+<body>
+<canvas id="bgstars" aria-hidden="true"></canvas>
+
+<header class="site-head">
+  <a class="wordmark" href="/">Starloom</a>
+  <span class="head-note">printed on demand · ships worldwide</span>
+</header>
+
+<main>
+  <section class="hero">
+    <h1>The night sky above your moment,<br><em>on a heavyweight tee.</em></h1>
+    <p class="lede">
+      Pick a date, a time and a place. We compute the exact sky that hung above it —
+      every star in its true position — and print it direct to garment.
+      One night. One shirt. <strong>No two are ever alike.</strong>
+    </p>
+    <div class="hero-ticks">
+      <div>✦&ensp;Astronomically exact — computed for your coordinates &amp; minute</div>
+      <div>✦&ensp;3,600+ real stars &amp; all 88 constellations, charted from real catalogues</div>
+      <div>✦&ensp;300-dpi direct-to-garment print, Gildan Softstyle ringspun cotton</div>
+    </div>
+  </section>
+
+  <section id="studio" class="studio">
+    <div class="preview-col">
+      <div class="preview-frame">
+        <canvas id="mockup" width="800" height="1000" aria-label="Shirt preview"></canvas>
+      </div>
+      <div class="preview-hint" id="previewHint">charting the sky…</div>
+    </div>
+
+    <div class="controls-col">
+      <div class="panel">
+        <label class="step-label">1 · The moment</label>
+        <div class="row">
+          <div class="field"><span>Date</span><input type="date" id="date"></div>
+          <div class="field"><span>Time</span><input type="time" id="time"></div>
+          <button class="ghost" id="nowBtn" type="button" title="Use the current moment">now</button>
+        </div>
+      </div>
+
+      <div class="panel">
+        <label class="step-label">2 · The place</label>
+        <div class="searchwrap">
+          <input id="cityInput" type="search" placeholder="Search a city — e.g. Kyoto, Lisbon, Buenos Aires…" autocomplete="off">
+          <div id="cityResults" class="results" hidden></div>
+        </div>
+        <div class="row manual-row">
+          <button class="linkbtn" id="manualToggle" type="button">enter coordinates manually</button>
+        </div>
+        <div id="manualBox" hidden>
+          <div class="row">
+            <div class="field"><span>Latitude</span><input id="latInput" type="number" step="0.0001" min="-90" max="90" value="48.8566"></div>
+            <div class="field"><span>Longitude</span><input id="lonInput" type="number" step="0.0001" min="-180" max="180" value="2.3522"></div>
+          </div>
+          <div class="row">
+            <div class="field grow"><span>Place label (printed on the shirt)</span><input id="placeInput" type="text" maxlength="48" value="Paris, France"></div>
+          </div>
+          <div class="row">
+            <div class="field grow"><span>Time zone</span><input id="tzInput" type="text" list="tzList" value="UTC"></div>
+          </div>
+          <datalist id="tzList"></datalist>
+        </div>
+        <div class="selected-place" id="selectedPlace" hidden></div>
+      </div>
+
+      <div class="panel">
+        <label class="step-label">3 · The words</label>
+        <div class="field"><span>Title <small id="titleCount">0/30</small></span>
+          <input id="titleInput" type="text" maxlength="30" value="The Night We Met"></div>
+        <div class="field"><span>Line under the sky <small id="msgCount">0/42</small></span>
+          <input id="msgInput" type="text" maxlength="42" placeholder="forever begins here" value="forever begins here"></div>
+        <label class="checkline"><input type="checkbox" id="linesToggle" checked> Draw constellation lines</label>
+      </div>
+
+      <div class="panel">
+        <label class="step-label">4 · The shirt</label>
+        <div class="row">
+          <div class="field grow"><span>Color</span><div id="colorSwatches" class="swatches"></div></div>
+        </div>
+        <div class="row">
+          <div class="field"><span>Size</span><select id="sizeSelect"></select></div>
+          <div class="field price-box">
+            <span>Price</span>
+            <strong id="priceLabel">$49.00</strong>
+            <small id="shipLabel">$42 tee + $7 shipping · worldwide</small>
+          </div>
+        </div>
+      </div>
+
+      <button class="cta" id="checkoutBtn">Continue to checkout →</button>
+      <p class="assurance">Payment is taken securely before anything is printed. Shirts are printed &amp; shipped via the Prodigi print network.</p>
+    </div>
+  </section>
+
+  <section class="how">
+    <h2>How it works</h2>
+    <ol>
+      <li><strong>You pick the moment.</strong> A first date, a birth, a goodbye, a hello — down to the minute.</li>
+      <li><strong>We chart the sky.</strong> Sidereal time, your exact latitude and longitude, 3,600 catalogue stars — the true sky, as it was.</li>
+      <li><strong>We print it on cotton.</strong> Direct-to-garment at 300 dpi — fine halos on the brightest stars, every constellation in its place — and ship it worldwide, white-label.</li>
+    </ol>
+  </section>
+</main>
+
+<div id="checkoutModal" class="modal" hidden>
+  <div class="modal-card">
+    <div class="modal-head">
+      <h2>Shipping details</h2>
+      <button class="linkbtn" id="closeCheckout" type="button">✕ close</button>
+    </div>
+    <div class="summary" id="checkoutSummary"></div>
+    <form id="checkoutForm" class="checkout-form" novalidate>
+      <div class="row">
+        <div class="field grow"><span>Full name</span><input name="name" required maxlength="100" autocomplete="name"></div>
+        <div class="field grow"><span>Email</span><input name="email" type="email" required maxlength="120" autocomplete="email"></div>
+      </div>
+      <div class="field"><span>Address line 1</span><input name="line1" required maxlength="100" autocomplete="address-line1"></div>
+      <div class="field"><span>Address line 2 <small>optional</small></span><input name="line2" maxlength="100" autocomplete="address-line2"></div>
+      <div class="row">
+        <div class="field grow"><span>City</span><input name="city" required maxlength="60" autocomplete="address-level2"></div>
+        <div class="field"><span>State / region</span><input name="state" maxlength="60" autocomplete="address-level1"></div>
+      </div>
+      <div class="row">
+        <div class="field"><span>ZIP / postcode</span><input name="zip" required maxlength="20" autocomplete="postal-code"></div>
+        <div class="field grow"><span>Country</span><select name="country" id="countrySelect" required></select></div>
+      </div>
+      <div class="field"><span>Phone <small>optional — helps couriers</small></span><input name="phone" type="tel" maxlength="30" autocomplete="tel"></div>
+      <div class="payerr" id="checkoutErr"></div>
+      <button class="cta" type="submit" id="placeOrderBtn">Place order — $49.00</button>
+      <p class="assurance">You'll pay on the next screen. Nothing is printed or sent to our print network until your payment succeeds.</p>
+    </form>
+  </div>
+</div>
+
+<footer>
+  <span>Starloom — every sky tells a story.</span>
+  <span class="fine">Fulfilment by the Prodigi print network · astronomy from the Yale Bright Star catalogue</span>
+</footer>
+
+<script type="module" src="/app.js"></script>
+</body>
+</html>

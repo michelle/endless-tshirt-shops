@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Your order — Starloom</title>
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<canvas id="bgstars" aria-hidden="true"></canvas>
+<main class="narrow" id="page">
+  <h1 id="title">Your night is on its way</h1>
+  <p class="sub" id="subtitle">Order <span id="oid"></span> · <span id="when2"></span></p>
+
+  <div class="summary">
+    <img id="designThumb" alt="Your star map">
+    <div class="rows" id="orderRows"></div>
+  </div>
+
+  <ul class="steps" id="steps"></ul>
+
+  <div class="meta-grid" id="meta"></div>
+  <div class="payerr" id="orderErr"></div>
+  <button class="cta" id="retryBtn" hidden>Retry sending to print network</button>
+
+  <details class="fine-details" id="fine" hidden>
+    <summary>Fulfilment details (sandbox)</summary>
+    <pre id="finePre"></pre>
+  </details>
+
+  <p style="margin-top:30px"><a class="backhome" href="/">← chart another night</a></p>
+</main>
+<script type="module" src="/order.js"></script>
+<script type="module">
+  // little static starfield for the page background
+  const c = document.getElementById("bgstars");
+  const ctx = c.getContext("2d");
+  const dpr = window.devicePixelRatio || 1;
+  c.width = innerWidth * dpr; c.height = innerHeight * dpr;
+  let seed = 7;
+  const rand = () => { seed = (seed * 1664525 + 1013904223) % 4294967296; return seed / 4294967296; };
+  ctx.fillStyle = "rgba(233,228,212,0.5)";
+  for (let i = 0; i < 130; i++) {
+    ctx.globalAlpha = 0.25 + rand() * 0.55;
+    ctx.beginPath();
+    ctx.arc(rand() * c.width, rand() * c.height, rand() * 1.5 * dpr + 0.3, 0, Math.PI * 2);
+    ctx.fill();
+  }
+</script>
+</body>
+</html>

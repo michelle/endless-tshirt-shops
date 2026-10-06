@@ -1,0 +1,18 @@
+{
+  "name": "starloom",
+  "version": "1.0.0",
+  "description": "Starloom - custom night-sky t-shirts. Every shirt is the exact star map above a moment and place of your choosing.",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node tests/astro.test.mjs && node tests/render.test.mjs"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "@napi-rs/canvas": "^0.1.65",
+    "express": "^4.21.2"
+  }
+}

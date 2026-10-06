@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Secure checkout — Starloom</title>
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<main class="narrow">
+  <span class="badge" id="driverBadge">sandbox checkout</span>
+  <h1>Pay for your sky</h1>
+  <p class="sub">Your shirt is only sent to the print network after payment succeeds.</p>
+
+  <div class="summary" id="orderSummary"></div>
+
+  <div class="testcards" id="testCards">
+    <b>Sandbox gateway — no real charges.</b> Try these test cards:<br>
+    <code>4242 4242 4242 4242</code> approve ·
+    <code>4000 0000 0000 0002</code> decline ·
+    <code>4000 0000 0000 9995</code> insufficient funds<br>
+    Any other Luhn-valid number also approves. Expiry any future date, CVC any 3 digits.
+  </div>
+
+  <form id="payForm" class="checkout-form" novalidate>
+    <div class="field"><span>Name on card</span><input name="name" required maxlength="100" autocomplete="cc-name"></div>
+    <div class="field"><span>Card number</span>
+      <input name="number" required inputmode="numeric" autocomplete="cc-number"
+             placeholder="4242 4242 4242 4242" maxlength="23"></div>
+    <div class="grid2">
+      <div class="field"><span>Expiry month</span><input name="expMonth" required inputmode="numeric" placeholder="12" maxlength="2" autocomplete="cc-exp-month"></div>
+      <div class="field"><span>Expiry year</span><input name="expYear" required inputmode="numeric" placeholder="29" maxlength="4" autocomplete="cc-exp-year"></div>
+    </div>
+    <div class="field"><span>Security code</span><input name="cvc" required inputmode="numeric" placeholder="123" maxlength="4" autocomplete="cc-csc"></div>
+    <div class="payerr" id="payErr"></div>
+    <button class="cta" type="submit" id="payBtn">Pay $49.00</button>
+    <p class="assurance">Test mode: this simulates a card charge. Fulfilment (print + shipping) triggers on success.</p>
+  </form>
+</main>
+<script type="module">
+const id = location.pathname.split("/").pop();
+const $ = (x) => document.getElementById(x);
+const fmt = (v) => `$${v.toFixed(2)}`;
+
+const res = await fetch(`/api/order/${id}`).then((r) => r.json());
+if (!res.ok) location.href = "/";
+const o = res.order;
+$("driverBadge").textContent = "sandbox checkout";
+$("orderSummary").innerHTML = `
+  <div class="rows">
+    <div><span>${o.design.place}</span></div>
+    <div><span>${o.design.dateStr} · ${o.design.timeStr} · ${o.design.tz}</span></div>
+    <div><span>Tee (${o.product.color}, ${o.product.size.toUpperCase()})</span><span>${fmt(o.amounts.item)}</span></div>
+    <div><span>Shipping</span><span>${fmt(o.amounts.shipping)}</span></div>
+    <div class="tot"><span>Total</span><span>${fmt(o.amounts.total)}</span></div>
+  </div>`;
+$("payBtn").textContent = `Pay ${fmt(o.amounts.total)}`;
+
+$("payForm").onsubmit = async (e) => {
+  e.preventDefault();
+  $("payErr").textContent = "";
+  const btn = $("payBtn");
+  btn.disabled = true;
+  btn.textContent = "Processing…";
+  const f = Object.fromEntries(new FormData(e.target).entries());
+  try {
+    const r = await fetch(`/api/pay/${id}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ card: f }),
+    });
+    const data = await r.json();
+    if (!r.ok || !data.ok) {
+      throw new Error(data.error?.message || data.error || "Payment failed.");
+    }
+    location.href = data.url;
+  } catch (err) {
+    $("payErr").textContent = err.message;
+    btn.disabled = false;
+    btn.textContent = `Pay ${fmt(o.amounts.total)}`;
+  }
+};
+</script>
+</body>
+</html>

@@ -1,0 +1,7 @@
+node_modules/
+.scratch/
+data/orders.json
+data/orders.json.tmp
+data/print-files/
+*.log
+.DS_Store
