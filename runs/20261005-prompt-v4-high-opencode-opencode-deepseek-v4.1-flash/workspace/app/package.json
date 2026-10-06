@@ -1,0 +1,9 @@
+{
+  "name": "under-same-sky",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Personalised star-map t-shirts, printed DTG via Prodigi.",
+  "dependencies": {
+    "@resvg/resvg-wasm": "2.6.2"
+  }
+}
