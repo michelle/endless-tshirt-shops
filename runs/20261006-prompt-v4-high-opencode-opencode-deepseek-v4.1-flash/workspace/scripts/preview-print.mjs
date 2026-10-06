@@ -1,0 +1,13 @@
+import { createCanvas, loadImage } from '@napi-rs/canvas';
+import { writeFileSync } from 'node:fs';
+const img = await loadImage('/tmp/print2.png');
+const scale = 0.16;
+const w = Math.round(img.width*scale), h = Math.round(img.height*scale);
+const c = createCanvas(w*2+30, h);
+const ctx = c.getContext('2d');
+ctx.fillStyle='#141414'; ctx.fillRect(0,0,w,h);
+ctx.fillStyle='#f2efe9'; ctx.fillRect(w+30,0,w,h);
+ctx.drawImage(img,0,0,w,h);
+ctx.drawImage(img,w+30,0,w,h);
+writeFileSync('/tmp/print-composite.png', c.toBuffer('image/png'));
+console.log('ok', w, h);

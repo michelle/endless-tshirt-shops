@@ -1,0 +1,22 @@
+{
+  "name": "echoform",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Echoform - custom soundprint t-shirts",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "deploy": "bash scripts/deploy.sh",
+    "test:render": "node scripts/render-test.mjs"
+  },
+  "dependencies": {
+    "@napi-rs/canvas": "^0.1.65",
+    "express": "^4.21.2",
+    "stripe": "^17.7.0"
+  },
+  "devDependencies": {
+    "puppeteer-core": "^23.11.1"
+  }
+}
