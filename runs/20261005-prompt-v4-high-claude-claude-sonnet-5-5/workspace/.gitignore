@@ -1,0 +1,5 @@
+node_modules
+.next
+lib/secrets.generated.js
+.env*
+.vercel
