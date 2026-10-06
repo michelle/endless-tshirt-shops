@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Your Dayprint is on its way</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+<meta name="robots" content="noindex">
+</head>
+<body>
+<header class="top"><a class="brand" href="/">Dayprint</a><nav><a href="/#build">Make another</a></nav></header>
+<main class="receipt">
+  <div>
+    <p class="eyebrow">Order confirmation</p>
+    <h1 id="title">Checking your order…</h1>
+    <p id="lede" class="lede"></p>
+    <div class="card">
+      <ul class="timeline" id="timeline">
+        <li class="wait" id="t-paid"><b>1</b><div>Payment<small id="t-paid-s">Confirming with Stripe…</small></div></li>
+        <li id="t-print"><b>2</b><div>Sent to print<small id="t-print-s">Waiting for payment</small></div></li>
+        <li id="t-ship"><b>3</b><div>Shipped<small id="t-ship-s">You will get a tracking email when the shirt leaves the print facility.</small></div></li>
+      </ul>
+      <p id="meta" class="dim" style="font-size:.82rem;color:var(--ink2)"></p>
+    </div>
+    <p class="fine" id="dl"></p>
+  </div>
+  <div>
+    <div class="art-wrap" id="art"></div>
+    <p class="fine" id="art-caption"></p>
+  </div>
+</main>
+<script type="module">
+import { renderSVG, SHIRTS } from '/lib/dayprint.js';
+const $ = (s) => document.querySelector(s);
+const id = new URLSearchParams(location.search).get('session_id');
+const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+function mark(el, cls, text) { const li = $('#' + el); li.className = cls; $('#' + el + '-s').textContent = text; }
+
+let drawn = false;
+async function poll(attempt = 0) {
+  if (!id) { $('#title').textContent = 'No order found'; $('#lede').textContent = 'This page needs a checkout session link.'; return; }
+  let j;
+  try { j = await (await fetch('/api/order-status?session_id=' + encodeURIComponent(id))).json(); }
+  catch { if (attempt < 10) return setTimeout(() => poll(attempt + 1), 3000); }
+  if (!j || j.error) { $('#title').textContent = 'We could not load this order'; $('#lede').textContent = j?.error || 'Please refresh in a moment.'; return; }
+
+  const s = j.spec;
+  const place = [s.place.name, s.place.admin1 || s.place.country].filter(Boolean).join(', ');
+  const nice = new Date(s.date + 'T12:00:00Z').toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' });
+  $('#meta').textContent = `${SHIRTS[s.shirt]?.label} tee · size ${s.size.toUpperCase()} · ${place} · ${nice}${j.ship_to ? ` · ships to ${j.ship_to.name}, ${j.ship_to.city || ''} ${j.ship_to.country}` : ''} · order ref ${id.slice(-10)}`;
+  $('#art-caption').textContent = `Your print file, exactly as sent to the printer (${s.caption ? '“' + s.caption + '” · ' : ''}${place}, ${nice}).`;
+  if (!drawn) {
+    drawn = true;
+    try {
+      const qs = new URLSearchParams({ lat: s.place.lat, lon: s.place.lon, date: s.date, unit: s.unit, name: s.place.name, admin1: s.place.admin1, country: s.place.country, cc: s.place.countryCode });
+      const day = await (await fetch('/api/day?' + qs)).json();
+      $('#art').style.background = SHIRTS[s.shirt]?.hex || '#141519';
+      $('#art').innerHTML = renderSVG(day, { shirt: s.shirt, caption: s.caption });
+    } catch { $('#art').innerHTML = `<img src="${esc(j.art_url)}?w=900" alt="Your Dayprint artwork">`; }
+    $('#dl').innerHTML = `<a href="${esc(j.art_url)}" target="_blank" rel="noopener">Download the full-resolution print file (PNG, 4680×5790)</a>`;
+  }
+
+  if (!j.paid) {
+    $('#title').textContent = 'Payment not completed';
+    $('#lede').textContent = 'Stripe has not confirmed this payment. If you were charged, it will show up here shortly.';
+    mark('t-paid', 'wait', 'Not confirmed yet');
+    if (attempt < 20) setTimeout(() => poll(attempt + 1), 4000);
+    return;
+  }
+  mark('t-paid', 'done', `Paid ${(j.amount_total / 100).toLocaleString('en-US', { style: 'currency', currency: (j.currency || 'usd').toUpperCase() })}${j.email ? ' · receipt sent to ' + j.email : ''}`);
+  const f = j.fulfillment || {};
+  if (f.prodigiOrderId) {
+    $('#title').textContent = 'Your Dayprint is going to print';
+    $('#lede').textContent = 'Payment confirmed and your print order has been placed. Each shirt is printed to order, so allow 2–5 business days before it ships.';
+    const stage = j.prodigi?.stage || f.prodigiStage || 'InProgress';
+    mark('t-print', 'done', `Prodigi order ${f.prodigiOrderId} · status: ${stage}`);
+    const sh = j.prodigi?.shipments?.find((x) => x.tracking);
+    if (sh) { mark('t-ship', 'done', `Shipped via ${sh.carrier}`); $('#t-ship-s').innerHTML += ` · <a href="${esc(sh.tracking)}" target="_blank" rel="noopener">track</a>`; }
+    else if (stage === 'Complete') mark('t-ship', 'done', 'Shipped');
+    else $('#t-ship').className = 'wait';
+  } else if (f.error) {
+    $('#title').textContent = 'Paid — print order pending';
+    $('#lede').textContent = 'Your payment went through but we hit a snag handing the order to the printer. We retry automatically, and a human will follow up if it does not clear.';
+    mark('t-print', 'fail', 'Retrying: ' + f.error);
+    if (attempt < 6) setTimeout(() => poll(attempt + 1), 8000);
+  } else {
+    $('#title').textContent = 'Payment received';
+    mark('t-print', 'wait', 'Handing your design to the printer…');
+    if (attempt < 10) setTimeout(() => poll(attempt + 1), 3000);
+  }
+}
+poll();
+</script>
+</body>
+</html>

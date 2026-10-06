@@ -1,0 +1,9 @@
+node_modules
+.vercel
+.secrets
+.env
+.env.*
+!.env.example
+out
+*.png
+!public/*.png

@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dayprint — the weather of one day in your life, on a shirt</title>
+<meta name="description" content="Pick a place and a date. We pull the real hourly weather from the archive — sky, temperature, rain, sunrise, moon — and print that day as a one-of-a-kind shirt.">
+<meta property="og:title" content="Dayprint — wear the weather of a day that mattered">
+<meta property="og:description" content="Every day has a shape. Enter a place and a date and we print its real weather on a shirt, made to order.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='14' fill='%23262c63'/%3E%3Cpath d='M16 2a14 14 0 0 1 0 28z' fill='%236cb0ea'/%3E%3C/svg%3E">
+</head>
+<body>
+<header class="top">
+  <a class="brand" href="/">Dayprint</a>
+  <nav><a href="#how">How it works</a><a href="#build">Make yours</a><a href="#faq">FAQ</a></nav>
+</header>
+
+<section class="hero">
+  <div class="hero-copy">
+    <p class="eyebrow">Made to order · Printed direct to garment</p>
+    <h1>Every day has a shape.<br><em>Wear yours.</em></h1>
+    <p class="lede">The morning your kid arrived. The rainy afternoon you said yes. The heatwave you met in. Give us a place and a date and we pull the <strong>real hourly weather from the archive</strong> — sky, temperature, rain, sunrise, moon — and print that one day as a shirt nobody else can own.</p>
+    <a class="btn btn-primary" href="#build">Make your Dayprint →</a>
+    <p class="fine">Any day since 1940 · Anywhere on Earth · Ships worldwide</p>
+  </div>
+  <div class="hero-art" id="hero-art" aria-hidden="true"></div>
+</section>
+
+<section id="how" class="how">
+  <div class="step"><span>01</span><h3>Pick the day</h3><p>A birthday, a wedding, a first date, a finish line. Any date from 1 January 1940 up to about a week ago.</p></div>
+  <div class="step"><span>02</span><h3>We find the sky</h3><p>Hour by hour: temperature, cloud, rain or snow, sunrise and sunset, plus the moon that night. All from the ERA5 climate reanalysis archive.</p></div>
+  <div class="step"><span>03</span><h3>Printed to order</h3><p>Rendered at 300 DPI onto a Bella + Canvas 3001 tee with direct-to-garment ink. Full colour, soft hand, no two alike.</p></div>
+</section>
+
+<section id="build" class="builder">
+  <form id="form" class="controls" autocomplete="off">
+    <h2>Make your Dayprint</h2>
+
+    <label class="field">
+      <span>Place</span>
+      <input id="place" type="text" placeholder="City or town, e.g. Portland" required>
+      <ul id="suggest" class="suggest" hidden></ul>
+      <small id="place-picked" class="hint"></small>
+    </label>
+
+    <div class="row">
+      <label class="field">
+        <span>Date</span>
+        <input id="date" type="date" required>
+      </label>
+      <label class="field unit">
+        <span>Units</span>
+        <div class="seg" role="radiogroup">
+          <button type="button" data-unit="F" class="on">°F</button><button type="button" data-unit="C">°C</button>
+        </div>
+      </label>
+    </div>
+
+    <label class="field">
+      <span>Caption <small>(optional, printed in italics)</small></span>
+      <input id="caption" type="text" maxlength="36" placeholder="The day you were born">
+      <small class="hint"><span id="caption-count">0</span>/36</small>
+    </label>
+
+    <div class="field">
+      <span>Shirt colour</span>
+      <div id="swatches" class="swatches"></div>
+    </div>
+
+    <div class="field">
+      <span>Size <a class="hint" href="#size-guide">size guide</a></span>
+      <div id="sizes" class="sizes"></div>
+    </div>
+
+    <div class="buy">
+      <div class="price"><strong id="price">$36</strong><small>+ <span id="shipping">$7.95</span> shipping, worldwide</small></div>
+      <button id="buy" class="btn btn-primary" type="submit" disabled>Buy this shirt</button>
+    </div>
+    <p id="status" class="status" role="status"></p>
+    <p class="fine">Secure checkout by Stripe. Printed and shipped by Prodigi. Made to order — please allow 2–5 business days for printing plus shipping.</p>
+  </form>
+
+  <div class="stage">
+    <div class="mockup" id="mockup">
+      <svg id="shirt" viewBox="0 0 400 460" xmlns="http://www.w3.org/2000/svg" aria-label="Shirt preview">
+        <defs>
+          <linearGradient id="shade" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0" stop-color="#000" stop-opacity=".18"/><stop offset=".12" stop-color="#000" stop-opacity="0"/>
+            <stop offset=".88" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".18"/>
+          </linearGradient>
+          <clipPath id="tee-clip"><path id="tee-clip-path" d=""/></clipPath>
+        </defs>
+        <path id="tee" d="" fill="#141519"/>
+        <path id="tee-shade" d="" fill="url(#shade)"/>
+        <path id="collar" d="" fill="none" stroke="#000" stroke-opacity=".25" stroke-width="2"/>
+        <g clip-path="url(#tee-clip)"><g id="design"></g></g>
+      </svg>
+      <div id="loading" class="loading" hidden><span></span>Reading the archive…</div>
+    </div>
+    <div class="facts" id="facts"><p>Pick a place and a date to see its weather take shape.</p></div>
+    <div class="legend">
+      <span><i style="background:#262c63"></i>night</span><span><i style="background:#f0955c"></i>dawn</span><span><i style="background:#6cb0ea"></i>clear day</span><span><i style="background:#b1b6bf"></i>cloud</span><span><i style="background:#5c7392"></i>rain</span><span><i style="background:#e26e8c"></i>dusk</span>
+      <em>Wedge length = how warm that hour was. Noon at the top, midnight at the bottom.</em>
+    </div>
+  </div>
+</section>
+
+<section id="faq" class="faq">
+  <h2>Questions</h2>
+  <details open><summary>Where does the weather come from?</summary><p>From the ERA5 reanalysis published by Copernicus / ECMWF, served through the Open-Meteo historical archive. It covers every point on Earth, hourly, since 1940. It is a model reconstruction blended with observations, so it reflects the day faithfully but may differ by a degree or two from a specific weather station.</p></details>
+  <details><summary>Why can't I pick yesterday?</summary><p>The archive is finalised a few days after the fact. We hold a one-week margin so your shirt is printed from settled data.</p></details>
+  <details><summary>How do I read the design?</summary><p>It is a 24-hour clock: midnight at the bottom, noon at the top. Each wedge is one hour. Its colour is that hour's sky (night, dawn, day, dusk, shaded by cloud and darkened by rain or lightened by snow). Its length is the temperature relative to the day's range. Dotted lines mark sunrise and sunset. Ticks outside the ring show rain; dots show snow. The moon shows its real phase that night.</p></details>
+  <details id="size-guide"><summary>Shirt &amp; size guide</summary><p>Bella + Canvas 3001, unisex, 100% combed ring-spun cotton (heathers are a cotton/poly blend), 4.2 oz, side-seamed, retail fit. Chest width, laid flat: XS 16½″ · S 18″ · M 20″ · L 22″ · XL 24″ · 2XL 26″ · 3XL 28″. The print is about 11.5″ wide on the chest.</p></details>
+  <details><summary>Shipping &amp; returns</summary><p>Printed within 2–5 business days, then shipped from the facility nearest you (US, UK, EU and Australia). Tracking is emailed when it ships. Because every shirt is unique to you, we can't resell returns — but if anything arrives damaged or misprinted, reply to your receipt and we will reprint it free.</p></details>
+</section>
+
+<footer>
+  <p>© Dayprint. Weather data © Copernicus Climate Change Service / ECMWF via Open-Meteo (CC BY 4.0). Printed on demand by Prodigi.</p>
+  <p id="env-badge" class="env-badge" hidden></p>
+</footer>
+
+<script type="module" src="/app.js"></script>
+</body>
+</html>

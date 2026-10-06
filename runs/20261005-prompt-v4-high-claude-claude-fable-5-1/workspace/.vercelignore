@@ -1,0 +1,7 @@
+.env
+.env.*
+.secrets
+.vercel
+out
+scripts/dev-server.mjs
+tests
