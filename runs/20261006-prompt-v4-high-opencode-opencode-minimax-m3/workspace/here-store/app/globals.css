@@ -1,0 +1,56 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-sans: 'Geist', 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-serif: 'Geist', 'Cormorant Garamond', 'Playfair Display', serif;
+  --font-mono: 'Geist Mono', 'JetBrains Mono', ui-monospace, 'SFMono-Regular', monospace;
+  color-scheme: light;
+}
+
+html, body { background-color: #f5f1ea; color: #0c0c0d; }
+
+body {
+  font-family: var(--font-sans);
+  font-feature-settings: 'ss01', 'cv11';
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Subtle paper texture on the bone background */
+.paper {
+  background-image:
+    radial-gradient(rgba(12,12,13,0.04) 1px, transparent 1px);
+  background-size: 4px 4px;
+}
+
+/* Marquee animation for the "as featured/as seen" strip */
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.marquee-track { animation: marquee 32s linear infinite; }
+
+/* Map grid (decorative backgound of the configurator) */
+.grid-bg {
+  background-image:
+    linear-gradient(rgba(12,12,13,0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(12,12,13,0.08) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+/* Small hand-drawn crosshair */
+.crosshair::before, .crosshair::after {
+  content: '';
+  position: absolute;
+  background: currentColor;
+}
+.crosshair::before {
+  top: 50%; left: 0; right: 0; height: 1px;
+  transform: translateY(-0.5px);
+}
+.crosshair::after {
+  left: 50%; top: 0; bottom: 0; width: 1px;
+  transform: translateX(-0.5px);
+}
