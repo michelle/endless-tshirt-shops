@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Northmark — a shirt of one night</title>
+  <meta name="description" content="Commission a one-off t-shirt: the sky above a place, at the hour you choose, printed once by direct-to-garment.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600&family=Barlow:wght@400;500&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='12' fill='none' stroke='%231c1712' stroke-width='1.5'/%3E%3Cpath d='M16 6v6' stroke='%239a3f24' stroke-width='1.6'/%3E%3C/svg%3E">
+</head>
+<body>
+  <div class="banner">Proof studio · pay with card <strong>4242 4242 4242 4242</strong> · any future date, any CVC, any ZIP · shirts are sent to Prodigi’s sandbox and are not physically printed</div>
+  <div class="wrap">
+    <header class="mast">
+      <a class="brand" href="/">
+        <svg class="mark" viewBox="0 0 42 42" aria-hidden="true">
+          <circle cx="21" cy="21" r="18" fill="none" stroke="#1c1712" stroke-width="1.4"/>
+          <circle cx="21" cy="21" r="12" fill="none" stroke="#9a3f24" stroke-width="1"/>
+          <path d="M21 5.5v7" stroke="#9a3f24" stroke-width="1.6"/>
+          <circle cx="21" cy="21" r="1.4" fill="#1c1712"/>
+        </svg>
+        <div>
+          <div class="brand-name">NORTHMARK</div>
+          <small>Field plates, printed once</small>
+        </div>
+      </a>
+      <p class="mast-note">Gildan 2000 · direct to garment · shipped from the nearest print lab</p>
+    </header>
+
+    <main class="studio">
+      <section class="stage" aria-label="Shirt preview">
+        <div class="stage-top">
+          <span>Plate preview</span>
+          <span class="swatch-name" id="stage-color">Black</span>
+        </div>
+        <div class="shirt-frame">
+          <svg class="shirt" id="shirt" viewBox="0 0 400 470" aria-hidden="true">
+            <path id="shirt-body" fill="#141414" d="M78 92c18-8 36-28 52-40 8-6 18-10 28-10h84c10 0 20 4 28 10 16 12 34 32 52 40 22 8 46 18 52 38l18 46c4 10-2 20-12 24l-38 12v196c0 16-12 28-28 28H86c-16 0-28-12-28-28V212l-38-12c-10-4-16-14-12-24l18-46c6-20 30-30 52-38z"/>
+            <path id="shirt-neck" fill="none" stroke="rgba(255,255,255,0.18)" stroke-width="8" d="M158 48c8 22 22 34 42 34s34-12 42-34"/>
+            <path fill="rgba(255,255,255,0.05)" d="M150 150c30 18 70 18 100 0 8 40 8 90 0 150-30 16-70 16-100 0-8-60-8-110 0-150z"/>
+          </svg>
+          <img class="print loading" id="print" alt="Your night plate, positioned on the shirt">
+        </div>
+        <div class="stage-bottom">
+          <span id="stage-specimen">Specimen —</span>
+          <span>Front print · 8.3 × 11.7 in</span>
+        </div>
+      </section>
+
+      <section class="commission">
+        <p class="label">Commission</p>
+        <h1>The night,<br>kept in cloth.</h1>
+        <p class="lede">Every Northmark shirt is a survey of one sky: the stars above a place, at the hour you name, with a line only you would write. Direct-to-garment means the plate is composed for that order — not pulled from a stack of blanks.</p>
+        <div class="examples" id="examples"></div>
+
+        <form id="order">
+          <fieldset>
+            <legend>The night</legend>
+            <label class="field">
+              <span>Plate title</span>
+              <input id="title" name="title" maxlength="42" required value="The night we met" autocomplete="off">
+            </label>
+            <div class="city-box">
+              <label class="field">
+                <span>City the sky belongs to</span>
+                <input id="city-search" placeholder="Search a city" autocomplete="off" value="Paris">
+              </label>
+              <div class="results" id="results" hidden></div>
+            </div>
+            <p class="hint" id="place-label">Paris, France · 48.86° N, 2.35° E</p>
+            <div class="grid-2">
+              <label class="field"><span>Date</span><input id="date" type="date" required value="2019-06-21"></label>
+              <label class="field"><span>Local time</span><input id="time" type="time" required value="22:30"></label>
+            </div>
+            <label class="field">
+              <span>Dedication, optional</span>
+              <textarea id="dedication" maxlength="80">For the hour the city went quiet.</textarea>
+            </label>
+          </fieldset>
+
+          <fieldset>
+            <legend>The garment</legend>
+            <div class="colors" id="colors"></div>
+            <div class="sizes" id="sizes"></div>
+            <p class="hint">Unisex Gildan 2000, classic fit, 100% cotton. Width is the flat body measurement. Between sizes, size up.</p>
+            <label class="field" style="max-width:8rem">
+              <span>Quantity</span>
+              <input id="copies" type="number" min="1" max="4" value="1">
+            </label>
+          </fieldset>
+
+          <fieldset>
+            <legend>Where it ships</legend>
+            <div class="grid-2">
+              <label class="field"><span>Recipient</span><input id="shipName" required autocomplete="name" placeholder="Ada Lovelace"></label>
+              <label class="field"><span>Email</span><input id="email" type="email" required autocomplete="email" placeholder="ada@example.com"></label>
+            </div>
+            <label class="field"><span>Phone</span><input id="phone" required autocomplete="tel" placeholder="+1 415 555 0134"></label>
+            <label class="field"><span>Address</span><input id="line1" required autocomplete="address-line1" placeholder="14 Test Place"></label>
+            <label class="field"><span>Address line 2</span><input id="line2" autocomplete="address-line2" placeholder="Apartment, studio, c/o"></label>
+            <div class="grid-3">
+              <label class="field"><span>City</span><input id="ship-city" required autocomplete="address-level2"></label>
+              <label class="field"><span id="region-label">State</span><input id="region" autocomplete="address-level1"><select id="region-select" hidden></select></label>
+              <label class="field"><span id="postal-label">Postal code</span><input id="postal" required autocomplete="postal-code"></label>
+            </div>
+            <label class="field">
+              <span>Country</span>
+              <select id="country" required></select>
+            </label>
+          </fieldset>
+
+          <div class="price" id="price">
+            <div><span>Plate</span><span id="price-shirt">—</span></div>
+            <div><span>Standard shipping</span><span id="price-ship">—</span></div>
+            <div class="total"><span>Total</span><span id="price-total">—</span></div>
+          </div>
+          <p class="error" id="error" hidden></p>
+          <button class="pay" id="pay" type="submit" disabled>Pay and send to print</button>
+          <p class="fine">Payment is taken by Stripe before anything is sent to the printer. Sandbox orders are not produced or charged by Prodigi. US quotes exclude sales tax.</p>
+        </form>
+      </section>
+    </main>
+
+    <section class="notes">
+      <div>
+        <h2>How a plate is made</h2>
+        <p>You name a place, a date, and an hour. Northmark computes the sky that was actually overhead — horizon at the ring, north at the top — and sets your title and dedication in the same plate. The file is a transparent PNG at the garment’s print size, so only the ink lands on the cloth.</p>
+      </div>
+      <div>
+        <h2>The shirt</h2>
+        <p>Gildan 2000, a 6 oz classic unisex tee, printed direct-to-garment. Dark shirts take a cream and gold plate. Light shirts take ink and rust. One front print, composed to sit on the chest rather than bleed to the hem.</p>
+      </div>
+      <div>
+        <h2>After you pay</h2>
+        <p>Stripe confirms the charge. Only then does Northmark hand the plate and your address to Prodigi, who print and ship from the lab nearest you. In this proof studio the handoff is real, the printing is not.</p>
+      </div>
+    </section>
+  </div>
+  <script src="/app.js" type="module"></script>
+</body>
+</html>

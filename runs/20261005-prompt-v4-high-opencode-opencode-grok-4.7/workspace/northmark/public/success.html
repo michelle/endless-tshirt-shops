@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Northmark — order</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600&family=Barlow:wght@400;500&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <div class="banner">Proof studio · Prodigi sandbox · nothing is physically printed</div>
+  <div class="wrap">
+    <header class="mast">
+      <a class="brand" href="/">
+        <svg class="mark" viewBox="0 0 42 42" aria-hidden="true">
+          <circle cx="21" cy="21" r="18" fill="none" stroke="#1c1712" stroke-width="1.4"/>
+          <path d="M21 5.5v7" stroke="#9a3f24" stroke-width="1.6"/>
+        </svg>
+        <div>
+          <div class="brand-name">NORTHMARK</div>
+          <small>Field plates, printed once</small>
+        </div>
+      </a>
+    </header>
+    <main class="success">
+      <p class="label" id="kicker">Payment</p>
+      <h1 id="headline">Sending the plate to print.</h1>
+      <p id="status" class="lede">Stripe is being checked. The shirt is not sent to Prodigi until the payment is paid.</p>
+      <div class="card" id="details" hidden>
+        <dl id="facts"></dl>
+      </div>
+      <div class="proof" id="proof" hidden>
+        <img id="art" alt="The print file sent to the printer">
+      </div>
+      <p class="error" id="error" hidden></p>
+      <a class="ghost" href="/">Commission another night</a>
+    </main>
+  </div>
+  <script>
+    const params = new URLSearchParams(location.search);
+    const id = params.get("session_id");
+    const headline = document.getElementById("headline");
+    const status = document.getElementById("status");
+    const error = document.getElementById("error");
+    const details = document.getElementById("details");
+    const facts = document.getElementById("facts");
+    const proof = document.getElementById("proof");
+
+    function fail(message) {
+      headline.textContent = "The plate is waiting.";
+      status.textContent = message;
+      error.hidden = false;
+      error.textContent = message;
+    }
+
+    function row(term, value) {
+      const dt = document.createElement("dt");
+      dt.textContent = term;
+      const dd = document.createElement("dd");
+      dd.textContent = value || "—";
+      facts.appendChild(dt);
+      facts.appendChild(dd);
+    }
+
+    async function run() {
+      if (!id) {
+        fail("No checkout session was returned.");
+        return;
+      }
+      const res = await fetch(`/api/orders/${encodeURIComponent(id)}/fulfill`, { method: "POST" });
+      const data = await res.json();
+      if (!res.ok) {
+        fail(data.error || "The order could not be confirmed.");
+        return;
+      }
+      if (!data.paid) {
+        fail("Payment has not completed, so nothing was sent to print.");
+        return;
+      }
+      headline.textContent = "Paid, and sent to print.";
+      status.textContent = data.prodigiOrderId
+        ? "Stripe confirmed the charge. The plate was then submitted to Prodigi. In this sandbox it will not be manufactured or shipped."
+        : "Payment succeeded, but the print id has not come back yet. Refresh in a moment.";
+      details.hidden = false;
+      row("Stripe", id);
+      row("Prodigi", data.prodigiOrderId || "pending");
+      row("Print stage", data.prodigiStage || "submitted");
+      row("Title", data.metadata?.title);
+      row("Place", data.metadata?.place);
+      row("When", `${data.metadata?.date || ""} ${data.metadata?.time || ""}`);
+      row("Garment", `${data.metadata?.size || ""} · ${data.metadata?.color || ""} · ×${data.metadata?.copies || 1}`);
+      if (data.amountTotal) row("Paid", new Intl.NumberFormat("en-US", { style: "currency", currency: (data.currency || "usd").toUpperCase() }).format(data.amountTotal / 100));
+      if (data.prodigiOrderId) {
+        proof.hidden = false;
+        document.getElementById("art").src = `/art/${encodeURIComponent(id)}.png`;
+      }
+    }
+    run().catch(() => fail("The studio could not be reached."));
+  </script>
+</body>
+</html>

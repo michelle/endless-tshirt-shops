@@ -1,0 +1,8 @@
+{
+  "functions": {
+    "src/index.js": {
+      "includeFiles": "{fonts,data}/**",
+      "maxDuration": 60
+    }
+  }
+}
