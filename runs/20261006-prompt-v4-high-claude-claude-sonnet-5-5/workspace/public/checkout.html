@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23f2cf82' d='M12 0Q13.6 9.4 24 12Q13.6 14.6 12 24Q10.4 14.6 0 12Q10.4 9.4 12 0Z'/%3E%3C/svg%3E"><link rel="stylesheet" href="/css/style.css"><title>Checkout — Asterism</title><meta name="robots" content="noindex"></head>
+<body><main id="main" class="page"><div class="wrap">
+<h2 style="margin-bottom:28px">Checkout</h2>
+<div id="empty" hidden class="panel center" style="text-align:center"><h3>Your cart is empty</h3><p class="muted">Chart a constellation first.</p><a class="btn" href="/#studio">Open the studio</a></div>
+<div class="checkout" id="co" hidden>
+  <div>
+    <div id="modeBanner"></div>
+    <div id="cancelled" class="banner" hidden>Payment was cancelled. Your cart is still here whenever you're ready.</div>
+    <form class="panel" id="addr" novalidate>
+      <h3>Ship to</h3>
+      <div class="row2"><div class="field"><label for="name">Full name</label><input type="text" id="name" autocomplete="name" required><div class="err" id="nameErr" role="alert"></div></div>
+      <div class="field"><label for="email">Email</label><input type="email" id="email" autocomplete="email" required><div class="err" id="emailErr" role="alert"></div></div></div>
+      <div class="field"><label for="phone">Phone <span class="opt">(for the courier)</span></label><input type="tel" id="phone" autocomplete="tel" required><div class="err" id="phoneErr" role="alert"></div></div>
+      <div class="field"><label for="country">Country</label><select id="country" autocomplete="country"></select><div class="err" id="countryErr" role="alert"></div></div>
+      <div class="field"><label for="line1">Address</label><input type="text" id="line1" autocomplete="address-line1" required><div class="err" id="line1Err" role="alert"></div></div>
+      <div class="field"><label for="line2">Apartment, suite <span class="opt">(optional)</span></label><input type="text" id="line2" autocomplete="address-line2"></div>
+      <div class="row3"><div class="field"><label for="city">City</label><input type="text" id="city" autocomplete="address-level2" required><div class="err" id="cityErr" role="alert"></div></div>
+      <div class="field"><label for="state" id="stateLbl">State / region</label><input type="text" id="state" autocomplete="address-level1"><div class="err" id="stateErr" role="alert"></div></div>
+      <div class="field"><label for="postal">Postal code</label><input type="text" id="postal" autocomplete="postal-code" required><div class="err" id="postalErr" role="alert"></div></div></div>
+      <div class="err" id="formErr" role="alert"></div>
+      <button class="btn block" id="pay" type="submit" style="margin-top:14px">Continue to payment</button>
+      <p class="hint" style="text-align:center;margin-top:12px" id="payHint"></p>
+    </form>
+  </div>
+  <aside class="panel summary"><h3>Your order</h3><div id="lines"></div><div id="sums" style="margin-top:14px"></div></aside>
+</div></div></main>
+<script src="/js/common.js"></script><script src="/js/checkout.js"></script></body></html>

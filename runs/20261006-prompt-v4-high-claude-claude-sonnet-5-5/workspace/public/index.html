@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Asterism — T-shirts printed with a constellation that exists only for you</title>
+<meta name="description" content="Enter a name and a date that matters. We chart a brand-new constellation, one star per letter, and print it on a premium cotton tee. One of one, made to order.">
+<meta property="og:title" content="Asterism — wear your own constellation">
+<meta property="og:description" content="One star per letter of your name. A sky that has never existed before, printed on a tee.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23f2cf82' d='M12 0Q13.6 9.4 24 12Q13.6 14.6 12 24Q10.4 14.6 0 12Q10.4 9.4 12 0Z'/%3E%3C/svg%3E">
+<link rel="preload" href="/fonts/cormorant-garamond-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<main id="main">
+<section class="hero">
+  <div class="wrap">
+    <div>
+      <div class="eyebrow">One of one · printed to order</div>
+      <h1 style="margin-top:18px">Wear the sky<br>that exists only<br><em>for you.</em></h1>
+      <p class="lead">Give us a name and a date that matters. We chart a brand-new constellation, one star for every letter, and print it on a premium cotton tee. No two skies are alike.</p>
+      <div class="cta"><a class="btn" href="#studio">Chart your constellation</a><a class="btn ghost" href="#how">How it works</a></div>
+      <div class="facts"><span>Bella+Canvas 3001 cotton</span><span>Ships worldwide</span><span>$36 + shipping</span></div>
+    </div>
+    <div class="stage"><div class="glowbg"></div><div class="float" id="heroShirt"></div></div>
+  </div>
+</section>
+
+<section id="how" class="alt">
+  <div class="wrap">
+    <div class="head"><div class="eyebrow">How it works</div><h2 style="margin-top:12px">A sky drawn from your name</h2></div>
+    <div class="steps">
+      <div class="step"><div class="n">i.</div><h3>Name it</h3><p>Every letter of your name becomes a star. The first letter is your brightest, your alpha star.</p></div>
+      <div class="step"><div class="n">ii.</div><h3>Date it</h3><p>Add a birthday, an anniversary or any date that matters, plus a place and a few words if you like. They shape the sky and are printed on the shirt.</p></div>
+      <div class="step"><div class="n">iii.</div><h3>Wear it</h3><p>Not feeling this sky? Re-roll it until it feels right. We print it with direct-to-garment ink and ship it to you.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="studio">
+  <div class="wrap">
+    <div class="head"><div class="eyebrow">The studio</div><h2 style="margin-top:12px">Chart your constellation</h2><p>Your preview is the exact artwork we print, not a mock-up of it.</p></div>
+    <div class="studio">
+      <div class="preview" id="preview">
+        <span class="tag">Live preview</span><span class="busy"></span>
+        <div id="shirtStage" style="margin-top:22px"></div>
+        <div class="swatches" id="colorDots" role="group" aria-label="Shirt colour"></div>
+        <p class="hint" style="text-align:center;margin:10px 0 0" id="colorName"></p>
+      </div>
+
+      <form class="panel" id="form" novalidate autocomplete="off">
+        <h3>Your constellation</h3>
+        <p class="muted" style="margin:0">Everything here is printed on the shirt.</p>
+
+        <div class="field">
+          <label for="name">Name</label>
+          <input class="name" type="text" id="name" maxlength="24" placeholder="Your Name" autocomplete="off" aria-describedby="nameHint nameErr">
+          <div class="hint" id="nameHint">Each letter becomes a star (up to 16).</div>
+          <div class="err" id="nameErr" role="alert"></div>
+        </div>
+        <div class="row2">
+          <div class="field"><label for="date">Date <span class="opt">(optional)</span></label><input type="date" id="date" min="1800-01-01" max="2100-12-31"><div class="err" id="dateErr" role="alert"></div></div>
+          <div class="field"><label for="place">Place <span class="opt">(optional)</span></label><input type="text" id="place" maxlength="30" placeholder="Lisbon"><div class="err" id="placeErr" role="alert"></div></div>
+        </div>
+        <div class="field"><label for="message">A few words <span class="opt">(optional)</span></label><input type="text" id="message" maxlength="36" placeholder="Always look up"><div class="err" id="messageErr" role="alert"></div></div>
+
+        <div class="field"><span class="label">Ink</span><div class="pal" id="palettes" role="group" aria-label="Ink colour"></div></div>
+        <div class="field sky">
+          <button type="button" class="btn ghost small" id="reroll">&#10227; Re-roll my sky</button>
+          <span class="muted" id="skyNo">Sky no. 1</span>
+        </div>
+        <div class="field"><label class="toggle"><input type="checkbox" id="labels"> Label each star with its letter</label></div>
+
+        <div class="field"><span class="label">Size <button type="button" class="link" id="sizeGuide" style="margin-left:8px;font-size:13px">Size guide</button></span><div class="chips" id="sizes" role="group" aria-label="Size"></div><div class="err" id="sizeErr" role="alert"></div></div>
+
+        <div class="buy">
+          <div class="price"><span id="priceTxt">$36.00</span><small>+ shipping at checkout</small></div>
+          <div class="qty" aria-label="Quantity"><button type="button" id="qDec" aria-label="Fewer">&minus;</button><span id="qVal">1</span><button type="button" id="qInc" aria-label="More">+</button></div>
+          <button class="btn" id="add" type="submit" style="margin-left:auto" disabled>Add to cart</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
+
+<section id="gallery" class="alt">
+  <div class="wrap">
+    <div class="head"><div class="eyebrow">Gallery</div><h2 style="margin-top:12px">Skies already charted</h2><p>Each of these was generated from a single name and date. Yours will be nothing like them.</p></div>
+    <div class="gallery" id="galleryGrid"></div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="head"><div class="eyebrow">The shirt</div><h2 style="margin-top:12px">Made to be worn, not just looked at</h2></div>
+    <div class="specs">
+      <div><b>Bella+Canvas 3001</b><span>Soft, light, retail-fit unisex tee. 100% combed cotton.</span></div>
+      <div><b>Direct-to-garment</b><span>Ink is printed straight into the fibre, so there's no stiff patch and fine detail stays crisp.</span></div>
+      <div><b>6 fabric colours</b><span>The ink palette adapts to the fabric: luminous on dark, deep on light.</span></div>
+      <div><b>XS to 3XL</b><span>See the size guide in the studio before you order.</span></div>
+    </div>
+  </div>
+</section>
+
+<section id="faq" class="alt">
+  <div class="wrap" style="max-width:860px">
+    <div class="head"><div class="eyebrow">Questions</div><h2 style="margin-top:12px">Good to know</h2></div>
+    <details><summary>Is the constellation really unique?</summary><p>It's generated from your name, date and sky number, so the same inputs always give the same sky and different inputs give a different one. Every shirt carries a catalogue number derived from its design.</p></details>
+    <details><summary>Can I see exactly what will be printed?</summary><p>Yes. The preview is drawn by the same code that produces the print file. Only the shirt fabric around it is an illustration.</p></details>
+    <details><summary>How long does it take?</summary><p>Each shirt is printed to order after payment clears. Production takes a few days; delivery depends on your country. Tracking is available on your order page once it ships.</p></details>
+    <details><summary>Can I return it?</summary><p>Because every shirt is made for one person, we can't accept returns for sizing or change of mind. If it arrives damaged or misprinted, we'll reprint it. See the <a href="/policies.html#returns">returns policy</a>.</p></details>
+    <details><summary>Which characters can I use?</summary><p>Latin letters (including accents like é, ñ, ü), spaces, hyphens and apostrophes in names. Other scripts aren't supported yet.</p></details>
+  </div>
+</section>
+</main>
+<script src="/js/common.js"></script>
+<script src="/js/studio.js"></script>
+</body>
+</html>
