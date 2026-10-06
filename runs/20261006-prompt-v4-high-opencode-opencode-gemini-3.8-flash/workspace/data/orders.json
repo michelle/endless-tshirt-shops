@@ -1,0 +1,36 @@
+{
+  "cs_test_a15VxHPx83I1c1RHLKI4pbMrXMuhpetnlDt8mlpImzrUyoaNSX0Z2KQvpZ": {
+    "sessionId": "cs_test_a15VxHPx83I1c1RHLKI4pbMrXMuhpetnlDt8mlpImzrUyoaNSX0Z2KQvpZ",
+    "prodigiOrderId": "ord_1178099",
+    "prodigiStatus": "InProgress",
+    "design": {
+      "inscription": "TEST CELESTIAL MOMENT",
+      "date": "2024-10-14",
+      "time": "21:45",
+      "lat": 37.7749,
+      "lon": -122.4194,
+      "locationName": "SAN FRANCISCO, CA",
+      "theme": "gold",
+      "garment": "black",
+      "size": "l"
+    },
+    "designToken": "eyJpbnNjcmlwdGlvbiI6IlRFU1QgQ0VMRVNUSUFMIE1PTUVOVCIsImRhdGUiOiIyMDI0LTEwLTE0IiwidGltZSI6IjIxOjQ1IiwibGF0IjozNy43NzQ5LCJsb24iOi0xMjIuNDE5NCwibG9jYXRpb25OYW1lIjoiU0FOIEZSQU5DSVNDTywgQ0EiLCJ0aGVtZSI6ImdvbGQiLCJnYXJtZW50IjoiYmxhY2siLCJzaXplIjoibCJ9",
+    "printUrl": "https://diameter-sake-hop-extras.trycloudflare.com/api/print/eyJpbnNjcmlwdGlvbiI6IlRFU1QgQ0VMRVNUSUFMIE1PTUVOVCIsImRhdGUiOiIyMDI0LTEwLTE0IiwidGltZSI6IjIxOjQ1IiwibGF0IjozNy43NzQ5LCJsb24iOi0xMjIuNDE5NCwibG9jYXRpb25OYW1lIjoiU0FOIEZSQU5DSVNDTywgQ0EiLCJ0aGVtZSI6ImdvbGQiLCJnYXJtZW50IjoiYmxhY2siLCJzaXplIjoibCJ9.png",
+    "status": "fulfilled",
+    "amountTotal": 3400,
+    "currency": "usd",
+    "customerEmail": "test-buyer@example.com",
+    "customerName": "Ada Lovelace",
+    "shippingAddress": {
+      "city": "Austin",
+      "country": "US",
+      "line1": "1100 Congress Ave",
+      "line2": null,
+      "postal_code": "78701",
+      "state": "TX"
+    },
+    "paymentStatus": "paid",
+    "createdAt": "2026-10-06T11:53:45.388Z",
+    "updatedAt": "2026-10-06T11:53:45.388Z"
+  }
+}

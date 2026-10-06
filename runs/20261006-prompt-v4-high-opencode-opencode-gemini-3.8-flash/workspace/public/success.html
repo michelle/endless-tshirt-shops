@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Order Confirmed — AstroThread</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css">
+  <style>
+    .success-container {
+      max-width: 800px;
+      margin: 60px auto;
+      padding: 0 24px;
+    }
+    .success-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 40px;
+      text-align: center;
+    }
+    .check-icon {
+      width: 64px;
+      height: 64px;
+      background: rgba(245, 208, 97, 0.15);
+      border: 2px solid var(--gold);
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      color: var(--gold);
+      margin-bottom: 24px;
+    }
+    .order-details-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      text-align: left;
+      margin: 32px 0;
+      padding: 24px;
+      background: #05070D;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-subtle);
+    }
+    .detail-item h4 {
+      font-size: 11px;
+      font-family: var(--font-mono);
+      color: var(--gold);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 6px;
+    }
+    .detail-item p {
+      font-size: 14px;
+      color: var(--text-main);
+      word-break: break-word;
+    }
+    .timeline {
+      display: flex;
+      justify-content: space-between;
+      margin: 40px 0 20px;
+      position: relative;
+    }
+    .timeline::before {
+      content: '';
+      position: absolute;
+      top: 14px;
+      left: 10%;
+      right: 10%;
+      height: 2px;
+      background: rgba(255, 255, 255, 0.1);
+      z-index: 1;
+    }
+    .step {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+    .step-dot {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: var(--bg-card);
+      border: 2px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .step.active .step-dot {
+      border-color: var(--gold);
+      background: var(--gold);
+      color: #080C14;
+    }
+    .step-title {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    .step.active .step-title {
+      color: var(--text-main);
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container nav-content">
+      <a href="/" class="logo">
+        <span class="logo-symbol">✧</span>
+        <span class="logo-text">ASTROTHREAD</span>
+      </a>
+      <a href="/" class="btn btn-sm btn-outline">Back to Storefront</a>
+    </div>
+  </header>
+
+  <main class="success-container">
+    <div class="success-card">
+      <div class="check-icon">✓</div>
+      <h1 style="font-family: var(--font-heading); font-size: 32px; margin-bottom: 8px;">Order Confirmed!</h1>
+      <p style="color: var(--text-muted); font-size: 16px;">
+        Thank you for your order. Your custom star chart has been generated and dispatched to Prodigi's direct-to-garment print facility.
+      </p>
+
+      <div class="timeline">
+        <div class="step active">
+          <div class="step-dot">1</div>
+          <div class="step-title">Payment Paid</div>
+        </div>
+        <div class="step active">
+          <div class="step-dot">2</div>
+          <div class="step-title">Sent to Prodigi</div>
+        </div>
+        <div class="step">
+          <div class="step-dot">3</div>
+          <div class="step-title">DTG Printing</div>
+        </div>
+        <div class="step">
+          <div class="step-dot">4</div>
+          <div class="step-title">Dispatched</div>
+        </div>
+      </div>
+
+      <div class="order-details-grid" id="orderDetails">
+        <div class="detail-item">
+          <h4>Stripe Checkout Session</h4>
+          <p id="sessionIdText">Loading…</p>
+        </div>
+        <div class="detail-item">
+          <h4>Prodigi Print Order ID</h4>
+          <p id="prodigiOrderIdText" style="color: var(--gold); font-weight: 700;">Processing with printer…</p>
+        </div>
+        <div class="detail-item">
+          <h4>Customer &amp; Shipping</h4>
+          <p id="customerText">—</p>
+        </div>
+        <div class="detail-item">
+          <h4>Garment &amp; Design</h4>
+          <p id="garmentText">—</p>
+        </div>
+      </div>
+
+      <div id="previewContainer" style="margin: 24px 0; text-align: center;">
+        <img id="confirmedMockup" src="" alt="Order Mockup" style="max-width: 320px; border-radius: 12px; border: 1px solid var(--border-subtle); display: none;">
+      </div>
+
+      <div style="display: flex; gap: 16px; justify-content: center; margin-top: 32px;">
+        <a href="/" class="btn btn-primary">Create Another Design</a>
+        <a id="downloadArtworkBtn" href="#" target="_blank" class="btn btn-outline" style="display: none;">View Print Asset (4680×5790)</a>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const sessionId = params.get('session_id');
+
+    if (!sessionId) {
+      document.getElementById('sessionIdText').textContent = 'No session ID provided';
+    } else {
+      document.getElementById('sessionIdText').textContent = sessionId;
+
+      async function checkOrderStatus() {
+        try {
+          const res = await fetch(`/api/order/${encodeURIComponent(sessionId)}`);
+          const data = await res.json();
+
+          if (data.ok && data.order) {
+            const ord = data.order;
+            document.getElementById('prodigiOrderIdText').textContent = ord.prodigiOrderId || 'Received';
+            document.getElementById('customerText').textContent = `${ord.customerName || 'Customer'} (${ord.customerEmail || '—'})`;
+
+            const d = ord.design;
+            if (d) {
+              document.getElementById('garmentText').textContent =
+                `“${d.inscription}” · ${d.garment?.toUpperCase()} (${d.size?.toUpperCase()}) · ${d.locationName}`;
+
+              const img = document.getElementById('confirmedMockup');
+              img.src = `/api/mockup?token=${encodeURIComponent(ord.designToken)}&w=640`;
+              img.style.display = 'inline-block';
+
+              const artBtn = document.getElementById('downloadArtworkBtn');
+              artBtn.href = `/api/print/${encodeURIComponent(ord.designToken)}.png`;
+              artBtn.style.display = 'inline-flex';
+            }
+          } else {
+            setTimeout(checkOrderStatus, 2000);
+          }
+        } catch {
+          setTimeout(checkOrderStatus, 3000);
+        }
+      }
+
+      checkOrderStatus();
+    }
+  </script>
+</body>
+</html>

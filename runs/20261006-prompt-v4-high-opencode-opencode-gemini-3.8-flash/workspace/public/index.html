@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AstroThread — 1-of-1 Custom Celestial Star Map T-Shirts</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <!-- Header / Navigation -->
+  <header class="site-header">
+    <div class="container nav-content">
+      <div class="logo">
+        <span class="logo-symbol">✧</span>
+        <span class="logo-text">ASTROTHREAD</span>
+      </div>
+      <nav class="nav-links">
+        <a href="#studio">The Studio</a>
+        <a href="#moments">Moments</a>
+        <a href="#technology">DTG Technology</a>
+        <a href="#specs">Garment Specs</a>
+      </nav>
+      <a href="#studio" class="btn btn-sm btn-primary">Customize Yours</a>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="container hero-content">
+      <div class="hero-badge">✦ DIRECT-TO-GARMENT ON-DEMAND CELESTIAL PRINTS</div>
+      <h1 class="hero-title">Wear the exact sky from the night your world changed.</h1>
+      <p class="hero-desc">
+        Every shirt is an authentic, mathematically calculated star chart projected for your exact date, time, and coordinates on Earth.
+        Printed on-demand using museum-grade direct-to-garment technology. No two shirts are alike.
+      </p>
+      <div class="hero-cta">
+        <a href="#studio" class="btn btn-lg btn-primary">Design Your Shirt — $34</a>
+        <a href="#moments" class="btn btn-lg btn-outline">Explore Historic Skies</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Interactive Studio Section -->
+  <section id="studio" class="studio-section">
+    <div class="container">
+      <div class="section-head text-center">
+        <span class="eyebrow">Interactive Studio</span>
+        <h2>Personalize Your Celestial Print</h2>
+        <p>Watch your custom star chart calculate in real time as you alter date, time, and coordinates.</p>
+      </div>
+
+      <div class="studio-layout">
+        <!-- Left: Live Mockup Preview -->
+        <div class="mockup-column">
+          <div class="mockup-card">
+            <div class="mockup-badge" id="mockupBadge">Live Preview · Bella + Canvas 3001</div>
+            <div class="mockup-stage" id="mockupStage">
+              <img id="mockupImg" src="/api/mockup" alt="Custom Star Map Shirt Preview">
+              <div class="loading-overlay" id="loadingOverlay">
+                <div class="spinner"></div>
+                <span>Aligning celestial coordinates…</span>
+              </div>
+            </div>
+            <div class="mockup-actions">
+              <a id="artworkLink" href="/api/preview" target="_blank" class="text-link">
+                ↗ View Full Resolution Artwork File
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Customizer Controls Form -->
+        <div class="controls-column">
+          <form id="customizeForm" class="controls-card">
+            <div class="form-group">
+              <label for="inscriptionInput">
+                <span class="label-title">Custom Inscription</span>
+                <span class="label-hint">Up to 40 characters</span>
+              </label>
+              <input type="text" id="inscriptionInput" name="inscription" value="UNDER THIS SKY" maxlength="40" required>
+              <div class="quick-tags">
+                <button type="button" class="tag-btn" data-text="UNDER THIS SKY">Under This Sky</button>
+                <button type="button" class="tag-btn" data-text="THE NIGHT WE MET">The Night We Met</button>
+                <button type="button" class="tag-btn" data-text="AUSTIN &amp; MICHELLE">Austin &amp; Michelle</button>
+                <button type="button" class="tag-btn" data-text="STELLA WAS BORN">Stella Was Born</button>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="dateInput">Date</label>
+                <input type="date" id="dateInput" name="date" value="2024-10-14" required>
+              </div>
+              <div class="form-group">
+                <label for="timeInput">Time (UTC / 24h)</label>
+                <input type="time" id="timeInput" name="time" value="21:45" required>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="citySelect">
+                <span class="label-title">Observation Location</span>
+              </label>
+              <select id="citySelect" name="city">
+                <option value="San Francisco, CA" data-lat="37.7749" data-lon="-122.4194" selected>San Francisco, CA (37.77° N, 122.42° W)</option>
+                <option value="New York, NY" data-lat="40.7128" data-lon="-74.0060">New York, NY (40.71° N, 74.01° W)</option>
+                <option value="London, United Kingdom" data-lat="51.5074" data-lon="-0.1278">London, United Kingdom (51.51° N, 0.13° W)</option>
+                <option value="Paris, France" data-lat="48.8566" data-lon="2.3522">Paris, France (48.86° N, 2.35° E)</option>
+                <option value="Tokyo, Japan" data-lat="35.6762" data-lon="139.6503">Tokyo, Japan (35.68° N, 139.65° E)</option>
+                <option value="Sydney, Australia" data-lat="-33.8688" data-lon="151.2093">Sydney, Australia (33.87° S, 151.21° E)</option>
+                <option value="Los Angeles, CA" data-lat="34.0522" data-lon="-118.2437">Los Angeles, CA (34.05° N, 118.24° W)</option>
+                <option value="Honolulu, HI" data-lat="21.3069" data-lon="-157.8583">Honolulu, HI (21.31° N, 157.86° W)</option>
+                <option value="Rome, Italy" data-lat="41.9028" data-lon="12.4964">Rome, Italy (41.90° N, 12.50° E)</option>
+                <option value="Reykjavik, Iceland" data-lat="64.1466" data-lon="-21.9426">Reykjavik, Iceland (64.15° N, 21.94° W)</option>
+                <option value="custom">Custom Coordinates…</option>
+              </select>
+            </div>
+
+            <div class="form-row custom-coords-row" id="customCoordsRow" style="display: none;">
+              <div class="form-group">
+                <label for="customLocationName">Location Name</label>
+                <input type="text" id="customLocationName" placeholder="e.g. Kyoto, Japan">
+              </div>
+              <div class="form-group">
+                <label for="customLat">Latitude</label>
+                <input type="number" step="0.0001" id="customLat" placeholder="35.0116">
+              </div>
+              <div class="form-group">
+                <label for="customLon">Longitude</label>
+                <input type="number" step="0.0001" id="customLon" placeholder="135.7681">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Ink Theme</label>
+              <div class="theme-options">
+                <label class="theme-pill active">
+                  <input type="radio" name="theme" value="gold" checked>
+                  <span class="color-dot gold"></span>
+                  <span>Starlight Gold</span>
+                </label>
+                <label class="theme-pill">
+                  <input type="radio" name="theme" value="cyan">
+                  <span class="color-dot cyan"></span>
+                  <span>Astral Blue</span>
+                </label>
+                <label class="theme-pill">
+                  <input type="radio" name="theme" value="rose">
+                  <span class="color-dot rose"></span>
+                  <span>Rose Nebula</span>
+                </label>
+                <label class="theme-pill">
+                  <input type="radio" name="theme" value="noir">
+                  <span class="color-dot noir"></span>
+                  <span>Midnight Noir</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label>Garment Color</label>
+                <div class="garment-options">
+                  <label class="garment-pill active">
+                    <input type="radio" name="garment" value="black" checked>
+                    <span class="swatch black"></span>
+                    <span>Obsidian</span>
+                  </label>
+                  <label class="garment-pill">
+                    <input type="radio" name="garment" value="navy">
+                    <span class="swatch navy"></span>
+                    <span>Navy</span>
+                  </label>
+                  <label class="garment-pill">
+                    <input type="radio" name="garment" value="white">
+                    <span class="swatch white"></span>
+                    <span>Cloud White</span>
+                  </label>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label>Size (Unisex Fit)</label>
+                <div class="size-options">
+                  <label class="size-pill"><input type="radio" name="size" value="s"><span>S</span></label>
+                  <label class="size-pill"><input type="radio" name="size" value="m"><span>M</span></label>
+                  <label class="size-pill active"><input type="radio" name="size" value="l" checked><span>L</span></label>
+                  <label class="size-pill"><input type="radio" name="size" value="xl"><span>XL</span></label>
+                  <label class="size-pill"><input type="radio" name="size" value="2xl"><span>2XL</span></label>
+                </div>
+              </div>
+            </div>
+
+            <div class="pricing-card">
+              <div class="price-row">
+                <div>
+                  <div class="price-val">$34.00 USD</div>
+                  <div class="price-caption">Standard Tracked Shipping Included</div>
+                </div>
+                <div class="price-perk">
+                  <span class="perk-icon">✓</span> 1-of-1 DTG Guarantee
+                </div>
+              </div>
+
+              <button type="submit" id="checkoutBtn" class="btn btn-block btn-primary btn-checkout">
+                <span>Proceed to Stripe Checkout</span>
+                <span class="btn-arrow">→</span>
+              </button>
+              <div class="checkout-hint">
+                🔒 Secure Stripe checkout • Fulfillment via Prodigi Print API
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Historic Moments Section -->
+  <section id="moments" class="moments-section">
+    <div class="container">
+      <div class="section-head text-center">
+        <span class="eyebrow">Curated Collections</span>
+        <h2>Historic Celestial Moments</h2>
+        <p>Click any milestone to load its exact astronomical sky into the studio.</p>
+      </div>
+
+      <div class="moments-grid">
+        <div class="moment-card" data-inscription="THE FIRST FOOTSTEP" data-date="1969-07-20" data-time="20:17" data-city="Houston, TX" data-lat="29.7604" data-lon="-95.3698" data-theme="gold" data-garment="black">
+          <div class="moment-badge">Apollo 11</div>
+          <h3>The First Footstep</h3>
+          <p class="moment-meta">July 20, 1969 • Houston, TX</p>
+          <p class="moment-desc">The night humanity first set foot upon the Moon. The Sea of Tranquility under the cosmic canopy.</p>
+          <span class="moment-cta">Load Moment ↗</span>
+        </div>
+
+        <div class="moment-card" data-inscription="HALLEY ACROSS THE SEINE" data-date="1986-04-10" data-time="22:30" data-city="Paris, France" data-lat="48.8566" data-lon="2.3522" data-theme="cyan" data-garment="navy">
+          <div class="moment-badge">Astronomy</div>
+          <h3>Halley's Comet Over Paris</h3>
+          <p class="moment-meta">April 10, 1986 • Paris, France</p>
+          <p class="moment-desc">Once every 76 years, Halley's Comet illuminates the celestial sphere. Observed over the Eiffel Tower.</p>
+          <span class="moment-cta">Load Moment ↗</span>
+        </div>
+
+        <div class="moment-card" data-inscription="TOTALITY AT NOON" data-date="2017-08-21" data-time="18:27" data-city="Nashville, TN" data-lat="36.1627" data-lon="-86.7816" data-theme="gold" data-garment="black">
+          <div class="moment-badge">Solar Eclipse</div>
+          <h3>The Great American Eclipse</h3>
+          <p class="moment-meta">August 21, 2017 • Nashville, TN</p>
+          <p class="moment-desc">Day turned instantly to twilight as the corona flared across the North American continent.</p>
+          <span class="moment-cta">Load Moment ↗</span>
+        </div>
+
+        <div class="moment-card" data-inscription="REYKJAVIK AURORA NIGHT" data-date="2023-10-28" data-time="23:15" data-city="Reykjavik, Iceland" data-lat="64.1466" data-lon="-21.9426" data-theme="cyan" data-garment="black">
+          <div class="moment-badge">Arctic Sky</div>
+          <h3>Under the Northern Lights</h3>
+          <p class="moment-meta">October 28, 2023 • Reykjavik</p>
+          <p class="moment-desc">The magnetic sky of the high Arctic, where constellations dance above glacial fjords.</p>
+          <span class="moment-cta">Load Moment ↗</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Technology Section -->
+  <section id="technology" class="tech-section">
+    <div class="container">
+      <div class="section-head text-center">
+        <span class="eyebrow">The Manufacturing Advantage</span>
+        <h2>Why Direct-to-Garment (DTG) Changes Everything</h2>
+      </div>
+
+      <div class="tech-grid">
+        <div class="tech-card">
+          <div class="tech-icon">✦</div>
+          <h3>True 1-of-1 Personalization</h3>
+          <p>
+            Screen printing requires cutting separate mesh screens for each color and design, costing $50+ in setup fees per order.
+            DTG prints directly from 300 DPI vector digital rasters, allowing us to compute and render a unique star chart for every customer at zero extra cost.
+          </p>
+        </div>
+
+        <div class="tech-card">
+          <div class="tech-icon">◎</div>
+          <h3>Full Dynamic Range &amp; Star Magnitude</h3>
+          <p>
+            Our print files are rendered at 4,680 × 5,790 pixels with anti-aliased transparency.
+            From 1st-magnitude beacons like Sirius to 4th-magnitude background nebulae, DTG faithfully recreates delicate star glows and fine coordinate rings.
+          </p>
+        </div>
+
+        <div class="tech-card">
+          <div class="tech-icon">☼</div>
+          <h3>Water-Based Oeko-Tex® Inks</h3>
+          <p>
+            No stiff, rubbery plastic feeling. Our DTG printers use eco-friendly water-based inks that bind into the organic cotton fibers,
+            leaving a breathable, feather-light hand feel that softens further with every wash.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Garment Specs -->
+  <section id="specs" class="specs-section">
+    <div class="container">
+      <div class="specs-card">
+        <div class="specs-info">
+          <span class="eyebrow">Garment Specifications</span>
+          <h2>Bella + Canvas 3001 Unisex Classic Tee</h2>
+          <p>The gold standard in premium blank apparel, trusted by high-end streetwear and boutique labels worldwide.</p>
+          <ul class="specs-list">
+            <li><strong>Material:</strong> 100% Airlume combed and ring-spun cotton (4.2 oz/yd²)</li>
+            <li><strong>Construction:</strong> Retail fit, side-seamed, shoulder taping for shape retention</li>
+            <li><strong>Fulfillment:</strong> Direct integration with Prodigi Print API labs in the US, UK, and Europe</li>
+            <li><strong>Care:</strong> Machine wash cold inside out, tumble dry low or line dry</li>
+          </ul>
+        </div>
+        <div class="specs-sizing">
+          <h3>Unisex Sizing Guide (Inches)</h3>
+          <table class="sizing-table">
+            <thead>
+              <tr><th>Size</th><th>Chest to Fit</th><th>Length</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>S</td><td>34" – 37"</td><td>28"</td></tr>
+              <tr><td>M</td><td>38" – 41"</td><td>29"</td></tr>
+              <tr><td>L</td><td>42" – 45"</td><td>30"</td></tr>
+              <tr><td>XL</td><td>46" – 49"</td><td>31"</td></tr>
+              <tr><td>2XL</td><td>50" – 53"</td><td>32"</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="container footer-content">
+      <div class="footer-brand">
+        <div class="logo">
+          <span class="logo-symbol">✧</span>
+          <span class="logo-text">ASTROTHREAD</span>
+        </div>
+        <p>Custom celestial moment t-shirts powered by astronomical mathematics and DTG on-demand printing.</p>
+        <p class="copyright">© 2026 AstroThread Co. All rights reserved.</p>
+      </div>
+
+      <div class="footer-links-col">
+        <h4>Commerce &amp; Fulfillment</h4>
+        <ul>
+          <li>Payment Provider: Stripe Checkout (PCI-DSS Level 1)</li>
+          <li>Fulfillment Partner: Prodigi Global Print Network</li>
+          <li>Default SKU: GLOBAL-TEE-BC-3001</li>
+          <li><a href="/admin">Admin Order Portal</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-links-col">
+        <h4>Customer Care</h4>
+        <ul>
+          <li>Free standard tracked shipping to 21+ countries</li>
+          <li>2-5 business days average production time</li>
+          <li>100% Reprint Guarantee on all print defects</li>
+          <li>Support: support@astrothread.store</li>
+        </ul>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/app.js"></script>
+</body>
+</html>

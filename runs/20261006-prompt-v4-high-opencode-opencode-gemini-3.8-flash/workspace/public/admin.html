@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AstroThread Admin — Order Fulfillment Operations</title>
+  <link rel="stylesheet" href="/style.css">
+  <style>
+    body { padding: 40px 0; }
+    .admin-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 24px;
+      font-size: 13px;
+    }
+    .admin-table th, .admin-table td {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border-subtle);
+      text-align: left;
+    }
+    .admin-table th {
+      font-family: var(--font-mono);
+      color: var(--gold);
+      background: #05070D;
+    }
+    .badge {
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-family: var(--font-mono);
+    }
+    .badge-success { background: rgba(34, 197, 94, 0.2); color: #4ade80; }
+    .badge-warning { background: rgba(234, 179, 8, 0.2); color: #facc15; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+      <div>
+        <h1 style="font-family: var(--font-heading);">AstroThread Operations</h1>
+        <p style="color: var(--text-muted); font-size: 14px;">Stripe Checkout &amp; Prodigi Print API fulfillment ledger</p>
+      </div>
+      <a href="/" class="btn btn-sm btn-outline">Back to Storefront</a>
+    </div>
+
+    <div class="mockup-card" style="position: static; margin-bottom: 30px;">
+      <h3 style="font-family: var(--font-mono); font-size: 14px; color: var(--gold); margin-bottom: 12px;">System Status</h3>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; font-size: 13px;">
+        <div><strong>Fulfillment Engine:</strong> Active</div>
+        <div><strong>Print Provider:</strong> Prodigi v4.0 Sandbox</div>
+        <div><strong>Default SKU:</strong> GLOBAL-TEE-BC-3001</div>
+        <div><strong>Payment Mode:</strong> Stripe Test Mode</div>
+      </div>
+    </div>
+
+    <div class="mockup-card" style="position: static;">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <h2>Orders (<span id="orderCount">0</span>)</h2>
+        <button id="refreshBtn" class="btn btn-sm btn-outline">Refresh Orders</button>
+      </div>
+
+      <div style="overflow-x: auto;">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Stripe Session</th>
+              <th>Prodigi Order</th>
+              <th>Customer</th>
+              <th>Design &amp; Garment</th>
+              <th>Status</th>
+              <th>Print Asset</th>
+            </tr>
+          </thead>
+          <tbody id="ordersBody">
+            <tr><td colspan="7" style="text-align: center; color: var(--text-muted); padding: 30px;">Loading orders…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    async function loadOrders() {
+      try {
+        const res = await fetch('/api/admin/orders');
+        const data = await res.json();
+        const tbody = document.getElementById('ordersBody');
+        document.getElementById('orderCount').textContent = (data.orders || []).length;
+
+        if (!data.orders || data.orders.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: var(--text-muted); padding: 30px;">No orders found yet. Complete a checkout test to see it here!</td></tr>';
+          return;
+        }
+
+        tbody.innerHTML = data.orders.map(ord => `
+          <tr>
+            <td>${new Date(ord.createdAt).toLocaleString()}</td>
+            <td><code>${ord.sessionId.slice(0, 14)}…</code></td>
+            <td><strong style="color: var(--gold);">${ord.prodigiOrderId || '—'}</strong></td>
+            <td>${ord.customerName || 'Customer'}<br><small style="color: var(--text-muted);">${ord.customerEmail || '—'}</small></td>
+            <td>“${ord.design?.inscription || '—'}”<br><small style="color: var(--cyan);">${ord.design?.garment?.toUpperCase()} (${ord.design?.size?.toUpperCase()}) · ${ord.design?.locationName || '—'}</small></td>
+            <td><span class="badge ${ord.status === 'fulfilled' ? 'badge-success' : 'badge-warning'}">${ord.status}</span></td>
+            <td><a href="/api/print/${encodeURIComponent(ord.designToken)}.png" target="_blank" style="color: var(--gold);">4680×5790 PNG</a></td>
+          </tr>
+        `).join('');
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    document.getElementById('refreshBtn').addEventListener('click', loadOrders);
+    loadOrders();
+    setInterval(loadOrders, 10000);
+  </script>
+</body>
+</html>
